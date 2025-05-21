@@ -10,15 +10,23 @@ class PokedexController extends Controller
 {
     public function getUserPokemons(Request $request)
     {
-        $userId = $request->user()->id ?? 1;
-        $userPokemons = Pokedex::where('user_id', $userId)->get();
+        $userId = $request->user()->id;
+        $userPokemons = Pokedex::where('user_id', $userId)
+            ->with('pokemon')
+            ->get()
+            ->map(function ($userPokemon) {
+                return [
+                    'id' => $userPokemon->id,
+                    'name' => $userPokemon->pokemon->name,
+                    'level' => $userPokemon->level,
+                    'experience' => $userPokemon->experience,
+                    'sprite_url' => $userPokemon->pokemon->sprite_url,
+                    'types' => $userPokemon->pokemon->types,
+                    'is_in_team' => $userPokemon->isInTeam,
+                ];
+            });
 
-        if ($userPokemons->isEmpty()) {
-            return response()->json(['error' => 'No Pokémon found for this user'], 404);
-        }
-
-        return Inertia::render('Pokedex/UserPokemons', [
-            'userId' => $userId,
+        return Inertia::render('Me/Pokedex/Index', [
             'pokemons' => $userPokemons
         ]);
     }

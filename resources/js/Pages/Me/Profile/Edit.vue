@@ -1,24 +1,22 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+<script setup lang="ts">
+import MainLayout from '@/Layouts/MainLayout.vue';
 import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import { Head } from '@inertiajs/vue3';
+import { type PageProps } from '@/types/page';
 
-defineProps({
-    mustVerifyEmail: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-});
+defineProps<{
+    mustVerifyEmail?: boolean,
+    status?: string,
+    auth: PageProps['auth']
+}>();
 </script>
 
 <template>
     <Head title="Profile" />
 
-    <AuthenticatedLayout>
+    <MainLayout :auth="auth">
         <template #header>
             <h2
                 class="text-xl font-semibold leading-tight text-gray-800"
@@ -52,5 +50,5 @@ defineProps({
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </MainLayout>
 </template>

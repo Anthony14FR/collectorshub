@@ -8,11 +8,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home');
+    return Inertia::render('Home/Home');
 });
 
+// Public route for the Pokedex
+Route::get('/pokedex', [PokemonController::class, 'getAllPokemons'])->name('pokedex.public');
+
 Route::get('/me', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Me/Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -21,7 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Routes pour Pokedex
-    Route::get('/pokedex/user-pokemons', [PokedexController::class, 'getUserPokemons'])->name('pokedex.user-pokemons');
+    Route::get('/me/pokedex', [PokedexController::class, 'getUserPokemons'])->name('me.pokedex');
     Route::post('/pokedex/{id}/add-to-team', [PokedexController::class, 'addToTeam'])->name('pokedex.add-to-team');
     Route::post('/pokedex/{id}/remove-from-team', [PokedexController::class, 'removeFromTeam'])->name('pokedex.remove-from-team');
 
