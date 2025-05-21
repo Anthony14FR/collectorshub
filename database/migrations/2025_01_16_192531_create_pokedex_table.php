@@ -11,35 +11,35 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('pokedexes', function (Blueprint $table) {
+        Schema::create('pokedex', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('pokemon_id')->constrained('pokemon');
-            $table->integer('pokedexId');
+            $table->integer('pokedex_id');
             $table->string('name', 50);
             $table->string('nickname', 50)->nullable();
             $table->json('types');
             $table->json('resistances');
-            $table->integer('evolutionId')->nullable();
-            $table->integer('preEvolutionId')->nullable();
+            $table->integer('evolution_id')->nullable();
+            $table->integer('pre_evolution_id')->nullable();
             $table->string('description', 250);
             $table->integer('height');
             $table->integer('weight');
             $table->string('rarity', 20);
             $table->integer('level')->default(1);
             $table->integer('star')->default(0);
-            $table->boolean('isShiny')->default(false);
-            $table->integer('HP');
-            $table->integer('hpLeft')->nullable();
+            $table->boolean('is_shiny')->default(false);
+            $table->integer('hp');
+            $table->integer('hp_left')->nullable();
             $table->integer('attack');
             $table->integer('defense');
             $table->integer('speed');
             $table->integer('special_attack');
             $table->integer('special_defense');
             $table->integer('generation')->nullable();
-            $table->boolean('isInTeam')->default(false);
-            $table->boolean('isFavorite')->default(false);
-            $table->timestamp('obtainedAt')->useCurrent();
+            $table->boolean('is_in_team')->default(false);
+            $table->boolean('is_favorite')->default(false);
+            $table->timestamp('obtained_at')->useCurrent();
             $table->timestamps();
         });
     }
@@ -49,6 +49,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pokedexes');
+        Schema::dropIfExists('pokedex');
     }
 };
