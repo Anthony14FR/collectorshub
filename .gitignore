@@ -21,3 +21,39 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Fichiers de build et de cache
+/public/css
+/public/js
+/public/mix-manifest.json
+/public/storage
+/public/vendor
+
+# Fichiers de développement
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+*.cache
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Fichiers de dépendances
+package-lock.json
+yarn.lock
+composer.lock
+
+# Fichiers de configuration locaux
+.php_cs.cache
+.php-cs-fixer.cache
+.phpunit.result.cache
+.php_cs
+.php_cs.cache
+.php-cs-fixer.cache
+.phpunit.result.cache
+
+# Fichiers de test
+/coverage
+/tests/coverage 
