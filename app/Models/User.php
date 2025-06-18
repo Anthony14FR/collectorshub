@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -41,8 +43,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'last_login' => 'datetime',
         'password' => 'hashed',
+        'cash' => 'integer',
+        'level' => 'integer',
+        'experience' => 'integer',
     ];
 
     const ROLES = ['user', 'premium', 'admin'];
     const STATUSES = ['active', 'suspended', 'banned'];
+
+    public function inventory(): HasMany
+    {
+        return $this->hasMany(Inventory::class);
+    }
+
+    public function promoCodes(): BelongsToMany
+    {
+        return $this->belongsToMany(PromoCode::class, 'promo_code_users')
+            ->withPivot('is_used', 'used_at')
+            ->withTimestamps();
+    }
 }

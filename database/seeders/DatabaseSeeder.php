@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             PokemonSeeder::class,
-            PokedexSeeder::class
+            PokedexSeeder::class,
+            PromoCodeSeeder::class,
         ]);
     }
 }
