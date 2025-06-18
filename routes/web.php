@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PokedexController;
 use App\Http\Controllers\PokemonController;
+use App\Http\Controllers\PromoCodeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -34,6 +35,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/pokemon', action: [PokemonController::class, 'index'])->name('pokemon.index');
     Route::get('/pokemon/search', [PokemonController::class, 'search'])->name('pokemon.search');
     Route::get('/pokemon/{idOrName}', [PokemonController::class, 'show'])->name('pokemon.show');
+
+    // Routes pour PromoCode
+    Route::get('/promocodes', [PromoCodeController::class, 'index'])->name('promocodes.index');
+    Route::get('/promocodes/create', [PromoCodeController::class, 'create'])->name('promocodes.create');
+    Route::post('/promocodes', [PromoCodeController::class, 'store'])->name('promocodes.store');
+    Route::post('/promocodes/use', [PromoCodeController::class, 'useCode'])->name('promocodes.use');
+    Route::delete('/promocodes/{id}', [PromoCodeController::class, 'destroy'])->name('promocodes.destroy');
 });
 
 require __DIR__.'/auth.php';
