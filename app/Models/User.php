@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
@@ -54,9 +52,6 @@ class User extends Authenticatable
         'level' => 'integer',
         'experience' => 'integer',
     ];
-
-    const ROLES = ['user', 'premium', 'admin'];
-    const STATUSES = ['active', 'suspended', 'banned'];
 
     public function checkPassword(string $password): bool
     {
