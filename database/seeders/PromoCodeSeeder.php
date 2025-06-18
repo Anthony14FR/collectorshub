@@ -33,18 +33,5 @@ class PromoCodeSeeder extends Seeder
             'is_global' => true,
             'cash' => 0
         ]);
-
-        $pokeball = Item::firstOrCreate(
-            ['name' => 'Poké Ball'],
-            [
-                'description' => 'Boh c\'est une pokeball quoi',
-                'cost' => 200,
-                'image_path' => '/images/items/pokeball.png',
-                'type' => 'ball',
-                'pokemon_per_ball' => 1
-            ]
-        );
-
-        $promoWithItem->items()->attach($pokeball->id, ['quantity' => 5]);
     }
 } 
