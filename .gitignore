@@ -57,3 +57,6 @@ composer.lock
 # Fichiers de test
 /coverage
 /tests/coverage 
+
+# Dependances
+/storage/debugbar
