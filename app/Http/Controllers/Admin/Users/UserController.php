@@ -21,7 +21,7 @@ class UserController extends Controller
     public function index()
     {
         $users = $this->userService->getUsersWithPagination();
-        dd($users);
+        
         return Inertia::render('Admin/Users/Index', [
             'users' => $users
         ]);
