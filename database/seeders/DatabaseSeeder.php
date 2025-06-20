@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PokemonSeeder::class,
             PokedexSeeder::class,
+            ItemSeeder::class,
             PromoCodeSeeder::class,
+            InventorySeeder::class,
         ]);
     }
 }

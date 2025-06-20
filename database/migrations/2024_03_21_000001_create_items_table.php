@@ -12,10 +12,11 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);
             $table->text('description')->nullable();
-            $table->integer('cost')->default(0);
+            $table->string('type');
+            $table->json('effect');
+            $table->integer('price')->default(0);
+            $table->enum('rarity', ['common', 'uncommon', 'rare', 'epic', 'legendary']);
             $table->string('image_url')->nullable();
-            $table->enum('type', ['item', 'ball'])->default('item');
-            $table->integer('pokemon_per_ball')->nullable()->default(1);
             $table->timestamps();
         });
     }

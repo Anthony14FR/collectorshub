@@ -14,7 +14,8 @@ class Item extends Model
         'type',
         'effect',
         'price',
-        'rarity'
+        'rarity',
+        'image_url'
     ];
 
     protected $casts = [
@@ -30,7 +31,7 @@ class Item extends Model
             if (strlen($item->name) > 50) {
                 throw new \Exception('Le nom ne peut pas dépasser 50 caractères');
             }
-            if (strlen($item->description) > 250) {
+            if ($item->description && strlen($item->description) > 250) {
                 throw new \Exception('La description ne peut pas dépasser 250 caractères');
             }
             if (!in_array($item->type, ['heal', 'boost', 'evolution', 'special'])) {
