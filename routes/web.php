@@ -7,6 +7,8 @@ use App\Http\Controllers\PromoCodeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Pokedex;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -17,9 +19,14 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/me', function () {
+    $user = Auth::user();
+    $pokedex = Pokedex::where('user_id', $user->id)->with('pokemon')->get();
+
+    return Inertia::render('Me', [
+        'pokedex' => $pokedex,
+    ]);
+})->middleware(['auth', 'verified'])->name('me');
 
 Route::middleware('auth')->group(function () {
     // Routes pour Profil

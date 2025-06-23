@@ -15,7 +15,11 @@ setup: ## Configure le projet (env, key, dépendances et base de données)
 	@echo "Configuration terminee. Le projet est pret a etre utilise."
 
 start: ## Démarre les serveurs front (Vite) et back (Laravel)
+ifeq ($(OS),Windows_NT)
 	start "Laravel Server" bash -c "php artisan serve; exec bash" & start "Vite Server" bash -c "npm run dev; exec bash"
+else
+	php artisan serve --host=0.0.0.0 --port=8000 & npm run dev
+endif
 
 clear-cache: ## Nettoie tous les caches
 	php artisan cache:clear
