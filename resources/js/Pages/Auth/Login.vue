@@ -76,14 +76,14 @@ const submit = () => {
             <form @submit.prevent="submit"
                 class="mt-8 space-y-6 bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10">
                 <div class="space-y-4">
-                    <!-- login -->
+                    <!-- Login -->
                     <div>
                         <label for="login" class="block text-sm font-medium text-gray-300 mb-2">
-                            Adresse login
+                            Pseudo ou email
                         </label>
                         <input id="login" v-model="form.login" type="login" required autocomplete="login"
                             class="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                            placeholder="votre@login.com" />
+                            placeholder="votre@email.com" />
                         <div v-if="form.errors.login" class="mt-2 text-sm text-red-400">
                             {{ form.errors.login }}
                         </div>
