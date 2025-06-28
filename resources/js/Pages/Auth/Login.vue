@@ -10,7 +10,7 @@ interface Props {
 defineProps<Props>();
 
 const form = reactive({
-    email: '',
+    login: '',
     password: '',
     remember: false,
     processing: false,
@@ -24,7 +24,7 @@ const submit = () => {
     form.errors = {};
 
     router.post('/login', {
-        email: form.email,
+        login: form.login,
         password: form.password,
     }, {
         onFinish: () => {
@@ -76,16 +76,16 @@ const submit = () => {
             <form @submit.prevent="submit"
                 class="mt-8 space-y-6 bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10">
                 <div class="space-y-4">
-                    <!-- Email -->
+                    <!-- login -->
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
-                            Adresse email
+                        <label for="login" class="block text-sm font-medium text-gray-300 mb-2">
+                            Adresse login
                         </label>
-                        <input id="email" v-model="form.email" type="email" required autocomplete="email"
+                        <input id="login" v-model="form.login" type="login" required autocomplete="login"
                             class="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                            placeholder="votre@email.com" />
-                        <div v-if="form.errors.email" class="mt-2 text-sm text-red-400">
-                            {{ form.errors.email }}
+                            placeholder="votre@login.com" />
+                        <div v-if="form.errors.login" class="mt-2 text-sm text-red-400">
+                            {{ form.errors.login }}
                         </div>
                     </div>
 
