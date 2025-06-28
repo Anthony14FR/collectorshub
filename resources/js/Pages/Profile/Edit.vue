@@ -1,21 +1,7 @@
 <script setup lang="ts">
+import type { User } from '@/types/user';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { reactive, ref } from 'vue';
-
-interface User {
-    id: number;
-    username: string;
-    email: string;
-    email_verified_at: string | null;
-    level: number;
-    experience: number;
-    cash: number;
-    role: string;
-    status: string;
-    last_login: string | null;
-    created_at: string;
-    updated_at: string;
-}
 
 interface Props {
     auth: {

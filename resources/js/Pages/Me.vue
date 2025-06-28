@@ -3,18 +3,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { computed, reactive, ref } from 'vue';
 import PixelModal from '@/Components/PixelModal.vue';
 import CardPokemon from '@/Components/CardPokemon.vue';
-
-interface User {
-    id: number;
-    username: string;
-    email: string;
-    level: number;
-    experience: number;
-    cash: number;
-    role: string;
-    status: string;
-    created_at: string;
-}
+import type { User } from '@/types/user';
 
 interface Item {
     id: number;
@@ -227,6 +216,8 @@ const getTypeColor = (type: string) => {
                     <div v-if="menuOpen" class="user-menu">
                         <Link href="/profile" class="menu-link">⚙️ Profil</Link>
                         <Link href="/pokemon" class="menu-link">📚 Pokédex</Link>
+                        <Link v-if="auth.user.role === 'admin'" href="/admin/users" class="menu-link">👤 Utilisateurs
+                        </Link>
                         <button @click="logout" :disabled="logoutForm.processing" class="menu-link logout-btn">
                             <span v-if="logoutForm.processing">🔄 Déconnexion...</span>
                             <span v-else">🚪 Déconnexion</span>
@@ -598,6 +589,7 @@ const getTypeColor = (type: string) => {
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     min-width: 150px;
+    z-index: 1000;
 }
 
 .menu-link {
