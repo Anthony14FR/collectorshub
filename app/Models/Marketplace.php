@@ -23,6 +23,10 @@ class Marketplace extends Model
         'sold_at' => 'datetime'
     ];
 
+    protected $attributes = [
+        'status' => 'active'
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -31,11 +35,12 @@ class Marketplace extends Model
             if ($marketplace->price < 0) {
                 throw new \Exception('Le prix ne peut pas être négatif');
             }
+            
             if (!in_array($marketplace->status, ['active', 'sold', 'cancelled'])) {
                 throw new \Exception('Statut invalide');
             }
 
-            if ($marketplace->seller_id === $marketplace->buyer_id) {
+            if ($marketplace->buyer_id && $marketplace->seller_id === $marketplace->buyer_id) {
                 throw new \Exception('Le vendeur ne peut pas être l\'acheteur');
             }
 
@@ -69,6 +74,6 @@ class Marketplace extends Model
 
     public function pokemon(): BelongsTo
     {
-        return $this->belongsTo(Pokemon::class);
+        return $this->belongsTo(Pokedex::class, 'pokemon_id');
     }
 } 

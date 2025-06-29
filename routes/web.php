@@ -5,6 +5,7 @@ use App\Http\Controllers\PokedexController;
 use App\Http\Controllers\PokemonController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\MeController;
+use App\Http\Controllers\MarketplaceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,6 +46,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/promocodes', [PromoCodeController::class, 'store'])->name('promocodes.store');
     Route::post('/promocodes/use', [PromoCodeController::class, 'useCode'])->name('promocodes.use');
     Route::delete('/promocodes/{id}', [PromoCodeController::class, 'destroy'])->name('promocodes.destroy');
+    
+    // Routes pour Marketplace
+    Route::get('/marketplace', [MarketplaceController::class, 'index'])->name('marketplace.index');
+    Route::get('/marketplace/sell', [MarketplaceController::class, 'sell'])->name('marketplace.sell');
+    Route::post('/marketplace/sell', [MarketplaceController::class, 'listPokemon'])->name('marketplace.sell.post');
+    Route::post('/marketplace/buy/{listingId}', [MarketplaceController::class, 'buyPokemon'])->name('marketplace.buy');
+    Route::post('/marketplace/cancel/{listingId}', [MarketplaceController::class, 'cancelListing'])->name('marketplace.cancel');
+    Route::get('/marketplace/listings', [MarketplaceController::class, 'getListings'])->name('marketplace.listings');
 });
 
 require __DIR__.'/admin.php';
