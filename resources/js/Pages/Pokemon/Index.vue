@@ -1,29 +1,9 @@
 <script setup lang="ts">
 import CardPokemon from '@/Components/CardPokemon.vue';
+import type { Pokemon } from '@/types/pokemon';
 import { Head, Link } from '@inertiajs/vue3';
+import { useVirtualList } from '@vueuse/core';
 import { computed, ref } from 'vue';
-
-interface Pokemon {
-    id: number;
-    pokedex_id: number;
-    name: string;
-    types: Array<{ name: string; image: string }>;
-    resistances: Array<{ name: string; damage_multiplier: number; damage_relation: string }>;
-    evolution_id?: number;
-    pre_evolution_id?: number;
-    description: string;
-    height: number;
-    weight: number;
-    rarity: string;
-    is_shiny: boolean;
-    hp: number;
-    attack: number;
-    defense: number;
-    speed: number;
-    special_attack: number;
-    special_defense: number;
-    generation: number;
-}
 
 interface Props {
     auth: {
@@ -79,6 +59,26 @@ const filteredPokemons = computed(() => {
         return matchesSearch && matchesType && matchesRarity && matchesGeneration;
     });
 });
+
+// Virtualisation
+const pokemonRows = computed(() => {
+    const itemsPerRow = 3;
+    const rows = [];
+
+    for (let i = 0; i < filteredPokemons.value.length; i += itemsPerRow) {
+        rows.push(filteredPokemons.value.slice(i, i + itemsPerRow));
+    }
+
+    return rows;
+});
+
+const { list, containerProps, wrapperProps } = useVirtualList(
+    pokemonRows,
+    {
+        itemHeight: 440,
+        overscan: 2,
+    },
+);
 
 const clearFilters = () => {
     selectedType.value = '';
@@ -170,14 +170,19 @@ const clearFilters = () => {
                 </div>
             </div>
 
-            <!-- Grille des Pokémons -->
+            <!-- Grille des Pokémons avec virtualisation -->
             <div class="pokemons-zone">
-                <div class="pokemons-grid">
-                    <CardPokemon v-for="pokemon in filteredPokemons" :key="pokemon.id" :pokemon="pokemon" />
+                <div v-if="filteredPokemons.length > 0" v-bind="containerProps" class="virtual-container">
+                    <div v-bind="wrapperProps" class="virtual-wrapper">
+                        <div v-for="{ data: pokemonRow, index } in list" :key="`row-${index}`" class="virtual-row">
+                            <CardPokemon v-for="pokemon in pokemonRow" :key="pokemon.id" :pokemon="pokemon"
+                                class="pokemon-card" />
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Message si aucun résultat -->
-                <div v-if="filteredPokemons.length === 0" class="no-results">
+                <div v-else class="no-results">
                     <div class="no-results-icon">🔍</div>
                     <h3>Aucun Pokémon trouvé</h3>
                     <p>Essayez de modifier vos filtres de recherche.</p>
@@ -471,10 +476,34 @@ const clearFilters = () => {
     flex: 1;
 }
 
-.pokemons-grid {
+/* Styles pour la virtualisation */
+.virtual-container {
+    height: 70vh;
+    /* Hauteur fixe pour le scroll virtuel */
+    overflow: auto;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+}
+
+.virtual-wrapper {
+    width: 100%;
+}
+
+.virtual-row {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.pokemon-card {
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
 }
 
 .no-results {
@@ -499,14 +528,14 @@ const clearFilters = () => {
 
 .no-results p {
     color: #666;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .reset-search-btn {
     background: linear-gradient(145deg, #4a90e2, #357abd);
     border: 3px solid #2c5aa0;
     border-radius: 8px;
-    padding: 15px 30px;
+    padding: 12px 20px;
     color: white;
     font-family: 'Courier New', monospace;
     font-weight: bold;
@@ -526,13 +555,12 @@ const clearFilters = () => {
         2px 2px 0px rgba(0, 0, 0, 0.2);
 }
 
-/* Animations */
 @keyframes float {
-    0% {
+    from {
         transform: translateX(-100px);
     }
 
-    100% {
+    to {
         transform: translateX(calc(100vw + 100px));
     }
 }
@@ -542,7 +570,7 @@ const clearFilters = () => {
     0%,
     100% {
         opacity: 0;
-        transform: scale(0);
+        transform: scale(0.5);
     }
 
     50% {

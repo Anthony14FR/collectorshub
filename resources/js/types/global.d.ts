@@ -7,6 +7,10 @@ declare module '@inertiajs/vue3' {
     export const router: any;
 }
 
+declare global {
+    function route(name: string, params?: any): string;
+}
+
 declare module 'laravel-vite-plugin/inertia-helpers' {
     import type { DefineComponent } from 'vue';
     export function resolvePageComponent(

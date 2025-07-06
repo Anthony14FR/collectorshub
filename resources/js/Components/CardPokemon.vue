@@ -74,15 +74,14 @@ const pokemonTypes = computed(() => {
             <div v-if="pokemon.is_shiny" class="shiny-indicator">✨</div>
         </div>
 
-        <div class="pokemon-image-placeholder">
-            <Link :href="`/pokemon/${pokemon.id}`">
-            <img :src="`/images/pokemon/${pokemon.id}.png`" :alt="`Image de ${pokemon.name}`" class="pokemon-image">
-            </Link>
-        </div>
-
         <div class="pokemon-info">
             <h3 class="pokemon-name">{{ pokemon.nickname || pokemon.name }}</h3>
             <p v-if="pokemon.level" class="pokemon-level">Niv. {{ pokemon.level }}</p>
+
+            <!-- TODO: Ajouter l'image du Pokémon
+            <div class="pokemon-image">
+                <img :src="pokemon.image" :alt="pokemon.name" :title="pokemon.name" class="pokemon-image" />
+            </div> -->
 
             <div class="pokemon-types">
                 <template v-for="type in pokemonTypes" :key="type.name">
@@ -164,31 +163,6 @@ const pokemonTypes = computed(() => {
 .shiny-indicator {
     font-size: 20px;
     animation: pulse 2s infinite;
-}
-
-.pokemon-image-placeholder {
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    position: relative;
-    padding: 10px;
-}
-
-.pokemon-image {
-    max-height: 100%;
-    width: auto;
-    max-width: 100%;
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-    transition: transform 0.3s ease;
-}
-
-.pokemon-image:hover {
-    transform: scale(1.1);
 }
 
 .pokemon-info {
