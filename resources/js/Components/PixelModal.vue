@@ -52,7 +52,7 @@ const close = () => {
 .modal-container {
     min-width: 300px;
     width: 80%;
-    max-width: 800px;
+    max-width: 1000px;
     max-height: 90vh;
     margin: 0px auto;
     background: linear-gradient(145deg, #f5f5f5, #e0e0e0);

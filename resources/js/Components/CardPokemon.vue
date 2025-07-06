@@ -1,68 +1,17 @@
 <script setup lang="ts">
+import type { PokemonCard } from '@/types/pokemon';
+import { getRarityColor, getTypeColor } from '@/utils/pokemon';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-interface Pokemon {
-    id: number;
-    pokedex_id: number;
-    name: string;
-    types: any;
-    rarity: string;
-    is_shiny?: boolean;
-    hp?: number;
-    attack?: number;
-    defense?: number;
-    generation?: number;
-    level?: number;
-    nickname?: string;
-}
-
 interface Props {
-    pokemon: Pokemon;
+    pokemon: PokemonCard;
 }
 
 const props = defineProps<Props>();
 
-const getRarityColor = (rarity: string) => {
-    const colors: { [key: string]: string } = {
-        common: 'from-slate-400 to-slate-600',
-        uncommon: 'from-emerald-400 to-emerald-600',
-        rare: 'from-sky-400 to-sky-600',
-        epic: 'from-violet-400 to-violet-600',
-        legendary: 'from-amber-400 to-amber-600'
-    };
-    return colors[rarity] || colors.common;
-};
-
-const getTypeColor = (type: string) => {
-    const colors: { [key: string]: string } = {
-        fire: 'from-red-500 to-orange-500',
-        water: 'from-blue-500 to-cyan-500',
-        grass: 'from-green-500 to-lime-500',
-        electric: 'from-yellow-400 to-yellow-600',
-        psychic: 'from-pink-500 to-purple-500',
-        ice: 'from-cyan-300 to-blue-400',
-        dragon: 'from-purple-600 to-indigo-600',
-        dark: 'from-gray-700 to-gray-900',
-        fairy: 'from-pink-300 to-pink-500',
-        fighting: 'from-red-600 to-red-800',
-        poison: 'from-purple-500 to-purple-700',
-        ground: 'from-yellow-600 to-amber-600',
-        flying: 'from-indigo-400 to-blue-500',
-        bug: 'from-green-400 to-green-600',
-        rock: 'from-yellow-700 to-stone-600',
-        ghost: 'from-purple-700 to-indigo-800',
-        steel: 'from-gray-400 to-gray-600',
-        normal: 'from-gray-400 to-gray-500'
-    };
-    return colors[type?.toLowerCase()] || colors.normal;
-};
-
 const pokemonTypes = computed(() => {
-    if (Array.isArray(props.pokemon.types) && props.pokemon.types.every(t => typeof t === 'object' && t.name)) {
-        return props.pokemon.types.map(t => ({ ...t, isObject: true }));
-    }
-    return props.pokemon.types.map((t: string) => ({ name: t, isObject: false }));
+    return props.pokemon.types;
 });
 
 </script>
@@ -78,16 +27,13 @@ const pokemonTypes = computed(() => {
             <h3 class="pokemon-name">{{ pokemon.nickname || pokemon.name }}</h3>
             <p v-if="pokemon.level" class="pokemon-level">Niv. {{ pokemon.level }}</p>
 
-            <!-- TODO: Ajouter l'image du Pokémon
             <div class="pokemon-image">
-                <img :src="pokemon.image" :alt="pokemon.name" :title="pokemon.name" class="pokemon-image" />
-            </div> -->
+                <img :src="`/images/pokemon-gifs/${pokemon.is_shiny ? (pokemon.id - 1000) + '_S' : pokemon.id}.gif`" />
+            </div>
 
             <div class="pokemon-types">
                 <template v-for="type in pokemonTypes" :key="type.name">
-                    <img v-if="type.isObject" :src="type.image" :alt="type.name" :title="type.name"
-                        class="type-image" />
-                    <span v-else class="type-chip bg-gradient-to-r" :class="getTypeColor(type.name)">
+                    <span class="type-chip bg-gradient-to-r" :class="getTypeColor(type.name)">
                         {{ type.name }}
                     </span>
                 </template>
@@ -182,6 +128,19 @@ const pokemonTypes = computed(() => {
     text-align: center;
 }
 
+.pokemon-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+
+    img {
+        width: 30%;
+        height: auto;
+        object-fit: contain;
+    }
+}
+
 .pokemon-level {
     font-size: 14px;
     color: #666;
@@ -211,9 +170,9 @@ const pokemonTypes = computed(() => {
 }
 
 .type-chip {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
     font-weight: bold;
     color: white;
     text-transform: uppercase;
@@ -256,9 +215,9 @@ const pokemonTypes = computed(() => {
 }
 
 .rarity-chip {
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
     font-weight: bold;
     color: white;
     text-transform: uppercase;
@@ -266,10 +225,10 @@ const pokemonTypes = computed(() => {
 }
 
 .pokemon-generation {
-    text-align: center;
-    font-size: 12px;
+    font-size: 10px;
     color: #666;
-    margin-bottom: 15px;
+    font-weight: bold;
+    text-align: center;
 }
 
 .card-actions {
