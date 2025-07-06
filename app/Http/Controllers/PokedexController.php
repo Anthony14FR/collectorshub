@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PokedexController extends Controller
 {
-    public function getUserPokemons(Request $request)
+    public function getUserPokemons()
     {
         $user = Auth::user();
         $userPokemons = $user->pokedex()->with('pokemon')->get();
