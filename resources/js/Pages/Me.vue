@@ -4,6 +4,7 @@ import { computed, reactive, ref } from 'vue';
 import PixelModal from '@/Components/PixelModal.vue';
 import CardPokemon from '@/Components/CardPokemon.vue';
 import type { User } from '@/types/user';
+import type { Pokemon } from '@/types/pokemon';
 
 interface Item {
     id: number;
@@ -21,14 +22,6 @@ interface Inventory {
     item_id: number;
     quantity: number;
     item: Item;
-}
-
-interface Pokemon {
-    id: number;
-    name: string;
-    types: string[];
-    rarity: string;
-    is_shiny: boolean;
 }
 
 interface PokedexEntry {
