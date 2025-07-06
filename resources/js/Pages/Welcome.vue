@@ -100,11 +100,18 @@
       </div>
 
       <div class="text-center z-10 max-w-5xl mx-auto px-6">
-        <div class="inline-flex badge badge-base-100 items-center gap-3 bg-gradient-to-r from-success/30 to-primary/30 border-2 border-success/40 rounded-full px-6 md:px-8 py-3 md:py-4 backdrop-blur-sm mb-6 md:mb-8 shadow-2xl shadow-primary/20" data-aos="zoom-in" data-aos-delay="200">
+        <Badge 
+          variant="success" 
+          size="lg" 
+          pill 
+          class="mb-6 md:mb-8 shadow-2xl shadow-primary/20" 
+          data-aos="zoom-in" 
+          data-aos-delay="200"
+        >
           <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
           <span class="font-semibold text-sm md:text-base">Collector's Hub</span>
           <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-        </div>
+        </Badge>
         
         <div class="relative mb-6 md:mb-8">
           <h2 class="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black mb-4 md:mb-6 relative z-10" data-aos="fade-up" data-aos-delay="400">
@@ -163,26 +170,12 @@
         </div>
         
         <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center" data-aos="fade-up" data-aos-delay="400">
-          <button class="group relative overflow-hidden px-6 py-3 text-sm font-medium text-base-100 bg-gradient-to-br from-primary to-secondary border border-primary/30 hover:border-primary/50 rounded-xl shadow-lg shadow-primary/15 hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/12 before:to-white/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-xl">
-            <span class="relative z-10 flex items-center gap-2">
-              <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors duration-300">
-                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
-              </div>
-              Commencer Maintenant
-            </span>
-          </button>
-          <button class="group relative overflow-hidden px-6 py-3 text-sm font-medium text-base-content/70 hover:text-secondary bg-gradient-to-br from-base-100/60 via-base-200/70 to-base-100/60 backdrop-blur-sm border border-secondary/20 hover:border-secondary/40 rounded-xl shadow-lg shadow-secondary/15 hover:shadow-xl hover:shadow-secondary/20 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer before:absolute before:inset-0 before:bg-gradient-to-r before:from-secondary/0 before:via-secondary/8 before:to-secondary/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-xl">
-            <span class="relative z-10 flex items-center gap-2">
-              <div class="w-4 h-4 rounded-md bg-secondary/15 flex items-center justify-center group-hover:bg-secondary/25 transition-colors duration-300">
-                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                </svg>
-              </div>
-              Voir la collection
-            </span>
-          </button>
+          <Button variant="primary" icon="lightning" size="md">
+            Commencer Maintenant
+          </Button>
+          <Button variant="secondary" icon="collection" size="md">
+            Voir la collection
+          </Button>
         </div>
       </div>
     </section>
@@ -194,7 +187,9 @@ import { onMounted, onUnmounted } from 'vue'
 import Lenis from 'lenis'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-import AppNavbar from '@/components/AppNavbar.vue'
+import AppNavbar from '@/Components/UI/AppNavbar.vue'
+import Button from '@/Components/UI/Button.vue'
+import Badge from '@/Components/UI/Badge.vue'
 
 let lenis = null
 
