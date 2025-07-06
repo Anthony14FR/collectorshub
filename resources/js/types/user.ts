@@ -19,11 +19,33 @@ export type PokedexEntry = {
     id: number;
     user_id: number;
     pokemon_id: number;
+    nickname?: string;
     level: number;
-    is_shiny: boolean;
+    star: number;
+    hp_left?: number;
     is_in_team: boolean;
+    is_favorite: boolean;
+    obtained_at: string;
     created_at: string;
     updated_at: string;
+    pokemon?: {
+        id: number;
+        name: string;
+        types: any[];
+        resistances: any[];
+        description: string;
+        height: number;
+        weight: number;
+        rarity: string;
+        is_shiny: boolean;
+        hp: number;
+        attack: number;
+        defense: number;
+        speed: number;
+        special_attack: number;
+        special_defense: number;
+        generation: number;
+    };
 }
 
 export type InventoryItem = {

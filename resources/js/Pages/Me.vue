@@ -28,19 +28,20 @@ interface Pokemon {
     name: string;
     types: string[];
     rarity: string;
+    is_shiny: boolean;
 }
 
 interface PokedexEntry {
     id: number;
     user_id: number;
     pokemon_id: number;
-    name: string;
     nickname?: string;
     level: number;
     star: number;
-    is_shiny: boolean;
+    hp_left?: number;
     is_in_team: boolean;
     is_favorite: boolean;
+    obtained_at: string;
     pokemon: Pokemon;
 }
 
@@ -279,8 +280,8 @@ const getTypeColor = (type: string) => {
                             <div v-for="pokemon in pokedex.slice(0, 3)" :key="pokemon.id" class="pokemon-entry">
                                 <div class="entry-info">
                                     <div class="pokemon-name-entry">
-                                        {{ pokemon.nickname || pokemon.name }}
-                                        <span v-if="pokemon.is_shiny" class="shiny-star">✨</span>
+                                        {{ pokemon.nickname || pokemon.pokemon.name }}
+                                        <span v-if="pokemon.pokemon.is_shiny" class="shiny-star">✨</span>
                                         <span v-if="pokemon.is_favorite" class="favorite-heart">❤️</span>
                                         <span v-if="pokemon.is_in_team" class="team-star">⭐</span>
                                     </div>
@@ -315,7 +316,7 @@ const getTypeColor = (type: string) => {
         <template #default>
             <div v-if="pokedex.length > 0" class="pokedex-grid">
                 <CardPokemon v-for="entry in pokedex" :key="entry.id"
-                    :pokemon="{ ...entry.pokemon, pokedex_id: entry.pokemon.id, level: entry.level, is_shiny: entry.is_shiny, nickname: entry.nickname }" />
+                    :pokemon="{ ...entry.pokemon, pokedex_id: entry.pokemon.id, level: entry.level, is_shiny: entry.pokemon.is_shiny, nickname: entry.nickname }" />
             </div>
             <div v-else class="no-results-message">
                 <p>Vous n'avez aucun Pokémon pour le moment.</p>
