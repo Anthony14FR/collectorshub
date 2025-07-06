@@ -18,6 +18,7 @@ interface Props {
 }
 
 const { auth, pokemons } = defineProps<Props>();
+console.log(pokemons);
 
 // États des filtres
 const selectedType = ref('');

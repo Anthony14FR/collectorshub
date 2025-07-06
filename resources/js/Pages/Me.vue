@@ -1,59 +1,21 @@
 <script setup lang="ts">
+import CardPokemon from '@/Components/CardPokemon.vue';
+import PixelModal from '@/Components/PixelModal.vue';
+import type { Inventory } from '@/types/inventory';
+import type { Marketplace } from '@/types/marketplace';
+import type { Pokedex } from '@/types/pokedex';
+import type { User } from '@/types/user';
+import { getRarityColor, getTypeColor } from '@/utils/pokemon';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { computed, reactive, ref } from 'vue';
-import PixelModal from '@/Components/PixelModal.vue';
-import CardPokemon from '@/Components/CardPokemon.vue';
-import type { User } from '@/types/user';
-import type { Pokemon } from '@/types/pokemon';
-
-interface Item {
-    id: number;
-    name: string;
-    description: string;
-    type: string;
-    effect: any;
-    price: number;
-    rarity: string;
-}
-
-interface Inventory {
-    id: number;
-    user_id: number;
-    item_id: number;
-    quantity: number;
-    item: Item;
-}
-
-interface PokedexEntry {
-    id: number;
-    user_id: number;
-    pokemon_id: number;
-    nickname?: string;
-    level: number;
-    star: number;
-    hp_left?: number;
-    is_in_team: boolean;
-    is_favorite: boolean;
-    obtained_at: string;
-    pokemon: Pokemon;
-}
-
-interface MarketplaceEntry {
-    id: number;
-    seller_id: number;
-    pokemon_id: number;
-    price: number;
-    status: string;
-    pokemon: Pokemon;
-}
 
 interface Props {
     auth: {
         user: User;
     };
     inventory?: Inventory[];
-    pokedex?: PokedexEntry[];
-    marketplace?: MarketplaceEntry[];
+    pokedex?: Pokedex[];
+    marketplace?: Marketplace[];
 }
 
 const { auth, inventory = [], pokedex = [], marketplace = [] } = defineProps<Props>();
@@ -90,44 +52,10 @@ const experienceProgress = computed(() => {
     return Math.min(Math.max(progress, 0), 100);
 });
 
-const favoritePokemon = computed(() => pokedex.filter((p: PokedexEntry) => p.is_favorite));
+const favoritePokemon = computed(() => pokedex.filter((p: Pokedex) => p.is_favorite));
 
-const activeSales = computed(() => marketplace.filter((m: MarketplaceEntry) => m.status === 'active'));
+const activeSales = computed(() => marketplace.filter((m: Marketplace) => m.status === 'active'));
 
-const getRarityColor = (rarity: string) => {
-    const colors = {
-        common: 'from-slate-400 to-slate-600',
-        uncommon: 'from-emerald-400 to-emerald-600',
-        rare: 'from-sky-400 to-sky-600',
-        epic: 'from-violet-400 to-violet-600',
-        legendary: 'from-amber-400 to-amber-600'
-    };
-    return colors[rarity as keyof typeof colors] || colors.common;
-};
-
-const getTypeColor = (type: string) => {
-    const colors = {
-        fire: 'from-red-500 to-orange-500',
-        water: 'from-blue-500 to-cyan-500',
-        grass: 'from-green-500 to-lime-500',
-        electric: 'from-yellow-400 to-yellow-600',
-        psychic: 'from-pink-500 to-purple-500',
-        ice: 'from-cyan-300 to-blue-400',
-        dragon: 'from-purple-600 to-indigo-600',
-        dark: 'from-gray-700 to-gray-900',
-        fairy: 'from-pink-300 to-pink-500',
-        fighting: 'from-red-600 to-red-800',
-        poison: 'from-purple-500 to-purple-700',
-        ground: 'from-yellow-600 to-amber-600',
-        flying: 'from-indigo-400 to-blue-500',
-        bug: 'from-green-400 to-green-600',
-        rock: 'from-yellow-700 to-stone-600',
-        ghost: 'from-purple-700 to-indigo-800',
-        steel: 'from-gray-400 to-gray-600',
-        normal: 'from-gray-400 to-gray-500'
-    };
-    return colors[type?.toLowerCase() as keyof typeof colors] || colors.normal;
-};
 </script>
 
 <template>
@@ -214,7 +142,7 @@ const getTypeColor = (type: string) => {
                         </Link>
                         <button @click="logout" :disabled="logoutForm.processing" class="menu-link logout-btn">
                             <span v-if="logoutForm.processing">🔄 Déconnexion...</span>
-                            <span v-else">🚪 Déconnexion</span>
+                            <span v-else>🚪 Déconnexion</span>
                         </button>
                     </div>
                 </div>
@@ -244,9 +172,9 @@ const getTypeColor = (type: string) => {
                                 <div class="pokemon-info">
                                     <div class="pokemon-name">{{ sale.pokemon.name }}</div>
                                     <div class="pokemon-types">
-                                        <span v-for="type in sale.pokemon.types" :key="type"
-                                            class="type-chip bg-gradient-to-r" :class="getTypeColor(type)">
-                                            {{ type }}
+                                        <span v-for="type in sale.pokemon.types" :key="type.name"
+                                            class="type-chip bg-gradient-to-r" :class="getTypeColor(type.name)">
+                                            {{ type.name }}
                                         </span>
                                     </div>
                                 </div>
