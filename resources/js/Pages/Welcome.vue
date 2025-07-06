@@ -1,75 +1,228 @@
-<script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-
-interface Props {
-    canLogin?: boolean;
-    canRegister?: boolean;
-}
-
-defineProps<Props>();
-</script>
-
 <template>
+  <div data-theme="pokemon">
+    <AppNavbar />
+    
+    <section class="relative h-screen overflow-hidden bg-base-100">
+      <div class="absolute inset-0 z-[1]" data-speed="0">
+        <img
+          src="/images/background.png"
+          alt="Background"
+          class="w-full h-full object-cover object-center"
+        />
+      </div>
 
-    <Head title="Accueil" />
+      <div class="absolute inset-0 z-[10] -mb-20" data-speed="-0.1">
+        <img
+          src="/images/mountains.png"
+          alt="Mountains"
+          class="w-full h-full object-cover object-bottom"
+        />
+      </div>
 
-    <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <!-- Header -->
-        <header class="relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
+      <div class="absolute inset-0 z-[5] flex items-center justify-center -mt-96" data-speed="-0.8">
+        <h1
+          class="text-base-100/80 text-4xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-[10rem] 2xl:text-[12rem] font-black drop-shadow-2xl text-center px-4"
+        >
+          COLLECTOR'S HUB
+        </h1>
+      </div>
 
-            <!-- Navigation -->
-            <nav class="relative z-10 flex items-center justify-between p-6 lg:px-8">
-                <div class="flex lg:flex-1">
-                    <span class="text-2xl font-bold text-white">CollectorsHub</span>
-                </div>
+      <div class="absolute inset-0 z-[20] flex items-end justify-center" data-speed="0.6">
+        <img
+          src="/images/Foreground1.png"
+          alt="Foreground 1"
+          class="w-full h-auto object-cover object-bottom"
+          style="margin-bottom: -1px;"
+        />
+      </div>
 
-                <div v-if="canLogin" class="flex lg:flex-1 lg:justify-end space-x-4">
-                    <Link href="/login"
-                        class="text-sm font-semibold leading-6 text-white hover:text-blue-300 transition-colors">
-                    Login
-                    </Link>
-                    <Link v-if="canRegister" href="/register"
-                        class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors">
-                    Register
-                    </Link>
-                </div>
-            </nav>
+      <div
+        class="absolute inset-0 z-[30] flex flex-col items-center justify-end h-[200vh]"
+        data-speed="1.0"
+      >
+        <img 
+          src="/images/Foreground2.png" 
+          alt="Foreground 2" 
+          class="w-full h-auto object-cover object-bottom" 
+          style="margin-bottom: -1px;"
+        />
+        <div class="w-full h-screen bg-base-100 -mt-1"></div>
+      </div>
+    </section>
 
-            <!-- Hero Section -->
-            <div class="relative z-10 mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
-                <div class="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
-                    <h1 class="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                        Bienvenue sur
-                        <span
-                            class="text-gradient bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                            CollectorsHub
-                        </span>
-                    </h1>
-                    <p class="mt-6 text-lg leading-8 text-gray-300">
-                        Une application moderne construite avec Vue 3, TypeScript, Laravel et Inertia.js.
-                        Découvrez une expérience de développement exceptionnelle avec des technologies de pointe.
-                    </p>
-                    <div class="mt-10 flex items-center gap-x-6">
-                        <Link href="/login"
-                            class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all hover:scale-105">
-                        Commencer
-                        </Link>
-                        <Link href="/register"
-                            class="text-sm font-semibold leading-6 text-white hover:text-blue-300 transition-colors">
-                        En savoir plus <span aria-hidden="true">→</span>
-                        </Link>
-                    </div>
-                </div>
+    <section class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20 md:pt-0" data-aos="fade-up" data-aos-duration="1200">
+      <div class="absolute inset-0 z-0">
+        <img 
+          src="/images/section-2-background 1.jpg" 
+          alt="Pokémon background" 
+          class="w-full h-full object-cover object-center opacity-10"
+        />
+      </div>
+
+      <div class="absolute inset-0 z-[1]">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-48 h-48 bg-secondary/10 rounded-full blur-2xl animate-pulse delay-1000"></div>
+        <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-accent/10 rounded-full blur-xl animate-pulse delay-500"></div>
+        <div class="absolute top-1/3 left-1/2 w-20 h-20 bg-info/5 rounded-full blur-lg animate-bounce"></div>
+        <div class="absolute bottom-1/3 left-1/4 w-24 h-24 bg-success/8 rounded-full blur-2xl animate-pulse delay-700"></div>
+      </div>
+
+      <div class="absolute inset-0 pointer-events-none overflow-hidden z-[2]">
+        <div class="absolute top-16 left-16 w-3 h-3 bg-primary rounded-full animate-pulse opacity-60"></div>
+        <div class="absolute top-32 right-20 w-2 h-2 bg-secondary rounded-full animate-pulse delay-500 opacity-50"></div>
+        <div class="absolute bottom-24 left-32 w-4 h-4 bg-accent rounded-full animate-pulse delay-1000 opacity-40"></div>
+        <div class="absolute top-48 right-48 w-2.5 h-2.5 bg-info rounded-full animate-pulse delay-300 opacity-55"></div>
+        <div class="absolute bottom-32 right-16 w-3 h-3 bg-success rounded-full animate-pulse delay-800 opacity-45"></div>
+        
+        <div class="absolute top-24 left-48 w-2 h-2 bg-primary/80 rounded-full animate-pulse delay-200 opacity-50"></div>
+        <div class="absolute top-64 right-32 w-1.5 h-1.5 bg-secondary/80 rounded-full animate-pulse delay-600 opacity-60"></div>
+        <div class="absolute bottom-48 left-24 w-2 h-2 bg-accent/80 rounded-full animate-pulse delay-900 opacity-40"></div>
+        <div class="absolute top-80 right-64 w-1.5 h-1.5 bg-info/80 rounded-full animate-pulse delay-400 opacity-50"></div>
+        <div class="absolute bottom-16 right-40 w-2 h-2 bg-success/80 rounded-full animate-pulse delay-1200 opacity-45"></div>
+        
+        <div class="absolute top-40 left-64 w-1 h-1 bg-primary/60 rounded-full animate-pulse delay-100 opacity-70"></div>
+        <div class="absolute top-56 right-56 w-1 h-1 bg-secondary/60 rounded-full animate-pulse delay-700 opacity-50"></div>
+        <div class="absolute bottom-40 left-56 w-1 h-1 bg-accent/60 rounded-full animate-pulse delay-1100 opacity-60"></div>
+        <div class="absolute top-72 right-80 w-1 h-1 bg-info/60 rounded-full animate-pulse delay-350 opacity-40"></div>
+        <div class="absolute bottom-56 right-24 w-1 h-1 bg-success/60 rounded-full animate-pulse delay-950 opacity-55"></div>
+        
+        <div class="absolute top-20 left-80 w-2 h-2 bg-gradient-to-br from-primary to-secondary rounded-full animate-bounce opacity-50"></div>
+        <div class="absolute top-60 right-72 w-1.5 h-1.5 bg-gradient-to-br from-secondary to-accent rounded-full animate-bounce delay-500 opacity-40"></div>
+        <div class="absolute bottom-20 left-72 w-2 h-2 bg-gradient-to-br from-accent to-info rounded-full animate-bounce delay-1000 opacity-45"></div>
+      </div>
+
+      <div class="absolute bottom-0 left-0 right-0 z-10 pointer-events-none hidden md:block">
+        <img 
+          src="/images/Foreground1_old.png" 
+          alt="Foreground decoration" 
+          class="w-full h-auto object-cover object-bottom"
+        />
+      </div>
+
+      <div class="text-center z-10 max-w-5xl mx-auto px-6">
+        <div class="inline-flex badge badge-base-100 items-center gap-3 bg-gradient-to-r from-success/30 to-primary/30 border-2 border-success/40 rounded-full px-6 md:px-8 py-3 md:py-4 backdrop-blur-sm mb-6 md:mb-8 shadow-2xl shadow-primary/20" data-aos="zoom-in" data-aos-delay="200">
+          <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+          <span class="font-semibold text-sm md:text-base">Collector's Hub</span>
+          <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+        </div>
+        
+        <div class="relative mb-6 md:mb-8">
+          <h2 class="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black mb-4 md:mb-6 relative z-10" data-aos="fade-up" data-aos-delay="400">
+            <span class="bg-gradient-to-r from-success via-primary to-secondary bg-clip-text text-transparent drop-shadow-2xl animate-pulse">
+              REJOIGNEZ
+            </span>
+          </h2>
+          
+          <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-4 left-8 w-3 h-3 bg-accent rounded-full blur-sm animate-pulse opacity-40"></div>
+            <div class="absolute top-12 right-12 w-2 h-2 bg-info rounded-full blur-sm animate-pulse opacity-50 delay-500"></div>
+            <div class="absolute bottom-8 left-16 w-4 h-4 bg-secondary rounded-full blur-md animate-pulse opacity-30 delay-1000"></div>
+            <div class="absolute top-8 right-24 w-2.5 h-2.5 bg-primary rounded-full blur-sm animate-pulse opacity-45 delay-700"></div>
+          </div>
+        </div>
+        
+        <h3 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-base-content/90 mb-4 md:mb-6" data-aos="fade-up" data-aos-delay="450">
+          L'AVENTURE ULTIME
+        </h3>
+        
+        <div class="flex items-center justify-center gap-4 mb-8 md:mb-12" data-aos="fade-up" data-aos-delay="450">
+          <div class="h-px bg-gradient-to-r from-transparent via-primary/60 to-primary/20 w-16 md:w-24"></div>
+          <div class="w-3 h-3 bg-gradient-to-br from-primary to-secondary rounded-full shadow-lg shadow-primary/50 animate-pulse"></div>
+          <div class="h-px bg-gradient-to-l from-transparent via-primary/60 to-primary/20 w-16 md:w-24"></div>
+        </div>
+        
+        <div class="bg-gradient-to-br from-base-100/60 to-base-200/40 backdrop-blur-sm border-2 border-success/20 rounded-3xl p-8 mb-12 relative overflow-hidden shadow-2xl shadow-primary/10" data-aos="fade-up" data-aos-delay="500">
+          <div class="absolute top-6 right-6 w-6 h-6 border-2 border-success/30 rounded-full animate-pulse"></div>
+          <div class="absolute bottom-6 left-6 w-4 h-4 border-2 border-primary/40 rounded-full animate-pulse delay-500"></div>
+          <div class="absolute top-8 left-8 w-2 h-2 bg-accent rounded-full blur-sm animate-pulse opacity-60 delay-1000"></div>
+          <div class="absolute bottom-8 right-8 w-3 h-3 bg-info rounded-full blur-sm animate-pulse opacity-50 delay-300"></div>
+          
+          <p class="text-xl md:text-2xl text-base-content/90 leading-relaxed mb-8">
+            Des milliers de dresseurs vous attendent ! Commencez votre collection dès maintenant 
+            et devenez le maître Pokémon ultime dans cette aventure épique.
+          </p>
+          
+          <div class="flex flex-wrap justify-center gap-6 text-base-content/70 mb-8">
+            <div class="flex items-center gap-2 group">
+              <span class="text-success text-lg group-hover:scale-110 transition-transform">✓</span>
+              <span>Gratuit</span>
             </div>
-        </header>
-    </div>
+            <div class="flex items-center gap-2 group">
+              <span class="text-success text-lg group-hover:scale-110 transition-transform">✓</span>
+              <span>Pas de publicité</span>
+            </div>
+            <div class="flex items-center gap-2 group">
+              <span class="text-success text-lg group-hover:scale-110 transition-transform">✓</span>
+              <span>Mises à jour régulières</span>
+            </div>
+            <div class="flex items-center gap-2 group">
+              <span class="text-success text-lg group-hover:scale-110 transition-transform">✓</span>
+              <span>Communauté active</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center" data-aos="fade-up" data-aos-delay="400">
+          <button class="group relative overflow-hidden px-6 py-3 text-sm font-medium text-base-100 bg-gradient-to-br from-primary to-secondary border border-primary/30 hover:border-primary/50 rounded-xl shadow-lg shadow-primary/15 hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/12 before:to-white/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-xl">
+            <span class="relative z-10 flex items-center gap-2">
+              <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors duration-300">
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              Commencer Maintenant
+            </span>
+          </button>
+          <button class="group relative overflow-hidden px-6 py-3 text-sm font-medium text-base-content/70 hover:text-secondary bg-gradient-to-br from-base-100/60 via-base-200/70 to-base-100/60 backdrop-blur-sm border border-secondary/20 hover:border-secondary/40 rounded-xl shadow-lg shadow-secondary/15 hover:shadow-xl hover:shadow-secondary/20 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer before:absolute before:inset-0 before:bg-gradient-to-r before:from-secondary/0 before:via-secondary/8 before:to-secondary/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-xl">
+            <span class="relative z-10 flex items-center gap-2">
+              <div class="w-4 h-4 rounded-md bg-secondary/15 flex items-center justify-center group-hover:bg-secondary/25 transition-colors duration-300">
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+              Voir la collection
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
 </template>
 
+<script setup>
+import { onMounted, onUnmounted } from 'vue'
+import Lenis from 'lenis'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+import AppNavbar from '@/components/AppNavbar.vue'
+
+let lenis = null
+
+onMounted(() => {
+  AOS.init({
+    duration: 800,
+    easing: 'ease-out-cubic',
+    once: true,
+    offset: 100,
+  })
+
+  lenis = new Lenis({
+    autoRaf: true,
+  })
+
+  lenis.on('scroll', (e) => {
+    document.querySelectorAll('[data-speed]').forEach((el) => {
+      const speed = el.getAttribute('data-speed')
+      const yPos = -(e.scroll * speed)
+      el.style.transform = `translateY(${yPos}px)`
+    })
+  })
+})
+
+onUnmounted(() => {
+  lenis?.destroy()
+})
+</script>
+
 <style scoped>
-.text-gradient {
-    background: linear-gradient(90deg, #60a5fa, #a78bfa);
-    -webkit-background-clip: text;
-    background-clip: text;
-}
 </style>
