@@ -45,12 +45,12 @@ class MarketplaceController extends Controller
         $userPokemons = $user->pokedex()
             ->with('pokemon')
             ->get();
-        
+
         $myListings = $user->marketplaceSales()
             ->with(['pokemon.pokemon'])
             ->where('status', 'active')
             ->get();
-        
+
         return Inertia::render('Marketplace/Sell', [
             'userPokemons' => $userPokemons,
             'myListings' => $myListings
@@ -118,17 +118,17 @@ class MarketplaceController extends Controller
             ->where('id', $listingId)
             ->where('status', 'active')
             ->first();
-            
+
         if (!$listing) {
             return back()->withErrors([
                 'message' => 'Annonce non trouvée ou vous n\'êtes pas autorisé à la retirer'
             ]);
         }
-        
+
         $listing->update([
             'status' => 'cancelled'
         ]);
-        
+
         return redirect()->route('marketplace.sell')->with('success', 'Annonce retirée avec succès');
     }
 
@@ -139,39 +139,39 @@ class MarketplaceController extends Controller
             ->where('id', $listingId)
             ->where('status', 'active')
             ->first();
-    
+
         if (!$listing) {
             return back()->withErrors([
                 'message' => 'Annonce non trouvée'
             ]);
         }
-    
+
         if ($user->cash < $listing->price) {
             return back()->withErrors([
                 'message' => 'Fonds insuffisants'
             ]);
         }
-    
+
         if ($user->id === $listing->seller_id) {
             return back()->withErrors([
                 'message' => 'Vous ne pouvez pas acheter votre propre Pokemon'
             ]);
         }
-    
+
         try {
             DB::transaction(function () use ($user, $listing) {
                 $seller = $listing->seller;
-    
+
                 $user->cash -= $listing->price;
                 $user->save();
-    
+
                 $seller->cash += $listing->price;
                 $seller->save();
-    
+
                 $pokemon = $listing->pokemon;
                 $pokemon->user_id = $user->id;
                 $pokemon->save();
-    
+
                 $listing->status = 'sold';
                 $listing->sold_at = now();
                 $listing->buyer_id = $user->id;
@@ -182,16 +182,16 @@ class MarketplaceController extends Controller
                 'message' => 'Erreur lors de l\'achat : ' . $e->getMessage()
             ]);
         }
-    
+
         return redirect()->route('marketplace.index')->with('success', 'Achat réussi');
     }
-    
+
     public function getListings(Request $request)
     {
         $user = auth()->user();
         $query = Marketplace::with(['pokemon.pokemon', 'seller'])
             ->where('status', 'active');
-            
+
         if ($request->has('myListings') && $request->myListings === 'true') {
             $query->where('seller_id', $user->id);
         }
@@ -227,4 +227,4 @@ class MarketplaceController extends Controller
 
         return response()->json($listings);
     }
-} 
+}

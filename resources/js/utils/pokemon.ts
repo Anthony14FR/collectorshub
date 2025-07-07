@@ -30,4 +30,4 @@ export const getRarityColor = (rarity: string) => {
         legendary: 'from-amber-400 to-amber-600'
     };
     return colors[rarity] || colors.normal;
-}; 
+};

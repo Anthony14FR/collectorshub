@@ -18,6 +18,9 @@ export { default as MarketplaceCard } from './Cards/MarketplaceCard.vue';
 export { default as PokedexCard } from './Cards/PokedexCard.vue';
 export { default as PokemonCard } from './Cards/PokemonCard.vue';
 
+// Marketplace Components
+export { default as SaleRow } from './Marketplace/SaleRow.vue';
+
 // UI Components
 export { default as Modal } from './UI/Modal.vue';
 export { default as Button } from './UI/Button.vue';
@@ -30,4 +33,4 @@ export { default as Spinner } from './UI/Spinner.vue';
 export { default as PokemonTypeBadge } from './UI/PokemonTypeBadge.vue';
 export { default as RarityBadge } from './UI/RarityBadge.vue';
 export { default as BackgroundEffects } from './UI/BackgroundEffects.vue';
-export { default as AppNavbar } from './UI/AppNavbar.vue'; 
+export { default as AppNavbar } from './UI/AppNavbar.vue';

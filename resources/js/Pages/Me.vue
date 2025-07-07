@@ -28,7 +28,7 @@ const pokedexModalOpen = ref(false);
 <template>
     <Head title="Mon Profil" />
 
-    <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+    <div  class="h-screen w-screen !overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
 
         <BackgroundEffects />
 
@@ -84,11 +84,6 @@ const pokedexModalOpen = ref(false);
 
 <style>
 
-#app {
-    overflow: hidden !important;
-    height: 100vh !important;
-    width: 100vw !important;
-}
 
 ::-webkit-scrollbar {
     display: none !important;
