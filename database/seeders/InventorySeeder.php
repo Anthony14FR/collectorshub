@@ -14,9 +14,9 @@ class InventorySeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('role', 'admin')->first();
-        $user = User::where('role', 'user')->first();
-        
-        if (!$admin || !$user) {
+        $users = User::where('role', 'user')->get();
+
+        if (!$admin || $users->isEmpty()) {
             $this->command->error('Utilisateurs admin ou user non trouvés. Exécutez d\'abord UserSeeder.');
             return;
         }
@@ -30,7 +30,7 @@ class InventorySeeder extends Seeder
         }
         
         $this->command->info('Ajout de Pokémons à l\'admin...');
-        foreach ($pokemons->take(15) as $index => $pokemon) {
+        foreach ($pokemons->take(15) as $pokemon) {
             Pokedex::create([
                 'user_id' => $admin->id,
                 'pokemon_id' => $pokemon->id,
@@ -38,25 +38,27 @@ class InventorySeeder extends Seeder
                 'level' => rand(1, 50),
                 'star' => rand(1, 5),
                 'hp_left' => $pokemon->hp,
-                'is_in_team' => ($index < 6),
+                'is_in_team' => false,
                 'is_favorite' => (rand(1, 100) <= 20),
                 'obtained_at' => now()
             ]);
         }
         
         $this->command->info('Ajout de Pokémons à l\'utilisateur...');
-        foreach ($pokemons->take(8) as $index => $pokemon) {
-            Pokedex::create([
-                'user_id' => $user->id,
-                'pokemon_id' => $pokemon->id,
-                'nickname' => null,
-                'level' => rand(1, 30),
-                'star' => rand(1, 3),
-                'hp_left' => $pokemon->hp,
-                'is_in_team' => ($index < 6),
-                'is_favorite' => (rand(1, 100) <= 20),
-                'obtained_at' => now()
-            ]);
+        foreach ($users as $user) {
+            foreach ($pokemons->take(8) as $pokemon) {
+                Pokedex::create([
+                    'user_id' => $user->id,
+                    'pokemon_id' => $pokemon->id,
+                    'nickname' => null,
+                    'level' => rand(1, 30),
+                    'star' => rand(1, 3),
+                    'hp_left' => $pokemon->hp,
+                    'is_in_team' => false,
+                    'is_favorite' => (rand(1, 100) <= 20),
+                    'obtained_at' => now()
+                ]);
+            }
         }
         
         $this->command->info('Ajout d\'items à l\'admin...');
@@ -66,15 +68,17 @@ class InventorySeeder extends Seeder
                 'item_id' => $item->id,
                 'quantity' => rand(1, 10)
             ]);
-        }
+        }       
         
         $this->command->info('Ajout d\'items à l\'utilisateur...');
-        foreach ($items->take(3) as $item) {
-            Inventory::create([
-                'user_id' => $user->id,
-                'item_id' => $item->id,
-                'quantity' => rand(1, 5)
-            ]);
+        foreach ($users as $user) {
+            foreach ($items->take(3) as $item) {
+                Inventory::create([
+                    'user_id' => $user->id,
+                    'item_id' => $item->id,
+                    'quantity' => rand(1, 5)
+                ]);
+            }
         }
         
         $this->command->info('Inventaires remplis avec succès.');

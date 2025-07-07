@@ -42,5 +42,7 @@ class UserSeeder extends Seeder
         ]);
 
         $user->assignRole('user');
+
+        User::factory()->count(8)->create();
     }
 }

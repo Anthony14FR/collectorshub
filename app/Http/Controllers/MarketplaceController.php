@@ -11,18 +11,6 @@ use Inertia\Inertia;
 
 class MarketplaceController extends Controller
 {
-    private function getPriceRange(string $rarity): array
-    {
-        $ranges = [
-            'normal' => ['min' => 10, 'max' => 1000000],
-            'rare' => ['min' => 100, 'max' => 1000000],
-            'epic' => ['min' => 1000, 'max' => 1000000],
-            'legendary' => ['min' => 10000, 'max' => 1000000],
-        ];
-
-        return $ranges[$rarity] ?? $ranges['normal'];
-    }
-
     public function index()
     {
         $user = auth()->user();
@@ -95,7 +83,7 @@ class MarketplaceController extends Controller
             ]);
         }
 
-        $priceRange = $this->getPriceRange($pokedexEntry->pokemon->rarity);
+        $priceRange = Marketplace::getPriceRange($pokedexEntry->pokemon->rarity);
         if ($price < $priceRange['min'] || $price > $priceRange['max']) {
             return back()->withErrors([
                 'message' => "Le prix doit être entre {$priceRange['min']} et {$priceRange['max']} pour un Pokemon {$pokedexEntry->pokemon->rarity}"
