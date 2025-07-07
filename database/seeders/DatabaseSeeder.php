@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             ItemSeeder::class,
             PromoCodeSeeder::class,
             InventorySeeder::class,
+            MarketplaceSeeder::class,
         ]);
     }
 }

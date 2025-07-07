@@ -1,4 +1,4 @@
-.PHONY: help install setup start clear-cache refresh log
+.PHONY: help install setup start clear-cache refresh log main main-rebuild
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -35,3 +35,11 @@ refresh: ## Rafraîchit la base de données et exécute les seeders
 
 log: ## Affiche les 200 dernières lignes des logs Laravel et suit les nouvelles entrées
 	tail -f -n 200 storage/logs/laravel.log
+
+main: ## Checkout main et pull
+	git checkout main && git pull
+
+main-rebuild: ## Checkout main, pull, et rebuild + start
+	make main
+	make install
+	make start

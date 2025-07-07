@@ -21,7 +21,7 @@ class PokedexSeeder extends Seeder
         Pokedex::create([
             'user_id' => $admin->id,
             'pokemon_id' => $pokemon->id,
-            'is_in_team' => true,
+            'is_in_team' => false,
             'level' => 1,
         ]);
     }
