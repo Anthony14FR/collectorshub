@@ -37,7 +37,7 @@ class Item extends Model
             if (!in_array($item->type, ['heal', 'boost', 'evolution', 'special'])) {
                 throw new \Exception('Type d\'item invalide');
             }
-            if (!in_array($item->rarity, ['common', 'uncommon', 'rare', 'epic', 'legendary'])) {
+            if (!in_array($item->rarity, ['normal', 'rare', 'epic', 'legendary'])) {
                 throw new \Exception('Rareté invalide');
             }
             if ($item->price < 0) {

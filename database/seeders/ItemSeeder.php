@@ -16,7 +16,7 @@ class ItemSeeder extends Seeder
                 'type' => 'boost',
                 'effect' => ['stat' => 'attack', 'amount' => 1],
                 'price' => 500,
-                'rarity' => 'common',
+                'rarity' => 'normal',
             ],
             [
                 'name' => 'Tamato',
@@ -24,7 +24,7 @@ class ItemSeeder extends Seeder
                 'type' => 'boost',
                 'effect' => ['stat' => 'speed', 'amount' => 1],
                 'price' => 500,
-                'rarity' => 'common',
+                'rarity' => 'normal',
             ],
             [
                 'name' => 'Pomeg',
@@ -32,7 +32,7 @@ class ItemSeeder extends Seeder
                 'type' => 'boost',
                 'effect' => ['stat' => 'hp', 'amount' => 1],
                 'price' => 500,
-                'rarity' => 'common',
+                'rarity' => 'normal',
             ],
             [
                 'name' => 'Grepa',
@@ -40,7 +40,7 @@ class ItemSeeder extends Seeder
                 'type' => 'boost',
                 'effect' => ['stat' => 'special_attack', 'amount' => 1],
                 'price' => 500,
-                'rarity' => 'common',
+                'rarity' => 'normal',
             ],
             [
                 'name' => 'Qualot',
@@ -48,7 +48,7 @@ class ItemSeeder extends Seeder
                 'type' => 'boost',
                 'effect' => ['stat' => 'defense', 'amount' => 1],
                 'price' => 500,
-                'rarity' => 'common',
+                'rarity' => 'normal',
             ],
             [
                 'name' => 'Hondew',
@@ -56,7 +56,7 @@ class ItemSeeder extends Seeder
                 'type' => 'boost',
                 'effect' => ['stat' => 'special_defense', 'amount' => 1],
                 'price' => 500,
-                'rarity' => 'common',
+                'rarity' => 'normal',
             ],
             [
                 'name' => 'Super Kelpsy',
@@ -112,7 +112,7 @@ class ItemSeeder extends Seeder
                 'type' => 'heal',
                 'effect' => ['amount' => 20],
                 'price' => 300,
-                'rarity' => 'common',
+                'rarity' => 'normal',
             ],
             [
                 'name' => 'Super Potion',
@@ -120,7 +120,7 @@ class ItemSeeder extends Seeder
                 'type' => 'heal',
                 'effect' => ['amount' => 50],
                 'price' => 700,
-                'rarity' => 'uncommon',
+                'rarity' => 'rare',
             ],
             [
                 'name' => 'Hyper Potion',

@@ -24,11 +24,10 @@ export const getTypeColor = (type: string) => {
 
 export const getRarityColor = (rarity: string) => {
     const colors: { [key: string]: string } = {
-        common: 'from-slate-400 to-slate-600',
-        uncommon: 'from-emerald-400 to-emerald-600',
+        normal: 'from-slate-400 to-slate-600',
         rare: 'from-sky-400 to-sky-600',
         epic: 'from-violet-400 to-violet-600',
         legendary: 'from-amber-400 to-amber-600'
     };
-    return colors[rarity] || colors.common;
+    return colors[rarity] || colors.normal;
 }; 
