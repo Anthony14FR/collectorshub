@@ -25,34 +25,28 @@ const { user, inventory, marketplace, pokedex, onOpenPokedexModal } = defineProp
 
 <template>
     <div class="hidden lg:block h-screen w-screen overflow-hidden relative">
-        <!-- Zone centrale top : Level centré -->
         <div class="flex justify-center pt-8 mb-8">
             <LevelDisplay :user="user" />
         </div>
 
-        <!-- DRESSEUR AU CENTRE -->
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
             <TrainerProfile :user="user" :trainer-image-id="2" />
         </div>
 
-        <!-- Zone gauche : SAC -->
         <SideSection position="left" :top="true">
             <GameInventory :inventory="inventory" :cash="user.cash" />
         </SideSection>
 
-        <!-- Zone gauche : MARKETPLACE -->
         <SideSection position="left" :top="false">
             <MarketplaceSection :marketplace="marketplace" />
         </SideSection>
 
-        <!-- Zone droite : MENU -->
         <SideSection position="right" :top="true">
             <UserMenu :user="user" />
         </SideSection>
 
-        <!-- Zone droite : POKÉDEX -->
         <SideSection position="right" :top="false">
             <PokedexSection :pokedex="pokedex" :onOpenModal="onOpenPokedexModal" />
         </SideSection>
     </div>
-</template> 
+</template>

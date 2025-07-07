@@ -14,10 +14,9 @@ const isModalOpen = ref(false);
 
 <template>
     <div class="relative">
-        <!-- Bouton Sac -->
-        <Button 
-            variant="primary" 
-            icon="collection" 
+        <Button
+            variant="primary"
+            icon="collection"
             size="md"
             @click="isModalOpen = true"
             class="w-full"
@@ -25,7 +24,6 @@ const isModalOpen = ref(false);
             SAC
         </Button>
 
-        <!-- Modal -->
         <Modal :show="isModalOpen" @close="isModalOpen = false">
             <template #header>
                 <div class="flex items-center gap-3">
@@ -50,11 +48,11 @@ const isModalOpen = ref(false);
                     <p class="text-base-content/70 mb-2">Votre sac est vide</p>
                     <p class="text-sm text-base-content/50">Explorez pour trouver des objets !</p>
                 </div>
-                
+
                 <div v-else class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
-                    <div 
-                        v-for="item in inventory" 
-                        :key="item.id" 
+                    <div
+                        v-for="item in inventory"
+                        :key="item.id"
                         class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-3 border border-success/30 hover:border-success/50 shadow-lg shadow-success/10 hover:shadow-xl hover:shadow-success/20 transition-all duration-300 hover:scale-105 cursor-pointer"
                     >
                         <div class="text-center">
@@ -77,4 +75,4 @@ const isModalOpen = ref(false);
             </template>
         </Modal>
     </div>
-</template> 
+</template>

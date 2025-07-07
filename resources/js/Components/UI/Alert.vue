@@ -9,10 +9,10 @@ interface Props {
     show?: boolean;
 }
 
-const { 
-    type = 'info', 
-    variant = 'filled', 
-    size = 'md', 
+const {
+    type = 'info',
+    variant = 'filled',
+    size = 'md',
     icon,
     title,
     dismissible = false,
@@ -72,7 +72,7 @@ const sizeClasses = {
         leave-from-class="transform scale-100 opacity-100"
         leave-to-class="transform scale-95 opacity-0"
     >
-        <div 
+        <div
             v-if="show"
             :class="[
                 'relative rounded-xl shadow-lg transition-all duration-300 overflow-hidden',
@@ -81,7 +81,6 @@ const sizeClasses = {
             ]"
             role="alert"
         >
-            <!-- Particules décoratives -->
             <div class="absolute inset-0 overflow-hidden pointer-events-none">
                 <div :class="`absolute top-2 left-4 w-1 h-1 bg-${typeConfig[type].color} rounded-full animate-pulse opacity-60`"></div>
                 <div :class="`absolute top-4 right-6 w-1.5 h-1.5 bg-${typeConfig[type].color} rounded-full animate-pulse delay-300 opacity-40`"></div>
@@ -89,9 +88,8 @@ const sizeClasses = {
             </div>
 
             <div class="relative z-10 flex items-start gap-3">
-                <!-- Icône -->
                 <div class="flex-shrink-0 mt-0.5">
-                    <div v-if="icon || !$slots.icon" 
+                    <div v-if="icon || !$slots.icon"
                          :class="`w-6 h-6 rounded-lg bg-${typeConfig[type].color}/20 flex items-center justify-center`">
                         <span v-if="!icon" class="text-sm">{{ typeConfig[type].emoji }}</span>
                         <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +99,6 @@ const sizeClasses = {
                     <slot v-else name="icon" />
                 </div>
 
-                <!-- Contenu -->
                 <div class="flex-1 min-w-0">
                     <h4 v-if="title" class="font-bold mb-1">{{ title }}</h4>
                     <div :class="title ? 'text-sm opacity-90' : ''">
@@ -109,8 +106,7 @@ const sizeClasses = {
                     </div>
                 </div>
 
-                <!-- Bouton de fermeture -->
-                <button 
+                <button
                     v-if="dismissible"
                     @click="handleDismiss"
                     class="flex-shrink-0 ml-2 p-1 rounded-lg hover:bg-black/10 transition-colors duration-200"
@@ -122,4 +118,4 @@ const sizeClasses = {
             </div>
         </div>
     </Transition>
-</template> 
+</template>

@@ -1,9 +1,28 @@
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import Button from '@/Components/UI/Button.vue'
+
+const scrolled = ref(false)
+
+const handleScroll = () => {
+  scrolled.value = window.scrollY > 50
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+</script>
+
 <template>
-    <nav 
+    <nav
       class="fixed top-4 left-4 right-4 z-50 rounded-3xl transition-all duration-500 ease-out hidden md:block"
       :style="{
-        background: scrolled 
-          ? 'linear-gradient(135deg, rgb(var(--color-primary) / 0.1), rgb(var(--color-secondary) / 0.05), rgb(var(--color-accent) / 0.1))' 
+        background: scrolled
+          ? 'linear-gradient(135deg, rgb(var(--color-primary) / 0.1), rgb(var(--color-secondary) / 0.05), rgb(var(--color-accent) / 0.1))'
           : 'transparent',
         backdropFilter: scrolled ? 'blur(20px)' : 'blur(0px)',
         boxShadow: scrolled ? '0 8px 32px rgb(var(--color-primary) / 0.15), inset 0 1px 0 rgb(var(--color-primary) / 0.2)' : 'none',
@@ -18,7 +37,7 @@
         <div class="absolute top-3 right-20 w-1 h-1 bg-info rounded-full animate-pulse delay-500 opacity-60"></div>
         <div class="absolute bottom-2 right-8 w-1.5 h-1.5 bg-success rounded-full animate-pulse delay-1000 opacity-50"></div>
       </div>
-  
+
       <div class="relative px-8 py-4 flex items-center justify-between">
         <RouterLink to="/" class="flex items-center group">
           <div class="relative">
@@ -34,10 +53,10 @@
             <span class="text-xs text-base-content/60 -mt-1">Collection Pokémon</span>
           </div>
         </RouterLink>
-  
+
         <div class="flex items-center gap-2">
-          <RouterLink 
-            to="/collection" 
+          <RouterLink
+            to="/collection"
             class="group relative overflow-hidden px-6 py-3 text-sm font-medium text-base-content/70 hover:text-primary transition-all duration-300 cursor-pointer rounded-2xl hover:bg-gradient-to-r hover:from-primary/5 hover:to-secondary/5 before:absolute before:inset-0 before:bg-gradient-to-r before:from-primary/0 before:via-primary/10 before:to-primary/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-2xl"
             active-class="!text-primary !bg-gradient-to-r !from-primary/10 !to-secondary/10"
           >
@@ -50,9 +69,9 @@
               Collection
             </span>
           </RouterLink>
-  
-          <RouterLink 
-            to="/gacha" 
+
+          <RouterLink
+            to="/gacha"
             class="group relative overflow-hidden px-6 py-3 text-sm font-medium text-base-content/70 hover:text-secondary transition-all duration-300 cursor-pointer rounded-2xl hover:bg-gradient-to-r hover:from-secondary/5 hover:to-accent/5 before:absolute before:inset-0 before:bg-gradient-to-r before:from-secondary/0 before:via-secondary/10 before:to-secondary/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-2xl"
             active-class="!text-secondary !bg-gradient-to-r !from-secondary/10 !to-accent/10"
           >
@@ -66,7 +85,7 @@
             </span>
           </RouterLink>
         </div>
-  
+
         <div class="flex items-center">
           <Button variant="primary" icon="user" size="md">
             Connexion
@@ -74,7 +93,7 @@
         </div>
       </div>
     </nav>
-  
+
     <div class="fixed top-6 right-6 z-50 md:hidden">
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="group btn btn-circle w-14 h-14 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 backdrop-blur-2xl shadow-2xl shadow-primary/20 cursor-pointer hover:scale-105 transition-all duration-300">
@@ -129,25 +148,8 @@
       </div>
     </div>
   </template>
-  
-  <script setup>
-  import { ref, onMounted, onUnmounted } from 'vue'
-  import Button from '@/Components/UI/Button.vue'
-  
-  const scrolled = ref(false)
-  
-  const handleScroll = () => {
-    scrolled.value = window.scrollY > 50
-  }
-  
-  onMounted(() => {
-    window.addEventListener('scroll', handleScroll)
-  })
-  
-  onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll)
-  })
-  </script>
-  
+
+
+
   <style scoped>
   </style>

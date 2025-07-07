@@ -7,7 +7,6 @@ interface Props {
 const { type, size = 'sm' } = defineProps<Props>();
 
 const typeConfig: Record<string, { color: string; bg: string; emoji: string }> = {
-    // Types de base
     normal: { color: 'text-neutral-content', bg: 'from-neutral to-neutral/80', emoji: '⚪' },
     fire: { color: 'text-error-content', bg: 'from-red-500 to-orange-600', emoji: '🔥' },
     water: { color: 'text-info-content', bg: 'from-blue-500 to-cyan-600', emoji: '💧' },
@@ -39,7 +38,7 @@ const sizeClasses = {
 </script>
 
 <template>
-    <span 
+    <span
         :class="[
             'inline-flex items-center justify-center font-semibold rounded-full shadow-lg transition-all duration-200 hover:scale-105',
             `bg-gradient-to-br ${config.bg}`,
@@ -50,4 +49,4 @@ const sizeClasses = {
         <span class="opacity-80">{{ config.emoji }}</span>
         <span class="capitalize font-bold tracking-wide">{{ type }}</span>
     </span>
-</template> 
+</template>

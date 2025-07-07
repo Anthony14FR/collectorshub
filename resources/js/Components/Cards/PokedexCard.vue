@@ -14,7 +14,7 @@ const { entry } = defineProps<Props>();
         <div class="flex items-center gap-3">
             <div class="relative">
                 <div class="w-16 h-16 bg-gradient-to-br from-base-200/50 to-base-300/30 rounded-lg flex items-center justify-center overflow-hidden">
-                    <img 
+                    <img
                         :src="`/images/pokemon-gifs/${entry.pokemon.is_shiny ? (entry.pokemon.id - 1000) + '_S' : entry.pokemon.id}.gif`"
                         :alt="entry.nickname || entry.pokemon.name"
                         class="w-14 h-14 group-hover:scale-110 transition-transform duration-300"
@@ -28,7 +28,6 @@ const { entry } = defineProps<Props>();
                 </div>
             </div>
 
-            <!-- Infos Pokémon -->
             <div class="flex-1">
                 <h4 class="font-bold text-sm mb-1">
                     {{ entry.nickname || entry.pokemon.name }}
@@ -40,10 +39,9 @@ const { entry } = defineProps<Props>();
                 </div>
             </div>
 
-            <!-- Rareté -->
             <div>
-                <div 
-                    class="text-xs px-3 py-1 rounded-md bg-gradient-to-r" 
+                <div
+                    class="text-xs px-3 py-1 rounded-md bg-gradient-to-r"
                     :class="getRarityColor(entry.pokemon.rarity)"
                 >
                     {{ entry.pokemon.rarity }}
@@ -51,4 +49,4 @@ const { entry } = defineProps<Props>();
             </div>
         </div>
     </div>
-</template> 
+</template>

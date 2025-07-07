@@ -8,9 +8,9 @@ interface Props {
     rounded?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
-const { 
-    variant = 'default', 
-    size = 'md', 
+const {
+    variant = 'default',
+    size = 'md',
     hover = false,
     clickable = false,
     padding = 'md',
@@ -64,7 +64,7 @@ const clickableClasses = clickable ? 'cursor-pointer hover:scale-[1.02] active:s
 </script>
 
 <template>
-    <div 
+    <div
         :class="[
             baseClasses,
             variantClasses[variant],
@@ -76,31 +76,26 @@ const clickableClasses = clickable ? 'cursor-pointer hover:scale-[1.02] active:s
         ]"
         @click="handleClick"
     >
-        <!-- Particules décoratives pour variant glass -->
         <div v-if="variant === 'glass'" class="absolute inset-0 overflow-hidden pointer-events-none">
             <div class="absolute top-4 left-6 w-1 h-1 bg-primary rounded-full animate-pulse opacity-60"></div>
             <div class="absolute top-8 right-8 w-1.5 h-1.5 bg-secondary rounded-full animate-pulse delay-300 opacity-40"></div>
             <div class="absolute bottom-6 left-10 w-1 h-1 bg-accent rounded-full animate-pulse delay-700 opacity-50"></div>
         </div>
 
-        <!-- Header slot -->
         <div v-if="$slots.header" class="mb-4">
             <slot name="header" />
         </div>
 
-        <!-- Main content -->
         <div class="relative z-10">
             <slot />
         </div>
 
-        <!-- Footer slot -->
         <div v-if="$slots.footer" class="mt-4 pt-4 border-t border-base-300/30">
             <slot name="footer" />
         </div>
 
-        <!-- Actions slot -->
         <div v-if="$slots.actions" class="mt-4 flex flex-wrap gap-2">
             <slot name="actions" />
         </div>
     </div>
-</template> 
+</template>

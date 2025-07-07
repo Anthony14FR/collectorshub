@@ -22,10 +22,9 @@ const close = () => {
         leave-to-class="opacity-0"
     >
         <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="close">
-            <!-- Backdrop -->
+
             <div class="absolute inset-0 bg-base-100/80 backdrop-blur-md"></div>
-            
-            <!-- Modal Container -->
+
             <Transition
                 enter-active-class="transition ease-out duration-300"
                 enter-from-class="opacity-0 scale-95"
@@ -35,14 +34,14 @@ const close = () => {
                 leave-to-class="opacity-0 scale-95"
             >
                 <div v-if="show" class="relative w-full max-w-5xl max-h-[90vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col">
-                    <!-- Header -->
+
                     <div class="bg-gradient-to-r from-primary/20 to-secondary/20 px-8 py-6 border-b border-primary/20 flex items-center justify-between flex-shrink-0">
                         <div class="flex-1">
                             <slot name="header">
                                 <h3 class="text-xl font-bold tracking-wider">Modal Title</h3>
                             </slot>
                         </div>
-                        <button 
+                        <button
                             @click="close"
                             class="w-10 h-10 rounded-xl bg-base-200/50 hover:bg-base-200 transition-colors duration-200 flex items-center justify-center text-2xl font-bold hover:text-error"
                         >
@@ -50,12 +49,10 @@ const close = () => {
                         </button>
                     </div>
 
-                    <!-- Body -->
                     <div class="flex-1 overflow-y-auto p-6">
                         <slot>Modal content goes here.</slot>
                     </div>
 
-                    <!-- Particules décoratives -->
                     <div class="absolute top-6 right-16 w-6 h-6 border-2 border-success/20 rounded-full animate-pulse pointer-events-none"></div>
                     <div class="absolute bottom-6 left-6 w-4 h-4 border-2 border-primary/30 rounded-full animate-pulse delay-500 pointer-events-none"></div>
                     <div class="absolute top-12 left-12 w-2 h-2 bg-accent/40 rounded-full blur-sm animate-pulse opacity-60 delay-1000 pointer-events-none"></div>

@@ -19,10 +19,9 @@ const logout = () => {
 
 <template>
     <div class="relative">
-        <!-- Bouton Menu -->
-        <Button 
-            variant="secondary" 
-            icon="lightning" 
+        <Button
+            variant="secondary"
+            icon="lightning"
             size="md"
             @click="isModalOpen = true"
             class="w-full"
@@ -30,7 +29,6 @@ const logout = () => {
             MENU
         </Button>
 
-        <!-- Modal -->
         <Modal :show="isModalOpen" @close="isModalOpen = false">
             <template #header>
                 <div class="flex items-center gap-3">
@@ -44,13 +42,12 @@ const logout = () => {
             </template>
             <template #default>
                 <div class="space-y-6">
-                    <!-- Informations utilisateur -->
                     <div class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-primary/20">
                         <div class="flex items-center gap-4">
                             <div class="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
-                                <img 
-                                    :src="`/images/dresseur.png`" 
-                                    :alt="user.username" 
+                                <img
+                                    :src="`/images/dresseur.png`"
+                                    :alt="user.username"
                                     class="w-12 h-12 rounded-full object-cover"
                                 />
                             </div>
@@ -69,10 +66,9 @@ const logout = () => {
                         </div>
                     </div>
 
-                    <!-- Menu principal -->
                     <div class="space-y-3">
-                        <Link 
-                            href="/profile" 
+                        <Link
+                            href="/profile"
                             class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary/10 transition-all duration-300 group"
                         >
                             <div class="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center group-hover:bg-primary/30 transition-colors">
@@ -83,8 +79,8 @@ const logout = () => {
                             <span class="font-medium">Mon Profil</span>
                         </Link>
 
-                        <Link 
-                            href="/collection" 
+                        <Link
+                            href="/collection"
                             class="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary/10 transition-all duration-300 group"
                         >
                             <div class="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
@@ -95,8 +91,8 @@ const logout = () => {
                             <span class="font-medium">Collection</span>
                         </Link>
 
-                        <Link 
-                            href="/gacha" 
+                        <Link
+                            href="/gacha"
                             class="flex items-center gap-3 p-3 rounded-xl hover:bg-accent/10 transition-all duration-300 group"
                         >
                             <div class="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center group-hover:bg-accent/30 transition-colors">
@@ -107,7 +103,7 @@ const logout = () => {
                             <span class="font-medium">Gacha</span>
                         </Link>
 
-                        <button 
+                        <button
                             @click="logout"
                             class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-error/10 transition-all duration-300 group text-left"
                         >
@@ -123,4 +119,4 @@ const logout = () => {
             </template>
         </Modal>
     </div>
-</template> 
+</template>

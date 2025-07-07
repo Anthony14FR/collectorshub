@@ -17,7 +17,7 @@ interface Props {
     clearable?: boolean;
 }
 
-const { 
+const {
     type = 'text',
     size = 'md',
     variant = 'default',
@@ -80,60 +80,55 @@ const roundingClasses = 'rounded-lg';
 
 <template>
     <div class="space-y-2">
-        <!-- Label -->
         <label v-if="label" class="block text-sm font-medium text-base-content/80">
             {{ label }}
             <span v-if="required" class="text-error ml-1">*</span>
         </label>
 
-        <!-- Input wrapper -->
         <div class="relative">
-            <!-- Prefix -->
-            <div 
+            <div
                 v-if="prefix"
                 class="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/60 pointer-events-none z-10"
             >
                 {{ prefix }}
             </div>
 
-            <!-- Icon -->
-            <div 
+            <div
                 v-if="icon"
                 class="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/60 pointer-events-none z-10"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path 
+                    <path
                         v-if="icon === 'search'"
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
-                    <path 
+                    <path
                         v-else-if="icon === 'email'"
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                     />
-                    <path 
+                    <path
                         v-else-if="icon === 'lock'"
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                     />
-                    <path 
+                    <path
                         v-else-if="icon === 'user'"
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                     />
                 </svg>
             </div>
 
-            <!-- Input -->
             <input
                 :type="type"
                 :value="modelValue"
@@ -156,15 +151,13 @@ const roundingClasses = 'rounded-lg';
                 @blur="$emit('blur', $event)"
             />
 
-            <!-- Suffix -->
-            <div 
+            <div
                 v-if="suffix"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/60 pointer-events-none z-10"
             >
                 {{ suffix }}
             </div>
 
-            <!-- Clear button -->
             <button
                 v-if="clearable && modelValue"
                 @click="handleClear"
@@ -176,13 +169,12 @@ const roundingClasses = 'rounded-lg';
                 </svg>
             </button>
 
-            <!-- State indicator -->
-            <div 
+            <div
                 v-if="state !== 'default'"
                 class="absolute right-3 top-1/2 -translate-y-1/2 z-10"
                 :class="{ 'right-10': clearable && modelValue }"
             >
-                <div 
+                <div
                     :class="`w-5 h-5 rounded-full flex items-center justify-center ${
                         state === 'success' ? 'bg-success/20 text-success' :
                         state === 'warning' ? 'bg-warning/20 text-warning' :
@@ -190,25 +182,25 @@ const roundingClasses = 'rounded-lg';
                     }`"
                 >
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path 
+                        <path
                             v-if="state === 'success'"
-                            stroke-linecap="round" 
-                            stroke-linejoin="round" 
-                            stroke-width="2" 
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
                             d="M5 13l4 4L19 7"
                         />
-                        <path 
+                        <path
                             v-else-if="state === 'warning'"
-                            stroke-linecap="round" 
-                            stroke-linejoin="round" 
-                            stroke-width="2" 
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                         />
-                        <path 
+                        <path
                             v-else
-                            stroke-linecap="round" 
-                            stroke-linejoin="round" 
-                            stroke-width="2" 
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
                             d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                     </svg>
@@ -216,8 +208,7 @@ const roundingClasses = 'rounded-lg';
             </div>
         </div>
 
-        <!-- Helper text -->
-        <p 
+        <p
             v-if="helperText"
             :class="`text-sm ${
                 state === 'success' ? 'text-success' :
@@ -229,4 +220,4 @@ const roundingClasses = 'rounded-lg';
             {{ helperText }}
         </p>
     </div>
-</template> 
+</template>

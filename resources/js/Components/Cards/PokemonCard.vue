@@ -26,33 +26,31 @@ const cardClasses = {
 </script>
 
 <template>
-    <div 
+    <div
         :class="[
             cardClasses[variant],
             'text-center transition-all duration-300 group cursor-pointer hover:scale-105 relative'
         ]"
     >
-        <!-- Status Icons en coin supérieur droit - BIEN POSITIONNÉS -->
-        <div v-if="(entry.pokemon.is_shiny || entry.is_favorite || entry.is_in_team)" 
+        <div v-if="(entry.pokemon.is_shiny || entry.is_favorite || entry.is_in_team)"
              class="absolute top-2 right-2 flex gap-1 z-10">
-            <div v-if="entry.pokemon.is_shiny" 
+            <div v-if="entry.pokemon.is_shiny"
                  class="w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
                 <span class="text-yellow-400 text-xs">✨</span>
             </div>
-            <div v-if="entry.is_favorite" 
+            <div v-if="entry.is_favorite"
                  class="w-5 h-5 bg-pink-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-pink-500/30">
                 <span class="text-pink-400 text-xs">❤️</span>
             </div>
-            <div v-if="entry.is_in_team" 
+            <div v-if="entry.is_in_team"
                  class="w-5 h-5 bg-blue-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-blue-500/30">
                 <span class="text-blue-400 text-xs">⭐</span>
             </div>
         </div>
 
-        <!-- Pokemon Image - CENTREE SANS OVERLAP -->
         <div class="flex justify-center items-center mb-3" :class="variant === 'modal' ? 'h-24' : 'h-auto'">
             <div class="relative">
-                <img 
+                <img
                     :src="`/images/pokemon-gifs/${entry.pokemon.is_shiny ? (entry.pokemon.id - 1000) + '_S' : entry.pokemon.id}.gif`"
                     :alt="entry.pokemon?.name"
                     :class="[sizeClasses[size], 'object-contain group-hover:scale-110 transition-transform duration-300']"
@@ -61,7 +59,6 @@ const cardClasses = {
             </div>
         </div>
 
-        <!-- Pokemon Details -->
         <template v-if="showDetails">
             <h4 class="font-bold mb-1" :class="variant === 'modal' ? 'text-sm' : 'text-xs'">
                 {{ entry.nickname || entry.pokemon?.name }}
@@ -70,17 +67,15 @@ const cardClasses = {
                 N°{{ entry.pokemon_id }}
             </p>
 
-            <!-- Types de Pokémon - NOUVEAUX BADGES -->
             <div v-if="entry.pokemon.types && entry.pokemon.types.length > 0" class="flex justify-center gap-1 mb-2">
-                <PokemonTypeBadge 
-                    v-for="type in entry.pokemon.types" 
+                <PokemonTypeBadge
+                    v-for="type in entry.pokemon.types"
                     :key="type.name"
                     :type="type.name"
                     :size="variant === 'modal' ? 'sm' : 'xs'"
                 />
             </div>
-            
-            <!-- Stats pour variant modal -->
+
             <div v-if="variant === 'modal'" class="space-y-2">
                 <div v-if="entry.level" class="flex justify-between items-center text-xs">
                     <span class="opacity-70">Niveau:</span>
@@ -90,11 +85,10 @@ const cardClasses = {
                     <RarityBadge :rarity="entry.star" size="xs" />
                 </div>
             </div>
-            
-            <!-- Rareté pour variant card -->
+
             <div v-if="variant === 'card' && entry.star" class="flex justify-center mt-1">
                 <RarityBadge :rarity="entry.star" size="xs" />
             </div>
         </template>
     </div>
-</template> 
+</template>

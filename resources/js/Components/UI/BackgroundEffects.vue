@@ -8,16 +8,14 @@ const { backgroundImage = '/images/section-me-background.jpg' } = defineProps<Pr
 
 <template>
     <div class="absolute inset-0">
-        <!-- Image de fond -->
         <div class="absolute inset-0 opacity-30">
-            <img 
+            <img
                 :src="backgroundImage"
-                alt="Background" 
+                alt="Background"
                 class="w-full h-full object-cover"
             />
         </div>
 
-        <!-- Particules de fond -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
             <div class="absolute top-20 left-20 w-2 h-2 bg-primary/30 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
             <div class="absolute top-40 right-32 w-3 h-3 bg-secondary/20 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
@@ -25,4 +23,4 @@ const { backgroundImage = '/images/section-me-background.jpg' } = defineProps<Pr
             <div class="absolute bottom-20 right-20 w-3 h-3 bg-success/20 rounded-full animate-pulse" style="animation-delay: 3s;"></div>
         </div>
     </div>
-</template> 
+</template>

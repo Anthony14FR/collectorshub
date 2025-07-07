@@ -17,7 +17,6 @@ const shinyPokemon = computed(() => pokedex?.filter((p) => p.pokemon?.is_shiny) 
 
 <template>
     <div class="h-full flex flex-col bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden max-h-[500px]">
-        <!-- Header -->
         <div class="shrink-0 p-3 bg-gradient-to-r from-secondary/10 to-accent/5 border-b border-secondary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
                 <span class="text-lg">📚</span>
@@ -25,11 +24,10 @@ const shinyPokemon = computed(() => pokedex?.filter((p) => p.pokemon?.is_shiny) 
             </h3>
         </div>
 
-        <!-- Contenu scrollable -->
         <div class="flex-1 overflow-y-auto p-3" style="max-height: calc(100% - 11rem);">
             <div v-if="pokedex && pokedex.length > 0" class="space-y-2">
-                <PokedexCard 
-                    v-for="pokemon in pokedex" 
+                <PokedexCard
+                    v-for="pokemon in pokedex"
                     :key="pokemon.id"
                     :entry="pokemon"
                 />
@@ -41,9 +39,8 @@ const shinyPokemon = computed(() => pokedex?.filter((p) => p.pokemon?.is_shiny) 
             </div>
         </div>
 
-        <!-- Bouton Voir tout TOUJOURS VISIBLE -->
         <div v-if="pokedex && pokedex.length > 4" class="shrink-0 p-3 border-t border-secondary/20">
-            <button 
+            <button
                 @click="onOpenModal"
                 class="w-full group relative overflow-hidden px-4 py-2 text-sm font-medium bg-gradient-to-br from-secondary to-accent border border-secondary/30 hover:border-secondary/50 rounded-lg shadow-lg shadow-secondary/15 hover:shadow-xl hover:shadow-secondary/20 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/12 before:to-white/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-lg"
             >
@@ -53,7 +50,6 @@ const shinyPokemon = computed(() => pokedex?.filter((p) => p.pokemon?.is_shiny) 
             </button>
         </div>
 
-        <!-- Stats Footer -->
         <div class="bg-gradient-to-r from-secondary/10 to-accent/10 px-3 py-2 border-t border-primary/20 flex-shrink-0">
             <div class="grid grid-cols-4 gap-2 text-center">
                 <div class="group cursor-pointer">
@@ -75,4 +71,4 @@ const shinyPokemon = computed(() => pokedex?.filter((p) => p.pokemon?.is_shiny) 
             </div>
         </div>
     </div>
-</template> 
+</template>

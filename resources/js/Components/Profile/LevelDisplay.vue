@@ -5,18 +5,17 @@ import type { User } from '@/types/user';
 
 interface Props {
     user: User;
-    responsive?: boolean; // Nouveau prop pour mode responsive
+    responsive?: boolean;
 }
 
 const { user, responsive = false } = defineProps<Props>();
 
-// Calculate experience progress percentage
 const experienceProgress = computed(() => {
-    const currentLevelExp = (user.level - 1) * 1000; // Each level requires 1000 more XP
+    const currentLevelExp = (user.level - 1) * 1000;
     const nextLevelExp = user.level * 1000;
     const progressInLevel = user.experience - currentLevelExp;
     const expNeededForLevel = nextLevelExp - currentLevelExp;
-    
+
     return Math.min((progressInLevel / expNeededForLevel) * 100, 100);
 });
 
@@ -27,11 +26,8 @@ const experienceForNextLevel = computed(() => {
 </script>
 
 <template>
-    <!-- Version Desktop (absolue) -->
     <div v-if="!responsive" class="absolute left-1/2 -translate-x-1/2 top-8 z-20">
-        <!-- Container avec glassmorphism - ENCORE PLUS LARGE -->
         <div class="bg-gradient-to-br from-base-100/60 to-base-200/40 backdrop-blur-sm border-2 border-success/20 rounded-3xl px-16 py-6 relative overflow-hidden shadow-2xl shadow-primary/10 min-w-[500px]">
-            <!-- Particules décoratives -->
             <div class="absolute inset-0 overflow-hidden pointer-events-none">
                 <div class="absolute top-3 left-6 w-1 h-1 bg-success rounded-full animate-pulse opacity-60"></div>
                 <div class="absolute top-6 right-8 w-1.5 h-1.5 bg-primary rounded-full animate-pulse delay-300 opacity-40"></div>
@@ -39,12 +35,11 @@ const experienceForNextLevel = computed(() => {
                 <div class="absolute top-8 right-12 w-2 h-2 bg-secondary rounded-full animate-pulse delay-500 opacity-30"></div>
             </div>
 
-            <!-- Badge LEVEL avec particules -->
             <div class="relative z-10 text-center">
-                <Badge 
-                    variant="success" 
-                    size="lg" 
-                    pill 
+                <Badge
+                    variant="success"
+                    size="lg"
+                    pill
                     class="shadow-2xl shadow-primary/20"
                 >
                     <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
@@ -53,20 +48,17 @@ const experienceForNextLevel = computed(() => {
                 </Badge>
             </div>
 
-            <!-- Barre d'expérience -->
             <div class="mt-4 mb-3">
                 <div class="h-2 bg-base-200/50 rounded-full overflow-hidden relative">
-                    <div 
+                    <div
                         class="h-full bg-gradient-to-r from-success via-primary to-secondary transition-all duration-1000 ease-out relative group"
                         :style="{ width: experienceProgress + '%' }"
                     >
-                        <!-- Effet de brillance -->
                         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Stats d'expérience avec séparateurs et SLASH -->
             <div class="flex items-center justify-center text-xs gap-4">
                 <div class="flex items-center gap-2">
                     <div class="h-px bg-gradient-to-r from-transparent via-primary/40 to-primary/10 w-20"></div>
@@ -78,7 +70,6 @@ const experienceForNextLevel = computed(() => {
                     </div>
                 </div>
 
-                <!-- SLASH au milieu -->
                 <div class="text-2xl font-bold text-base-content/30">/</div>
 
                 <div class="flex items-center gap-2">
@@ -90,7 +81,6 @@ const experienceForNextLevel = computed(() => {
                 </div>
             </div>
 
-            <!-- Info niveau suivant -->
             <div class="mt-2 text-center">
                 <p class="text-xs text-base-content/50">
                     {{ experienceForNextLevel.toLocaleString() }} EXP pour le niveau {{ user.level + 1 }}
@@ -99,16 +89,14 @@ const experienceForNextLevel = computed(() => {
         </div>
     </div>
 
-    <!-- Version Mobile/Responsive (dans le flux) -->
     <div v-else class="w-full max-w-sm mx-auto">
-        <!-- Container avec glassmorphism - Version mobile -->
         <div class="bg-gradient-to-br from-base-100/60 to-base-200/40 backdrop-blur-sm border-2 border-success/20 rounded-2xl px-6 py-4 relative overflow-hidden shadow-xl shadow-primary/10">
-            <!-- Badge LEVEL -->
+
             <div class="text-center mb-3">
-                <Badge 
-                    variant="success" 
-                    size="md" 
-                    pill 
+                <Badge
+                    variant="success"
+                    size="md"
+                    pill
                     class="shadow-lg shadow-primary/20"
                 >
                     <div class="w-1.5 h-1.5 bg-success rounded-full animate-pulse"></div>
@@ -117,17 +105,15 @@ const experienceForNextLevel = computed(() => {
                 </Badge>
             </div>
 
-            <!-- Barre d'expérience -->
             <div class="mb-3">
                 <div class="h-1.5 bg-base-200/50 rounded-full overflow-hidden relative">
-                    <div 
+                    <div
                         class="h-full bg-gradient-to-r from-success via-primary to-secondary transition-all duration-1000 ease-out"
                         :style="{ width: experienceProgress + '%' }"
                     ></div>
                 </div>
             </div>
 
-            <!-- Stats simplifié pour mobile -->
             <div class="text-center text-xs">
                 <div class="mb-1">
                     <span class="font-bold text-success">{{ user.experience.toLocaleString() }}</span>
@@ -141,4 +127,4 @@ const experienceForNextLevel = computed(() => {
             </div>
         </div>
     </div>
-</template> 
+</template>

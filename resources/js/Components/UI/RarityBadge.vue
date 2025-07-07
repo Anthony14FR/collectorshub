@@ -33,21 +33,21 @@ const starSizeClasses = {
     lg: 'text-lg'
 };
 
-const baseClasses = variant === 'filled' 
+const baseClasses = variant === 'filled'
     ? `bg-gradient-to-br ${config.color} ${config.text} shadow-lg`
     : `border-2 ${config.border} ${config.text} bg-transparent`;
 </script>
 
 <template>
-    <span 
+    <span
         :class="[
             'inline-flex items-center justify-center font-bold rounded-full transition-all duration-200 hover:scale-105',
             baseClasses,
             sizeClasses[size]
         ]"
     >
-        <span 
-            v-for="i in rarity" 
+        <span
+            v-for="i in rarity"
             :key="i"
             :class="['opacity-90', starSizeClasses[size]]"
         >
@@ -57,7 +57,6 @@ const baseClasses = variant === 'filled'
 </template>
 
 <style scoped>
-/* Classes pour les gradients rainbow (rareté 7) */
 .from-rainbow-start {
     --tw-gradient-from: #ff0000;
 }
@@ -68,4 +67,4 @@ const baseClasses = variant === 'filled'
 .to-rainbow-end {
     --tw-gradient-to: #0000ff;
 }
-</style> 
+</style>

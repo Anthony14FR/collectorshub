@@ -12,7 +12,7 @@ interface Props {
     fallback?: string;
 }
 
-const { 
+const {
     src,
     alt = 'Avatar',
     size = 'md',
@@ -72,8 +72,7 @@ const placeholderInitials = placeholder ? getInitials(placeholder) : fallback ||
 
 <template>
     <div class="relative inline-block">
-        <!-- Avatar container -->
-        <div 
+        <div
             :class="[
                 'relative overflow-hidden transition-all duration-200',
                 sizeClasses[size],
@@ -82,17 +81,15 @@ const placeholderInitials = placeholder ? getInitials(placeholder) : fallback ||
                 gradient ? 'bg-gradient-to-br from-primary/20 to-secondary/20' : 'bg-base-200'
             ]"
         >
-            <!-- Image -->
-            <img 
+            <img
                 v-if="src"
                 :src="src"
                 :alt="alt"
                 class="w-full h-full object-cover"
                 loading="lazy"
             />
-            
-            <!-- Placeholder/Initials -->
-            <div 
+
+            <div
                 v-else
                 class="w-full h-full flex items-center justify-center font-semibold text-base-content/70"
                 :class="{
@@ -107,15 +104,13 @@ const placeholderInitials = placeholder ? getInitials(placeholder) : fallback ||
                 {{ placeholderInitials }}
             </div>
 
-            <!-- Gradient overlay for glass effect -->
-            <div 
+            <div
                 v-if="gradient"
                 class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"
             ></div>
         </div>
 
-        <!-- Status indicator -->
-        <div 
+        <div
             v-if="status"
             :class="[
                 'absolute bottom-0 right-0 rounded-full border-2 border-base-100',
@@ -125,7 +120,6 @@ const placeholderInitials = placeholder ? getInitials(placeholder) : fallback ||
             :title="statusConfig[status].label"
         ></div>
 
-        <!-- Notification badge -->
         <slot name="badge" />
     </div>
-</template> 
+</template>

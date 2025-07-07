@@ -27,15 +27,13 @@ const pokedexModalOpen = ref(false);
 
 <template>
     <Head title="Mon Profil" />
-    
+
     <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
-        <!-- Background et particules -->
+
         <BackgroundEffects />
 
-        <!-- Contenu principal -->
         <div class="relative z-10 h-screen w-screen overflow-hidden">
-            <!-- Layout Mobile -->
-            <MobileLayout 
+            <MobileLayout
                 :user="auth.user"
                 :inventory="inventory"
                 :marketplace="marketplace"
@@ -43,8 +41,7 @@ const pokedexModalOpen = ref(false);
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
             />
 
-            <!-- Layout Desktop -->
-            <DesktopLayout 
+            <DesktopLayout
                 :user="auth.user"
                 :inventory="inventory"
                 :marketplace="marketplace"
@@ -53,7 +50,6 @@ const pokedexModalOpen = ref(false);
             />
         </div>
 
-        <!-- Modal Pokédex -->
         <Modal :show="pokedexModalOpen" @close="pokedexModalOpen = false">
             <template #header>
                 <div class="flex items-center gap-3">
@@ -72,8 +68,8 @@ const pokedexModalOpen = ref(false);
             </template>
             <template #default>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
-                    <PokemonCard 
-                        v-for="pokemon in pokedex" 
+                    <PokemonCard
+                        v-for="pokemon in pokedex"
                         :key="pokemon.id"
                         :entry="pokemon"
                         size="large"
