@@ -6,7 +6,7 @@ use App\Models\Marketplace;
 use App\Models\Pokedex;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class MarketplaceController extends Controller
@@ -25,18 +25,13 @@ class MarketplaceController extends Controller
 
     public function index()
     {
-        $userId = Auth::id();
-        $listings = Marketplace::with(['pokemon', 'seller'])
+        $user = auth()->user();
+        $listings = Marketplace::with(['pokemon.pokemon', 'seller'])
             ->where('status', 'active')
             ->get();
 
-        $myListings = $listings->filter(function ($listing) use ($userId) {
-            return $listing->seller_id === $userId;
-        });
-
-        $otherListings = $listings->filter(function ($listing) use ($userId) {
-            return $listing->seller_id !== $userId;
-        });
+        $myListings = $listings->where('seller_id', $user->id)->values();
+        $otherListings = $listings->where('seller_id', '!=', $user->id)->values();
 
         return Inertia::render('Marketplace/Index', [
             'myListings' => $myListings,
@@ -46,11 +41,13 @@ class MarketplaceController extends Controller
 
     public function sell()
     {
-        $userId = Auth::id();
-        $userPokemons = Pokedex::where('user_id', $userId)->get();
+        $user = auth()->user();
+        $userPokemons = $user->pokedex()
+            ->with('pokemon')
+            ->get();
         
-        $myListings = Marketplace::with(['pokemon'])
-            ->where('seller_id', $userId)
+        $myListings = $user->marketplaceSales()
+            ->with(['pokemon.pokemon'])
             ->where('status', 'active')
             ->get();
         
@@ -67,15 +64,16 @@ class MarketplaceController extends Controller
             'price' => 'required|integer|min:10|max:1000000',
         ]);
 
-        $userId = Auth::id();
+        $user = auth()->user();
         $pokemonId = $validated['pokemon_id'];
         $price = $validated['price'];
 
-        $pokemon = Pokedex::where('id', $pokemonId)
-            ->where('user_id', $userId)
+        $pokedexEntry = $user->pokedex()
+            ->with('pokemon')
+            ->where('id', $pokemonId)
             ->first();
 
-        if (!$pokemon) {
+        if (!$pokedexEntry) {
             return back()->withErrors([
                 'message' => 'Pokemon non trouvé dans votre collection'
             ]);
@@ -83,7 +81,7 @@ class MarketplaceController extends Controller
 
         $existingListing = Marketplace::where('pokemon_id', $pokemonId)
             ->where('status', 'active')
-            ->first();
+            ->exists();
 
         if ($existingListing) {
             return back()->withErrors([
@@ -91,21 +89,20 @@ class MarketplaceController extends Controller
             ]);
         }
 
-        if ($pokemon->is_in_team) {
+        if ($pokedexEntry->is_in_team) {
             return back()->withErrors([
                 'message' => 'Impossible de vendre un Pokemon de votre équipe'
             ]);
         }
 
-        $priceRange = $this->getPriceRange($pokemon->rarity);
+        $priceRange = $this->getPriceRange($pokedexEntry->pokemon->rarity);
         if ($price < $priceRange['min'] || $price > $priceRange['max']) {
             return back()->withErrors([
-                'message' => "Le prix doit être entre {$priceRange['min']} et {$priceRange['max']} pour un Pokemon {$pokemon->rarity}"
+                'message' => "Le prix doit être entre {$priceRange['min']} et {$priceRange['max']} pour un Pokemon {$pokedexEntry->pokemon->rarity}"
             ]);
         }
 
-        $listing = Marketplace::create([
-            'seller_id' => $userId,
+        $user->marketplaceSales()->create([
             'pokemon_id' => $pokemonId,
             'price' => $price,
             'status' => 'active'
@@ -116,10 +113,9 @@ class MarketplaceController extends Controller
 
     public function cancelListing($listingId)
     {
-        $userId = Auth::id();
-        
-        $listing = Marketplace::where('id', $listingId)
-            ->where('seller_id', $userId)
+        $user = auth()->user();
+        $listing = $user->marketplaceSales()
+            ->where('id', $listingId)
             ->where('status', 'active')
             ->first();
             
@@ -138,77 +134,76 @@ class MarketplaceController extends Controller
 
     public function buyPokemon(Request $request, $listingId)
     {
-        $buyerId = Auth::id();
-
-        $listing = Marketplace::with(['pokemon'])
+        $user = auth()->user();
+        $listing = Marketplace::with(['pokemon.pokemon', 'seller'])
             ->where('id', $listingId)
             ->where('status', 'active')
             ->first();
-
+    
         if (!$listing) {
             return back()->withErrors([
                 'message' => 'Annonce non trouvée'
             ]);
         }
-
-        $buyer = User::find($buyerId);
-        if (!$buyer) {
-            return back()->withErrors([
-                'message' => 'Acheteur non trouvé'
-            ]);
-        }
-
-        if ($buyer->cash < $listing->price) {
+    
+        if ($user->cash < $listing->price) {
             return back()->withErrors([
                 'message' => 'Fonds insuffisants'
             ]);
         }
-
-        $seller = User::find($listing->seller_id);
-        if (!$seller) {
-            return back()->withErrors([
-                'message' => 'Vendeur non trouvé'
-            ]);
-        }
-
-        if ($buyerId === $listing->seller_id) {
+    
+        if ($user->id === $listing->seller_id) {
             return back()->withErrors([
                 'message' => 'Vous ne pouvez pas acheter votre propre Pokemon'
             ]);
         }
-
-        $buyer->update(['cash' => $buyer->cash - $listing->price]);
-        $seller->update(['cash' => $seller->cash + $listing->price]);
-
-        $pokemon = Pokedex::find($listing->pokemon_id);
-        $pokemon->update(['user_id' => $buyerId]);
-
-        $listing->update([
-            'status' => 'sold',
-            'sold_at' => now(),
-            'buyer_id' => $buyerId,
-        ]);
-
+    
+        try {
+            DB::transaction(function () use ($user, $listing) {
+                $seller = $listing->seller;
+    
+                $user->cash -= $listing->price;
+                $user->save();
+    
+                $seller->cash += $listing->price;
+                $seller->save();
+    
+                $pokemon = $listing->pokemon;
+                $pokemon->user_id = $user->id;
+                $pokemon->save();
+    
+                $listing->status = 'sold';
+                $listing->sold_at = now();
+                $listing->buyer_id = $user->id;
+                $listing->save();
+            });
+        } catch (\Throwable $e) {
+            return back()->withErrors([
+                'message' => 'Erreur lors de l\'achat : ' . $e->getMessage()
+            ]);
+        }
+    
         return redirect()->route('marketplace.index')->with('success', 'Achat réussi');
     }
-
+    
     public function getListings(Request $request)
     {
-        $query = Marketplace::with(['pokemon', 'seller'])
+        $user = auth()->user();
+        $query = Marketplace::with(['pokemon.pokemon', 'seller'])
             ->where('status', 'active');
             
         if ($request->has('myListings') && $request->myListings === 'true') {
-            $query->where('seller_id', Auth::id());
+            $query->where('seller_id', $user->id);
         }
 
         if ($request->has('rarity')) {
-            $query->whereHas('pokemon', function ($q) use ($request) {
+            $query->whereHas('pokemon.pokemon', function ($q) use ($request) {
                 $q->where('rarity', $request->rarity);
             });
         }
 
         if ($request->has('type')) {
-            $query->whereHas('pokemon', function ($q) use ($request) {
+            $query->whereHas('pokemon.pokemon', function ($q) use ($request) {
                 $q->whereJsonContains('types', $request->type);
             });
         }
@@ -223,7 +218,7 @@ class MarketplaceController extends Controller
 
         if ($request->has('isShiny')) {
             $isShiny = filter_var($request->isShiny, FILTER_VALIDATE_BOOLEAN);
-            $query->whereHas('pokemon', function ($q) use ($isShiny) {
+            $query->whereHas('pokemon.pokemon', function ($q) use ($isShiny) {
                 $q->where('is_shiny', $isShiny);
             });
         }

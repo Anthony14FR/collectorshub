@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('type');
             $table->json('effect');
             $table->integer('price')->default(0);
-            $table->enum('rarity', ['common', 'uncommon', 'rare', 'epic', 'legendary']);
+            $table->enum('rarity', ['normal', 'rare', 'epic', 'legendary']);
             $table->string('image_url')->nullable();
             $table->timestamps();
         });

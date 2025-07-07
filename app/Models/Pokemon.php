@@ -60,7 +60,7 @@ class Pokemon extends Model
             if (strlen($pokemon->description) > 250) {
                 throw new \Exception('La description ne peut pas dépasser 250 caractères');
             }
-            if (!in_array($pokemon->rarity, ['common', 'uncommon', 'rare', 'epic', 'legendary'])) {
+            if (!in_array($pokemon->rarity, ['normal', 'rare', 'epic', 'legendary'])) {
                 throw new \Exception('Rareté invalide');
             }
 

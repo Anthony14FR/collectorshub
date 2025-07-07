@@ -150,8 +150,7 @@ const clearFilters = () => {
 
                         <select v-model="selectedRarity" class="filter-select">
                             <option value="">Toutes les raretés</option>
-                            <option value="common">Commun</option>
-                            <option value="uncommon">Peu commun</option>
+                            <option value="normal">Normal</option>
                             <option value="rare">Rare</option>
                             <option value="epic">Épique</option>
                             <option value="legendary">Légendaire</option>

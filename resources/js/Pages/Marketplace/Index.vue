@@ -36,8 +36,7 @@
             <label class="block text-sm font-medium text-gray-300 mb-1">Rareté</label>
             <select v-model="filters.rarity" class="bg-gray-700 text-white rounded-md w-full py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="">Toutes</option>
-              <option value="common">Commun</option>
-              <option value="uncommon">Peu commun</option>
+              <option value="normal">Normal</option>
               <option value="rare">Rare</option>
               <option value="epic">Épique</option>
               <option value="legendary">Légendaire</option>
@@ -103,13 +102,24 @@
               <div class="flex justify-between items-start mb-2">
                 <h3 class="text-xl font-bold text-white">{{ listing.pokemon.name }}</h3>
                 <span :class="getRarityClass(listing.pokemon.rarity)" class="px-2 py-1 rounded text-xs font-bold">
-                  {{ listing.pokemon.rarity }}
+                  {{ formatRarity(listing.pokemon.rarity) }}
                 </span>
               </div>
               
               <div class="flex justify-between mb-4">
                 <span class="text-gray-300">Niveau {{ listing.pokemon.level }}</span>
                 <span v-if="listing.pokemon.is_shiny" class="text-yellow-400 font-bold">✨ Shiny</span>
+              </div>
+              
+              <div class="flex flex-wrap gap-1 mb-3">
+                <span 
+                  v-for="(type, index) in getTypes(listing.pokemon.types)" 
+                  :key="index"
+                  class="px-2 py-1 rounded text-xs font-bold"
+                  :class="getTypeClass(type)"
+                >
+                  {{ formatType(type) }}
+                </span>
               </div>
               
               <div class="grid grid-cols-2 gap-2 mb-4">
@@ -155,13 +165,24 @@
               <div class="flex justify-between items-start mb-2">
                 <h3 class="text-xl font-bold text-white">{{ listing.pokemon.name }}</h3>
                 <span :class="getRarityClass(listing.pokemon.rarity)" class="px-2 py-1 rounded text-xs font-bold">
-                  {{ listing.pokemon.rarity }}
+                  {{ formatRarity(listing.pokemon.rarity) }}
                 </span>
               </div>
               
               <div class="flex justify-between mb-4">
                 <span class="text-gray-300">Niveau {{ listing.pokemon.level }}</span>
                 <span v-if="listing.pokemon.is_shiny" class="text-yellow-400 font-bold">✨ Shiny</span>
+              </div>
+              
+              <div class="flex flex-wrap gap-1 mb-3">
+                <span 
+                  v-for="(type, index) in getTypes(listing.pokemon.types)" 
+                  :key="index"
+                  class="px-2 py-1 rounded text-xs font-bold"
+                  :class="getTypeClass(type)"
+                >
+                  {{ formatType(type) }}
+                </span>
               </div>
               
               <div class="grid grid-cols-2 gap-2 mb-4">
@@ -239,13 +260,85 @@ const displayedListings = computed(() => {
 
 const getRarityClass = (rarity) => {
   const classes = {
-    common: 'bg-gray-600 text-white',
-    uncommon: 'bg-green-600 text-white',
+    normal: 'bg-gray-600 text-white',
     rare: 'bg-blue-600 text-white',
     epic: 'bg-purple-600 text-white',
     legendary: 'bg-yellow-600 text-black'
   };
-  return classes[rarity] || classes.common;
+  return classes[rarity] || classes.normal;
+};
+
+const formatRarity = (rarity) => {
+  const rarityLabels = {
+    normal: 'Normal',
+    rare: 'Rare',
+    epic: 'Épique',
+    legendary: 'Légendaire'
+  };
+  return rarityLabels[rarity] || rarity;
+};
+
+const getTypeClass = (type) => {
+  const classes = {
+    normal: 'bg-gray-400 text-gray-800',
+    fire: 'bg-red-500 text-white',
+    water: 'bg-blue-500 text-white',
+    electric: 'bg-yellow-400 text-gray-800',
+    grass: 'bg-green-500 text-white',
+    ice: 'bg-blue-200 text-gray-800',
+    fighting: 'bg-red-700 text-white',
+    poison: 'bg-purple-500 text-white',
+    ground: 'bg-yellow-600 text-white',
+    flying: 'bg-indigo-300 text-gray-800',
+    psychic: 'bg-pink-500 text-white',
+    bug: 'bg-green-600 text-white',
+    rock: 'bg-yellow-700 text-white',
+    ghost: 'bg-purple-700 text-white',
+    dragon: 'bg-indigo-600 text-white',
+    dark: 'bg-gray-800 text-white',
+    steel: 'bg-gray-500 text-white',
+    fairy: 'bg-pink-300 text-gray-800'
+  };
+  return classes[type] || 'bg-gray-400 text-gray-800';
+};
+
+const formatType = (type) => {
+  const typeLabels = {
+    normal: 'Normal',
+    fire: 'Feu',
+    water: 'Eau',
+    electric: 'Électrique',
+    grass: 'Plante',
+    ice: 'Glace',
+    fighting: 'Combat',
+    poison: 'Poison',
+    ground: 'Sol',
+    flying: 'Vol',
+    psychic: 'Psy',
+    bug: 'Insecte',
+    rock: 'Roche',
+    ghost: 'Spectre',
+    dragon: 'Dragon',
+    dark: 'Ténèbres',
+    steel: 'Acier',
+    fairy: 'Fée'
+  };
+  return typeLabels[type] || type;
+};
+
+const getTypes = (types) => {
+  if (!types) return [];
+  if (typeof types === 'string') {
+    try {
+      return JSON.parse(types);
+    } catch (e) {
+      return [];
+    }
+  }
+  if (Array.isArray(types)) {
+    return types.map(type => typeof type === 'object' && type.name ? type.name : type);
+  }
+  return [];
 };
 
 const formatPrice = (price) => {
