@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Marketplace extends Model
 {
     protected $table = 'marketplace';
+    use HasFactory;
 
     protected $fillable = [
         'seller_id',
@@ -19,8 +21,7 @@ class Marketplace extends Model
     ];
 
     protected $casts = [
-        'price' => 'integer',
-        'sold_at' => 'datetime'
+        'sold_at' => 'datetime',
     ];
 
     protected $attributes = [
@@ -75,5 +76,17 @@ class Marketplace extends Model
     public function pokemon(): BelongsTo
     {
         return $this->belongsTo(Pokedex::class, 'pokemon_id');
+    }
+    
+    public static function getPriceRange(string $rarity): array
+    {
+        $ranges = [
+            'normal' => ['min' => 10, 'max' => 1000],
+            'rare' => ['min' => 100, 'max' => 5000],
+            'epic' => ['min' => 1000, 'max' => 20000],
+            'legendary' => ['min' => 10000, 'max' => 100000],
+        ];
+        
+        return $ranges[$rarity] ?? $ranges['normal'];
     }
 } 
