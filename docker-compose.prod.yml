@@ -1,0 +1,170 @@
+services:
+  app:
+    build:
+      context: .
+      target: production
+      dockerfile: Dockerfile
+    container_name: collectorshub_app_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - APP_NAME=CollectorsHub
+      - APP_ENV=production
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=false
+      - APP_URL=${APP_URL:-http://localhost}
+      
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-collectorshub_prod}
+      - DB_USERNAME=${DB_USERNAME:-collectorshub_user}
+      - DB_PASSWORD=${DB_PASSWORD}
+      
+      - BROADCAST_DRIVER=redis
+      - CACHE_DRIVER=redis
+      - FILESYSTEM_DISK=local
+      - QUEUE_CONNECTION=redis
+      - SESSION_DRIVER=redis
+      - SESSION_LIFETIME=120
+      
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
+      - REDIS_PORT=6379
+      
+      - MAIL_MAILER=${MAIL_MAILER:-smtp}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_ENCRYPTION=${MAIL_ENCRYPTION:-tls}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+      - MAIL_FROM_NAME="${APP_NAME}"
+      
+      - VITE_APP_NAME="${APP_NAME}"
+      
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_logs:/var/www/html/storage/logs
+    networks:
+      - collectorshub_network
+    depends_on:
+      - postgres
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: collectorshub_postgres_prod
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${DB_DATABASE:-collectorshub_prod}
+      - POSTGRES_USER=${DB_USERNAME:-collectorshub_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - collectorshub_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-collectorshub_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: collectorshub_redis_prod
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-""} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - collectorshub_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  queue-worker:
+    build:
+      context: .
+      target: production
+      dockerfile: Dockerfile
+    container_name: collectorshub_queue_prod
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    environment:
+      - APP_NAME=CollectorsHub
+      - APP_ENV=production
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=false
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-collectorshub_prod}
+      - DB_USERNAME=${DB_USERNAME:-collectorshub_user}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    volumes:
+      - app_storage:/var/www/html/storage
+    networks:
+      - collectorshub_network
+    depends_on:
+      - postgres
+      - redis
+      - app
+
+  scheduler:
+    build:
+      context: .
+      target: production
+      dockerfile: Dockerfile
+    container_name: collectorshub_scheduler_prod
+    restart: unless-stopped
+    command: sh -c "while true; do php artisan schedule:run && sleep 60; done"
+    environment:
+      - APP_NAME=CollectorsHub
+      - APP_ENV=production
+      - APP_KEY=${APP_KEY}
+      - APP_DEBUG=false
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-collectorshub_prod}
+      - DB_USERNAME=${DB_USERNAME:-collectorshub_user}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
+      - REDIS_PORT=6379
+    volumes:
+      - app_storage:/var/www/html/storage
+    networks:
+      - collectorshub_network
+    depends_on:
+      - postgres
+      - redis
+      - app
+
+networks:
+  collectorshub_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  app_storage:
+    driver: local
+  app_logs:
+    driver: local 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CardPokemon from '@/Components/CardPokemon.vue';
+import PokemonCard from '@/Components/Cards/PokemonCard.vue';
 import type { Pokemon } from '@/types/pokemon';
 import { Head, Link } from '@inertiajs/vue3';
 import { useVirtualList } from '@vueuse/core';
@@ -87,6 +87,21 @@ const clearFilters = () => {
     selectedGeneration.value = '';
     searchQuery.value = '';
 };
+
+// Adaptateur pour convertir Pokemon en Pokedex
+const adaptPokemonToPokedex = (pokemon: Pokemon) => ({
+    id: 0, // ID fictif pour l'entrée pokédex
+    user_id: 0, // ID utilisateur fictif
+    pokemon_id: pokemon.id,
+    nickname: undefined,
+    level: 1, // Niveau par défaut
+    star: 1, // Star par défaut
+    hp_left: pokemon.hp,
+    is_in_team: false,
+    is_favorite: false,
+    obtained_at: '', // Date fictive
+    pokemon: pokemon
+});
 </script>
 
 <template>
@@ -175,8 +190,8 @@ const clearFilters = () => {
                 <div v-if="filteredPokemons.length > 0" v-bind="containerProps" class="virtual-container">
                     <div v-bind="wrapperProps" class="virtual-wrapper">
                         <div v-for="{ data: pokemonRow, index } in list" :key="`row-${index}`" class="virtual-row">
-                            <CardPokemon v-for="pokemon in pokemonRow" :key="pokemon.id" :pokemon="pokemon"
-                                class="pokemon-card" />
+                            <PokemonCard v-for="pokemon in pokemonRow" :key="pokemon.id"
+                                :entry="adaptPokemonToPokedex(pokemon)" class="pokemon-card" />
                         </div>
                     </div>
                 </div>
