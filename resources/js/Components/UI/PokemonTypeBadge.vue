@@ -6,7 +6,6 @@ interface Props {
 
 const { type, size = 'sm' } = defineProps<Props>();
 
-// Mapping des noms français vers anglais pour la logique
 const frenchToEnglish: Record<string, string> = {
     'normal': 'normal',
     'feu': 'fire',
@@ -49,10 +48,8 @@ const typeConfig: Record<string, { color: string; bg: string; fileName: string; 
     fairy: { color: '#EC4899', bg: 'rgba(236, 72, 153, 0.2)', borderColor: 'rgba(236, 72, 153, 0.3)', fileName: 'Fée' },
 };
 
-// Debug: log des types reçus
 console.log('Type reçu:', type);
 
-// Convertir le type en anglais pour la logique
 const normalizedType = type.toLowerCase();
 const englishType = frenchToEnglish[normalizedType] || normalizedType;
 

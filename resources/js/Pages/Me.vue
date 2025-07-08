@@ -53,7 +53,7 @@ const goToMarketplace = () => {
             />
         </div>
 
-        <Modal :show="pokedexModalOpen" @close="pokedexModalOpen = false">
+        <Modal :show="pokedexModalOpen" @close="pokedexModalOpen = false" max-width="7xl">
             <template #header>
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">

@@ -123,7 +123,6 @@ const roundingClasses = 'rounded-lg';
                 </option>
             </select>
 
-            <!-- Icône dropdown -->
             <div
                 class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none z-10"
                 :class="{ 'right-8': state !== 'default' }"
@@ -133,7 +132,6 @@ const roundingClasses = 'rounded-lg';
                 </svg>
             </div>
 
-            <!-- Icône d'état -->
             <div
                 v-if="state !== 'default'"
                 class="absolute right-2 top-1/2 -translate-y-1/2 z-10"

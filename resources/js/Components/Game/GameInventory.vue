@@ -46,7 +46,6 @@ const formatPrice = (price: number) => {
                 </div>
             </template>
             <template #default>
-                <!-- Wallet Section -->
                 <div class="bg-gradient-to-r from-warning/10 to-warning/5 rounded-xl p-4 mb-4 border border-warning/20">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -64,7 +63,6 @@ const formatPrice = (price: number) => {
                     </div>
                 </div>
 
-                <!-- Inventory Items -->
                 <div v-if="inventory.length === 0" class="text-center py-8">
                     <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-base-200/50 to-base-300/50 rounded-full flex items-center justify-center">
                         <span class="text-2xl opacity-50">🎒</span>

@@ -39,7 +39,6 @@ const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace } = defi
         </div>
 
         <div class="flex-1 grid grid-cols-1 gap-4 min-h-0 overflow-hidden">
-            <!-- Marketplace section -->
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">

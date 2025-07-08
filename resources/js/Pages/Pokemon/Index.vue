@@ -18,15 +18,12 @@ interface Props {
 }
 
 const { auth, pokemons } = defineProps<Props>();
-console.log(pokemons);
 
-// États des filtres
 const selectedType = ref('');
 const selectedRarity = ref('');
 const selectedGeneration = ref('');
 const searchQuery = ref('');
 
-// Types uniques
 const uniqueTypes = computed(() => {
     const types = new Set<string>();
     pokemons.forEach(pokemon => {
@@ -35,14 +32,12 @@ const uniqueTypes = computed(() => {
     return Array.from(types).sort();
 });
 
-// Générations uniques
 const uniqueGenerations = computed(() => {
     const generations = new Set<number>();
     pokemons.forEach(pokemon => generations.add(pokemon.generation));
     return Array.from(generations).sort((a, b) => a - b);
 });
 
-// Pokémons filtrés
 const filteredPokemons = computed(() => {
     return pokemons.filter(pokemon => {
         const matchesSearch = searchQuery.value === '' ||
@@ -61,7 +56,6 @@ const filteredPokemons = computed(() => {
     });
 });
 
-// Virtualisation
 const pokemonRows = computed(() => {
     const itemsPerRow = 3;
     const rows = [];
@@ -94,7 +88,6 @@ const clearFilters = () => {
     <Head title="Pokédex - Tous les Pokémons" />
 
     <div class="pokemon-discovery-world">
-        <!-- Arrière-plan immersif -->
         <div class="world-background">
             <div class="sky-gradient"></div>
             <div class="clouds cloud-1"></div>
@@ -111,9 +104,7 @@ const clearFilters = () => {
             </div>
         </div>
 
-        <!-- Interface principale -->
         <div class="ui-overlay">
-            <!-- Header -->
             <div class="header-zone">
                 <div class="header-content">
                     <Link href="/me" class="back-button">
@@ -132,7 +123,6 @@ const clearFilters = () => {
                 </div>
             </div>
 
-            <!-- Filtres -->
             <div class="filters-zone">
                 <div class="filters-panel">
                     <div class="search-section">
@@ -170,7 +160,6 @@ const clearFilters = () => {
                 </div>
             </div>
 
-            <!-- Grille des Pokémons avec virtualisation -->
             <div class="pokemons-zone">
                 <div v-if="filteredPokemons.length > 0" v-bind="containerProps" class="virtual-container">
                     <div v-bind="wrapperProps" class="virtual-wrapper">
@@ -181,7 +170,6 @@ const clearFilters = () => {
                     </div>
                 </div>
 
-                <!-- Message si aucun résultat -->
                 <div v-else class="no-results">
                     <div class="no-results-icon">🔍</div>
                     <h3>Aucun Pokémon trouvé</h3>
@@ -476,10 +464,8 @@ const clearFilters = () => {
     flex: 1;
 }
 
-/* Styles pour la virtualisation */
 .virtual-container {
     height: 70vh;
-    /* Hauteur fixe pour le scroll virtuel */
     overflow: auto;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(20px);
@@ -579,7 +565,6 @@ const clearFilters = () => {
     }
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -594,7 +579,6 @@ const clearFilters = () => {
     border-radius: 4px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .header-content {
         flex-direction: column;
