@@ -130,6 +130,22 @@ class ItemSeeder extends Seeder
                 'price' => 1500,
                 'rarity' => 'rare',
             ],
+            [
+                'name' => 'Pokeball',
+                'description' => 'Boh c\'est une pokeball quoi',
+                'type' => 'ball',
+                'effect' => ['opening'],
+                'price' => 100,
+                'rarity' => 'normal',
+            ],
+            [
+                'name' => 'Masterball',
+                'description' => 'Ca c\'est dla pokemon mon gaté',
+                'type' => 'ball',
+                'effect' => ['opening'],
+                'price' => 200,
+                'rarity' => 'epic',
+            ],
         ];
 
         foreach ($items as $item) {

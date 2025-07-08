@@ -34,7 +34,7 @@ class Item extends Model
             if ($item->description && strlen($item->description) > 250) {
                 throw new \Exception('La description ne peut pas dépasser 250 caractères');
             }
-            if (!in_array($item->type, ['heal', 'boost', 'evolution', 'special'])) {
+            if (!in_array($item->type, ['heal', 'boost', 'evolution', 'special', 'ball'])) {
                 throw new \Exception('Type d\'item invalide');
             }
             if (!in_array($item->rarity, ['normal', 'rare', 'epic', 'legendary'])) {

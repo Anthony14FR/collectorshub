@@ -68,7 +68,28 @@ class InventorySeeder extends Seeder
                 'item_id' => $item->id,
                 'quantity' => rand(1, 10)
             ]);
-        }       
+        }
+        
+        $pokeball = Item::where('name', 'Pokeball')->first();
+        $masterball = Item::where('name', 'Masterball')->first();
+        
+        if ($pokeball) {
+            Inventory::create([
+                'user_id' => $admin->id,
+                'item_id' => $pokeball->id,
+                'quantity' => 100
+            ]);
+            $this->command->info('100 Pokeball ajoutées à l\'admin.');
+        }
+        
+        if ($masterball) {
+            Inventory::create([
+                'user_id' => $admin->id,
+                'item_id' => $masterball->id,
+                'quantity' => 100
+            ]);
+            $this->command->info('100 Masterball ajoutées à l\'admin.');
+        }
         
         $this->command->info('Ajout d\'items à l\'utilisateur...');
         foreach ($users as $user) {
