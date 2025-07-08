@@ -3,7 +3,7 @@
 
   <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
-    
+
     <div class="relative z-10 h-screen w-screen overflow-hidden">
       <!-- Header -->
       <div class="flex justify-center pt-4 mb-4">
@@ -12,17 +12,9 @@
             🏪 MARKETPLACE
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
-            {{ showMyListings ? 'MES ANNONCES' : 'POKÉMONS À VENDRE' }}
+            POKÉMONS À VENDRE
           </p>
         </div>
-      </div>
-
-      <!-- Flash Messages -->
-      <div v-if="($page.props.flash as any)?.success" class="mx-4 mb-4">
-        <Alert type="success" :message="($page.props.flash as any).success" />
-      </div>
-      <div v-if="($page.props.errors as any)?.message" class="mx-4 mb-4">
-        <Alert type="error" :message="($page.props.errors as any).message" />
       </div>
 
       <!-- Left Side - Filters -->
@@ -34,7 +26,7 @@
               FILTRES
             </h3>
           </div>
-          
+
           <div class="p-3 space-y-3">
             <Select
               v-model="filters.rarity"
@@ -73,7 +65,7 @@
               variant="default"
               size="sm"
             />
-            
+
             <Button
               @click="applyFilters"
               variant="secondary"
@@ -89,24 +81,16 @@
 
       <!-- Right Side - Controls -->
       <div class="absolute right-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+        <!-- Controls Section -->
+        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
           <div class="p-3 bg-gradient-to-r from-secondary/10 to-accent/5 border-b border-secondary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
               <span class="text-lg">⚙️</span>
               ACTIONS
             </h3>
           </div>
-          
-          <div class="p-3 space-y-2">
-            <Button
-              @click="toggleMyListings"
-              :variant="showMyListings ? 'primary' : 'secondary'"
-              size="sm"
-              class="w-full"
-            >
-              {{ showMyListings ? '👥 Voir toutes' : '👤 Mes annonces' }}
-            </Button>
-            
+
+          <div class="p-3">
             <Button
               @click="router.visit('/marketplace/sell')"
               variant="secondary"
@@ -117,7 +101,88 @@
             </Button>
           </div>
         </div>
-        
+
+        <!-- My Listings Section - TOUJOURS VISIBLE -->
+        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden max-h-[500px] mt-4">
+          <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+              <span class="text-lg">🏪</span>
+              MES ANNONCES
+            </h3>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-3">
+            <div v-if="myListings.length === 0" class="text-center py-8">
+              <p class="text-2xl mb-2">📭</p>
+              <p class="text-sm mb-1">Aucune annonce</p>
+              <p class="opacity-70 text-xs">Créez votre première annonce !</p>
+            </div>
+
+            <div v-else class="space-y-2">
+              <div
+                v-for="listing in myListings"
+                :key="listing.id"
+                class="bg-base-200/30 backdrop-blur-sm rounded-lg p-3 border border-base-300/20 hover:border-primary/40 transition-all duration-200 cursor-pointer group"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="relative">
+                    <img
+                      :src="`/images/pokemon-gifs/${getPokemonData(listing).is_shiny ? (getPokemonData(listing).id - 1000) + '_S' : getPokemonData(listing).id}.gif`"
+                      :alt="getPokemonData(listing).name"
+                      class="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-200"
+                      style="image-rendering: pixelated;"
+                    />
+                    <!-- Shiny indicator -->
+                    <div v-if="getPokemonData(listing).is_shiny" class="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
+                      <span class="text-yellow-400 text-xs">✨</span>
+                    </div>
+                    <!-- Rarity stars -->
+                    <div v-if="getPokemonData(listing).rarity" class="absolute -top-1 -left-1 w-auto h-4 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30 px-1">
+                      <span class="text-yellow-400 text-xs font-bold">{{ getRarityStars(getPokemonData(listing).rarity) }}⭐</span>
+                    </div>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-sm text-base-content truncate">{{ getPokemonData(listing).name }}</h4>
+                    <p class="text-xs text-base-content/70">Niv. {{ getPokemonData(listing).level }}</p>
+                    <!-- Rarity text with color -->
+                    <p v-if="getPokemonData(listing).rarity" class="text-xs font-medium uppercase" :class="getRarityColor(getPokemonData(listing).rarity)">
+                      {{ getPokemonData(listing).rarity }}
+                    </p>
+                    <div class="text-xs font-bold text-warning">{{ formatPrice(listing.price) }}</div>
+                  </div>
+
+                  <Button
+                    @click.stop="showCancelConfirm(listing)"
+                    variant="ghost"
+                    size="sm"
+                    class="!text-error hover:!bg-error/5"
+                  >
+                    🗑️
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="myListings.length > 0" class="bg-gradient-to-r from-warning/10 to-warning/5 px-3 py-2 border-t border-warning/20">
+            <div class="text-xs text-center text-base-content/70">
+              {{ myListings.length }} annonce{{ myListings.length > 1 ? 's' : '' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet Display -->
+        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mt-4">
+          <div class="bg-gradient-to-r from-success/10 to-success/5 px-3 py-2 border-b border-success/20">
+            <h4 class="text-xs font-bold tracking-wider">PORTE-MONNAIE</h4>
+          </div>
+          <div class="p-3 text-center">
+            <div class="text-2xl font-bold text-success">{{ formatPrice(userCash) }}</div>
+            <div class="text-xs text-base-content/70">Votre solde</div>
+          </div>
+        </div>
+
         <!-- Stats -->
         <div v-if="!loading" class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mt-4">
           <div class="bg-gradient-to-r from-warning/10 to-warning/5 px-3 py-2 border-b border-warning/20">
@@ -127,12 +192,12 @@
             <div class="grid grid-cols-2 gap-2 text-center">
               <div class="group cursor-pointer">
                 <div class="text-xs text-base-content/70 group-hover:text-base-content transition-colors">Total</div>
-                <div class="text-sm font-bold group-hover:scale-110 transition-transform">{{ displayedListings.length }}</div>
+                <div class="text-sm font-bold group-hover:scale-110 transition-transform">{{ otherListings.length }}</div>
               </div>
               <div class="group cursor-pointer">
                 <div class="text-xs text-base-content/70 group-hover:text-base-content transition-colors">Shiny</div>
                 <div class="text-sm font-bold text-yellow-400 group-hover:scale-110 transition-transform">
-                  {{ displayedListings.filter(l => l.pokemon.is_shiny).length }}
+                  {{ otherListings.filter(l => getPokemonData(l).is_shiny).length }}
                 </div>
               </div>
             </div>
@@ -142,11 +207,19 @@
 
       <!-- Center Content -->
       <div class="absolute top-32 left-1/2 -translate-x-1/2 w-[700px] max-h-[600px]">
+        <!-- Flash Messages - Positioned above the marketplace section -->
+        <div v-if="$page.props.flash?.success" class="mb-4">
+          <Alert type="success" :message="$page.props.flash.success" />
+        </div>
+        <div v-if="$page.props.errors?.message" class="mb-4">
+          <Alert type="error" :message="$page.props.errors.message" />
+        </div>
+
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
           <div class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
               <span class="text-lg">📦</span>
-              {{ showMyListings ? 'MES ANNONCES' : 'MARKETPLACE' }}
+              MARKETPLACE
             </h3>
           </div>
 
@@ -156,84 +229,79 @@
             </div>
 
             <div v-else-if="paginatedListings.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div 
-                v-for="listing in paginatedListings" 
+                                <div
+                v-for="listing in paginatedListings"
                 :key="listing.id"
-                class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 cursor-pointer group"
-                @click="showPokemonDetails(listing)"
+                class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group"
               >
-                <div class="flex gap-4">
-                  <!-- Pokemon Image -->
-                  <div class="relative flex-shrink-0">
-                    <img
-                      :src="`/images/pokemon-gifs/${listing.pokemon.is_shiny ? (listing.pokemon.id - 1000) + '_S' : listing.pokemon.id}.gif`"
-                      :alt="listing.pokemon.name"
-                      class="w-20 h-20 object-contain group-hover:scale-110 transition-transform duration-300"
-                      style="image-rendering: pixelated;"
-                    />
-                    <!-- Shiny indicator -->
-                    <div v-if="listing.pokemon.is_shiny" class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-                      <span class="text-yellow-400 text-sm">✨</span>
+                <div class="flex flex-col h-full">
+                  <!-- Top section: Image + Info -->
+                  <div class="flex gap-4 mb-3">
+                    <!-- Pokemon Image -->
+                    <div class="relative flex-shrink-0 flex items-center">
+                      <img
+                        :src="`/images/pokemon-gifs/${getPokemonData(listing).is_shiny ? (getPokemonData(listing).id - 1000) + '_S' : getPokemonData(listing).id}.gif`"
+                        :alt="getPokemonData(listing).name"
+                        class="w-24 h-24 object-contain group-hover:scale-110 transition-transform duration-300"
+                        style="image-rendering: pixelated;"
+                      />
+                      <!-- Rarity and Shiny indicators in top left -->
+                      <div v-if="getPokemonData(listing).rarity || getPokemonData(listing).is_shiny" class="absolute -top-2 -left-2 flex gap-1">
+                        <!-- Rarity stars -->
+                        <div v-if="getPokemonData(listing).rarity" class="w-auto h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30 px-2">
+                          <span class="text-yellow-400 text-xs font-bold">{{ getRarityStars(getPokemonData(listing).rarity) }}⭐</span>
+                        </div>
+                        <!-- Shiny indicator -->
+                        <div v-if="getPokemonData(listing).is_shiny" class="w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
+                          <span class="text-yellow-400 text-xs">✨</span>
+                        </div>
+                      </div>
                     </div>
-                    <!-- Stars in top left -->
-                    <div v-if="listing.pokemon.rarity" class="absolute -top-2 -left-2 w-auto h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30 px-2">
-                      <span class="text-yellow-400 text-xs font-bold">{{ listing.pokemon.rarity === 'normal' ? 1 : listing.pokemon.rarity === 'rare' ? 2 : listing.pokemon.rarity === 'epic' ? 3 : 4 }}</span>
-                      <span class="text-yellow-400 text-xs ml-1">⭐</span>
+
+                    <!-- Pokemon Info -->
+                    <div class="flex-1 min-w-0 flex flex-col">
+                      <div class="flex items-start justify-between mb-2">
+                        <div>
+                          <h4 class="font-bold text-base text-base-content">{{ getPokemonData(listing).name }}</h4>
+                          <p class="text-xs text-base-content/70">Niveau {{ getPokemonData(listing).level }}</p>
+                        </div>
+                        <div class="text-right">
+                          <div class="text-lg font-bold text-warning">{{ formatPrice(listing.price) }}</div>
+                        </div>
+                      </div>
+
+
+
+                      <!-- Types -->
+                      <div class="flex flex-wrap gap-1">
+                        <PokemonTypeBadge
+                          v-for="(type, index) in getTypes(getPokemonData(listing).types)"
+                          :key="index"
+                          :type="type"
+                          size="xs"
+                        />
+                      </div>
                     </div>
                   </div>
-                  
-                  <!-- Pokemon Info -->
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between mb-2">
-                      <div>
-                        <h4 class="font-bold text-lg text-base-content">{{ listing.pokemon.name }}</h4>
-                        <p class="text-sm text-base-content/70">Niveau {{ listing.pokemon.level }}</p>
-                      </div>
-                      <div class="text-right">
-                        <div class="text-xl font-bold text-warning">{{ formatPrice(listing.price) }}</div>
-                        <div class="text-xs text-base-content/50">Prix</div>
-                      </div>
+
+                  <!-- Bottom section with seller and button -->
+                  <div class="flex items-center justify-between mt-auto pt-2 border-t border-base-300/20">
+                    <!-- Seller info on bottom left -->
+                    <div class="text-xs text-base-content/70">
+                      <span>{{ listing.seller.username }}</span>
                     </div>
-                    
-                    <!-- Rarity Badge -->
-                    <div class="flex items-center gap-2 mb-3">
-                      <RarityBadge v-if="listing.pokemon.rarity" :rarity="listing.pokemon.rarity" size="xs" />
-                    </div>
-                    
-                    <!-- Types -->
-                    <div class="flex flex-wrap gap-1 mb-3">
-                      <PokemonTypeBadge
-                        v-for="(type, index) in getTypes(listing.pokemon.types)"
-                        :key="index"
-                        :type="type"
-                        size="xs"
-                      />
-                    </div>
-                    
-                    <!-- Stats mini -->
-                    <div class="grid grid-cols-4 gap-1 mb-2">
-                      <div class="bg-base-300/30 rounded px-2 py-1 text-center">
-                        <div class="text-xs text-base-content/70">HP</div>
-                        <div class="text-sm font-bold text-error">{{ listing.pokemon.hp }}</div>
-                      </div>
-                      <div class="bg-base-300/30 rounded px-2 py-1 text-center">
-                        <div class="text-xs text-base-content/70">ATK</div>
-                        <div class="text-sm font-bold text-warning">{{ listing.pokemon.attack }}</div>
-                      </div>
-                      <div class="bg-base-300/30 rounded px-2 py-1 text-center">
-                        <div class="text-xs text-base-content/70">DEF</div>
-                        <div class="text-sm font-bold text-info">{{ listing.pokemon.defense }}</div>
-                      </div>
-                      <div class="bg-base-300/30 rounded px-2 py-1 text-center">
-                        <div class="text-xs text-base-content/70">SPD</div>
-                        <div class="text-sm font-bold text-success">{{ listing.pokemon.speed }}</div>
-                      </div>
-                    </div>
-                    
-                    <!-- Seller -->
-                    <div class="text-xs text-base-content/70 flex items-center justify-between">
-                      <span>Vendeur: {{ listing.seller.username }}{{ showMyListings ? ' (Vous)' : '' }}</span>
-                      <span class="text-primary">Cliquer pour détails</span>
+
+                    <!-- Action button on bottom right -->
+                    <div>
+                      <Button
+                        @click="showPurchaseConfirm(listing)"
+                        variant="secondary"
+                        size="sm"
+                        :disabled="loading || userCash < listing.price"
+                        :class="userCash < listing.price ? 'opacity-50' : ''"
+                      >
+                        💰 Acheter
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -241,11 +309,9 @@
             </div>
 
             <div v-else class="text-center py-8">
-              <p class="text-2xl mb-2">{{ showMyListings ? '📭' : '🛒' }}</p>
-              <p class="text-sm mb-1">{{ showMyListings ? 'Aucune annonce' : 'Aucun Pokémon en vente' }}</p>
-              <p class="opacity-70 text-xs">
-                {{ showMyListings ? 'Mettez des Pokémon en vente !' : 'Revenez plus tard !' }}
-              </p>
+              <p class="text-2xl mb-2">🛒</p>
+              <p class="text-sm mb-1">Aucun Pokémon en vente</p>
+              <p class="opacity-70 text-xs">Revenez plus tard !</p>
             </div>
           </div>
 
@@ -260,7 +326,7 @@
               >
                 ←
               </Button>
-              
+
               <span v-for="page in totalPages" :key="page">
                 <Button
                   @click="changePage(page)"
@@ -271,7 +337,7 @@
                   {{ page }}
                 </Button>
               </span>
-              
+
               <Button
                 @click="changePage(currentPage + 1)"
                 :disabled="currentPage === totalPages"
@@ -292,106 +358,62 @@
         </div>
       </div>
 
-      <!-- Pokemon Detail Modal -->
-      <Modal :show="showPokemonModal" @close="showPokemonModal = false">
+      <!-- Purchase Confirmation Modal -->
+      <ConfirmationModal
+        :show="showPurchaseModal"
+        :listing="selectedListing"
+        :user-cash="userCash"
+        :loading="loading"
+        @close="showPurchaseModal = false"
+        @confirm="confirmPurchase"
+      />
+
+      <!-- Cancel Confirmation Modal -->
+      <Modal :show="showCancelModal" @close="showCancelModal = false">
         <template #header>
-          <div v-if="selectedPokemon" class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-              <span class="text-lg">📦</span>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
+              <span class="text-lg">🗑️</span>
             </div>
             <div class="flex flex-col">
-              <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
-                {{ selectedPokemon.pokemon.name }}
-                <span v-if="selectedPokemon.pokemon.is_shiny" class="text-yellow-400 ml-2">✨</span>
+              <h3 class="text-xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent">
+                Retirer de la vente
               </h3>
               <div class="mt-1">
-                <span class="text-sm font-semibold text-warning">{{ formatPrice(selectedPokemon.price) }}</span>
+                <span class="text-sm font-semibold text-error">Confirmation requise</span>
               </div>
             </div>
           </div>
         </template>
-        
+
         <template #default>
-          <div v-if="selectedPokemon" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Pokemon Image -->
-            <div class="flex justify-center">
-              <div class="relative">
-                <img
-                  :src="`/images/pokemon-gifs/${selectedPokemon.pokemon.is_shiny ? (selectedPokemon.pokemon.id - 1000) + '_S' : selectedPokemon.pokemon.id}.gif`"
-                  :alt="selectedPokemon.pokemon.name"
-                  class="w-48 h-48 object-contain"
-                  style="image-rendering: pixelated;"
-                />
-              </div>
-            </div>
+          <div v-if="selectedListing" class="space-y-4">
+            <p class="text-base-content">
+              Êtes-vous sûr de vouloir retirer
+              <span class="font-bold">{{ selectedListing.pokemon.name }}</span>
+              de la vente ?
+            </p>
 
-            <!-- Pokemon Details -->
-            <div class="space-y-6">
-              <div class="text-center">
-                <RarityBadge v-if="selectedPokemon.pokemon.rarity" :rarity="selectedPokemon.pokemon.rarity" size="md" />
-              </div>
-              
-              <div class="flex justify-center gap-2">
-                <PokemonTypeBadge
-                  v-for="type in getTypes(selectedPokemon.pokemon.types)"
-                  :key="type"
-                  :type="type"
-                  size="sm"
-                />
-              </div>
+            <div class="flex gap-3">
+              <Button
+                @click="showCancelModal = false"
+                variant="outline"
+                size="lg"
+                class="flex-1"
+                :disabled="loading"
+              >
+                Annuler
+              </Button>
 
-              <!-- Stats -->
-              <div class="grid grid-cols-2 gap-4">
-                <div class="bg-base-200/50 rounded-xl p-4 text-center">
-                  <span class="text-base-content/70 text-sm">HP</span>
-                  <p class="text-2xl font-bold text-error">{{ selectedPokemon.pokemon.hp }}</p>
-                </div>
-                <div class="bg-base-200/50 rounded-xl p-4 text-center">
-                  <span class="text-base-content/70 text-sm">Attaque</span>
-                  <p class="text-2xl font-bold text-warning">{{ selectedPokemon.pokemon.attack }}</p>
-                </div>
-                <div class="bg-base-200/50 rounded-xl p-4 text-center">
-                  <span class="text-base-content/70 text-sm">Défense</span>
-                  <p class="text-2xl font-bold text-info">{{ selectedPokemon.pokemon.defense }}</p>
-                </div>
-                <div class="bg-base-200/50 rounded-xl p-4 text-center">
-                  <span class="text-base-content/70 text-sm">Vitesse</span>
-                  <p class="text-2xl font-bold text-success">{{ selectedPokemon.pokemon.speed }}</p>
-                </div>
-              </div>
-
-              <!-- Seller Info -->
-              <div class="bg-base-200/50 rounded-xl p-4">
-                <h4 class="font-bold text-base-content mb-2">Vendeur</h4>
-                <p class="text-base-content/70">
-                  {{ selectedPokemon.seller.username }}
-                  <span v-if="showMyListings" class="text-primary ml-1">(Vous)</span>
-                </p>
-              </div>
-
-              <!-- Actions -->
-              <div class="space-y-2">
-                <Button
-                  v-if="showMyListings"
-                  @click="cancelListing(selectedPokemon.id)"
-                  variant="outline"
-                  size="lg"
-                  :disabled="loading"
-                  class="w-full !text-error !border-error/30 hover:!border-error/50 hover:!bg-error/5"
-                >
-                  {{ loading ? '🔄' : '🗑️' }} Retirer de la vente
-                </Button>
-                <Button
-                  v-else
-                  @click="buyPokemon(selectedPokemon)"
-                  variant="primary"
-                  size="lg"
-                  :disabled="loading"
-                  class="w-full"
-                >
-                  {{ loading ? '🔄' : '💰' }} Acheter pour {{ formatPrice(selectedPokemon.price) }}
-                </Button>
-              </div>
+              <Button
+                @click="confirmCancel"
+                variant="error"
+                size="lg"
+                class="flex-1"
+                :disabled="loading"
+              >
+                {{ loading ? '🔄 En cours...' : '🗑️ Confirmer' }}
+              </Button>
             </div>
           </div>
         </template>
@@ -402,16 +424,18 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
+import { router, Head, usePage } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Select from '@/Components/UI/Select.vue';
 import Input from '@/Components/UI/Input.vue';
 import Alert from '@/Components/UI/Alert.vue';
 import Modal from '@/Components/UI/Modal.vue';
+import ConfirmationModal from '@/Components/UI/ConfirmationModal.vue';
 import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import Spinner from '@/Components/UI/Spinner.vue';
+
 
 interface Pokemon {
   id: number;
@@ -441,15 +465,22 @@ interface Props {
   otherListings: Listing[];
 }
 
+
 const props = defineProps<Props>();
+const page = usePage();
 const loading = ref(false);
-const showMyListings = ref(false);
 const myListings = ref(props.myListings || []);
 const otherListings = ref(props.otherListings || []);
-const selectedPokemon = ref<Listing | null>(null);
-const showPokemonModal = ref(false);
+const selectedListing = ref<Listing | null>(null);
+const showPurchaseModal = ref(false);
+const showCancelModal = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 6;
+
+// Get user cash from page props
+const userCash = computed(() => {
+  return page.props.auth?.user?.cash || 0;
+});
 
 const filters = ref({
   rarity: '',
@@ -496,7 +527,8 @@ const shinyOptions = [
 ];
 
 const displayedListings = computed(() => {
-  return showMyListings.value ? myListings.value : otherListings.value;
+  // Affiche toujours les autres annonces dans le centre, mes annonces sont à droite
+  return otherListings.value;
 });
 
 const paginatedListings = computed(() => {
@@ -510,46 +542,87 @@ const totalPages = computed(() => {
 });
 
 const getTypes = (types: string | any[]) => {
+  console.log('Types bruts reçus:', types);
   if (!types) return [];
   if (typeof types === 'string') {
     try {
-      return JSON.parse(types);
+      const parsed = JSON.parse(types);
+      console.log('Types parsés:', parsed);
+      return parsed;
     } catch (e) {
+      console.log('Erreur parsing types:', e);
       return [];
     }
   }
   if (Array.isArray(types)) {
-    return types.map(type => typeof type === 'object' && type.name ? type.name : type);
+    const result = types.map(type => typeof type === 'object' && type.name ? type.name : type);
+    console.log('Types array traités:', result);
+    return result;
   }
   return [];
+};
+
+const getPokemonData = (listing: Listing) => {
+  // Access the nested pokemon data correctly
+  const pokemonData = listing.pokemon.pokemon || listing.pokemon;
+  return {
+    ...listing.pokemon,
+    name: pokemonData.name || listing.pokemon.name,
+    rarity: pokemonData.rarity || listing.pokemon.rarity,
+    is_shiny: pokemonData.is_shiny || listing.pokemon.is_shiny,
+    types: pokemonData.types || listing.pokemon.types,
+    level: listing.pokemon.level,
+    id: pokemonData.id || listing.pokemon.id,
+    hp: pokemonData.hp || listing.pokemon.hp,
+    attack: pokemonData.attack || listing.pokemon.attack,
+    defense: pokemonData.defense || listing.pokemon.defense,
+    speed: pokemonData.speed || listing.pokemon.speed
+  };
 };
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('fr-FR').format(price) + ' ₽';
 };
 
+const getRarityStars = (rarity: string) => {
+  switch(rarity) {
+    case 'normal': return 1;
+    case 'rare': return 2;
+    case 'epic': return 3;
+    case 'legendary': return 4;
+    default: return 1;
+  }
+};
+
+const getRarityColor = (rarity: string) => {
+  switch(rarity) {
+    case 'normal': return 'text-base-content/70';
+    case 'rare': return 'text-blue-400';
+    case 'epic': return 'text-purple-400';
+    case 'legendary': return 'text-orange-400';
+    default: return 'text-base-content/70';
+  }
+};
+
 const applyFilters = async () => {
   loading.value = true;
   currentPage.value = 1;
-  
+
   try {
     const params: any = {};
-    
-    if (showMyListings.value) params.myListings = 'true';
+
+    // Les filtres n'affectent que les autres annonces, PAS mes annonces
     if (filters.value.rarity) params.rarity = filters.value.rarity;
     if (filters.value.type) params.type = filters.value.type;
     if (filters.value.isShiny) params.isShiny = filters.value.isShiny;
     if (filters.value.minPrice) params.minPrice = Number(filters.value.minPrice);
     if (filters.value.maxPrice) params.maxPrice = Number(filters.value.maxPrice);
-    
+
     const response = await fetch(`/marketplace/listings?${new URLSearchParams(params)}`);
     const data = await response.json();
-    
-    if (showMyListings.value) {
-      myListings.value = data;
-    } else {
-      otherListings.value = data;
-    }
+
+    // Toujours mettre à jour seulement otherListings
+    otherListings.value = data;
   } catch (error) {
     console.error('Erreur lors de la récupération des annonces:', error);
   } finally {
@@ -557,14 +630,39 @@ const applyFilters = async () => {
   }
 };
 
-const buyPokemon = (listing: Listing) => {
+const showPurchaseConfirm = (listing: Listing) => {
+  // Garde l'ID original de la listing, mais transforme seulement les données Pokemon pour l'affichage
+  const transformedListing = {
+    ...listing, // Garde l'ID original !
+    pokemon: getPokemonData(listing)
+  };
+  selectedListing.value = transformedListing;
+  showPurchaseModal.value = true;
+};
+
+const showCancelConfirm = (listing: Listing) => {
+  // Transform the listing with correct pokemon data
+  const transformedListing = {
+    ...listing,
+    pokemon: getPokemonData(listing)
+  };
+  selectedListing.value = transformedListing;
+  showCancelModal.value = true;
+};
+
+const confirmPurchase = () => {
+  if (!selectedListing.value) return;
+
   loading.value = true;
-  
-  router.post(`/marketplace/buy/${listing.id}`, {}, {
+
+  router.post(`/marketplace/buy/${selectedListing.value.id}`, {}, {
     preserveScroll: true,
     onSuccess: () => {
+      // Remove the purchased pokemon from the listings
+      otherListings.value = otherListings.value.filter(listing => listing.id !== selectedListing.value!.id);
       loading.value = false;
-      showPokemonModal.value = false;
+      showPurchaseModal.value = false;
+      selectedListing.value = null;
     },
     onError: () => {
       loading.value = false;
@@ -572,32 +670,23 @@ const buyPokemon = (listing: Listing) => {
   });
 };
 
-const cancelListing = (listingId: number) => {
-  if (confirm('Êtes-vous sûr de vouloir retirer cette annonce ?')) {
-    loading.value = true;
-    
-    router.post(`/marketplace/cancel/${listingId}`, {}, {
-      preserveScroll: true,
-      onSuccess: () => {
-        myListings.value = myListings.value.filter(listing => listing.id !== listingId);
-        loading.value = false;
-        showPokemonModal.value = false;
-      },
-      onError: () => {
-        loading.value = false;
-      }
-    });
-  }
-};
+const confirmCancel = () => {
+  if (!selectedListing.value) return;
 
-const showPokemonDetails = (listing: Listing) => {
-  selectedPokemon.value = listing;
-  showPokemonModal.value = true;
-};
+  loading.value = true;
 
-const toggleMyListings = () => {
-  showMyListings.value = !showMyListings.value;
-  currentPage.value = 1;
+  router.post(`/marketplace/cancel/${selectedListing.value.id}`, {}, {
+    preserveScroll: true,
+    onSuccess: () => {
+      myListings.value = myListings.value.filter(listing => listing.id !== selectedListing.value!.id);
+      loading.value = false;
+      showCancelModal.value = false;
+      selectedListing.value = null;
+    },
+    onError: () => {
+      loading.value = false;
+    }
+  });
 };
 
 const changePage = (page: number) => {
@@ -609,4 +698,4 @@ onMounted(() => {
     applyFilters();
   }
 });
-</script> 
+</script>

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
 import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
+import Button from '@/Components/UI/Button.vue';
 import PokemonCard from '@/Components/Cards/PokemonCard.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
-import type { Marketplace } from '@/types/marketplace';
 import type { Pokedex } from '@/types/pokedex';
 
 interface Props extends PageProps {
@@ -17,12 +17,15 @@ interface Props extends PageProps {
         user: User;
     };
     inventory?: Inventory[];
-    marketplace?: Marketplace[];
     pokedex?: Pokedex[];
 }
 
-const { auth, inventory = [], marketplace = [], pokedex = [] } = defineProps<Props>();
+const { auth, inventory = [], pokedex = [] } = defineProps<Props>();
 const pokedexModalOpen = ref(false);
+
+const goToMarketplace = () => {
+    router.visit('/marketplace');
+};
 </script>
 
 <template>
@@ -36,17 +39,17 @@ const pokedexModalOpen = ref(false);
             <MobileLayout
                 :user="auth.user"
                 :inventory="inventory"
-                :marketplace="marketplace"
                 :pokedex="pokedex"
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
+                :onGoToMarketplace="goToMarketplace"
             />
 
             <DesktopLayout
                 :user="auth.user"
                 :inventory="inventory"
-                :marketplace="marketplace"
                 :pokedex="pokedex"
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
+                :onGoToMarketplace="goToMarketplace"
             />
         </div>
 

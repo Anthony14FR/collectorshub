@@ -7,10 +7,10 @@ interface Props {
     type?: 'button' | 'submit' | 'reset';
 }
 
-const { 
-    variant = 'primary', 
-    size = 'md', 
-    icon, 
+const {
+    variant = 'primary',
+    size = 'md',
+    icon,
     disabled = false,
     type = 'button'
 } = defineProps<Props>();
@@ -25,7 +25,7 @@ const handleClick = (event: MouseEvent) => {
     }
 };
 
-const baseClasses = 'group relative overflow-hidden font-medium transition-all duration-300 cursor-pointer before:absolute before:inset-0 before:bg-gradient-to-r before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700';
+const baseClasses = 'group relative overflow-hidden font-medium transition-all duration-300 cursor-pointer focus:outline-none focus:ring-0 before:absolute before:inset-0 before:bg-gradient-to-r before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700';
 
 const variantClasses = {
     primary: 'text-base-100 bg-gradient-to-br from-primary to-secondary border border-primary/30 hover:border-primary/50 shadow-lg shadow-primary/15 hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 before:from-white/0 before:via-white/12 before:to-white/0',
@@ -36,7 +36,7 @@ const variantClasses = {
 
 const sizeClasses = {
     sm: 'px-4 py-2 text-sm rounded-lg',
-    md: 'px-6 py-3 text-sm rounded-xl', 
+    md: 'px-6 py-3 text-sm rounded-xl',
     lg: 'px-8 py-4 text-base rounded-2xl'
 };
 
@@ -50,12 +50,12 @@ const roundingClasses = {
 </script>
 
 <template>
-    <button 
+    <button
         :type="type"
         :disabled="disabled"
         :class="[
-            baseClasses, 
-            variantClasses[variant], 
+            baseClasses,
+            variantClasses[variant],
             sizeClasses[size],
             roundingClasses[size],
             disabled ? disabledClasses : ''
@@ -63,38 +63,38 @@ const roundingClasses = {
         @click="handleClick"
     >
         <span class="relative z-10 flex items-center justify-center gap-2">
-            <div 
-                v-if="icon" 
+            <div
+                v-if="icon"
                 class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors duration-300"
                 :class="{ 'group-hover:bg-primary/25': variant === 'secondary' }"
             >
                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path 
+                    <path
                         v-if="icon === 'lightning'"
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M13 10V3L4 14h7v7l9-11h-7z"
                     />
-                    <path 
+                    <path
                         v-else-if="icon === 'collection'"
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                     />
-                    <path 
+                    <path
                         v-else-if="icon === 'user'"
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                     />
-                    <path 
+                    <path
                         v-else-if="icon === 'gacha'"
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
                     />
                 </svg>
@@ -102,4 +102,4 @@ const roundingClasses = {
             <slot />
         </span>
     </button>
-</template> 
+</template>

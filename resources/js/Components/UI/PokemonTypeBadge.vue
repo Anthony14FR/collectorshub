@@ -6,41 +6,75 @@ interface Props {
 
 const { type, size = 'sm' } = defineProps<Props>();
 
-const typeConfig: Record<string, { color: string; bg: string; fileName: string }> = {
-    normal: { color: 'text-neutral-content', bg: 'from-neutral to-neutral/80', fileName: 'Normal' },
-    fire: { color: 'text-error-content', bg: 'from-red-500 to-orange-600', fileName: 'Feu' },
-    water: { color: 'text-info-content', bg: 'from-blue-500 to-cyan-600', fileName: 'Eau' },
-    electric: { color: 'text-warning-content', bg: 'from-yellow-400 to-yellow-600', fileName: 'Électrik' },
-    grass: { color: 'text-success-content', bg: 'from-green-500 to-emerald-600', fileName: 'Plante' },
-    ice: { color: 'text-info-content', bg: 'from-cyan-300 to-blue-400', fileName: 'Glace' },
-    fighting: { color: 'text-error-content', bg: 'from-red-700 to-red-900', fileName: 'Combat' },
-    poison: { color: 'text-purple-100', bg: 'from-purple-500 to-purple-700', fileName: 'Poison' },
-    ground: { color: 'text-yellow-100', bg: 'from-yellow-600 to-amber-700', fileName: 'Sol' },
-    flying: { color: 'text-sky-100', bg: 'from-sky-300 to-indigo-500', fileName: 'Vol' },
-    psychic: { color: 'text-pink-100', bg: 'from-pink-400 to-purple-600', fileName: 'Psy' },
-    bug: { color: 'text-green-100', bg: 'from-lime-500 to-green-700', fileName: 'Insecte' },
-    rock: { color: 'text-stone-100', bg: 'from-stone-500 to-gray-700', fileName: 'Roche' },
-    ghost: { color: 'text-purple-100', bg: 'from-indigo-600 to-purple-800', fileName: 'Spectre' },
-    dragon: { color: 'text-indigo-100', bg: 'from-indigo-600 to-purple-700', fileName: 'Dragon' },
-    dark: { color: 'text-gray-100', bg: 'from-gray-700 to-black', fileName: 'Ténèbres' },
-    steel: { color: 'text-slate-100', bg: 'from-slate-400 to-gray-600', fileName: 'Acier' },
-    fairy: { color: 'text-pink-100', bg: 'from-pink-300 to-pink-500', fileName: 'Fée' },
+// Mapping des noms français vers anglais pour la logique
+const frenchToEnglish: Record<string, string> = {
+    'normal': 'normal',
+    'feu': 'fire',
+    'eau': 'water',
+    'électrik': 'electric',
+    'plante': 'grass',
+    'glace': 'ice',
+    'combat': 'fighting',
+    'poison': 'poison',
+    'sol': 'ground',
+    'vol': 'flying',
+    'psy': 'psychic',
+    'insecte': 'bug',
+    'roche': 'rock',
+    'spectre': 'ghost',
+    'dragon': 'dragon',
+    'ténèbres': 'dark',
+    'acier': 'steel',
+    'fée': 'fairy'
 };
 
-const config = typeConfig[type.toLowerCase()] || typeConfig.normal;
+const typeConfig: Record<string, { color: string; bg: string; fileName: string; borderColor: string }> = {
+    normal: { color: '#6B7280', bg: 'rgba(107, 114, 128, 0.2)', borderColor: 'rgba(107, 114, 128, 0.3)', fileName: 'Normal' },
+    fire: { color: '#DC2626', bg: 'rgba(220, 38, 38, 0.2)', borderColor: 'rgba(220, 38, 38, 0.3)', fileName: 'Feu' },
+    water: { color: '#2563EB', bg: 'rgba(37, 99, 235, 0.2)', borderColor: 'rgba(37, 99, 235, 0.3)', fileName: 'Eau' },
+    electric: { color: '#D97706', bg: 'rgba(217, 119, 6, 0.2)', borderColor: 'rgba(217, 119, 6, 0.3)', fileName: 'Électrik' },
+    grass: { color: '#16A34A', bg: 'rgba(22, 163, 74, 0.2)', borderColor: 'rgba(22, 163, 74, 0.3)', fileName: 'Plante' },
+    ice: { color: '#0891B2', bg: 'rgba(8, 145, 178, 0.2)', borderColor: 'rgba(8, 145, 178, 0.3)', fileName: 'Glace' },
+    fighting: { color: '#B91C1C', bg: 'rgba(185, 28, 28, 0.2)', borderColor: 'rgba(185, 28, 28, 0.3)', fileName: 'Combat' },
+    poison: { color: '#7C3AED', bg: 'rgba(124, 58, 237, 0.2)', borderColor: 'rgba(124, 58, 237, 0.3)', fileName: 'Poison' },
+    ground: { color: '#D97706', bg: 'rgba(217, 119, 6, 0.2)', borderColor: 'rgba(217, 119, 6, 0.3)', fileName: 'Sol' },
+    flying: { color: '#0284C7', bg: 'rgba(2, 132, 199, 0.2)', borderColor: 'rgba(2, 132, 199, 0.3)', fileName: 'Vol' },
+    psychic: { color: '#DB2777', bg: 'rgba(219, 39, 119, 0.2)', borderColor: 'rgba(219, 39, 119, 0.3)', fileName: 'Psy' },
+    bug: { color: '#65A30D', bg: 'rgba(101, 163, 13, 0.2)', borderColor: 'rgba(101, 163, 13, 0.3)', fileName: 'Insecte' },
+    rock: { color: '#78716C', bg: 'rgba(120, 113, 108, 0.2)', borderColor: 'rgba(120, 113, 108, 0.3)', fileName: 'Roche' },
+    ghost: { color: '#6366F1', bg: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 0.3)', fileName: 'Spectre' },
+    dragon: { color: '#7C3AED', bg: 'rgba(124, 58, 237, 0.2)', borderColor: 'rgba(124, 58, 237, 0.3)', fileName: 'Dragon' },
+    dark: { color: '#374151', bg: 'rgba(55, 65, 81, 0.2)', borderColor: 'rgba(55, 65, 81, 0.3)', fileName: 'Ténèbres' },
+    steel: { color: '#64748B', bg: 'rgba(100, 116, 139, 0.2)', borderColor: 'rgba(100, 116, 139, 0.3)', fileName: 'Acier' },
+    fairy: { color: '#EC4899', bg: 'rgba(236, 72, 153, 0.2)', borderColor: 'rgba(236, 72, 153, 0.3)', fileName: 'Fée' },
+};
+
+// Debug: log des types reçus
+console.log('Type reçu:', type);
+
+// Convertir le type en anglais pour la logique
+const normalizedType = type.toLowerCase();
+const englishType = frenchToEnglish[normalizedType] || normalizedType;
+
+console.log('Type normalisé:', normalizedType);
+console.log('Type anglais:', englishType);
+
+const config = typeConfig[englishType] || typeConfig.normal;
+
+console.log('Config trouvée:', config);
 
 const sizeClasses = {
-    xs: 'px-1.5 py-0.5 text-xs gap-1',
-    sm: 'px-2 py-1 text-xs gap-1.5',
-    md: 'px-2.5 py-1.5 text-sm gap-2',
-    lg: 'px-3 py-2 text-base gap-2.5'
+    xs: 'px-2 py-1 text-xs gap-1.5',
+    sm: 'px-2.5 py-1.5 text-xs gap-2',
+    md: 'px-3 py-2 text-sm gap-2',
+    lg: 'px-4 py-2.5 text-base gap-2.5'
 };
 
 const iconSizeClasses = {
-    xs: 'w-3 h-3',
-    sm: 'w-4 h-4',
-    md: 'w-5 h-5',
-    lg: 'w-6 h-6'
+    xs: 'w-4 h-4',
+    sm: 'w-5 h-5',
+    md: 'w-6 h-6',
+    lg: 'w-7 h-7'
 };
 
 const formatType = (type: string) => {
@@ -64,18 +98,21 @@ const formatType = (type: string) => {
         steel: 'Acier',
         fairy: 'Fée'
     };
-    return typeLabels[type.toLowerCase()] || type;
+    return typeLabels[englishType] || type;
 };
 </script>
 
 <template>
     <span
         :class="[
-            'inline-flex items-center justify-center font-semibold rounded-full shadow-lg transition-all duration-200 hover:scale-105',
-            `bg-gradient-to-br ${config.bg}`,
-            config.color,
+            'inline-flex items-center justify-center font-medium rounded-full border transition-all duration-200',
             sizeClasses[size]
         ]"
+        :style="{
+            backgroundColor: config.bg,
+            color: config.color,
+            borderColor: config.borderColor
+        }"
     >
         <img
             :src="`/images/types/${config.fileName}.png`"
@@ -83,6 +120,6 @@ const formatType = (type: string) => {
             :class="[iconSizeClasses[size], 'object-contain']"
             style="image-rendering: pixelated;"
         />
-        <span class="capitalize font-bold tracking-wide">{{ formatType(type) }}</span>
+        <span class="font-semibold">{{ formatType(type) }}</span>
     </span>
 </template>
