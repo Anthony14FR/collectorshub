@@ -33,7 +33,7 @@ const close = () => {
                 leave-from-class="opacity-100 scale-100"
                 leave-to-class="opacity-0 scale-95"
             >
-                <div v-if="show" class="relative w-full max-w-5xl max-h-[90vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col">
+                <div v-if="show" class="relative w-full max-w-7xl max-h-[90vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col">
 
                     <div class="bg-gradient-to-r from-primary/20 to-secondary/20 px-8 py-6 border-b border-primary/20 flex items-center justify-between flex-shrink-0">
                         <div class="flex-1">

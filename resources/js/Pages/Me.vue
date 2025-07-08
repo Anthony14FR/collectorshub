@@ -67,7 +67,7 @@ const pokedexModalOpen = ref(false);
                 </div>
             </template>
             <template #default>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 max-h-[70vh] overflow-y-auto p-2">
                     <PokemonCard
                         v-for="pokemon in pokedex"
                         :key="pokemon.id"

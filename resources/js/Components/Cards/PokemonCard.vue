@@ -32,6 +32,15 @@ const cardClasses = {
             'text-center transition-all duration-300 group cursor-pointer hover:scale-105 relative'
         ]"
     >
+        <div v-if="(entry.pokemon.is_shiny || entry.is_favorite || entry.is_in_team || entry.star)"
+             class="absolute top-2 left-2 flex flex-col gap-1 z-10">
+            <div v-if="entry.star"
+                 class="w-auto h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30 px-2">
+                <span class="text-yellow-400 text-xs font-bold">{{ entry.star }}</span>
+                <span class="text-yellow-400 text-xs ml-1">⭐</span>
+            </div>
+        </div>
+
         <div v-if="(entry.pokemon.is_shiny || entry.is_favorite || entry.is_in_team)"
              class="absolute top-2 right-2 flex gap-1 z-10">
             <div v-if="entry.pokemon.is_shiny"
@@ -81,14 +90,9 @@ const cardClasses = {
                     <span class="opacity-70">Niveau:</span>
                     <span class="font-semibold text-primary">{{ entry.level }}</span>
                 </div>
-                <div v-if="entry.star" class="flex justify-center">
-                    <RarityBadge :rarity="entry.star" size="xs" />
-                </div>
             </div>
 
-            <div v-if="variant === 'card' && entry.star" class="flex justify-center mt-1">
-                <RarityBadge :rarity="entry.star" size="xs" />
-            </div>
+
         </template>
     </div>
 </template>

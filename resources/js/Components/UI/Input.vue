@@ -60,11 +60,19 @@ const sizeClasses = {
     lg: 'px-5 py-4 text-lg'
 };
 
-const variantClasses = {
-    default: 'bg-base-100 border border-base-300/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20',
-    outlined: 'bg-transparent border-2 border-base-300/50 focus:border-primary/50',
-    ghost: 'bg-base-100/50 backdrop-blur-sm border border-base-300/30 focus:border-primary/50',
-    bordered: 'bg-gradient-to-br from-base-100 to-base-200/50 border-2 border-base-300/50 focus:border-primary/50 shadow-sm'
+const getVariantClasses = (variant: string) => {
+    switch (variant) {
+        case 'default':
+            return 'bg-base-200/50 border border-base-300 focus:border-primary focus:bg-base-200/80 backdrop-blur-sm';
+        case 'outline':
+            return 'bg-transparent border border-base-300 focus:border-primary';
+        case 'ghost':
+            return 'bg-transparent border-none focus:bg-base-200/30';
+        case 'bordered':
+            return 'bg-base-200/30 border-2 border-base-300 focus:border-primary';
+        default:
+            return 'bg-base-200/50 border border-base-300 focus:border-primary focus:bg-base-200/80 backdrop-blur-sm';
+    }
 };
 
 const stateClasses = {
@@ -80,7 +88,7 @@ const roundingClasses = 'rounded-lg';
 
 <template>
     <div class="space-y-2">
-        <label v-if="label" class="block text-sm font-medium text-base-content/80">
+        <label v-if="label" class="block text-xs font-bold tracking-wider text-base-content/80 uppercase">
             {{ label }}
             <span v-if="required" class="text-error ml-1">*</span>
         </label>
@@ -139,7 +147,7 @@ const roundingClasses = 'rounded-lg';
                 :class="[
                     baseClasses,
                     sizeClasses[size],
-                    variantClasses[variant],
+                    getVariantClasses(variant),
                     stateClasses[state],
                     roundingClasses,
                     disabledClasses,
@@ -210,7 +218,7 @@ const roundingClasses = 'rounded-lg';
 
         <p
             v-if="helperText"
-            :class="`text-sm ${
+            :class="`text-xs ${
                 state === 'success' ? 'text-success' :
                 state === 'warning' ? 'text-warning' :
                 state === 'error' ? 'text-error' :
