@@ -13,7 +13,11 @@ class OpeningController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Opening/Index');
+        $inventory = Auth::user()->inventory()->with('item')->get();
+
+        return Inertia::render('Opening/Index', [
+            'inventory' => $inventory
+        ]);
     }
 
     public function open(Request $request)
@@ -126,7 +130,8 @@ class OpeningController extends Controller
             'pokemon_id' => $pokemon->id,
             'name' => $pokemon->name,
             'types' => $pokemon->types,
-            'rarity' => $pokemon->rarity
+            'rarity' => $pokemon->rarity,
+            'is_shiny' => $pokemon->is_shiny
         ];
     }
 }
