@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\PromoCode;
-use App\Models\Item;
+use Illuminate\Database\Seeder;
 
 class PromoCodeSeeder extends Seeder
 {
@@ -34,4 +33,4 @@ class PromoCodeSeeder extends Seeder
             'cash' => 0
         ]);
     }
-} 
+}

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
+use App\Models\Item;
 use App\Models\PromoCode;
 use App\Models\User;
-use App\Models\Item;
-use App\Models\Inventory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PromoCodeController extends Controller
 {

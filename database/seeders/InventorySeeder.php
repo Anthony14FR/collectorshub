@@ -20,15 +20,15 @@ class InventorySeeder extends Seeder
             $this->command->error('Utilisateurs admin ou user non trouvés. Exécutez d\'abord UserSeeder.');
             return;
         }
-        
+
         $pokemons = Pokemon::inRandomOrder()->limit(20)->get();
         $items = Item::inRandomOrder()->limit(10)->get();
-        
+
         if ($pokemons->isEmpty() || $items->isEmpty()) {
             $this->command->error('Aucun Pokémon ou item trouvé. Exécutez d\'abord PokemonSeeder et ItemSeeder.');
             return;
         }
-        
+
         $this->command->info('Ajout de Pokémons à l\'admin...');
         foreach ($pokemons->take(15) as $pokemon) {
             Pokedex::create([
@@ -43,7 +43,7 @@ class InventorySeeder extends Seeder
                 'obtained_at' => now()
             ]);
         }
-        
+
         $this->command->info('Ajout de Pokémons à l\'utilisateur...');
         foreach ($users as $user) {
             foreach ($pokemons->take(8) as $pokemon) {
@@ -60,7 +60,7 @@ class InventorySeeder extends Seeder
                 ]);
             }
         }
-        
+
         $this->command->info('Ajout d\'items à l\'admin...');
         foreach ($items->take(5) as $item) {
             Inventory::create([
@@ -69,10 +69,10 @@ class InventorySeeder extends Seeder
                 'quantity' => rand(1, 10)
             ]);
         }
-        
+
         $pokeball = Item::where('name', 'Pokeball')->first();
         $masterball = Item::where('name', 'Masterball')->first();
-        
+
         if ($pokeball) {
             Inventory::create([
                 'user_id' => $admin->id,
@@ -81,7 +81,7 @@ class InventorySeeder extends Seeder
             ]);
             $this->command->info('100 Pokeball ajoutées à l\'admin.');
         }
-        
+
         if ($masterball) {
             Inventory::create([
                 'user_id' => $admin->id,
@@ -90,7 +90,7 @@ class InventorySeeder extends Seeder
             ]);
             $this->command->info('100 Masterball ajoutées à l\'admin.');
         }
-        
+
         $this->command->info('Ajout d\'items à l\'utilisateur...');
         foreach ($users as $user) {
             foreach ($items->take(3) as $item) {
@@ -101,7 +101,7 @@ class InventorySeeder extends Seeder
                 ]);
             }
         }
-        
+
         $this->command->info('Inventaires remplis avec succès.');
     }
-} 
+}

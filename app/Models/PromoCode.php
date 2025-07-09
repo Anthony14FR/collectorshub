@@ -8,17 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class PromoCode extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-  protected $fillable = [
-        'code',
-        'description',
-        'discount_percentage',
-        'start_date',
-        'end_date',
-        'max_uses',
-        'current_uses'
-    ];
+    protected $fillable = [
+          'code',
+          'description',
+          'discount_percentage',
+          'start_date',
+          'end_date',
+          'max_uses',
+          'current_uses'
+      ];
 
     protected $casts = [
         'discount_percentage' => 'integer',
@@ -97,4 +97,4 @@ class PromoCode extends Model
             ->withPivot(['is_used', 'used_at'])
             ->withTimestamps();
     }
-} 
+}

@@ -9,4 +9,4 @@ Route::middleware(['auth', 'admin'])
     ->group(function () {
         // Routes pour CRUD Users
         Route::resource('users', UserController::class);
-}); 
+    });

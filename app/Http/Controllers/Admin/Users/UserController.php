@@ -21,7 +21,7 @@ class UserController extends Controller
     public function index()
     {
         $users = $this->userService->getUsersWithPagination();
-        
+
         return Inertia::render('Admin/Users/Index', [
             'users' => $users
         ]);
@@ -46,7 +46,7 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user = $this->userService->getUserWithDetails($user);
-        
+
         return Inertia::render('Admin/Users/Show', [
             'user' => $user
         ]);
@@ -81,4 +81,4 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('success', 'Utilisateur supprimé avec succès');
     }
-} 
+}

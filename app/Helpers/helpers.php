@@ -6,24 +6,24 @@ if (!function_exists('type_to_class')) {
     function type_to_class(string $type): ?string
     {
         $type = str($type)->ucfirst()->lower();
-        
+
         $className = 'App\\Models\\' . $type;
         if (class_exists($className)) {
             return $className;
         }
-        
+
         $singular = str($type)->singular();
         $className = 'App\\Models\\' . $singular;
         if (class_exists($className)) {
             return $className;
         }
-        
+
         $plural = str($type)->plural();
         $className = 'App\\Models\\' . $plural;
         if (class_exists($className)) {
             return $className;
         }
-        
+
         return null;
     }
 }
@@ -34,7 +34,7 @@ if (!function_exists('is_admin')) {
         if (!auth()->check()) {
             return false;
         }
-        
+
         return auth()->user()->hasRole('admin');
     }
 }
@@ -45,36 +45,36 @@ if (!function_exists('human_date')) {
         if (is_null($date)) {
             return '';
         }
-        
+
         $originalDate = $date;
-        
+
         if (!$date instanceof Carbon) {
             $date = Carbon::parse($date);
         }
-        
+
         Carbon::setLocale('fr');
         $date->setTimezone('Europe/Paris');
-        
+
         $now = now()->setTimezone('Europe/Paris');
-        
+
         $hasTime = false;
-        
+
         if (is_string($originalDate)) {
             $hasTime = preg_match('/\d{2}:\d{2}(:\d{2})?/', $originalDate);
         } else {
             $hasTime = $date->format('H:i:s') !== '00:00:00';
         }
-        
+
         $timeFormat = $hasTime ? ' à ' . $date->format('H:i') : '';
-        
+
         if ($date->isSameDay($now)) {
             return "Aujourd'hui" . $timeFormat;
         }
-        
+
         if ($date->isYesterday()) {
             return "Hier" . $timeFormat;
         }
-        
+
         $frenchMonths = [
             '01' => 'janvier',
             '02' => 'février',
@@ -89,13 +89,13 @@ if (!function_exists('human_date')) {
             '11' => 'novembre',
             '12' => 'décembre'
         ];
-        
+
         $month = $frenchMonths[$date->format('m')];
-        
+
         if ($date->isSameYear($now)) {
             return $date->format('d') . ' ' . $month . $timeFormat;
         }
-        
+
         return $date->format('d') . ' ' . $month . ' ' . $date->format('Y') . $timeFormat;
     }
 }

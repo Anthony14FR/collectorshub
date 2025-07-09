@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Pokemon;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PokemonController extends Controller
@@ -11,7 +11,7 @@ class PokemonController extends Controller
     public function index()
     {
         $pokemons = Pokemon::all();
-        if($pokemons->isEmpty()) {
+        if ($pokemons->isEmpty()) {
             return response()->json(['error' => 'No pokemons found'], 404);
         }
         return Inertia::render('Pokemon/Index', [
@@ -23,19 +23,19 @@ class PokemonController extends Controller
     {
         $query = Pokemon::query();
 
-        if($request->type) {
+        if ($request->type) {
             $query->where('types', 'like', "%{$request->type}%");
         }
-        if($request->rarity) {
+        if ($request->rarity) {
             $query->where('rarity', $request->rarity);
         }
-        if($request->generation) {
+        if ($request->generation) {
             $query->where('generation', $request->generation);
         }
 
         $pokemons = $query->get();
 
-        if($pokemons->isEmpty()) {
+        if ($pokemons->isEmpty()) {
             return response()->json(['error' => 'No pokemons found'], 404);
         }
         return Inertia::render('Pokemon/Search', [
@@ -50,7 +50,7 @@ class PokemonController extends Controller
             ? Pokemon::find($idOrName)
             : Pokemon::where('name', $idOrName)->first();
 
-        if(!$pokemon) {
+        if (!$pokemon) {
             return response()->json(['error' => 'Pokemon not found'], 404);
         }
         return Inertia::render('Pokemon/Show', [

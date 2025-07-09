@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Marketplace extends Model
 {
-    protected $table = 'marketplace';
     use HasFactory;
+    protected $table = 'marketplace';
 
     protected $fillable = [
         'seller_id',
@@ -36,7 +36,7 @@ class Marketplace extends Model
             if ($marketplace->price < 0) {
                 throw new \Exception('Le prix ne peut pas être négatif');
             }
-            
+
             if (!in_array($marketplace->status, ['active', 'sold', 'cancelled'])) {
                 throw new \Exception('Statut invalide');
             }
@@ -77,7 +77,7 @@ class Marketplace extends Model
     {
         return $this->belongsTo(Pokedex::class, 'pokemon_id');
     }
-    
+
     public static function getPriceRange(string $rarity): array
     {
         $ranges = [
@@ -86,7 +86,7 @@ class Marketplace extends Model
             'epic' => ['min' => 1000, 'max' => 20000],
             'legendary' => ['min' => 10000, 'max' => 100000],
         ];
-        
+
         return $ranges[$rarity] ?? $ranges['normal'];
     }
-} 
+}
