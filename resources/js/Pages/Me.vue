@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
 import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
+import Button from '@/Components/UI/Button.vue';
 import PokemonCard from '@/Components/Cards/PokemonCard.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
-import type { Marketplace } from '@/types/marketplace';
 import type { Pokedex } from '@/types/pokedex';
 
 interface Props extends PageProps {
@@ -17,12 +17,15 @@ interface Props extends PageProps {
         user: User;
     };
     inventory?: Inventory[];
-    marketplace?: Marketplace[];
     pokedex?: Pokedex[];
 }
 
-const { auth, inventory = [], marketplace = [], pokedex = [] } = defineProps<Props>();
+const { auth, inventory = [], pokedex = [] } = defineProps<Props>();
 const pokedexModalOpen = ref(false);
+
+const goToMarketplace = () => {
+    router.visit('/marketplace');
+};
 </script>
 
 <template>
@@ -36,21 +39,21 @@ const pokedexModalOpen = ref(false);
             <MobileLayout
                 :user="auth.user"
                 :inventory="inventory"
-                :marketplace="marketplace"
                 :pokedex="pokedex"
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
+                :onGoToMarketplace="goToMarketplace"
             />
 
             <DesktopLayout
                 :user="auth.user"
                 :inventory="inventory"
-                :marketplace="marketplace"
                 :pokedex="pokedex"
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
+                :onGoToMarketplace="goToMarketplace"
             />
         </div>
 
-        <Modal :show="pokedexModalOpen" @close="pokedexModalOpen = false">
+        <Modal :show="pokedexModalOpen" @close="pokedexModalOpen = false" max-width="7xl">
             <template #header>
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
@@ -67,7 +70,7 @@ const pokedexModalOpen = ref(false);
                 </div>
             </template>
             <template #default>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 max-h-[70vh] overflow-y-auto p-2">
                     <PokemonCard
                         v-for="pokemon in pokedex"
                         :key="pokemon.id"

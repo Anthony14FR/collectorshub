@@ -5,16 +5,18 @@ interface Props {
     size?: 'sm' | 'md' | 'lg';
     icon?: string;
     title?: string;
+    message?: string;
     dismissible?: boolean;
     show?: boolean;
 }
 
 const {
     type = 'info',
-    variant = 'filled',
+    variant = 'ghost',
     size = 'md',
     icon,
     title,
+    message,
     dismissible = false,
     show = true
 } = defineProps<Props>();
@@ -52,8 +54,8 @@ const typeConfig = {
 
 const variantClasses = {
     filled: `bg-gradient-to-br from-${typeConfig[type].color} to-${typeConfig[type].color}/80 text-${typeConfig[type].color}-content border-${typeConfig[type].color}/30`,
-    outlined: `bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg border-2 border-${typeConfig[type].color}/50 text-${typeConfig[type].color}`,
-    ghost: `bg-gradient-to-br from-${typeConfig[type].color}/10 to-${typeConfig[type].color}/5 border border-${typeConfig[type].color}/20 text-${typeConfig[type].color}`
+    outlined: `bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg border-2 border-${typeConfig[type].color}/40 text-${typeConfig[type].color}`,
+    ghost: `bg-gradient-to-br from-${typeConfig[type].color}/5 to-${typeConfig[type].color}/3 border border-${typeConfig[type].color}/30 text-${typeConfig[type].color}`
 };
 
 const sizeClasses = {
@@ -82,9 +84,9 @@ const sizeClasses = {
             role="alert"
         >
             <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div :class="`absolute top-2 left-4 w-1 h-1 bg-${typeConfig[type].color} rounded-full animate-pulse opacity-60`"></div>
-                <div :class="`absolute top-4 right-6 w-1.5 h-1.5 bg-${typeConfig[type].color} rounded-full animate-pulse delay-300 opacity-40`"></div>
-                <div :class="`absolute bottom-2 left-8 w-1 h-1 bg-${typeConfig[type].color} rounded-full animate-pulse delay-700 opacity-50`"></div>
+                <div :class="`absolute top-2 left-4 w-1 h-1 bg-${typeConfig[type].color}/40 rounded-full animate-pulse opacity-60`"></div>
+                <div :class="`absolute top-4 right-6 w-1.5 h-1.5 bg-${typeConfig[type].color}/40 rounded-full animate-pulse delay-300 opacity-40`"></div>
+                <div :class="`absolute bottom-2 left-8 w-1 h-1 bg-${typeConfig[type].color}/40 rounded-full animate-pulse delay-700 opacity-50`"></div>
             </div>
 
             <div class="relative z-10 flex items-start gap-3">
@@ -102,6 +104,7 @@ const sizeClasses = {
                 <div class="flex-1 min-w-0">
                     <h4 v-if="title" class="font-bold mb-1">{{ title }}</h4>
                     <div :class="title ? 'text-sm opacity-90' : ''">
+                        {{ message }}
                         <slot />
                     </div>
                 </div>

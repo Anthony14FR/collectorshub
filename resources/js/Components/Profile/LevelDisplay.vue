@@ -66,7 +66,6 @@ const experienceForNextLevel = computed(() => {
                         <span class="text-lg font-bold bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
                             {{ user.experience.toLocaleString() }}
                         </span>
-                        <p class="text-base-content/60 text-xs mt-1">EXP Actuel</p>
                     </div>
                 </div>
 
@@ -75,7 +74,6 @@ const experienceForNextLevel = computed(() => {
                 <div class="flex items-center gap-2">
                     <div class="text-center">
                         <span class="text-lg font-bold text-base-content/80">{{ (user.level * 1000).toLocaleString() }}</span>
-                        <p class="text-base-content/60 text-xs mt-1">EXP Requis</p>
                     </div>
                     <div class="h-px bg-gradient-to-l from-transparent via-primary/40 to-primary/10 w-20"></div>
                 </div>

@@ -3,7 +3,6 @@ import LevelDisplay from '@/Components/Profile/LevelDisplay.vue';
 import GameInventory from '@/Components/Game/GameInventory.vue';
 import UserMenu from '@/Components/Profile/UserMenu.vue';
 import TrainerProfile from '@/Components/Profile/TrainerProfile.vue';
-import MarketplaceSection from '@/Components/Game/MarketplaceSection.vue';
 import Button from '@/Components/UI/Button.vue';
 
 import type { User } from '@/types/user';
@@ -14,12 +13,12 @@ import type { Pokedex } from '@/types/pokedex';
 interface Props {
     user: User;
     inventory: Inventory[];
-    marketplace: Marketplace[];
     pokedex: Pokedex[];
     onOpenPokedexModal: () => void;
+    onGoToMarketplace?: () => void;
 }
 
-const { user, inventory, marketplace, pokedex, onOpenPokedexModal } = defineProps<Props>();
+const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace } = defineProps<Props>();
 </script>
 
 <template>
@@ -29,7 +28,7 @@ const { user, inventory, marketplace, pokedex, onOpenPokedexModal } = defineProp
         </div>
 
         <div class="shrink-0 grid grid-cols-2 gap-4 mb-6">
-            <GameInventory :inventory="inventory" />
+            <GameInventory :inventory="inventory" :cash="user.cash" />
             <UserMenu :user="user" />
         </div>
 
@@ -40,9 +39,31 @@ const { user, inventory, marketplace, pokedex, onOpenPokedexModal } = defineProp
         </div>
 
         <div class="flex-1 grid grid-cols-1 gap-4 min-h-0 overflow-hidden">
-            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden max-h-60">
-                <MarketplaceSection :marketplace="marketplace" />
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
+                        <span class="text-lg">🏪</span>
+                    </div>
+                    <h3 class="text-lg font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
+                        Marketplace
+                    </h3>
+                </div>
+
+                <p class="text-sm text-base-content/70">
+                    Achetez et vendez vos Pokémon
+                </p>
+
+                <Button
+                    v-if="onGoToMarketplace"
+                    @click="onGoToMarketplace"
+                    variant="secondary"
+                    size="md"
+                    class="w-full max-w-xs"
+                >
+                    🏪 Accéder au marketplace
+                </Button>
             </div>
+
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-lg flex items-center justify-center">

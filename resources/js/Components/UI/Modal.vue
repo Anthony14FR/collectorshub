@@ -2,13 +2,28 @@
 
 interface Props {
     show: boolean;
+    maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
 }
 
-defineProps<Props>();
+const { maxWidth = 'md' } = defineProps<Props>();
 const emit = defineEmits(['close']);
 
 const close = () => {
     emit('close');
+};
+
+const maxWidthClasses = {
+    xs: 'max-w-xs',
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
+    '2xl': 'max-w-2xl',
+    '3xl': 'max-w-3xl',
+    '4xl': 'max-w-4xl',
+    '5xl': 'max-w-5xl',
+    '6xl': 'max-w-6xl',
+    '7xl': 'max-w-7xl'
 };
 </script>
 
@@ -33,23 +48,32 @@ const close = () => {
                 leave-from-class="opacity-100 scale-100"
                 leave-to-class="opacity-0 scale-95"
             >
-                <div v-if="show" class="relative w-full max-w-5xl max-h-[90vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col">
+                <div v-if="show" :class="[
+                    'relative w-full max-h-[90vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col',
+                    maxWidthClasses[maxWidth]
+                ]">
 
-                    <div class="bg-gradient-to-r from-primary/20 to-secondary/20 px-8 py-6 border-b border-primary/20 flex items-center justify-between flex-shrink-0">
+                    <div :class="[
+                        'bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-primary/20 flex items-center justify-between flex-shrink-0',
+                        maxWidth === 'xs' ? 'px-3 py-2' : 'px-8 py-6'
+                    ]">
                         <div class="flex-1">
                             <slot name="header">
-                                <h3 class="text-xl font-bold tracking-wider">Modal Title</h3>
+                                <h3 :class="maxWidth === 'xs' ? 'text-sm font-bold' : 'text-xl font-bold tracking-wider'">Modal Title</h3>
                             </slot>
                         </div>
                         <button
                             @click="close"
-                            class="w-10 h-10 rounded-xl bg-base-200/50 hover:bg-base-200 transition-colors duration-200 flex items-center justify-center text-2xl font-bold hover:text-error"
+                            :class="[
+                                'rounded-xl bg-base-200/50 hover:bg-base-200 transition-colors duration-200 flex items-center justify-center font-bold hover:text-error',
+                                maxWidth === 'xs' ? 'w-6 h-6 text-lg' : 'w-10 h-10 text-2xl'
+                            ]"
                         >
                             ×
                         </button>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto p-6">
+                    <div :class="['flex-1 overflow-y-auto', maxWidth === 'xs' ? 'p-3' : 'p-6']">
                         <slot>Modal content goes here.</slot>
                     </div>
 
