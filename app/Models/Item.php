@@ -15,7 +15,7 @@ class Item extends Model
         'effect',
         'price',
         'rarity',
-        'image_url'
+        'image'
     ];
 
     protected $casts = [
