@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User } from '@/types/user';
+import type { User } from "@/types/user";
 
 interface Props {
     user: User;
@@ -13,10 +13,14 @@ const { user, trainerImageId = 2 } = defineProps<Props>();
     <div class="flex flex-col items-center space-y-4">
         <div class="w-48 h-48">
             <img
-                :src="`/images/trainer/${trainerImageId}.png`"
+                :src="
+                    user.avatar
+                        ? user.avatar
+                        : `/images/trainer/${trainerImageId}.png`
+                "
                 :alt="user.username"
                 class="w-full h-full object-cover"
-                style="image-rendering: pixelated;"
+                style="image-rendering: pixelated"
             />
         </div>
 
@@ -24,9 +28,7 @@ const { user, trainerImageId = 2 } = defineProps<Props>();
             <h2 class="text-3xl font-bold text-base-content mb-2">
                 {{ user.username }}
             </h2>
-            <div class="text-lg text-base-content/70">
-                Maître Dresseur
-            </div>
+            <div class="text-lg text-base-content/70">Maître Dresseur</div>
         </div>
     </div>
 </template>

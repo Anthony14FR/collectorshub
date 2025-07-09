@@ -34,6 +34,7 @@ class RegisteredUserController extends Controller
             'username' => 'required|string|max:255|unique:'.User::class,
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'avatar' => 'required|in:/images/trainer/1.png,/images/trainer/2.png',
         ]);
 
         $user = User::create([
@@ -41,6 +42,8 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'last_login' => now(),
+            'avatar' => $request->avatar,
+            'unlocked_avatars' => json_encode(["/images/trainer/1.png", "/images/trainer/2.png"]),
         ]);
 
         $user->assignRole('user');
