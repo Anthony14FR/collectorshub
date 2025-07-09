@@ -58,10 +58,10 @@ class SuccessService
 
     public function claimAllSuccesses(User $user): int
     {
-        $unclaimedSuccesses = $user->userSuccesses()->unclaimed()->get();
+        $unclaimedSuccesses = $user->userSuccesses()->where('is_claimed', false)->get();
         $count = $unclaimedSuccesses->count();
         
-        $user->userSuccesses()->unclaimed()->update([
+        $user->userSuccesses()->where('is_claimed', false)->update([
             'is_claimed' => true,
             'claimed_at' => now()
         ]);
@@ -73,8 +73,8 @@ class SuccessService
     {
         $totalSuccesses = Success::count();
         $unlockedSuccesses = $user->successes()->count();
-        $claimedSuccesses = $user->userSuccesses()->claimed()->count();
-        $unclaimedSuccesses = $user->userSuccesses()->unclaimed()->count();
+        $claimedSuccesses = $user->userSuccesses()->where('is_claimed', true)->count();
+        $unclaimedSuccesses = $user->userSuccesses()->where('is_claimed', false)->count();
         
         return [
             'total' => $totalSuccesses,
@@ -108,7 +108,15 @@ class SuccessService
         $query = $user->pokedex();
         
         if (isset($requirements['shiny'])) {
-            $query->where('is_shiny', $requirements['shiny']);
+            $query->whereHas('pokemon', function ($q) use ($requirements) {
+                $q->where('is_shiny', $requirements['shiny']);
+            });
+        }
+        
+        if (isset($requirements['rarity'])) {
+            $query->whereHas('pokemon', function ($q) use ($requirements) {
+                $q->where('rarity', $requirements['rarity']);
+            });
         }
         
         return $query->distinct('pokemon_id')->count();
