@@ -44,6 +44,35 @@ class ProfileController extends Controller
     }
 
     /**
+     * Met à jour uniquement l'avatar de l'utilisateur.
+     */
+    public function updateAvatar(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $unlocked = $user->unlocked_avatars;
+        if (is_string($unlocked)) {
+            $unlocked = json_decode($unlocked, true);
+        }
+        $unlocked = $unlocked ?? [];
+
+        $request->validate([
+            'avatar' => [
+                'required',
+                function ($attribute, $value, $fail) use ($unlocked) {
+                    if (!in_array($value, $unlocked)) {
+                        $fail('Avatar non débloqué.');
+                    }
+                }
+            ]
+        ]);
+
+        $user->avatar = $request->avatar;
+        $user->save();
+
+        return back()->with('status', 'Avatar mis à jour !');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
