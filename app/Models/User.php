@@ -109,12 +109,16 @@ class User extends Authenticatable
 
     public function unclaimedSuccesses()
     {
-        return $this->userSuccesses()->unclaimed()->with('success');
+        return $this->userSuccesses()
+                    ->where('is_claimed', false)
+                    ->with('success');
     }
 
     public function claimedSuccesses()
     {
-        return $this->userSuccesses()->claimed()->with('success');
+        return $this->userSuccesses()
+                    ->where('is_claimed', true)
+                    ->with('success');
     }
 
     public function hasSuccess($successKey): bool
@@ -122,51 +126,8 @@ class User extends Authenticatable
         return $this->successes()->where('key', $successKey)->exists();
     }
 
-    public function claimSuccess($successId): bool
-    {
-        $userSuccess = $this->userSuccesses()
-                            ->where('success_id', $successId)
-                            ->where('is_claimed', false)
-                            ->first();
-
-        if ($userSuccess) {
-            $userSuccess->claim();
-            return true;
-        }
-
-        return false;
-    }
-
-    public function claimAllSuccesses(): int
-    {
-        $unclaimedCount = $this->userSuccesses()->unclaimed()->count();
-        
-        $this->userSuccesses()->unclaimed()->update([
-            'is_claimed' => true,
-            'claimed_at' => now()
-        ]);
-
-        return $unclaimedCount;
-    }
-
-    public function getSuccessProgress()
-    {
-        $totalSuccesses = Success::count();
-        $unlockedSuccesses = $this->successes()->count();
-        $claimedSuccesses = $this->userSuccesses()->claimed()->count();
-        $unclaimedSuccesses = $this->userSuccesses()->unclaimed()->count();
-        
-        return [
-            'total' => $totalSuccesses,
-            'unlocked' => $unlockedSuccesses,
-            'claimed' => $claimedSuccesses,
-            'unclaimed' => $unclaimedSuccesses,
-            'percentage' => $totalSuccesses > 0 ? round(($unlockedSuccesses / $totalSuccesses) * 100, 2) : 0
-        ];
-    }
-
     public function getUnclaimedCount(): int
     {
-        return $this->userSuccesses()->unclaimed()->count();
+        return $this->userSuccesses()->where('is_claimed', false)->count();
     }
 }

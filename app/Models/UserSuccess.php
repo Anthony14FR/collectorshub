@@ -29,22 +29,4 @@ class UserSuccess extends Model
     {
         return $this->belongsTo(Success::class);
     }
-
-    public function claim()
-    {
-        $this->update([
-            'is_claimed' => true,
-            'claimed_at' => now()
-        ]);
-    }
-
-    public function scopeUnclaimed($query)
-    {
-        return $query->where('is_claimed', false);
-    }
-
-    public function scopeClaimed($query)
-    {
-        return $query->where('is_claimed', true);
-    }
 }

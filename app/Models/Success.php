@@ -13,6 +13,7 @@ class Success extends Model
         'key',
         'title', 
         'description',
+        'image',
         'type',
         'requirements'
     ];
@@ -20,6 +21,13 @@ class Success extends Model
     protected $casts = [
         'requirements' => 'array'
     ];
+
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute(): string
+    {
+        return $this->image ? '/images/badges/' . $this->image : '/images/badges/default.png';
+    }
 
     public function users()
     {

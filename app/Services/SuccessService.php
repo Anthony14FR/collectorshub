@@ -38,6 +38,53 @@ class SuccessService
         }
     }
 
+    public function claimSuccess(User $user, int $successId): bool
+    {
+        $userSuccess = $user->userSuccesses()
+                            ->where('success_id', $successId)
+                            ->where('is_claimed', false)
+                            ->first();
+
+        if ($userSuccess) {
+            $userSuccess->update([
+                'is_claimed' => true,
+                'claimed_at' => now()
+            ]);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function claimAllSuccesses(User $user): int
+    {
+        $unclaimedSuccesses = $user->userSuccesses()->unclaimed()->get();
+        $count = $unclaimedSuccesses->count();
+        
+        $user->userSuccesses()->unclaimed()->update([
+            'is_claimed' => true,
+            'claimed_at' => now()
+        ]);
+
+        return $count;
+    }
+
+    public function getSuccessProgress(User $user): array
+    {
+        $totalSuccesses = Success::count();
+        $unlockedSuccesses = $user->successes()->count();
+        $claimedSuccesses = $user->userSuccesses()->claimed()->count();
+        $unclaimedSuccesses = $user->userSuccesses()->unclaimed()->count();
+        
+        return [
+            'total' => $totalSuccesses,
+            'unlocked' => $unlockedSuccesses,
+            'claimed' => $claimedSuccesses,
+            'unclaimed' => $unclaimedSuccesses,
+            'percentage' => $totalSuccesses > 0 ? round(($unlockedSuccesses / $totalSuccesses) * 100, 2) : 0
+        ];
+    }
+
     private function checkPokedexRequirements(User $user, array $requirements): bool
     {
         $pokedexCount = $this->getPokedexCount($user, $requirements);
@@ -115,7 +162,5 @@ class SuccessService
             'is_claimed' => false,
             'claimed_at' => null
         ]);
-
-        event(new \App\Events\SuccessUnlocked($user, $success));
     }
 }
