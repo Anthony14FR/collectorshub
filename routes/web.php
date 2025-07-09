@@ -1,17 +1,16 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MarketplaceController;
+use App\Http\Controllers\MeController;
+use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokedexController;
 use App\Http\Controllers\PokemonController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
-use App\Http\Controllers\MeController;
-use App\Http\Controllers\MarketplaceController;
-use App\Http\Controllers\OpeningController;
+use App\Models\Pokedex;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Pokedex;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -25,7 +24,7 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     // Route pour Me
     Route::get('/me', [MeController::class, 'index'])->middleware(['verified'])->name('me');
-    
+
     // Routes pour Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -47,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/promocodes', [PromoCodeController::class, 'store'])->name('promocodes.store');
     Route::post('/promocodes/use', [PromoCodeController::class, 'useCode'])->name('promocodes.use');
     Route::delete('/promocodes/{id}', [PromoCodeController::class, 'destroy'])->name('promocodes.destroy');
-    
+
     // Routes pour Marketplace
     Route::get('/marketplace', [MarketplaceController::class, 'index'])->name('marketplace.index');
     Route::get('/marketplace/sell', [MarketplaceController::class, 'sell'])->name('marketplace.sell');
@@ -61,5 +60,5 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/admin.php';
-require __DIR__.'/auth.php'; 
+require __DIR__.'/auth.php';
 require __DIR__.'/api.php';

@@ -26,4 +26,4 @@ class UserStoreRequest extends FormRequest
             'status' => ['required', Rule::in(User::STATUSES)],
         ];
     }
-} 
+}

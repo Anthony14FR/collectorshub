@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Pokemon;
 use App\Models\Pokedex;
+use App\Models\Pokemon;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class PokedexSeeder extends Seeder
 {

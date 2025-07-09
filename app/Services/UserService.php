@@ -60,4 +60,4 @@ class UserService
     {
         return $user->id !== auth()->id();
     }
-} 
+}

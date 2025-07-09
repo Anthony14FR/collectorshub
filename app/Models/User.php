@@ -7,21 +7,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
-    
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
+    use HasRoles;
+
     protected $with = ['roles', 'permissions'];
 
     protected $table = 'users';
 
-    const ROLES = ['user', 'premium', 'admin'];
-    const STATUSES = ['active', 'suspended', 'banned'];
+    public const ROLES = ['user', 'premium', 'admin'];
+    public const STATUSES = ['active', 'suspended', 'banned'];
 
     protected $fillable = [
         'username',

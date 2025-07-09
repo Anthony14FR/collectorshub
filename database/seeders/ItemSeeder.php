@@ -152,4 +152,4 @@ class ItemSeeder extends Seeder
             Item::create($item);
         }
     }
-} 
+}

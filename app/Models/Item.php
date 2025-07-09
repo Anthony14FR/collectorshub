@@ -96,4 +96,4 @@ class Item extends Model
             ->withPivot(['quantity'])
             ->withTimestamps();
     }
-} 
+}

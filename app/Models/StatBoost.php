@@ -21,4 +21,4 @@ class StatBoost extends Model
     {
         return $this->belongsTo(Pokedex::class);
     }
-} 
+}

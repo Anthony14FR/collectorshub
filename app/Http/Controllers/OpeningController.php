@@ -28,7 +28,7 @@ class OpeningController extends Controller
         $quantity = $request->quantity;
 
         $ball = Item::where('name', $ballType)->where('type', 'ball')->first();
-        
+
         if (!$ball) {
             return response()->json([
                 'success' => false,
@@ -47,15 +47,15 @@ class OpeningController extends Controller
 
         return DB::transaction(function () use ($user, $ball, $ballType, $quantity, $inventory) {
             $pokemons = [];
-            
+
             for ($i = 0; $i < $quantity; $i++) {
                 $pokemon = $this->drawRandomPokemon($ballType);
                 $pokemons[] = $this->addPokemonToPokedex($user, $pokemon);
             }
-            
+
             $inventory->quantity -= $quantity;
             $inventory->save();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => $quantity === 1 ? 'Pokémon obtenu avec succès' : 'Pokémons obtenus avec succès',
@@ -67,7 +67,7 @@ class OpeningController extends Controller
     private function drawRandomPokemon($ballType)
     {
         $rarityChances = [];
-        
+
         switch ($ballType) {
             case 'Pokeball':
                 $rarityChances = [
@@ -77,7 +77,7 @@ class OpeningController extends Controller
                     'legendary' => 0.3 // 0.3%
                 ];
                 break;
-                
+
             case 'Masterball':
                 $rarityChances = [
                     'normal' => 34, // 34%
@@ -86,7 +86,7 @@ class OpeningController extends Controller
                     'legendary' => 1 // 1%
                 ];
                 break;
-                
+
             default:
                 throw new \Exception('Type de ball non pris en charge: ' . $ballType);
         }
@@ -129,4 +129,4 @@ class OpeningController extends Controller
             'rarity' => $pokemon->rarity
         ];
     }
-} 
+}
