@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import GachaBall from '@/Components/Game/GachaBall.vue';
 import PokemonCard from '@/Components/Cards/PokemonCard.vue';
+import EvolutionAnimation from '@/Components/Game/EvolutionAnimation.vue';
 
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
@@ -22,13 +23,13 @@ const { auth, inventory } = defineProps<Props>();
 const page = usePage();
 
 const isInvoking = ref(false);
+const showEvolutionAnimation = ref(false);
 const showGachaResults = ref(false);
 const showFinalResults = ref(false);
 const invocationResults = ref<any[]>([]);
 const revealedBalls = ref<boolean[]>([]);
 const currentBallType = ref('');
 
-// Récupération des quantités
 const getInventoryQuantity = (itemName: string) => {
     const item = inventory.find(inv => inv.item?.name === itemName);
     return item ? item.quantity : 0;
@@ -37,12 +38,11 @@ const getInventoryQuantity = (itemName: string) => {
 const pokeballQuantity = getInventoryQuantity('Pokeball');
 const masterballQuantity = getInventoryQuantity('Masterball');
 
-// Transformation des données pour le composant PokemonCard
 const transformedResults = computed(() => {
     return invocationResults.value.map(pokemon => ({
         id: pokemon.id,
         user_id: auth.user.id,
-        pokemon_id: pokemon.pokemon_id, // ✅ Utilise pokemon_id pour les images
+        pokemon_id: pokemon.pokemon_id,
         level: pokemon.level,
         star: pokemon.star,
         nickname: null,
@@ -50,7 +50,7 @@ const transformedResults = computed(() => {
         is_in_team: false,
         obtained_at: new Date().toISOString(),
         pokemon: {
-            id: pokemon.pokemon_id, // ✅ Utilise pokemon_id
+            id: pokemon.pokemon_id,
             name: pokemon.name,
             is_shiny: pokemon.is_shiny,
             rarity: pokemon.rarity,
@@ -64,6 +64,24 @@ const transformedResults = computed(() => {
         }
     }));
 });
+
+// Nouvelles fonctions pour l'analyse des résultats
+const getMaxRarity = () => {
+    if (!invocationResults.value.length) return 'normal';
+    
+    const rarityOrder = { 'normal': 0, 'rare': 1, 'epic': 2, 'legendary': 3 };
+    
+    return invocationResults.value.reduce((maxRarity, pokemon) => {
+        const currentRarityValue = rarityOrder[pokemon.rarity] || 0;
+        const maxRarityValue = rarityOrder[maxRarity] || 0;
+        
+        return currentRarityValue > maxRarityValue ? pokemon.rarity : maxRarity;
+    }, 'normal');
+};
+
+const hasShinyPokemon = () => {
+    return invocationResults.value.some(pokemon => pokemon.is_shiny);
+};
 
 const canInvoke = (ballType: string, quantity: number) => {
     const available = ballType === 'Pokeball' ? pokeballQuantity : masterballQuantity;
@@ -96,35 +114,41 @@ const startInvocation = async (ballType: string, quantity: number) => {
         const data = await response.json();
 
         if (data.success) {
-            console.log('🎉 Invocation réussie!', data.pokemons);
-            console.log('🔮 Pokémons obtenus:', data.pokemons.map(p => `${p.name} (${p.rarity}${p.is_shiny ? ' ✨' : ''})`));
-            console.log('🖼️ Vérification des IDs:', data.pokemons.map(p => ({ name: p.name, pokemon_id: p.pokemon_id, pokedex_id: p.pokedex_id, is_shiny: p.is_shiny })));
-
             invocationResults.value = data.pokemons;
             revealedBalls.value = new Array(data.pokemons.length).fill(false);
-
+            
+            // Délai pour le loading initial
             setTimeout(() => {
                 isInvoking.value = false;
-                showGachaResults.value = true;
+                
+                // Lancer l'animation d'évolution seulement si on a au moins 5 Pokémons (pour x10)
+                if (quantity >= 5) {
+                    showEvolutionAnimation.value = true;
+                } else {
+                    // Pour les invocations simples, aller directement aux résultats
+                    showGachaResults.value = true;
+                }
             }, 2000);
         } else {
             throw new Error(data.message || 'Erreur lors de l\'invocation');
         }
     } catch (error) {
-        console.error('❌ Erreur invocation:', error);
         isInvoking.value = false;
         alert('Erreur lors de l\'invocation. Veuillez réessayer.');
     }
 };
 
+const onEvolutionComplete = () => {
+    showEvolutionAnimation.value = false;
+    showGachaResults.value = true;
+};
+
 const revealBall = (index: number) => {
     revealedBalls.value[index] = true;
-    console.log(`🎁 Révélation de la ball ${index + 1}:`, invocationResults.value[index]);
 };
 
 const revealAllBalls = () => {
     revealedBalls.value = revealedBalls.value.map(() => true);
-    console.log('🎊 Toutes les balls révélées!');
 };
 
 const allBallsRevealed = computed(() => {
@@ -134,15 +158,14 @@ const allBallsRevealed = computed(() => {
 const showAllResults = () => {
     showGachaResults.value = false;
     showFinalResults.value = true;
-    console.log('📋 Affichage des résultats finaux');
 };
 
 const closeResults = () => {
     showGachaResults.value = false;
     showFinalResults.value = false;
+    showEvolutionAnimation.value = false;
     invocationResults.value = [];
     revealedBalls.value = [];
-    console.log('🔄 Rechargement de la page...');
     router.reload();
 };
 
@@ -158,12 +181,22 @@ const getBallEmoji = (ballType: string) => {
 <template>
     <Head title="Invocation" />
 
-    <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative">
+    <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
         <BackgroundEffects />
 
-        <!-- Header -->
-        <div class="relative z-10 p-6">
-            <div class="flex items-center justify-between mb-8">
+        <div class="relative z-10 h-screen w-screen overflow-hidden">
+            <div class="flex justify-center pt-4 mb-4">
+                <div class="text-center">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-1 tracking-wider">
+                        ⚡ INVOCATION
+                    </h1>
+                    <p class="text-xs text-base-content/70 uppercase tracking-wider">
+                        Choisissez votre type de ball et la quantité
+                    </p>
+                </div>
+            </div>
+
+            <div class="absolute left-8 top-20">
                 <Button
                     @click="goBack"
                     variant="ghost"
@@ -172,163 +205,170 @@ const getBallEmoji = (ballType: string) => {
                 >
                     ← Retour
                 </Button>
+            </div>
 
-                <div class="text-center">
-                    <h1 class="text-3xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                        ⚡ Invocation
-                    </h1>
-                    <p class="text-base-content/70 mt-2">
-                        Choisissez votre type de ball et la quantité
-                    </p>
+            <div class="flex flex-row justify-center items-start gap-8 mt-24">
+                <!-- Pokeball -->
+                <div class="w-64">
+                    <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                        <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                                <img src="/images/items/pokeball.png" alt="Pokeball" class="w-6 h-6" />
+                                POKEBALL
+                            </h3>
+                        </div>
+                        <div class="p-3 text-center">
+                            <div class="text-2xl font-bold text-info mb-1">{{ pokeballQuantity }}</div>
+                            <div class="text-xs text-base-content/70">disponible{{ pokeballQuantity > 1 ? 's' : '' }}</div>
+                        </div>
+                        <div class="p-3 bg-base-100/40">
+                            <h4 class="text-xs font-bold tracking-wider mb-2 text-center">CHANCES</h4>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between">
+                                    <span>Normal</span>
+                                    <span class="font-bold">70%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-info">Rare</span>
+                                    <span class="font-bold">27%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">Epic</span>
+                                    <span class="font-bold">2.7%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-warning">Légendaire</span>
+                                    <span class="font-bold">0.3%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 space-y-2">
+                            <Button
+                                @click="startInvocation('Pokeball', 1)"
+                                :disabled="!canInvoke('Pokeball', 1)"
+                                variant="secondary"
+                                size="sm"
+                                class="w-full flex items-center justify-center gap-2"
+                            >
+                                <img src="/images/items/pokeball.png" alt="Pokeball" class="w-6 h-6 inline-block" />
+                                Invoquer x1
+                            </Button>
+                            <Button
+                                @click="startInvocation('Pokeball', 10)"
+                                :disabled="!canInvoke('Pokeball', 10)"
+                                variant="primary"
+                                size="sm"
+                                class="w-full flex items-center justify-center gap-2"
+                            >
+                                <img src="/images/items/pokeball.png" alt="Pokeball" class="w-6 h-6 inline-block" />
+                                Invoquer x10
+                            </Button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="w-20"></div>
+                <!-- Bloc central décoratif -->
+                <div class="flex-1 max-w-md">
+                    <div class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
+                        <div class="text-7xl mb-4 animate-pulse">🎰</div>
+                        <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">Machine à Invocation</h2>
+                        <p class="text-base-content/70 text-center mb-2">
+                            Tente ta chance et découvre quels Pokémon tu vas obtenir !<br>
+                            Plus tu ouvres de balls, plus tu as de chances d'obtenir des Pokémon rares ou shiny.
+                        </p>
+                        <div class="mt-4 flex flex-col items-center gap-2">
+                            <span class="text-xs text-base-content/50">Bonne chance, Dresseur !</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Masterball -->
+                <div class="w-64">
+                    <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                        <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                                <img src="/images/items/masterball.png" alt="Masterball" class="w-6 h-6" />
+                                MASTERBALL
+                            </h3>
+                        </div>
+                        <div class="p-3 text-center">
+                            <div class="text-2xl font-bold text-warning mb-1">{{ masterballQuantity }}</div>
+                            <div class="text-xs text-base-content/70">disponible{{ masterballQuantity > 1 ? 's' : '' }}</div>
+                        </div>
+                        <div class="p-3 bg-base-100/40">
+                            <h4 class="text-xs font-bold tracking-wider mb-2 text-center">CHANCES</h4>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between">
+                                    <span>Normal</span>
+                                    <span class="font-bold">34%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-info">Rare</span>
+                                    <span class="font-bold">60%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">Epic</span>
+                                    <span class="font-bold">5%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-warning">Légendaire</span>
+                                    <span class="font-bold">1%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 space-y-2">
+                            <Button
+                                @click="startInvocation('Masterball', 1)"
+                                :disabled="!canInvoke('Masterball', 1)"
+                                variant="secondary"
+                                size="sm"
+                                class="w-full flex items-center justify-center gap-2"
+                            >
+                                <img src="/images/items/masterball.png" alt="Masterball" class="w-6 h-6 inline-block" />
+                                Invoquer x1
+                            </Button>
+                            <Button
+                                @click="startInvocation('Masterball', 10)"
+                                :disabled="!canInvoke('Masterball', 10)"
+                                variant="primary"
+                                size="sm"
+                                class="w-full flex items-center justify-center gap-2"
+                            >
+                                <img src="/images/items/masterball.png" alt="Masterball" class="w-6 h-6 inline-block" />
+                                Invoquer x10
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Animation d'invocation -->
-        <div v-if="isInvoking" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <!-- Loading, animation, résultats, etc. restent inchangés -->
+        <div v-if="isInvoking" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
             <div class="text-center">
-                <div class="text-8xl mb-4 animate-bounce">
-                    {{ getBallEmoji(currentBallType) }}
+                <div class="text-8xl mb-6 animate-spin">
+                    <img src="/images/items/pokeball.png" alt="Chargement" class="w-24 h-24 object-contain">
                 </div>
-                <div
-                    :class="[
-                        'text-2xl font-bold mb-4 bg-gradient-to-r bg-clip-text text-transparent',
-                        currentBallType === 'Masterball' ? 'from-warning to-error' : 'from-primary to-secondary'
-                    ]"
-                >
-                    ⚡ Invocation en cours...
-                </div>
-                <div class="text-base-content/70">
-                    Préparation de {{ invocationResults.length }} pokéball{{ invocationResults.length > 1 ? 's' : '' }}...
+                <div class="text-2xl font-bold text-white">
+                    Chargement...
                 </div>
             </div>
         </div>
-
-        <!-- Portails d'invocation -->
-        <div v-if="!showGachaResults && !showFinalResults" class="relative z-10 max-w-4xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Pokeball Portal -->
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-2xl border border-base-300/30 p-6">
-                    <div class="text-center mb-6">
-                        <div class="text-6xl mb-4">⚾</div>
-                        <h2 class="text-2xl font-bold text-primary mb-2">Pokeball</h2>
-                        <p class="text-base-content/70">{{ pokeballQuantity }} disponible{{ pokeballQuantity > 1 ? 's' : '' }}</p>
-                    </div>
-
-                    <div class="bg-base-100/40 rounded-xl p-4 mb-6">
-                        <h3 class="font-semibold mb-3 text-center">Chances</h3>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span>Normal</span>
-                                <span>70%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-info">Rare</span>
-                                <span>27%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-secondary">Epic</span>
-                                <span>2.7%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-warning">Légendaire</span>
-                                <span>0.3%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <Button
-                            @click="startInvocation('Pokeball', 1)"
-                            :disabled="!canInvoke('Pokeball', 1)"
-                            variant="secondary"
-                            size="lg"
-                            class="w-full"
-                        >
-                            🎯 Invoquer x1
-                        </Button>
-
-                        <Button
-                            @click="startInvocation('Pokeball', 10)"
-                            :disabled="!canInvoke('Pokeball', 10)"
-                            variant="primary"
-                            size="lg"
-                            class="w-full"
-                        >
-                            🌟 Invoquer x10
-                        </Button>
-                    </div>
-                </div>
-
-                <!-- Masterball Portal -->
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-2xl border border-base-300/30 p-6">
-                    <div class="text-center mb-6">
-                        <div class="text-6xl mb-4">🏐</div>
-                        <h2 class="text-2xl font-bold text-warning mb-2">Masterball</h2>
-                        <p class="text-base-content/70">{{ masterballQuantity }} disponible{{ masterballQuantity > 1 ? 's' : '' }}</p>
-                    </div>
-
-                    <div class="bg-base-100/40 rounded-xl p-4 mb-6">
-                        <h3 class="font-semibold mb-3 text-center">Chances</h3>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span>Normal</span>
-                                <span>34%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-info">Rare</span>
-                                <span>60%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-secondary">Epic</span>
-                                <span>5%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-warning">Légendaire</span>
-                                <span>1%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <Button
-                            @click="startInvocation('Masterball', 1)"
-                            :disabled="!canInvoke('Masterball', 1)"
-                            variant="secondary"
-                            size="lg"
-                            class="w-full"
-                        >
-                            🎯 Invoquer x1
-                        </Button>
-
-                        <Button
-                            @click="startInvocation('Masterball', 10)"
-                            :disabled="!canInvoke('Masterball', 10)"
-                            variant="primary"
-                            size="lg"
-                            class="w-full"
-                        >
-                            🌟 Invoquer x10
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Résultats Gacha (Balls à révéler) -->
+        <EvolutionAnimation
+            v-if="showEvolutionAnimation"
+            :max-rarity="getMaxRarity()"
+            :has-shiny="hasShinyPokemon()"
+            :on-complete="onEvolutionComplete"
+        />
         <div v-if="showGachaResults" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center">
             <div class="text-center max-w-6xl mx-auto px-6">
                 <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
                     🎁 Vos récompenses vous attendent !
                 </h2>
-                <p class="text-base-content/70 mb-8">
+                <p class="text-base-content/50 mb-20">
                     Survolez les balls pour apercevoir leur rareté, puis cliquez pour révéler !
                 </p>
-
-                <!-- Grille des balls -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-8">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-20 mb-8">
                     <div
                         v-for="(pokemon, index) in invocationResults"
                         :key="index"
@@ -344,31 +384,26 @@ const getBallEmoji = (ballType: string) => {
                         />
                     </div>
                 </div>
-
-                <!-- Boutons d'action -->
-                <div class="flex gap-4 justify-center">
+                <div class="flex gap-4 justify-center mt-20">
                     <Button
                         @click="revealAllBalls"
-                        variant="secondary"
+                        variant="outline"
                         size="lg"
                         :disabled="allBallsRevealed"
                     >
                         🎊 Tout révéler
                     </Button>
-
                     <Button
                         v-if="allBallsRevealed"
-                        @click="showAllResults"
-                        variant="primary"
+                        @click="closeResults"
+                        variant="outline"
                         size="lg"
                     >
-                        📋 Voir le résumé
+                        ✖️ Fermer
                     </Button>
                 </div>
             </div>
         </div>
-
-        <!-- Modal des résultats finaux -->
         <Modal :show="showFinalResults" @close="closeResults" max-width="7xl">
             <template #header>
                 <div class="text-center">
@@ -380,10 +415,9 @@ const getBallEmoji = (ballType: string) => {
                     </p>
                 </div>
             </template>
-
             <template #default>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <div
+                    <div 
                         v-for="(pokemon, index) in transformedResults"
                         :key="index"
                         class="transform transition-all duration-300 animate-slide-in-up"
@@ -397,7 +431,6 @@ const getBallEmoji = (ballType: string) => {
                         />
                     </div>
                 </div>
-
                 <div class="text-center mt-8">
                     <Button
                         @click="closeResults"

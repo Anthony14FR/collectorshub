@@ -45,7 +45,6 @@ const goToInvocation = () => {
         </div>
 
         <div class="flex-1 grid grid-cols-1 gap-4 min-h-0 overflow-hidden">
-            <!-- Section Invocation -->
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-accent/20 to-accent/40 rounded-lg flex items-center justify-center">
@@ -70,7 +69,6 @@ const goToInvocation = () => {
                 </Button>
             </div>
 
-            <!-- Section Marketplace -->
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
@@ -96,7 +94,6 @@ const goToInvocation = () => {
                 </Button>
             </div>
 
-            <!-- Section Pokédex -->
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-lg flex items-center justify-center">
