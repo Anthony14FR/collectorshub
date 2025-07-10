@@ -42,9 +42,9 @@ const getStars = (pokemon: Pokedex) => {
         </div>
 
         <div class="flex-1 overflow-y-auto p-3" style="max-height: calc(100% - 11rem);">
-            <div v-if="pokedex && pokedex.length > 0" class="space-y-2">
+            <div v-if="favoritePokemon && favoritePokemon.length > 0" class="space-y-2">
                 <div
-                    v-for="pokemon in pokedex"
+                    v-for="pokemon in favoritePokemon"
                     :key="pokemon.id"
                     class="bg-base-200/30 backdrop-blur-sm rounded-lg p-3 border border-base-300/20 transition-all duration-200 group"
                 >
@@ -77,9 +77,9 @@ const getStars = (pokemon: Pokedex) => {
                 </div>
             </div>
             <div v-else class="text-center py-8">
-                <p class="text-2xl mb-2">🎒</p>
-                <p class="text-sm mb-1">Aucun Pokémon</p>
-                <p class="opacity-70 text-xs">Partez à l'aventure !</p>
+                <p class="text-2xl mb-2">❤️</p>
+                <p class="text-sm mb-1">Aucun favori</p>
+                <p class="opacity-70 text-xs">Cliquez sur un Pokémon pour l'ajouter !</p>
             </div>
         </div>
 

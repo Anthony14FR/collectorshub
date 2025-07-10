@@ -5,13 +5,13 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
 import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import Button from '@/Components/UI/Button.vue';
-import PokemonCard from '@/Components/Cards/PokemonCard.vue';
 import LeaderboardSection from '@/Components/Game/LeaderboardSection.vue';
+import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
+import type { Pokemon } from '@/types/pokemon';
 import type { Leaderboards } from '@/types/leaderboard';
 
 interface Props extends PageProps {
@@ -20,10 +20,11 @@ interface Props extends PageProps {
     };
     inventory?: Inventory[];
     pokedex?: Pokedex[];
+    all_pokemons?: Pokemon[];
     leaderboards?: Leaderboards;
 }
 
-const { auth, inventory = [], pokedex = [], leaderboards } = defineProps<Props>();
+const { auth, inventory = [], pokedex = [], all_pokemons = [], leaderboards } = defineProps<Props>();
 const pokedexModalOpen = ref(false);
 const leaderboardModalOpen = ref(false);
 
@@ -63,35 +64,12 @@ const openLeaderboardModal = () => {
             />
         </div>
 
-        <Modal :show="pokedexModalOpen" @close="pokedexModalOpen = false" max-width="7xl">
-            <template #header>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
-                        <span class="text-lg">📚</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                            Pokédex Complet
-                        </h3>
-                        <div class="mt-1">
-                            <span class="text-sm font-semibold text-primary">{{ pokedex.length }} Pokémon capturés</span>
-                        </div>
-                    </div>
-                </div>
-            </template>
-            <template #default>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 max-h-[70vh] overflow-y-auto p-2">
-                    <PokemonCard
-                        v-for="pokemon in pokedex"
-                        :key="pokemon.id"
-                        :entry="pokemon"
-                        size="large"
-                        variant="modal"
-                        :show-details="true"
-                    />
-                </div>
-            </template>
-        </Modal>
+        <PokedexModal 
+            :show="pokedexModalOpen" 
+            :user-pokedex="pokedex" 
+            :all-pokemons="all_pokemons" 
+            :on-close="() => pokedexModalOpen = false" 
+        />
 
         <Modal :show="leaderboardModalOpen" @close="leaderboardModalOpen = false" max-width="4xl">
             <template #header>
