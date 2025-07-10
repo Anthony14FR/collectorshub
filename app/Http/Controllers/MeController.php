@@ -20,7 +20,7 @@ class MeController extends Controller
         $user = Auth::user();
         $pokedex = $user->pokedex()->with('pokemon')->get();
         $inventory = $user->inventory()->with('item')->get();
-        $leaderboards = $this->leaderboardService->getAllLeaderboards($user);
+        $leaderboards = $this->leaderboardService->getAllLeaderboards($user, 100);
 
         return Inertia::render('Me', [
             'user' => $user,

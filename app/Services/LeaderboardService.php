@@ -6,12 +6,16 @@ use App\Models\User;
 
 class LeaderboardService
 {
-    public function getCashLeaderboard(User $currentUser): array
+    public function getCashLeaderboard(User $currentUser, $limit = 100): array
     {
-        $topUsers = User::where('status', 'active')
-            ->orderBy('cash', 'desc')
-            ->limit(100)
-            ->get(['id', 'username', 'cash', 'level'])
+        $query = User::where('status', 'active')
+            ->orderBy('cash', 'desc');
+
+        if ($limit !== 'all') {
+            $query->limit($limit);
+        }
+
+        $topUsers = $query->get(['id', 'username', 'cash', 'level'])
             ->map(function ($user, $index) {
                 return [
                     'rank' => $index + 1,
@@ -22,6 +26,10 @@ class LeaderboardService
                 ];
             });
 
+        if ($limit === 'all') {
+            return ['top' => $topUsers];
+        }
+
         $userRank = $this->getUserRankByCash($currentUser);
 
         return [
@@ -30,12 +38,16 @@ class LeaderboardService
         ];
     }
 
-    public function getExperienceLeaderboard(User $currentUser): array
+    public function getExperienceLeaderboard(User $currentUser, $limit = 100): array
     {
-        $topUsers = User::where('status', 'active')
-            ->orderBy('experience', 'desc')
-            ->limit(100)
-            ->get(['id', 'username', 'experience', 'level'])
+        $query = User::where('status', 'active')
+            ->orderBy('experience', 'desc');
+
+        if ($limit !== 'all') {
+            $query->limit($limit);
+        }
+
+        $topUsers = $query->get(['id', 'username', 'experience', 'level'])
             ->map(function ($user, $index) {
                 return [
                     'rank' => $index + 1,
@@ -46,6 +58,10 @@ class LeaderboardService
                 ];
             });
 
+        if ($limit === 'all') {
+            return ['top' => $topUsers];
+        }
+
         $userRank = $this->getUserRankByExperience($currentUser);
 
         return [
@@ -54,13 +70,17 @@ class LeaderboardService
         ];
     }
 
-    public function getPokemonCountLeaderboard(User $currentUser): array
+    public function getPokemonCountLeaderboard(User $currentUser, $limit = 100): array
     {
-        $topUsers = User::where('status', 'active')
+        $query = User::where('status', 'active')
             ->withCount('pokedex')
-            ->orderBy('pokedex_count', 'desc')
-            ->limit(100)
-            ->get(['id', 'username', 'level', 'pokedex_count'])
+            ->orderBy('pokedex_count', 'desc');
+
+        if ($limit !== 'all') {
+            $query->limit($limit);
+        }
+
+        $topUsers = $query->get(['id', 'username', 'level', 'pokedex_count'])
             ->map(function ($user, $index) {
                 return [
                     'rank' => $index + 1,
@@ -70,6 +90,10 @@ class LeaderboardService
                     'level' => $user->level
                 ];
             });
+
+        if ($limit === 'all') {
+            return ['top' => $topUsers];
+        }
 
         $userRank = $this->getUserRankByPokemonCount($currentUser);
 
@@ -128,12 +152,12 @@ class LeaderboardService
         ];
     }
 
-    public function getAllLeaderboards(User $currentUser): array
+    public function getAllLeaderboards(User $currentUser, $limit = 100): array
     {
         return [
-            'cash' => $this->getCashLeaderboard($currentUser),
-            'experience' => $this->getExperienceLeaderboard($currentUser),
-            'pokemon_count' => $this->getPokemonCountLeaderboard($currentUser)
+            'cash' => $this->getCashLeaderboard($currentUser, $limit),
+            'experience' => $this->getExperienceLeaderboard($currentUser, $limit),
+            'pokemon_count' => $this->getPokemonCountLeaderboard($currentUser, $limit)
         ];
     }
 }
