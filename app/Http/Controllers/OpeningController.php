@@ -87,7 +87,7 @@ class OpeningController extends Controller
                     'normal' => 34, // 34%
                     'rare' => 60, // 60%
                     'epic' => 5, // 5%
-                    'legendary' => 1 // 1%
+                    'legendary' => 100 // 1%
                 ];
                 break;
 

@@ -22,24 +22,32 @@ const ballImage = computed(() => {
 const rarityConfig = computed(() => {
     const configs = {
         normal: {
-            aura: 'shadow-white/90',
-            border: 'border-white/70',
-            glow: 'drop-shadow-[0_0_25px_rgba(255,255,255,0.8)]',
+            aura: 'shadow-[0_0_40px_rgba(255,255,255,0.9)]',
+            border: 'border-white',
+            glow: 'drop-shadow-[0_0_35px_rgba(255,255,255,1)]',
+            bgGlow: 'bg-gradient-radial from-white/30 to-transparent',
+            particle: 'bg-white'
         },
         rare: {
-            aura: 'shadow-blue-400/90',
-            border: 'border-blue-400/70',
-            glow: 'drop-shadow-[0_0_25px_rgba(59,130,246,0.9)]',
+            aura: 'shadow-[0_0_45px_rgba(59,130,246,1)]',
+            border: 'border-blue-400',
+            glow: 'drop-shadow-[0_0_40px_rgba(59,130,246,1)]',
+            bgGlow: 'bg-gradient-radial from-blue-400/40 to-transparent',
+            particle: 'bg-blue-400'
         },
         epic: {
-            aura: 'shadow-purple-400/90',
-            border: 'border-purple-400/70',
-            glow: 'drop-shadow-[0_0_25px_rgba(168,85,247,0.9)]',
+            aura: 'shadow-[0_0_50px_rgba(168,85,247,1)]',
+            border: 'border-purple-400',
+            glow: 'drop-shadow-[0_0_45px_rgba(168,85,247,1)]',
+            bgGlow: 'bg-gradient-radial from-purple-400/40 to-transparent',
+            particle: 'bg-purple-400'
         },
         legendary: {
-            aura: 'shadow-orange-400/90',
-            border: 'border-orange-400/70',
-            glow: 'drop-shadow-[0_0_30px_rgba(251,146,60,1)]',
+            aura: 'shadow-[0_0_60px_rgba(251,146,60,1)]',
+            border: 'border-orange-400',
+            glow: 'drop-shadow-[0_0_50px_rgba(251,146,60,1)]',
+            bgGlow: 'bg-gradient-radial from-orange-400/50 to-transparent',
+            particle: 'bg-orange-400'
         }
     };
     return configs[pokemon.rarity] || configs.normal;
@@ -47,7 +55,7 @@ const rarityConfig = computed(() => {
 
 const pokemonImageUrl = computed(() => {
     const pokemonId = pokemon.pokemon_id;
-    
+
     if (pokemon.is_shiny) {
         const shinyId = pokemonId - 1000;
         return `/images/pokemon-gifs/${shinyId}_S.gif`;
@@ -64,7 +72,7 @@ const handleClick = () => {
 </script>
 
 <template>
-    <div 
+    <div
         class="relative w-32 h-32 mx-auto cursor-pointer transition-all duration-500 hover:scale-110"
         @mouseenter="isHovered = true"
         @mouseleave="isHovered = false"
@@ -73,90 +81,109 @@ const handleClick = () => {
     >
         <div
             :class="[
-                'absolute -inset-3 rounded-full transition-all duration-1000 ease-out z-0',
+                'absolute -inset-4 rounded-full transition-all duration-700 ease-out z-0',
                 rarityConfig.aura,
-                isHovered && !revealed ? 'opacity-80 scale-115 animate-pulse' : 'opacity-0 scale-100'
+                rarityConfig.bgGlow,
+                isHovered && !revealed ? 'opacity-70 scale-120 animate-pulseStrong' : 'opacity-0 scale-100'
             ]"
-            style="filter: blur(12px);"
+            style="filter: blur(20px);"
         />
 
         <div
             :class="[
-                'absolute -inset-2 rounded-full border-2 transition-all duration-1000 ease-out z-0',
+                'absolute -inset-3 rounded-full transition-all duration-700 ease-out z-0',
+                rarityConfig.aura,
+                isHovered && !revealed ? 'opacity-50 scale-110' : 'opacity-0 scale-100'
+            ]"
+            style="filter: blur(10px);"
+        />
+
+        <div
+            :class="[
+                'absolute -inset-1 rounded-full border-3 transition-all duration-700 ease-out z-0',
                 rarityConfig.border,
-                isHovered && !revealed ? 'opacity-60 scale-110' : 'opacity-0 scale-100'
+                isHovered && !revealed ? 'opacity-60 scale-105 animate-borderPulse' : 'opacity-0 scale-100'
             ]"
-            style="filter: blur(6px);"
         />
 
         <div
-            v-if="pokemon.is_shiny"
-            :class="[
-                'absolute -inset-4 rounded-full  transition-all duration-1200 ease-out z-0',
-                isHovered && !revealed ? 'opacity-80 scale-120 animate-pulse' : 'opacity-0 scale-100'
-            ]"
-        />
+            v-if="isHovered && !revealed"
+            class="absolute -inset-8 pointer-events-none animate-rotateAura"
+        >
+            <div
+                :class="[
+                    'absolute inset-0 rounded-full',
+                    pokemon.rarity === 'legendary' ? 'bg-gradient-conic from-orange-400/0 via-orange-400/40 to-orange-400/0' :
+                    pokemon.rarity === 'epic' ? 'bg-gradient-conic from-purple-400/0 via-purple-400/40 to-purple-400/0' :
+                    pokemon.rarity === 'rare' ? 'bg-gradient-conic from-blue-400/0 via-blue-400/40 to-blue-400/0' :
+                    'bg-gradient-conic from-white/0 via-white/30 to-white/0'
+                ]"
+            />
+        </div>
 
-        <div v-if="pokemon.is_shiny" class="absolute inset-0 pointer-events-none">
-            <div 
-                v-for="i in 12" 
+        <div v-if="pokemon.is_shiny" class="absolute inset-0 pointer-events-none z-30">
+            <div
+                v-for="i in 12"
                 :key="i"
                 :class="[
-                    'absolute w-1 h-1 bg-yellow-300/50 rounded-full animate-customPing transition-opacity duration-500 ease-out',
-                    isHovered && !revealed ? 'opacity-70' : 'opacity-0'
+                    'absolute w-1.5 h-1.5 bg-gradient-radial from-yellow-300 to-yellow-500 rounded-full animate-customPing transition-opacity duration-500 ease-out',
+                    isHovered && !revealed ? 'opacity-90' : 'opacity-0'
                 ]"
                 :style="{
                     left: `${Math.random() * 100}%`,
                     top: `${Math.random() * 100}%`,
                     animationDelay: `${(Math.random() * 2) + (i * 0.15)}s`,
                     animationDuration: `${1.5 + Math.random() * 1.5}s`,
-                    transitionDelay: isHovered ? `${i * 50}ms` : `${(12-i) * 30}ms`
+                    transitionDelay: isHovered ? `${i * 50}ms` : `${(12-i) * 30}ms`,
+                    boxShadow: '0 0 8px rgba(255, 215, 0, 0.8)'
                 }"
             />
-            
-            <div 
-                v-for="i in 6" 
+
+            <div
+                v-for="i in 6"
                 :key="`move-${i}`"
                 :class="[
-                    'absolute w-0.5 h-0.5 bg-yellow-400/60 rounded-full animate-sparkle transition-opacity duration-400 ease-out',
-                    isHovered && !revealed ? 'opacity-80' : 'opacity-0'
+                    'absolute w-1 h-1 bg-gradient-radial from-yellow-300 to-yellow-600 rounded-full animate-sparkle transition-opacity duration-400 ease-out',
+                    isHovered && !revealed ? 'opacity-100' : 'opacity-0'
                 ]"
                 :style="{
                     left: `${20 + Math.random() * 60}%`,
                     top: `${20 + Math.random() * 60}%`,
                     animationDelay: `${Math.random() * 2}s`,
-                    transitionDelay: isHovered ? `${i * 80}ms` : `${(6-i) * 50}ms`
+                    transitionDelay: isHovered ? `${i * 80}ms` : `${(6-i) * 50}ms`,
+                    boxShadow: '0 0 12px rgba(255, 215, 0, 1)'
                 }"
             />
         </div>
 
-        <div v-if="revealed && pokemon.is_shiny" class="absolute inset-0 pointer-events-none">
-            <div 
-                v-for="i in 8" 
+        <div v-if="revealed && pokemon.is_shiny" class="absolute inset-0 pointer-events-none z-30">
+            <div
+                v-for="i in 8"
                 :key="`revealed-${i}`"
-                class="absolute w-1 h-1 bg-yellow-400/25 rounded-full animate-customPing"
+                class="absolute w-1.5 h-1.5 bg-gradient-radial from-yellow-300 to-yellow-500 rounded-full animate-customPing"
                 :style="{
                     left: `${Math.random() * 100}%`,
                     top: `${Math.random() * 100}%`,
                     animationDelay: `${Math.random() * 3}s`,
-                    animationDuration: `${2 + Math.random() * 2}s`
+                    animationDuration: `${2 + Math.random() * 2}s`,
+                    boxShadow: '0 0 6px rgba(255, 215, 0, 0.6)'
                 }"
             />
         </div>
 
-        <div v-if="revealed && pokemon.is_shiny" class="absolute -inset-2 rounded-full border border-yellow-300/30 animate-pulse opacity-50 z-0" style="filter: blur(8px); box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);" />
+        <div v-if="revealed && pokemon.is_shiny" class="absolute -inset-3 rounded-full border-2 border-yellow-400/50 animate-pulseStrong z-0" style="filter: blur(4px); box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), inset 0 0 25px rgba(255, 215, 0, 0.3);" />
 
-        <div v-if="revealed" :class="['absolute -inset-4 rounded-full opacity-35 animate-pulse z-0', rarityConfig.aura]" style="filter: blur(15px);" />
+        <div v-if="revealed" :class="['absolute -inset-5 rounded-full opacity-50 animate-pulseStrong z-0', rarityConfig.aura]" style="filter: blur(25px);" />
 
-        <div 
+        <div
             :class="[
-                'relative w-full h-full rounded-full flex items-center justify-center transition-all duration-800 ease-out transform z-10',
+                'relative w-full h-full rounded-full flex items-center justify-center transition-all duration-800 ease-out transform z-20',
                 revealed ? 'bg-transparent scale-110' : '',
-                !revealed ? 'bg-gradient-to-br from-base-100/50 to-base-200/30 backdrop-blur-sm' : '',
+                !revealed ? 'bg-gradient-to-br from-base-100/70 to-base-200/50 backdrop-blur-sm' : '',
                 !revealed && isHovered ? 'scale-105' : ''
             ]"
-            :style="{ 
-                border: 'none', 
+            :style="{
+                border: 'none',
                 outline: 'none',
                 filter: !revealed && isHovered ? rarityConfig.glow : 'none'
             }"
@@ -165,51 +192,54 @@ const handleClick = () => {
                 v-if="!revealed"
                 :class="[
                     'transition-all duration-600 ease-out',
-                    isHovered ? 'animate-float' : ''
+                    isHovered ? 'animate-floatBall' : ''
                 ]"
             >
-                <img 
+                <img
                     :src="ballImage"
                     :alt="ballType"
                     class="w-20 h-20 object-contain"
+                    :style="{
+                        filter: isHovered ? 'brightness(1.2) contrast(1.1)' : 'brightness(1)'
+                    }"
                 />
             </div>
 
-            <div 
-                v-else 
+            <div
+                v-else
                 class="text-center animate-fadeInScale z-20"
                 :style="{ animationDelay: '0.3s' }"
             >
                 <div class="relative mb-2">
-                    <img 
+                    <img
                         :src="pokemonImageUrl"
                         :alt="pokemon.name"
                         class="w-24 h-24 object-contain mx-auto animate-bounceIn"
                         style="image-rendering: pixelated;"
                     />
-                    
-                    <div 
-                        v-if="pokemon.is_shiny" 
-                        class="absolute top-0 right-0 text-yellow-400 text-lg animate-sparkleStatic"
+
+                    <div
+                        v-if="pokemon.is_shiny"
+                        class="absolute top-0 right-0 text-yellow-400 text-xl animate-sparkleStatic drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]"
                     >
                         ✨
                     </div>
                 </div>
 
-                <div class="text-xs font-bold animate-slideUp" :style="{ animationDelay: '0.5s' }">
+                <div class="text-xs font-bold animate-slideUp text-white drop-shadow-lg" :style="{ animationDelay: '0.5s' }">
                     {{ pokemon.name }}
                 </div>
-                <div class="text-xs text-base-content/70 animate-slideUp" :style="{ animationDelay: '0.6s' }">
+                <div class="text-xs text-white/80 animate-slideUp drop-shadow-md" :style="{ animationDelay: '0.6s' }">
                     Niv. {{ pokemon.level }}
                 </div>
-                
-                <div 
+
+                <div
                     :class="[
-                        'text-xs px-2 py-1 rounded-full mt-1 inline-block animate-slideUp',
-                        pokemon.rarity === 'legendary' ? 'bg-orange-400/20 text-orange-400' :
-                        pokemon.rarity === 'epic' ? 'bg-purple-400/20 text-purple-400' :
-                        pokemon.rarity === 'rare' ? 'bg-blue-400/20 text-blue-400' :
-                        'bg-white/20 text-white'
+                        'text-xs px-3 py-1.5 rounded-full mt-1 inline-block animate-slideUp font-bold',
+                        pokemon.rarity === 'legendary' ? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white shadow-[0_0_20px_rgba(251,146,60,0.8)]' :
+                        pokemon.rarity === 'epic' ? 'bg-gradient-to-r from-purple-500 to-purple-400 text-white shadow-[0_0_20px_rgba(168,85,247,0.8)]' :
+                        pokemon.rarity === 'rare' ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-[0_0_20px_rgba(59,130,246,0.8)]' :
+                        'bg-gradient-to-r from-gray-400 to-gray-300 text-white shadow-[0_0_15px_rgba(255,255,255,0.5)]'
                     ]"
                     :style="{ animationDelay: '0.7s' }"
                 >
@@ -218,9 +248,9 @@ const handleClick = () => {
             </div>
         </div>
 
-        <div 
+        <div
             v-if="!revealed && isHovered"
-            class="absolute -bottom-10 left-1/2 -translate-x-1/2 text-xs text-center text-base-content/70 whitespace-nowrap transition-opacity duration-500"
+            class="absolute -bottom-10 left-1/2 -translate-x-1/2 text-xs text-center text-white font-bold whitespace-nowrap transition-opacity duration-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
         >
             Cliquer pour révéler
         </div>
@@ -229,18 +259,18 @@ const handleClick = () => {
 
 <style scoped>
 @keyframes sparkle {
-    0%, 100% { opacity: 0; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.2); }
+    0%, 100% { opacity: 0; transform: scale(0.8) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
 }
 
 @keyframes customPing {
     0% { opacity: 1; transform: scale(0.8); }
-    75%, 100% { opacity: 0; transform: scale(1.4); }
+    75%, 100% { opacity: 0; transform: scale(1.6); }
 }
 
 @keyframes sparkleStatic {
-    0%, 100% { opacity: 0.4; transform: scale(0.9); }
-    50% { opacity: 1; transform: scale(1.1); }
+    0%, 100% { opacity: 0.7; transform: scale(0.9) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.1) rotate(360deg); }
 }
 
 @keyframes fadeInScale {
@@ -259,9 +289,24 @@ const handleClick = () => {
     100% { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
+@keyframes floatBall {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(5deg); }
+}
+
+@keyframes pulseStrong {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes borderPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes rotateAura {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .animate-sparkle {
@@ -291,7 +336,31 @@ const handleClick = () => {
     opacity: 0;
 }
 
-.animate-float {
-    animation: float 3s ease-in-out infinite;
+.animate-floatBall {
+    animation: floatBall 3s ease-in-out infinite;
+}
+
+.animate-pulseStrong {
+    animation: pulseStrong 2s ease-in-out infinite;
+}
+
+.animate-borderPulse {
+    animation: borderPulse 1.5s ease-in-out infinite;
+}
+
+.animate-rotateAura {
+    animation: rotateAura 3s linear infinite;
+}
+
+.bg-gradient-radial {
+    background: radial-gradient(circle, var(--tw-gradient-from), var(--tw-gradient-to));
+}
+
+.bg-gradient-conic {
+    background: conic-gradient(var(--tw-gradient-stops));
+}
+
+.border-3 {
+    border-width: 3px;
 }
 </style>

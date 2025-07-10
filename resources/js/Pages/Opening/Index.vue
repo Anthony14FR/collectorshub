@@ -29,14 +29,19 @@ const showFinalResults = ref(false);
 const invocationResults = ref<any[]>([]);
 const revealedBalls = ref<boolean[]>([]);
 const currentBallType = ref('');
+const currentInventory = ref([...inventory]);
+const loadingProgress = ref(0);
+const loadingMessage = ref('Préparation de l\'invocation');
+const transitionToResults = ref(false);
+const ballsReady = ref(false);
 
 const getInventoryQuantity = (itemName: string) => {
-    const item = inventory.find(inv => inv.item?.name === itemName);
+    const item = currentInventory.value.find(inv => inv.item?.name === itemName);
     return item ? item.quantity : 0;
 };
 
-const pokeballQuantity = getInventoryQuantity('Pokeball');
-const masterballQuantity = getInventoryQuantity('Masterball');
+const pokeballQuantity = computed(() => getInventoryQuantity('Pokeball'));
+const masterballQuantity = computed(() => getInventoryQuantity('Masterball'));
 
 const transformedResults = computed(() => {
     return invocationResults.value.map(pokemon => ({
@@ -65,16 +70,15 @@ const transformedResults = computed(() => {
     }));
 });
 
-// Nouvelles fonctions pour l'analyse des résultats
 const getMaxRarity = () => {
     if (!invocationResults.value.length) return 'normal';
-    
+
     const rarityOrder = { 'normal': 0, 'rare': 1, 'epic': 2, 'legendary': 3 };
-    
+
     return invocationResults.value.reduce((maxRarity, pokemon) => {
         const currentRarityValue = rarityOrder[pokemon.rarity] || 0;
         const maxRarityValue = rarityOrder[maxRarity] || 0;
-        
+
         return currentRarityValue > maxRarityValue ? pokemon.rarity : maxRarity;
     }, 'normal');
 };
@@ -84,8 +88,37 @@ const hasShinyPokemon = () => {
 };
 
 const canInvoke = (ballType: string, quantity: number) => {
-    const available = ballType === 'Pokeball' ? pokeballQuantity : masterballQuantity;
-    return available >= quantity && !isInvoking.value;
+    const available = ballType === 'Pokeball' ? pokeballQuantity.value : masterballQuantity.value;
+    return available >= quantity && !isInvoking.value && !showEvolutionAnimation.value && !showGachaResults.value;
+};
+
+const updateInventoryQuantity = (itemName: string, usedQuantity: number) => {
+    const itemIndex = currentInventory.value.findIndex(inv => inv.item?.name === itemName);
+    if (itemIndex !== -1) {
+        currentInventory.value[itemIndex].quantity = Math.max(0, currentInventory.value[itemIndex].quantity - usedQuantity);
+    }
+};
+
+const animateLoading = async () => {
+    const messages = [
+        'Préparation de l\'invocation',
+        'Connexion au monde Pokémon',
+        'Recherche de créatures',
+        'Capture en cours'
+    ];
+
+    let messageIndex = 0;
+    const interval = setInterval(() => {
+        if (loadingProgress.value < 100) {
+            loadingProgress.value += 2;
+            if (loadingProgress.value % 25 === 0) {
+                loadingMessage.value = messages[messageIndex % messages.length];
+                messageIndex++;
+            }
+        } else {
+            clearInterval(interval);
+        }
+    }, 30);
 };
 
 const startInvocation = async (ballType: string, quantity: number) => {
@@ -93,6 +126,10 @@ const startInvocation = async (ballType: string, quantity: number) => {
 
     isInvoking.value = true;
     currentBallType.value = ballType;
+    loadingProgress.value = 0;
+    loadingMessage.value = 'Préparation de l\'invocation';
+
+    animateLoading();
 
     try {
         const response = await fetch('/api/opening', {
@@ -116,31 +153,51 @@ const startInvocation = async (ballType: string, quantity: number) => {
         if (data.success) {
             invocationResults.value = data.pokemons;
             revealedBalls.value = new Array(data.pokemons.length).fill(false);
-            
-            // Délai pour le loading initial
+
+            updateInventoryQuantity(ballType, quantity);
+
+            await new Promise(resolve => setTimeout(resolve, Math.max(0, 3000 - (loadingProgress.value * 30))));
+            loadingProgress.value = 100;
+
             setTimeout(() => {
                 isInvoking.value = false;
-                
-                // Lancer l'animation d'évolution seulement si on a au moins 5 Pokémons (pour x10)
+
                 if (quantity >= 5) {
                     showEvolutionAnimation.value = true;
                 } else {
-                    // Pour les invocations simples, aller directement aux résultats
-                    showGachaResults.value = true;
+                    transitionToResults.value = true;
+                    setTimeout(() => {
+                        showGachaResults.value = true;
+                        setTimeout(() => {
+                            ballsReady.value = true;
+                        }, 50);
+                    }, 500);
                 }
-            }, 2000);
+            }, 500);
         } else {
             throw new Error(data.message || 'Erreur lors de l\'invocation');
         }
     } catch (error) {
         isInvoking.value = false;
-        alert('Erreur lors de l\'invocation. Veuillez réessayer.');
+        loadingProgress.value = 0;
     }
 };
 
-const onEvolutionComplete = () => {
-    showEvolutionAnimation.value = false;
+const onEvolutionCompleted = () => {
+    // 1) Laisser l’animation d’évolution encore visible
+    // 2) Faire apparaître les GachaBalls PAR-DESSUS
+    transitionToResults.value = true;
     showGachaResults.value = true;
+
+    // Lancer l’animation des balls tout de suite
+    setTimeout(() => {
+        ballsReady.value = true;
+    }, 50);
+
+    // Après 400 ms (le temps que les balls soient bien visibles) on masque l’ancienne animation
+    setTimeout(() => {
+        showEvolutionAnimation.value = false;
+    }, 400);
 };
 
 const revealBall = (index: number) => {
@@ -166,7 +223,10 @@ const closeResults = () => {
     showEvolutionAnimation.value = false;
     invocationResults.value = [];
     revealedBalls.value = [];
-    router.reload();
+    currentBallType.value = '';
+    isInvoking.value = false;
+    transitionToResults.value = false;
+    ballsReady.value = false;
 };
 
 const goBack = () => {
@@ -208,7 +268,6 @@ const getBallEmoji = (ballType: string) => {
             </div>
 
             <div class="flex flex-row justify-center items-start gap-8 mt-24">
-                <!-- Pokeball -->
                 <div class="w-64">
                     <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
                         <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
@@ -249,6 +308,7 @@ const getBallEmoji = (ballType: string) => {
                                 variant="secondary"
                                 size="sm"
                                 class="w-full flex items-center justify-center gap-2"
+                                :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Pokeball', 1) }"
                             >
                                 <img src="/images/items/pokeball.png" alt="Pokeball" class="w-6 h-6 inline-block" />
                                 Invoquer x1
@@ -259,6 +319,7 @@ const getBallEmoji = (ballType: string) => {
                                 variant="primary"
                                 size="sm"
                                 class="w-full flex items-center justify-center gap-2"
+                                :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Pokeball', 10) }"
                             >
                                 <img src="/images/items/pokeball.png" alt="Pokeball" class="w-6 h-6 inline-block" />
                                 Invoquer x10
@@ -267,7 +328,6 @@ const getBallEmoji = (ballType: string) => {
                     </div>
                 </div>
 
-                <!-- Bloc central décoratif -->
                 <div class="flex-1 max-w-md">
                     <div class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
                         <div class="text-7xl mb-4 animate-pulse">🎰</div>
@@ -282,7 +342,6 @@ const getBallEmoji = (ballType: string) => {
                     </div>
                 </div>
 
-                <!-- Masterball -->
                 <div class="w-64">
                     <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
                         <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
@@ -323,6 +382,7 @@ const getBallEmoji = (ballType: string) => {
                                 variant="secondary"
                                 size="sm"
                                 class="w-full flex items-center justify-center gap-2"
+                                :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Masterball', 1) }"
                             >
                                 <img src="/images/items/masterball.png" alt="Masterball" class="w-6 h-6 inline-block" />
                                 Invoquer x1
@@ -333,6 +393,7 @@ const getBallEmoji = (ballType: string) => {
                                 variant="primary"
                                 size="sm"
                                 class="w-full flex items-center justify-center gap-2"
+                                :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Masterball', 10) }"
                             >
                                 <img src="/images/items/masterball.png" alt="Masterball" class="w-6 h-6 inline-block" />
                                 Invoquer x10
@@ -343,37 +404,77 @@ const getBallEmoji = (ballType: string) => {
             </div>
         </div>
 
-        <!-- Loading, animation, résultats, etc. restent inchangés -->
-        <div v-if="isInvoking" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+        <div v-if="isInvoking" class="fixed inset-0 z-30 flex items-center justify-center bg-black/90 backdrop-blur-sm">
             <div class="text-center">
-                <div class="text-8xl mb-6 animate-spin">
-                    <img src="/images/items/pokeball.png" alt="Chargement" class="w-24 h-24 object-contain">
+                <div class="relative w-48 h-48 mx-auto mb-8">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 animate-spin-slow"></div>
+                    <div class="absolute inset-2 rounded-full bg-gradient-to-r from-primary/30 to-accent/30 animate-spin-reverse"></div>
+                    <div class="absolute inset-4 rounded-full bg-gradient-to-r from-primary/40 to-accent/40 animate-spin-slow"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-24 h-24 rounded-full bg-base-100/20 backdrop-blur-md flex items-center justify-center">
+                            <img
+                                :src="currentBallType === 'Masterball' ? '/images/items/masterball.png' : '/images/items/pokeball.png'"
+                                alt="Loading"
+                                class="w-16 h-16 object-contain animate-bounce-slow"
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div class="text-2xl font-bold text-white">
-                    Chargement...
+
+                <div class="text-2xl font-bold text-white mb-4 animate-pulse">
+                    {{ loadingMessage }}
+                </div>
+
+                <div class="w-64 mx-auto">
+                    <div class="bg-base-100/20 rounded-full h-2 overflow-hidden backdrop-blur-sm">
+                        <div
+                            class="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300 ease-out rounded-full"
+                            :style="{ width: `${loadingProgress}%` }"
+                        ></div>
+                    </div>
+                    <div class="text-sm text-white/60 mt-2">{{ Math.round(loadingProgress) }}%</div>
                 </div>
             </div>
         </div>
+
         <EvolutionAnimation
             v-if="showEvolutionAnimation"
             :max-rarity="getMaxRarity()"
             :has-shiny="hasShinyPokemon()"
-            :on-complete="onEvolutionComplete"
+            @completed="onEvolutionCompleted"
         />
-        <div v-if="showGachaResults" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center">
-            <div class="text-center max-w-6xl mx-auto px-6">
-                <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
+
+        <div
+            v-if="showGachaResults"
+            class="fixed inset-0 z-40 flex items-center justify-center overflow-hidden"
+            :class="{ 'animate-fadeIn': transitionToResults }"
+        >
+            <img
+                src="/images/invocation_background.png"
+                alt="Background"
+                class="absolute inset-0 w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-black/60"></div>
+
+            <div class="relative text-center max-w-6xl mx-auto px-6">
+                <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent animate-slideDown">
                     🎁 Vos récompenses vous attendent !
                 </h2>
-                <p class="text-base-content/50 mb-20">
+                <p class="text-white/70 mb-20 animate-slideDown" style="animation-delay: 0.2s;">
                     Survolez les balls pour apercevoir leur rareté, puis cliquez pour révéler !
                 </p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-20 mb-8">
                     <div
                         v-for="(pokemon, index) in invocationResults"
                         :key="index"
-                        class="animate-slideInUp"
-                        :style="{ animationDelay: `${index * 100}ms` }"
+                        class="transition-all duration-400 ease-out"
+                        :class="{
+                            'opacity-0 translate-y-8 scale-0': !ballsReady,
+                            'opacity-100 translate-y-0 scale-100': ballsReady
+                        }"
+                        :style="{
+                            transitionDelay: ballsReady ? `${index * 15}ms` : '0ms'
+                        }"
                     >
                         <GachaBall
                             :ball-type="currentBallType"
@@ -384,12 +485,13 @@ const getBallEmoji = (ballType: string) => {
                         />
                     </div>
                 </div>
-                <div class="flex gap-4 justify-center mt-20">
+                <div class="flex gap-4 justify-center mt-20 animate-slideUp" style="animation-delay: 1s;">
                     <Button
                         @click="revealAllBalls"
                         variant="outline"
                         size="lg"
                         :disabled="allBallsRevealed"
+                        class="bg-white/10 backdrop-blur-sm hover:bg-white/20"
                     >
                         🎊 Tout révéler
                     </Button>
@@ -398,12 +500,14 @@ const getBallEmoji = (ballType: string) => {
                         @click="closeResults"
                         variant="outline"
                         size="lg"
+                        class="bg-white/10 backdrop-blur-sm hover:bg-white/20"
                     >
                         ✖️ Fermer
                     </Button>
                 </div>
             </div>
         </div>
+
         <Modal :show="showFinalResults" @close="closeResults" max-width="7xl">
             <template #header>
                 <div class="text-center">
@@ -417,7 +521,7 @@ const getBallEmoji = (ballType: string) => {
             </template>
             <template #default>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <div 
+                    <div
                         v-for="(pokemon, index) in transformedResults"
                         :key="index"
                         class="transform transition-all duration-300 animate-slide-in-up"
@@ -447,10 +551,46 @@ const getBallEmoji = (ballType: string) => {
 </template>
 
 <style scoped>
-@keyframes slideInUp {
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-reverse {
+    from {
+        transform: rotate(360deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes bounce-slow {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
     }
     to {
         opacity: 1;
@@ -469,12 +609,44 @@ const getBallEmoji = (ballType: string) => {
     }
 }
 
-.animate-slideInUp {
-    animation: slideInUp 0.6s ease-out forwards;
+@keyframes slide-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+}
+
+.animate-spin-reverse {
+    animation: spin-reverse 6s linear infinite;
+}
+
+.animate-bounce-slow {
+    animation: bounce-slow 2s ease-in-out infinite;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.animate-slideDown {
+    animation: slideDown 0.6s ease-out forwards;
+    opacity: 0;
+}
+
+.animate-slideUp {
+    animation: slideUp 0.6s ease-out forwards;
     opacity: 0;
 }
 
 .animate-slide-in-up {
-    animation: slideUp 0.5s ease-out forwards;
+    animation: slide-in-up 0.5s ease-out forwards;
 }
 </style>
