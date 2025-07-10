@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { Link, router } from "@inertiajs/vue3";
-import Modal from "@/Components/UI/Modal.vue";
-import Button from "@/Components/UI/Button.vue";
-import type { User } from "@/types/user";
+import { ref } from 'vue';
+import { Link, router } from '@inertiajs/vue3';
+import Modal from '@/Components/UI/Modal.vue';
+import Button from '@/Components/UI/Button.vue';
+import type { User } from '@/types/user';
 
 interface Props {
     user: User;
@@ -32,27 +32,19 @@ const logout = () => {
         <Modal :show="isModalOpen" @close="isModalOpen = false">
             <template #header>
                 <div class="flex items-center gap-3">
-                    <div
-                        class="w-8 h-8 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-lg flex items-center justify-center"
-                    >
+                    <div class="w-8 h-8 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-lg flex items-center justify-center">
                         <span class="text-lg">⚡</span>
                     </div>
-                    <h3
-                        class="text-xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent"
-                    >
+                    <h3 class="text-xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
                         Menu Principal
                     </h3>
                 </div>
             </template>
             <template #default>
                 <div class="space-y-6">
-                    <div
-                        class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-primary/20"
-                    >
+                    <div class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-primary/20">
                         <div class="flex items-center gap-4">
-                            <div
-                                class="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center"
-                            >
+                            <div class="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
                                 <img
                                     :src="
                                         user.avatar
@@ -71,14 +63,10 @@ const logout = () => {
                                     {{ user.email }}
                                 </p>
                                 <div class="flex items-center gap-2 mt-1">
-                                    <span
-                                        class="text-xs bg-gradient-to-r from-primary/20 to-secondary/20 px-2 py-1 rounded-full"
-                                    >
+                                    <span class="text-xs bg-gradient-to-r from-primary/20 to-secondary/20 px-2 py-1 rounded-full">
                                         Niveau {{ user.level || 1 }}
                                     </span>
-                                    <span
-                                        class="text-xs bg-gradient-to-r from-accent/20 to-success/20 px-2 py-1 rounded-full"
-                                    >
+                                    <span class="text-xs bg-gradient-to-r from-accent/20 to-success/20 px-2 py-1 rounded-full">
                                         {{ user.cash || 0 }} 💰
                                     </span>
                                 </div>
@@ -163,9 +151,7 @@ const logout = () => {
                             @click="logout"
                             class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-error/10 transition-all duration-300 group text-left"
                         >
-                            <div
-                                class="w-8 h-8 bg-error/20 rounded-lg flex items-center justify-center group-hover:bg-error/30 transition-colors"
-                            >
+                            <div class="w-8 h-8 bg-error/20 rounded-lg flex items-center justify-center group-hover:bg-error/30 transition-colors">
                                 <svg
                                     class="w-4 h-4"
                                     fill="none"

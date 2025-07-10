@@ -43,9 +43,6 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit');
     }
 
-    /**
-     * Met à jour uniquement l'avatar de l'utilisateur.
-     */
     public function updateAvatar(Request $request): RedirectResponse
     {
         $user = $request->user();

@@ -1,0 +1,1302 @@
+.
+├── Makefile
+├── README.md
+├── app
+│   ├── Helpers
+│   │   └── helpers.php
+│   ├── Http
+│   │   ├── Controllers
+│   │   │   ├── Admin
+│   │   │   │   └── Users
+│   │   │   │       └── UserController.php
+│   │   │   ├── Auth
+│   │   │   │   ├── AuthenticatedSessionController.php
+│   │   │   │   ├── ConfirmablePasswordController.php
+│   │   │   │   ├── EmailVerificationNotificationController.php
+│   │   │   │   ├── EmailVerificationPromptController.php
+│   │   │   │   ├── NewPasswordController.php
+│   │   │   │   ├── PasswordController.php
+│   │   │   │   ├── PasswordResetLinkController.php
+│   │   │   │   ├── RegisteredUserController.php
+│   │   │   │   └── VerifyEmailController.php
+│   │   │   ├── Controller.php
+│   │   │   ├── MarketplaceController.php
+│   │   │   ├── MeController.php
+│   │   │   ├── OpeningController.php
+│   │   │   ├── PokedexController.php
+│   │   │   ├── PokemonController.php
+│   │   │   ├── ProfileController.php
+│   │   │   └── PromoCodeController.php
+│   │   ├── Middleware
+│   │   │   ├── AdminMiddleware.php
+│   │   │   └── HandleInertiaRequests.php
+│   │   └── Requests
+│   │       ├── Admin
+│   │       │   ├── UserStoreRequest.php
+│   │       │   └── UserUpdateRequest.php
+│   │       ├── Auth
+│   │       │   └── LoginRequest.php
+│   │       └── ProfileUpdateRequest.php
+│   ├── Models
+│   │   ├── Inventory.php
+│   │   ├── Item.php
+│   │   ├── Marketplace.php
+│   │   ├── Pokedex.php
+│   │   ├── Pokemon.php
+│   │   ├── PromoCode.php
+│   │   ├── StatBoost.php
+│   │   └── User.php
+│   ├── Providers
+│   │   └── AppServiceProvider.php
+│   └── Services
+│       └── UserService.php
+├── artisan
+├── bootstrap
+│   ├── app.php
+│   ├── cache
+│   │   ├── packages.php
+│   │   └── services.php
+│   └── providers.php
+├── composer.json
+├── composer.lock
+├── config
+│   ├── app.php
+│   ├── auth.php
+│   ├── cache.php
+│   ├── database.php
+│   ├── filesystems.php
+│   ├── logging.php
+│   ├── mail.php
+│   ├── permission.php
+│   ├── queue.php
+│   ├── services.php
+│   └── session.php
+├── database
+│   ├── database.sqlite
+│   ├── factories
+│   │   └── UserFactory.php
+│   ├── migrations
+│   │   ├── 0001_01_01_000000_create_users_table.php
+│   │   ├── 0001_01_01_000001_create_cache_table.php
+│   │   ├── 0001_01_01_000002_create_jobs_table.php
+│   │   ├── 2025_01_16_190706_create_pokemon_table.php
+│   │   ├── 2025_01_16_192531_create_pokedex_table.php
+│   │   ├── 2025_01_21_191730_create_personal_access_tokens_table.php
+│   │   ├── 2025_03_21_000001_create_items_table.php
+│   │   ├── 2025_03_21_000002_create_inventory_table.php
+│   │   ├── 2025_03_21_000003_create_marketplace_table.php
+│   │   ├── 2025_03_21_000004_create_promo_codes_table.php
+│   │   ├── 2025_03_21_000005_create_promo_code_items_table.php
+│   │   ├── 2025_03_21_000006_create_promo_code_users_table.php
+│   │   ├── 2025_03_21_000007_create_stat_boosts_table.php
+│   │   ├── 2025_06_19_122910_create_permission_tables.php
+│   │   └── 2025_07_09_000001_add_avatar_to_users_table.php
+│   └── seeders
+│       ├── DatabaseSeeder.php
+│       ├── InventorySeeder.php
+│       ├── ItemSeeder.php
+│       ├── MarketplaceSeeder.php
+│       ├── PokedexSeeder.php
+│       ├── PokemonSeeder.php
+│       ├── PromoCodeSeeder.php
+│       └── UserSeeder.php
+├── package-lock.json
+├── package.json
+├── phpunit.xml
+├── public
+│   ├── favicon.ico
+│   ├── hot
+│   ├── images
+│   │   ├── Foreground1.png
+│   │   ├── Foreground1_old.png
+│   │   ├── Foreground2.png
+│   │   ├── Foreground2_old.png
+│   │   ├── background.png
+│   │   ├── background_colors.png
+│   │   ├── background_total.png
+│   │   ├── badges
+│   │   │   ├── 1.png
+│   │   │   ├── 10.png
+│   │   │   ├── 11.png
+│   │   │   ├── 12.png
+│   │   │   ├── 13.png
+│   │   │   ├── 14.png
+│   │   │   ├── 15.png
+│   │   │   ├── 16.png
+│   │   │   ├── 17.png
+│   │   │   ├── 18.png
+│   │   │   ├── 19.png
+│   │   │   ├── 2.png
+│   │   │   ├── 20.png
+│   │   │   ├── 3.png
+│   │   │   ├── 4.png
+│   │   │   ├── 5.png
+│   │   │   ├── 6.png
+│   │   │   ├── 7.png
+│   │   │   ├── 8.png
+│   │   │   └── 9.png
+│   │   ├── dresseur.png
+│   │   ├── inventory.png
+│   │   ├── logo.png
+│   │   ├── mountains.png
+│   │   ├── pokemon-gifs
+│   │   │   ├── 1.gif
+│   │   │   ├── 10.gif
+│   │   │   ├── 100.gif
+│   │   │   ├── 100_S.gif
+│   │   │   ├── 101.gif
+│   │   │   ├── 101_S.gif
+│   │   │   ├── 102.gif
+│   │   │   ├── 102_S.gif
+│   │   │   ├── 103.gif
+│   │   │   ├── 103_S.gif
+│   │   │   ├── 104.gif
+│   │   │   ├── 104_S.gif
+│   │   │   ├── 105.gif
+│   │   │   ├── 105_S.gif
+│   │   │   ├── 106.gif
+│   │   │   ├── 106_S.gif
+│   │   │   ├── 107.gif
+│   │   │   ├── 107_S.gif
+│   │   │   ├── 108.gif
+│   │   │   ├── 108_S.gif
+│   │   │   ├── 109.gif
+│   │   │   ├── 109_S.gif
+│   │   │   ├── 10_S.gif
+│   │   │   ├── 11.gif
+│   │   │   ├── 110.gif
+│   │   │   ├── 110_S.gif
+│   │   │   ├── 111.gif
+│   │   │   ├── 111_S.gif
+│   │   │   ├── 112.gif
+│   │   │   ├── 112_S.gif
+│   │   │   ├── 113.gif
+│   │   │   ├── 113_S.gif
+│   │   │   ├── 114.gif
+│   │   │   ├── 114_S.gif
+│   │   │   ├── 115.gif
+│   │   │   ├── 115_S.gif
+│   │   │   ├── 116.gif
+│   │   │   ├── 116_S.gif
+│   │   │   ├── 117.gif
+│   │   │   ├── 117_S.gif
+│   │   │   ├── 118.gif
+│   │   │   ├── 118_S.gif
+│   │   │   ├── 119.gif
+│   │   │   ├── 119_S.gif
+│   │   │   ├── 11_S.gif
+│   │   │   ├── 12.gif
+│   │   │   ├── 120.gif
+│   │   │   ├── 120_S.gif
+│   │   │   ├── 121.gif
+│   │   │   ├── 121_S.gif
+│   │   │   ├── 122.gif
+│   │   │   ├── 122_S.gif
+│   │   │   ├── 123.gif
+│   │   │   ├── 123_S.gif
+│   │   │   ├── 124.gif
+│   │   │   ├── 124_S.gif
+│   │   │   ├── 125.gif
+│   │   │   ├── 125_S.gif
+│   │   │   ├── 126.gif
+│   │   │   ├── 126_S.gif
+│   │   │   ├── 127.gif
+│   │   │   ├── 127_S.gif
+│   │   │   ├── 128.gif
+│   │   │   ├── 128_S.gif
+│   │   │   ├── 129.gif
+│   │   │   ├── 129_S.gif
+│   │   │   ├── 12_S.gif
+│   │   │   ├── 13.gif
+│   │   │   ├── 130.gif
+│   │   │   ├── 130_S.gif
+│   │   │   ├── 131.gif
+│   │   │   ├── 131_S.gif
+│   │   │   ├── 132.gif
+│   │   │   ├── 132_S.gif
+│   │   │   ├── 133.gif
+│   │   │   ├── 133_S.gif
+│   │   │   ├── 134.gif
+│   │   │   ├── 134_S.gif
+│   │   │   ├── 135.gif
+│   │   │   ├── 135_S.gif
+│   │   │   ├── 136.gif
+│   │   │   ├── 136_S.gif
+│   │   │   ├── 137.gif
+│   │   │   ├── 137_S.gif
+│   │   │   ├── 138.gif
+│   │   │   ├── 138_S.gif
+│   │   │   ├── 139.gif
+│   │   │   ├── 139_S.gif
+│   │   │   ├── 13_S.gif
+│   │   │   ├── 14.gif
+│   │   │   ├── 140.gif
+│   │   │   ├── 140_S.gif
+│   │   │   ├── 141.gif
+│   │   │   ├── 141_S.gif
+│   │   │   ├── 142.gif
+│   │   │   ├── 142_S.gif
+│   │   │   ├── 143.gif
+│   │   │   ├── 143_S.gif
+│   │   │   ├── 144.gif
+│   │   │   ├── 144_S.gif
+│   │   │   ├── 145.gif
+│   │   │   ├── 145_S.gif
+│   │   │   ├── 146.gif
+│   │   │   ├── 146_S.gif
+│   │   │   ├── 147.gif
+│   │   │   ├── 147_S.gif
+│   │   │   ├── 148.gif
+│   │   │   ├── 148_S.gif
+│   │   │   ├── 149.gif
+│   │   │   ├── 149_S.gif
+│   │   │   ├── 14_S.gif
+│   │   │   ├── 15.gif
+│   │   │   ├── 150.gif
+│   │   │   ├── 150_S.gif
+│   │   │   ├── 151.gif
+│   │   │   ├── 151_S.gif
+│   │   │   ├── 15_S.gif
+│   │   │   ├── 16.gif
+│   │   │   ├── 16_S.gif
+│   │   │   ├── 17.gif
+│   │   │   ├── 17_S.gif
+│   │   │   ├── 18.gif
+│   │   │   ├── 18_S.gif
+│   │   │   ├── 19.gif
+│   │   │   ├── 19_S.gif
+│   │   │   ├── 1_S.gif
+│   │   │   ├── 2.gif
+│   │   │   ├── 20.gif
+│   │   │   ├── 20_S.gif
+│   │   │   ├── 21.gif
+│   │   │   ├── 21_S.gif
+│   │   │   ├── 22.gif
+│   │   │   ├── 22_S.gif
+│   │   │   ├── 23.gif
+│   │   │   ├── 23_S.gif
+│   │   │   ├── 24.gif
+│   │   │   ├── 24_S.gif
+│   │   │   ├── 25.gif
+│   │   │   ├── 25_S.gif
+│   │   │   ├── 26.gif
+│   │   │   ├── 26_S.gif
+│   │   │   ├── 27.gif
+│   │   │   ├── 27_S.gif
+│   │   │   ├── 28.gif
+│   │   │   ├── 28_S.gif
+│   │   │   ├── 29.gif
+│   │   │   ├── 29_S.gif
+│   │   │   ├── 2_S.gif
+│   │   │   ├── 3.gif
+│   │   │   ├── 30.gif
+│   │   │   ├── 30_S.gif
+│   │   │   ├── 31.gif
+│   │   │   ├── 31_S.gif
+│   │   │   ├── 32.gif
+│   │   │   ├── 32_S.gif
+│   │   │   ├── 33.gif
+│   │   │   ├── 33_S.gif
+│   │   │   ├── 34.gif
+│   │   │   ├── 34_S.gif
+│   │   │   ├── 35.gif
+│   │   │   ├── 35_S.gif
+│   │   │   ├── 36.gif
+│   │   │   ├── 36_S.gif
+│   │   │   ├── 37.gif
+│   │   │   ├── 37_S.gif
+│   │   │   ├── 38.gif
+│   │   │   ├── 38_S.gif
+│   │   │   ├── 39.gif
+│   │   │   ├── 39_S.gif
+│   │   │   ├── 3_S.gif
+│   │   │   ├── 4.gif
+│   │   │   ├── 40.gif
+│   │   │   ├── 40_S.gif
+│   │   │   ├── 41.gif
+│   │   │   ├── 41_S.gif
+│   │   │   ├── 42.gif
+│   │   │   ├── 42_S.gif
+│   │   │   ├── 43.gif
+│   │   │   ├── 43_S.gif
+│   │   │   ├── 44.gif
+│   │   │   ├── 44_S.gif
+│   │   │   ├── 45.gif
+│   │   │   ├── 45_S.gif
+│   │   │   ├── 46.gif
+│   │   │   ├── 46_S.gif
+│   │   │   ├── 47.gif
+│   │   │   ├── 47_S.gif
+│   │   │   ├── 48.gif
+│   │   │   ├── 48_S.gif
+│   │   │   ├── 49.gif
+│   │   │   ├── 49_S.gif
+│   │   │   ├── 4_S.gif
+│   │   │   ├── 5.gif
+│   │   │   ├── 50.gif
+│   │   │   ├── 50_S.gif
+│   │   │   ├── 51.gif
+│   │   │   ├── 51_S.gif
+│   │   │   ├── 52.gif
+│   │   │   ├── 52_S.gif
+│   │   │   ├── 53.gif
+│   │   │   ├── 53_S.gif
+│   │   │   ├── 54.gif
+│   │   │   ├── 54_S.gif
+│   │   │   ├── 55.gif
+│   │   │   ├── 55_S.gif
+│   │   │   ├── 56.gif
+│   │   │   ├── 56_S.gif
+│   │   │   ├── 57.gif
+│   │   │   ├── 57_S.gif
+│   │   │   ├── 58.gif
+│   │   │   ├── 58_S.gif
+│   │   │   ├── 59.gif
+│   │   │   ├── 59_S.gif
+│   │   │   ├── 5_S.gif
+│   │   │   ├── 6.gif
+│   │   │   ├── 60.gif
+│   │   │   ├── 60_S.gif
+│   │   │   ├── 61.gif
+│   │   │   ├── 61_S.gif
+│   │   │   ├── 62.gif
+│   │   │   ├── 62_S.gif
+│   │   │   ├── 63.gif
+│   │   │   ├── 63_S.gif
+│   │   │   ├── 64.gif
+│   │   │   ├── 64_S.gif
+│   │   │   ├── 65.gif
+│   │   │   ├── 65_S.gif
+│   │   │   ├── 66.gif
+│   │   │   ├── 66_S.gif
+│   │   │   ├── 67.gif
+│   │   │   ├── 67_S.gif
+│   │   │   ├── 68.gif
+│   │   │   ├── 68_S.gif
+│   │   │   ├── 69.gif
+│   │   │   ├── 69_S.gif
+│   │   │   ├── 6_S.gif
+│   │   │   ├── 7.gif
+│   │   │   ├── 70.gif
+│   │   │   ├── 70_S.gif
+│   │   │   ├── 71.gif
+│   │   │   ├── 71_S.gif
+│   │   │   ├── 72.gif
+│   │   │   ├── 72_S.gif
+│   │   │   ├── 73.gif
+│   │   │   ├── 73_S.gif
+│   │   │   ├── 74.gif
+│   │   │   ├── 74_S.gif
+│   │   │   ├── 75.gif
+│   │   │   ├── 75_S.gif
+│   │   │   ├── 76.gif
+│   │   │   ├── 76_S.gif
+│   │   │   ├── 77.gif
+│   │   │   ├── 77_S.gif
+│   │   │   ├── 78.gif
+│   │   │   ├── 78_S.gif
+│   │   │   ├── 79.gif
+│   │   │   ├── 79_S.gif
+│   │   │   ├── 7_S.gif
+│   │   │   ├── 8.gif
+│   │   │   ├── 80.gif
+│   │   │   ├── 80_S.gif
+│   │   │   ├── 81.gif
+│   │   │   ├── 81_S.gif
+│   │   │   ├── 82.gif
+│   │   │   ├── 82_S.gif
+│   │   │   ├── 83.gif
+│   │   │   ├── 83_S.gif
+│   │   │   ├── 84.gif
+│   │   │   ├── 84_S.gif
+│   │   │   ├── 85.gif
+│   │   │   ├── 85_S.gif
+│   │   │   ├── 86.gif
+│   │   │   ├── 86_S.gif
+│   │   │   ├── 87.gif
+│   │   │   ├── 87_S.gif
+│   │   │   ├── 88.gif
+│   │   │   ├── 88_S.gif
+│   │   │   ├── 89.gif
+│   │   │   ├── 89_S.gif
+│   │   │   ├── 8_S.gif
+│   │   │   ├── 9.gif
+│   │   │   ├── 90.gif
+│   │   │   ├── 90_S.gif
+│   │   │   ├── 91.gif
+│   │   │   ├── 91_S.gif
+│   │   │   ├── 92.gif
+│   │   │   ├── 92_S.gif
+│   │   │   ├── 93.gif
+│   │   │   ├── 93_S.gif
+│   │   │   ├── 94.gif
+│   │   │   ├── 94_S.gif
+│   │   │   ├── 95.gif
+│   │   │   ├── 95_S.gif
+│   │   │   ├── 96.gif
+│   │   │   ├── 96_S.gif
+│   │   │   ├── 97.gif
+│   │   │   ├── 97_S.gif
+│   │   │   ├── 98.gif
+│   │   │   ├── 98_S.gif
+│   │   │   ├── 99.gif
+│   │   │   ├── 99_S.gif
+│   │   │   └── 9_S.gif
+│   │   ├── section-2-background 1.jpg
+│   │   ├── section-me-background.jpg
+│   │   ├── tiles
+│   │   │   └── test.png
+│   │   ├── trainer
+│   │   │   ├── 1.png
+│   │   │   ├── 10.png
+│   │   │   ├── 100.png
+│   │   │   ├── 101.png
+│   │   │   ├── 102.png
+│   │   │   ├── 103.png
+│   │   │   ├── 104.png
+│   │   │   ├── 105.png
+│   │   │   ├── 106.png
+│   │   │   ├── 107.png
+│   │   │   ├── 108.png
+│   │   │   ├── 109.png
+│   │   │   ├── 11.png
+│   │   │   ├── 110.png
+│   │   │   ├── 111.png
+│   │   │   ├── 112.png
+│   │   │   ├── 113.png
+│   │   │   ├── 114.png
+│   │   │   ├── 115.png
+│   │   │   ├── 116.png
+│   │   │   ├── 117.png
+│   │   │   ├── 118.png
+│   │   │   ├── 119.png
+│   │   │   ├── 12.png
+│   │   │   ├── 120.png
+│   │   │   ├── 121.png
+│   │   │   ├── 122.png
+│   │   │   ├── 123.png
+│   │   │   ├── 124.png
+│   │   │   ├── 125.png
+│   │   │   ├── 126.png
+│   │   │   ├── 127.png
+│   │   │   ├── 128.png
+│   │   │   ├── 129.png
+│   │   │   ├── 13.png
+│   │   │   ├── 130.png
+│   │   │   ├── 131.png
+│   │   │   ├── 132.png
+│   │   │   ├── 133.png
+│   │   │   ├── 134.png
+│   │   │   ├── 135.png
+│   │   │   ├── 136.png
+│   │   │   ├── 137.png
+│   │   │   ├── 138.png
+│   │   │   ├── 139.png
+│   │   │   ├── 14.png
+│   │   │   ├── 140.png
+│   │   │   ├── 141.png
+│   │   │   ├── 142.png
+│   │   │   ├── 143.png
+│   │   │   ├── 144.png
+│   │   │   ├── 145.png
+│   │   │   ├── 146.png
+│   │   │   ├── 147.png
+│   │   │   ├── 148.png
+│   │   │   ├── 149.png
+│   │   │   ├── 15.png
+│   │   │   ├── 150.png
+│   │   │   ├── 151.png
+│   │   │   ├── 152.png
+│   │   │   ├── 153.png
+│   │   │   ├── 154.png
+│   │   │   ├── 155.png
+│   │   │   ├── 156.png
+│   │   │   ├── 157.png
+│   │   │   ├── 158.png
+│   │   │   ├── 159.png
+│   │   │   ├── 16.png
+│   │   │   ├── 160.png
+│   │   │   ├── 161.png
+│   │   │   ├── 162.png
+│   │   │   ├── 163.png
+│   │   │   ├── 164.png
+│   │   │   ├── 165.png
+│   │   │   ├── 166.png
+│   │   │   ├── 167.png
+│   │   │   ├── 168.png
+│   │   │   ├── 169.png
+│   │   │   ├── 17.png
+│   │   │   ├── 170.png
+│   │   │   ├── 171.png
+│   │   │   ├── 172.png
+│   │   │   ├── 173.png
+│   │   │   ├── 174.png
+│   │   │   ├── 175.png
+│   │   │   ├── 176.png
+│   │   │   ├── 177.png
+│   │   │   ├── 178.png
+│   │   │   ├── 179.png
+│   │   │   ├── 18.png
+│   │   │   ├── 180.png
+│   │   │   ├── 181.png
+│   │   │   ├── 182.png
+│   │   │   ├── 183.png
+│   │   │   ├── 184.png
+│   │   │   ├── 185.png
+│   │   │   ├── 186.png
+│   │   │   ├── 187.png
+│   │   │   ├── 188.png
+│   │   │   ├── 189.png
+│   │   │   ├── 19.png
+│   │   │   ├── 190.png
+│   │   │   ├── 191.png
+│   │   │   ├── 192.png
+│   │   │   ├── 193.png
+│   │   │   ├── 194.png
+│   │   │   ├── 195.png
+│   │   │   ├── 196.png
+│   │   │   ├── 197.png
+│   │   │   ├── 198.png
+│   │   │   ├── 199.png
+│   │   │   ├── 2.png
+│   │   │   ├── 20.png
+│   │   │   ├── 200.png
+│   │   │   ├── 201.png
+│   │   │   ├── 202.png
+│   │   │   ├── 203.png
+│   │   │   ├── 204.png
+│   │   │   ├── 205.png
+│   │   │   ├── 206.png
+│   │   │   ├── 207.png
+│   │   │   ├── 208.png
+│   │   │   ├── 209.png
+│   │   │   ├── 21.png
+│   │   │   ├── 210.png
+│   │   │   ├── 211.png
+│   │   │   ├── 212.png
+│   │   │   ├── 213.png
+│   │   │   ├── 214.png
+│   │   │   ├── 215.png
+│   │   │   ├── 216.png
+│   │   │   ├── 217.png
+│   │   │   ├── 218.png
+│   │   │   ├── 219.png
+│   │   │   ├── 22.png
+│   │   │   ├── 220.png
+│   │   │   ├── 221.png
+│   │   │   ├── 222.png
+│   │   │   ├── 223.png
+│   │   │   ├── 224.png
+│   │   │   ├── 225.png
+│   │   │   ├── 226.png
+│   │   │   ├── 227.png
+│   │   │   ├── 228.png
+│   │   │   ├── 229.png
+│   │   │   ├── 23.png
+│   │   │   ├── 230.png
+│   │   │   ├── 231.png
+│   │   │   ├── 232.png
+│   │   │   ├── 233.png
+│   │   │   ├── 234.png
+│   │   │   ├── 235.png
+│   │   │   ├── 236.png
+│   │   │   ├── 237.png
+│   │   │   ├── 238.png
+│   │   │   ├── 239.png
+│   │   │   ├── 24.png
+│   │   │   ├── 240.png
+│   │   │   ├── 241.png
+│   │   │   ├── 242.png
+│   │   │   ├── 243.png
+│   │   │   ├── 244.png
+│   │   │   ├── 245.png
+│   │   │   ├── 246.png
+│   │   │   ├── 247.png
+│   │   │   ├── 248.png
+│   │   │   ├── 249.png
+│   │   │   ├── 25.png
+│   │   │   ├── 250.png
+│   │   │   ├── 251.png
+│   │   │   ├── 252.png
+│   │   │   ├── 253.png
+│   │   │   ├── 254.png
+│   │   │   ├── 255.png
+│   │   │   ├── 256.png
+│   │   │   ├── 257.png
+│   │   │   ├── 258.png
+│   │   │   ├── 26.png
+│   │   │   ├── 27.png
+│   │   │   ├── 28.png
+│   │   │   ├── 29.png
+│   │   │   ├── 3.png
+│   │   │   ├── 30.png
+│   │   │   ├── 31.png
+│   │   │   ├── 32.png
+│   │   │   ├── 33.png
+│   │   │   ├── 34.png
+│   │   │   ├── 35.png
+│   │   │   ├── 36.png
+│   │   │   ├── 37.png
+│   │   │   ├── 38.png
+│   │   │   ├── 39.png
+│   │   │   ├── 4.png
+│   │   │   ├── 40.png
+│   │   │   ├── 41.png
+│   │   │   ├── 42.png
+│   │   │   ├── 43.png
+│   │   │   ├── 44.png
+│   │   │   ├── 45.png
+│   │   │   ├── 46.png
+│   │   │   ├── 47.png
+│   │   │   ├── 48.png
+│   │   │   ├── 49.png
+│   │   │   ├── 5.png
+│   │   │   ├── 50.png
+│   │   │   ├── 51.png
+│   │   │   ├── 52.png
+│   │   │   ├── 53.png
+│   │   │   ├── 54.png
+│   │   │   ├── 55.png
+│   │   │   ├── 56.png
+│   │   │   ├── 57.png
+│   │   │   ├── 58.png
+│   │   │   ├── 59.png
+│   │   │   ├── 6.png
+│   │   │   ├── 60.png
+│   │   │   ├── 61.png
+│   │   │   ├── 62.png
+│   │   │   ├── 63.png
+│   │   │   ├── 64.png
+│   │   │   ├── 65.png
+│   │   │   ├── 66.png
+│   │   │   ├── 67.png
+│   │   │   ├── 68.png
+│   │   │   ├── 69.png
+│   │   │   ├── 7.png
+│   │   │   ├── 70.png
+│   │   │   ├── 71.png
+│   │   │   ├── 72.png
+│   │   │   ├── 73.png
+│   │   │   ├── 74.png
+│   │   │   ├── 75.png
+│   │   │   ├── 76.png
+│   │   │   ├── 77.png
+│   │   │   ├── 78.png
+│   │   │   ├── 79.png
+│   │   │   ├── 8.png
+│   │   │   ├── 80.png
+│   │   │   ├── 81.png
+│   │   │   ├── 82.png
+│   │   │   ├── 83.png
+│   │   │   ├── 84.png
+│   │   │   ├── 85.png
+│   │   │   ├── 86.png
+│   │   │   ├── 87.png
+│   │   │   ├── 88.png
+│   │   │   ├── 89.png
+│   │   │   ├── 9.png
+│   │   │   ├── 90.png
+│   │   │   ├── 91.png
+│   │   │   ├── 92.png
+│   │   │   ├── 93.png
+│   │   │   ├── 94.png
+│   │   │   ├── 95.png
+│   │   │   ├── 96.png
+│   │   │   ├── 97.png
+│   │   │   ├── 98.png
+│   │   │   └── 99.png
+│   │   └── types
+│   │       ├── Acier.png
+│   │       ├── Combat.png
+│   │       ├── Dragon.png
+│   │       ├── Eau.png
+│   │       ├── Feu.png
+│   │       ├── Fée.png
+│   │       ├── Glace.png
+│   │       ├── Insecte.png
+│   │       ├── Normal.png
+│   │       ├── Plante.png
+│   │       ├── Poison.png
+│   │       ├── Psy.png
+│   │       ├── Roche.png
+│   │       ├── Sol.png
+│   │       ├── Spectre.png
+│   │       ├── Ténèbres.png
+│   │       ├── Vol.png
+│   │       └── Électrik.png
+│   ├── index.php
+│   └── robots.txt
+├── resources
+│   ├── css
+│   │   └── app.css
+│   ├── js
+│   │   ├── Components
+│   │   │   ├── Cards
+│   │   │   │   ├── MarketplaceListingCard.vue
+│   │   │   │   ├── PokedexCard.vue
+│   │   │   │   ├── PokemonCard.vue
+│   │   │   │   └── SelectedPokemonCard.vue
+│   │   │   ├── Game
+│   │   │   │   ├── GameInventory.vue
+│   │   │   │   ├── MyListingsSection.vue
+│   │   │   │   └── PokedexSection.vue
+│   │   │   ├── Layout
+│   │   │   │   ├── DesktopLayout.vue
+│   │   │   │   ├── MobileLayout.vue
+│   │   │   │   └── SideSection.vue
+│   │   │   ├── Profile
+│   │   │   │   ├── LevelDisplay.vue
+│   │   │   │   ├── TrainerProfile.vue
+│   │   │   │   └── UserMenu.vue
+│   │   │   ├── UI
+│   │   │   │   ├── Alert.vue
+│   │   │   │   ├── AppNavbar.vue
+│   │   │   │   ├── Avatar.vue
+│   │   │   │   ├── BackgroundEffects.vue
+│   │   │   │   ├── Badge.vue
+│   │   │   │   ├── Button.vue
+│   │   │   │   ├── ConfirmationModal.vue
+│   │   │   │   ├── Input.vue
+│   │   │   │   ├── Modal.vue
+│   │   │   │   ├── PokemonTypeBadge.vue
+│   │   │   │   ├── RarityBadge.vue
+│   │   │   │   ├── Select.vue
+│   │   │   │   ├── Spinner.vue
+│   │   │   │   └── StarsBadge.vue
+│   │   │   └── index.ts
+│   │   ├── Pages
+│   │   │   ├── Admin
+│   │   │   │   └── Users
+│   │   │   │       ├── Create.vue
+│   │   │   │       ├── Edit.vue
+│   │   │   │       ├── Index.vue
+│   │   │   │       └── Show.vue
+│   │   │   ├── Auth
+│   │   │   │   ├── Login.vue
+│   │   │   │   └── Register.vue
+│   │   │   ├── Marketplace
+│   │   │   │   ├── Index.vue
+│   │   │   │   └── Sell.vue
+│   │   │   ├── Me.vue
+│   │   │   ├── Pokemon
+│   │   │   │   └── Index.vue
+│   │   │   ├── Profile
+│   │   │   │   └── Edit.vue
+│   │   │   ├── PromoCodes
+│   │   │   │   └── Index.vue
+│   │   │   └── Welcome.vue
+│   │   ├── app.ts
+│   │   ├── bootstrap.ts
+│   │   ├── composables
+│   │   │   ├── useMarketplace.ts
+│   │   │   └── useSelling.ts
+│   │   ├── types
+│   │   │   ├── env.d.ts
+│   │   │   ├── global.d.ts
+│   │   │   ├── index.ts
+│   │   │   ├── inventory.ts
+│   │   │   ├── marketplace.ts
+│   │   │   ├── pokedex.ts
+│   │   │   ├── pokemon.ts
+│   │   │   └── user.ts
+│   │   └── utils
+│   │       ├── marketplace.ts
+│   │       └── pokemon.ts
+│   └── views
+│       └── app.blade.php
+├── routes
+│   ├── admin.php
+│   ├── api.php
+│   ├── auth.php
+│   ├── console.php
+│   └── web.php
+├── routes.json
+├── storage
+│   ├── app
+│   │   ├── private
+│   │   │   └── data
+│   │   │       └── pokemon_test.json
+│   │   └── public
+│   ├── debugbar
+│   │   ├── 01JZQME29JH7VP5SX9CWQ442VN.json
+│   │   ├── 01JZQMEAJNBGDK665628S3PDM4.json
+│   │   ├── 01JZQMEKGPDVA8VVNRTW9D1TD9.json
+│   │   ├── 01JZQMEKJDN305J9TDBE95SFEM.json
+│   │   ├── 01JZQMFER546R2XFG6NFFNEMA4.json
+│   │   ├── 01JZQMFES3CF8S9ZSCAJQM4PPP.json
+│   │   ├── 01JZQMFM9KVVKDQ628CY392SMT.json
+│   │   ├── 01JZQMFN6G1197P759W8D4VEJ5.json
+│   │   ├── 01JZQMG42ATC71SWAZAPGFG1ND.json
+│   │   ├── 01JZQMG436QA9WJBHYH7PZN0VW.json
+│   │   ├── 01JZQMGY0TKKZ9KPT3MR8J6RG1.json
+│   │   ├── 01JZQMGY1Q46TFS9P78R1ZT6N4.json
+│   │   ├── 01JZQMH6MEMSBWWB8CGFZ5QVMA.json
+│   │   ├── 01JZQMH6NE0M0KJESRV8138XX3.json
+│   │   ├── 01JZQMMNQ3AVT3S8ARY8FJSQHS.json
+│   │   ├── 01JZQMN6760WPS160HJZ3VMNM3.json
+│   │   ├── 01JZQMN6821HRPEXFT0X1TQVRV.json
+│   │   ├── 01JZQMNS4Z4B3M37SQ13KV9GEZ.json
+│   │   ├── 01JZQMNS5ZG22GZ9ZAYQMEC6FM.json
+│   │   ├── 01JZQMNZ0HX07G515X9TAE6GA9.json
+│   │   ├── 01JZQMP2Q6Z4VPDQRTPNNNA61K.json
+│   │   ├── 01JZQMPEBCEMFEYCA3Z4QZSD6R.json
+│   │   ├── 01JZQMPEC9ZYG0VN78MNEC1N04.json
+│   │   ├── 01JZQPKB1NT6PJEZS35S6ZZGNM.json
+│   │   ├── 01JZQPMSSGD43H89539RZJXWAR.json
+│   │   ├── 01JZQPN7594ZCMBK2D7SRMBPY6.json
+│   │   ├── 01JZQPN75M8V1W1KJ7TA0XHG9E.json
+│   │   ├── 01JZQPN761ZY11M9HAP8AJDPCM.json
+│   │   ├── 01JZQPN76WEK9H2XTDW1AS449S.json
+│   │   ├── 01JZQPN776QTGM2SBJ61AYA1BY.json
+│   │   ├── 01JZQPN77GT1VQ9QFTN6SG4318.json
+│   │   ├── 01JZQPN77TX7PXSZPKY2V3QG6C.json
+│   │   ├── 01JZQPN784TYESXMH6Q6CMSH9F.json
+│   │   ├── 01JZQPN78FQAPG2J5VKDFYYYM7.json
+│   │   ├── 01JZQPN78SV16M4BMR4J87R4DD.json
+│   │   ├── 01JZQPN7944A69VTQE8SPBZKJG.json
+│   │   ├── 01JZQPN79DNGN75V6ZFY63277Z.json
+│   │   ├── 01JZQPN79QBD4WA5187MEEZ0PM.json
+│   │   ├── 01JZQPN7A0AC0CYJEKZKVNH1V5.json
+│   │   ├── 01JZQPN7AA4GB35B05GBBV4ZT5.json
+│   │   ├── 01JZQPN7AMWD2WJ5EKWN7KRQF6.json
+│   │   ├── 01JZQPN7AX1RCTS55CT9WRD479.json
+│   │   ├── 01JZQPQMKJ9JJ431YGGJJ7DS9Z.json
+│   │   ├── 01JZQPQMNB2KEX1EHJPENXDFX6.json
+│   │   ├── 01JZQPQMNP5045NXV1NSPYA3S7.json
+│   │   ├── 01JZQPQMP4R3R10ZZ4XPFS7NM3.json
+│   │   ├── 01JZQPQMPXJC39VKBH1FSCFK4W.json
+│   │   ├── 01JZQPQMQ73GVPG0QWX1RCYNXY.json
+│   │   ├── 01JZQPQMQG8RJKMHGNJQBP1QFP.json
+│   │   ├── 01JZQPQMQTX46DECEPP91PSEJJ.json
+│   │   ├── 01JZQPQMR32JZYCX1ZMF11EA29.json
+│   │   ├── 01JZQPQMRD95ZZDFA9A55DGVRX.json
+│   │   ├── 01JZQPQMRQ43NNWG42YG65YNEF.json
+│   │   ├── 01JZQPQMS04HD9P505KY9X0JGR.json
+│   │   ├── 01JZQPQMSAQTC4KFHXFYDH242Q.json
+│   │   ├── 01JZQPQMSMSRGXZKBBH0BB64ZM.json
+│   │   ├── 01JZQPQMSYG9FE210AJHWXH4AE.json
+│   │   ├── 01JZQPQMT7SHY6P85DSDTTCYY6.json
+│   │   ├── 01JZQPQMTG41D0VMJ0C28CE43T.json
+│   │   ├── 01JZQPQMTSQ7N0BWPQ3FYG2XRE.json
+│   │   ├── 01JZQPQQYMTRHX0JBTBTPWD0VS.json
+│   │   ├── 01JZQPQRHTZB4R9JAKT9DEP5AM.json
+│   │   ├── 01JZQPQRJ4KN84PXEBH3YGJF27.json
+│   │   ├── 01JZQPQRJK50YYZAEVQRADPRD0.json
+│   │   ├── 01JZQPQRKCFHF1YJ0TYBQABR38.json
+│   │   ├── 01JZQPQRM2ZN6NHC9NF21CV41N.json
+│   │   ├── 01JZQPQRMMFD416PGBMNDVY8BC.json
+│   │   ├── 01JZQPQRMZB7KY2GND6EBN4YYD.json
+│   │   ├── 01JZQPQRNA8F00D0YDSVF0DEM5.json
+│   │   ├── 01JZQPQRNKE7RXXA9EQ1ZN0B0G.json
+│   │   ├── 01JZQPQRNZHVSB0V5KZTJ5E54R.json
+│   │   ├── 01JZQPQRPA364T2G4B74ABEE5D.json
+│   │   ├── 01JZQPQRPPTKMFDEZ3MR60C8GD.json
+│   │   ├── 01JZQPQRPZ5DGJZDPEWB7BTSMN.json
+│   │   ├── 01JZQPQRQBPWKR8RTAVKD5X3F6.json
+│   │   ├── 01JZQPQRQNGYVSBADD5WY7ZK0S.json
+│   │   ├── 01JZQPQRR037RDM8NAB0X26M96.json
+│   │   ├── 01JZQPQRRA0XV9KR6AH0RJBPPD.json
+│   │   ├── 01JZQPV313P5QMS98WZNYAS2WE.json
+│   │   ├── 01JZQPV31E53JEESKS4CM8T8PP.json
+│   │   ├── 01JZQPV31Y97SY855DP275QG9G.json
+│   │   ├── 01JZQPV32Z1SYN6QMHG0666WQN.json
+│   │   ├── 01JZQPV33BSB6PRVDTRSF4MRBZ.json
+│   │   ├── 01JZQPV33PMMEN8WXE9RQXNZCV.json
+│   │   ├── 01JZQPV3443YE2WVVSN9M7W9XB.json
+│   │   ├── 01JZQPV34GKK15KHYYEEA52148.json
+│   │   ├── 01JZQPV34V5ZV9NE363XMV0CKM.json
+│   │   ├── 01JZQPV359PZCP8HQW3FRJQBK4.json
+│   │   ├── 01JZQPV35QNM0S0RZX03KDF0R2.json
+│   │   ├── 01JZQPV361RSYAJD4AERFFPYBH.json
+│   │   ├── 01JZQPV36D6D6Q9B9QARSS2AMR.json
+│   │   ├── 01JZQPV36SEYXPANMVXS8YJE72.json
+│   │   ├── 01JZQPV373HAHDBHXPK8TZDF0Q.json
+│   │   ├── 01JZQPV37FSVB7V2S0YMACA8HX.json
+│   │   ├── 01JZQPV37W0WAQG6ABK537QXWB.json
+│   │   ├── 01JZQPV9KGBZBQ0CMER4RH470T.json
+│   │   ├── 01JZQPVDA9RJHQWRRF9RK8MQ2D.json
+│   │   ├── 01JZQPVDCBPRMZ3BF7VQ709ESX.json
+│   │   ├── 01JZQPVDCQY8ST76PPBHFDRZEB.json
+│   │   ├── 01JZQPVDD5MRXDNYKK8DD1JM4S.json
+│   │   ├── 01JZQPVDE0CEJ7FNS6CXBP4APN.json
+│   │   ├── 01JZQPVDEC5035SQ4VTB8DWRYY.json
+│   │   ├── 01JZQPVDEQ4P0C9C298T62HP69.json
+│   │   ├── 01JZQPVDF1HFJQ0WHCG0TJB0DS.json
+│   │   ├── 01JZQPVDFCDZGCP16QD785K585.json
+│   │   ├── 01JZQPVDFPF5EADQT5T2JN4XCS.json
+│   │   ├── 01JZQPVDG1HM0SGPT2GTEJ20MG.json
+│   │   ├── 01JZQPVDGA9RTHNJXBYEBTFAGG.json
+│   │   ├── 01JZQPVDGNRYMYGYKZRRDESTK1.json
+│   │   ├── 01JZQPVDGY63357VPXAA45J5AD.json
+│   │   ├── 01JZQPVDH79754AFJC68DW8F0C.json
+│   │   ├── 01JZQPVDHHQ5X3B1F69QQ9XKA7.json
+│   │   ├── 01JZQPVDHVCD5W5CN7YKT4X938.json
+│   │   ├── 01JZQPVDJ4QNB678VV4Q70P7VR.json
+│   │   ├── 01JZQPVFGR7HZQSGVG70SKJ9KH.json
+│   │   ├── 01JZQPVFV58MVEW3XPEXJBJYK0.json
+│   │   ├── 01JZQPVFVKGWGYEHJYF0M7GGX7.json
+│   │   ├── 01JZQPVFW1840BXGV2QXNJ4RT8.json
+│   │   ├── 01JZQPVFWT9KWD9JKW35V1D2Z8.json
+│   │   ├── 01JZQPVFX4EFGTE6S27M0BFZ1F.json
+│   │   ├── 01JZQPVFXDM37MQZVBQ0HFBG92.json
+│   │   ├── 01JZQPVFXRWZRF5WJJMWM3FXAA.json
+│   │   ├── 01JZQPVFY3HWG548Z74Y2RS2FP.json
+│   │   ├── 01JZQPVFYDT00HDFXSWBQD41XT.json
+│   │   ├── 01JZQPVFYQ1MW65XK3MNKDB37W.json
+│   │   ├── 01JZQPVFZ1V1CWTPV8WG2RQY53.json
+│   │   ├── 01JZQPVFZBCFFFT00NMWBBZ3WN.json
+│   │   ├── 01JZQPVFZNN7KMMJQ991SQJ5KS.json
+│   │   ├── 01JZQPVFZYXDMF79XV920HA7QX.json
+│   │   ├── 01JZQPVG08KKM6XY79P7GXMRGW.json
+│   │   ├── 01JZQPVG0H6XMKRR1Z7767QGSX.json
+│   │   ├── 01JZQPVG0V2ZEEMAY11MTE0HC8.json
+│   │   ├── 01JZQPWC1ZA2B1B6W6803B7JXT.json
+│   │   ├── 01JZQPWC2B1D0SQQ5906ADW865.json
+│   │   ├── 01JZQPWC2WV8SQYAQ5HG2JTWDG.json
+│   │   ├── 01JZQPWC3NZB1ZH9TPMC3982AW.json
+│   │   ├── 01JZQPWC3ZTZ4V1XPHSZR8AZ1G.json
+│   │   ├── 01JZQPWC48YWEB453GS3QPPJ08.json
+│   │   ├── 01JZQPWC4J48B0A8FV27XN45EE.json
+│   │   ├── 01JZQPWC4WYVZP80Q2YKDYB7TZ.json
+│   │   ├── 01JZQPWC56DSWTJ19CQG84TGG4.json
+│   │   ├── 01JZQPWC5F3E5AP75H8BABBJ1M.json
+│   │   ├── 01JZQPWC5SMNX0SPKE4YZ23J91.json
+│   │   ├── 01JZQPWC63NQZTBNZPS033JS9Z.json
+│   │   ├── 01JZQPWC6FQKA5X7GMHAZMRHY1.json
+│   │   ├── 01JZQPWC6VJQYG0R74B41H9PP1.json
+│   │   ├── 01JZQPWC76TTYYR072W2E8P6QV.json
+│   │   ├── 01JZQPWC7G99KVHNEN1KD0WEZX.json
+│   │   ├── 01JZQPWC7VNM02AJMD6WPZA1R3.json
+│   │   ├── 01JZQPYYTZ901MY3B2D3QERVET.json
+│   │   ├── 01JZQPYZ5Q0RBJ6W3QCRQCGEW1.json
+│   │   ├── 01JZQPYZ630EZNQ4YQQKYGPW0F.json
+│   │   ├── 01JZQPYZ6G5PGXVMVV7F4Q019F.json
+│   │   ├── 01JZQPYZ78H2ZJE160GJA96FSK.json
+│   │   ├── 01JZQPYZ7M8RRD987Q35AP3ZFC.json
+│   │   ├── 01JZQPYZ7YCH5APAPZ13CSXFPX.json
+│   │   ├── 01JZQPYZ89P5MPP5H8WKNVXQ46.json
+│   │   ├── 01JZQPYZ8KJM6QCNZ7X7NXJD5F.json
+│   │   ├── 01JZQPYZ8WMHEHY4G4CKG0357J.json
+│   │   ├── 01JZQPYZ97A8YWQBGN7H2AW7M5.json
+│   │   ├── 01JZQPYZ9JKPK1HB3DYFMHM4AR.json
+│   │   ├── 01JZQPYZ9VNFVGM6X7MAPCXEHY.json
+│   │   ├── 01JZQPYZA5HJD3Q3ZD6MWZRVHX.json
+│   │   ├── 01JZQPYZAE3MA2QYAQB4RBAKK0.json
+│   │   ├── 01JZQPYZARA9NXX5VAB0EERGXE.json
+│   │   ├── 01JZQPYZB10DRZF4BJPFM6R91G.json
+│   │   ├── 01JZQPYZBBEG2GQVJ6T2NZ6SJ7.json
+│   │   ├── 01JZQPZ0TDZJ1A8F0M1M2J0CV3.json
+│   │   ├── 01JZQPZ0XBT72DBY06G3QX4XR3.json
+│   │   ├── 01JZQQDFP53YG5ZD0KEA34CDPN.json
+│   │   ├── 01JZQQDJE3M0MREMS8A2X3NVA4.json
+│   │   ├── 01JZQQDJGD2VS9MDPE6937115D.json
+│   │   ├── 01JZQQDJGRCK88Q5H3NHW2CDB5.json
+│   │   ├── 01JZQQDJH2GNN6HPFPD1JQXYYR.json
+│   │   ├── 01JZQQDJHHMPAA1XGHH2PQG1R5.json
+│   │   ├── 01JZQQDJJAEHHWQ0TAZKVXV6Z2.json
+│   │   ├── 01JZQQDJJNYYSMNH6W03W1SV25.json
+│   │   ├── 01JZQQDJJZ1ZVYTKSPQPAQ8XEX.json
+│   │   ├── 01JZQQDJKA5E5T40PDQSSARB2M.json
+│   │   ├── 01JZQQDJKM4TP3VXWSQK05T49X.json
+│   │   ├── 01JZQQDJKY8AEP29CENS1BYW68.json
+│   │   ├── 01JZQQDJM7QK99RB0MR837DAS1.json
+│   │   ├── 01JZQQDJMKNWG79FYK94JX8FNM.json
+│   │   ├── 01JZQQDJMW832N28MQ158M4S5C.json
+│   │   ├── 01JZQQDJN9ECDVY21ZANG1T6SC.json
+│   │   ├── 01JZQQDJNKDRS5WRP48T33TCPM.json
+│   │   ├── 01JZQQDJNW22K7KX2N4ZNB92G1.json
+│   │   ├── 01JZQQDJP59MCDPVT1A660PBDY.json
+│   │   ├── 01JZQQDS7WF7MJB4SZGR6V9EKM.json
+│   │   ├── 01JZQQDSQ7TZC4GNCN3YXDAB95.json
+│   │   ├── 01JZQQDSQJQCDG7ZKB8AWSK8V1.json
+│   │   ├── 01JZQQDSR0AHHDNY9TTA6B1YKD.json
+│   │   ├── 01JZQQDSRYZ2EDANYC0SQDFGDK.json
+│   │   ├── 01JZQQDSS7Z6FSVJPQQV02RHTC.json
+│   │   ├── 01JZQQDSSKK69FQDC7C0FD7RQT.json
+│   │   ├── 01JZQQDSSYPF0CXS428NE8V3JM.json
+│   │   ├── 01JZQQDST8N1G0XB6206JVJ75K.json
+│   │   ├── 01JZQQDSTJZHDJGNW8XS1KNTKX.json
+│   │   ├── 01JZQQDSTWH4YR937VFR3VY33W.json
+│   │   ├── 01JZQQDSV6A6FQP1EK8AXDCD9M.json
+│   │   ├── 01JZQQDSVGSCTMGXP0KMV9ZM78.json
+│   │   ├── 01JZQQDSVT6HBTQM3SYSW91FXM.json
+│   │   ├── 01JZQQDSW4WXMP23BVSPB9FXJY.json
+│   │   ├── 01JZQQDSWEXAY2D9GPXQTWVKTX.json
+│   │   ├── 01JZQQDSWR02PCGPCTSSZP0D3E.json
+│   │   ├── 01JZQQDSX4DEK3TJW2TS898JX6.json
+│   │   ├── 01JZQQSWBFJBWW2RJP4J52XDGR.json
+│   │   ├── 01JZQQSX91CXCH37QRBG6PF82G.json
+│   │   ├── 01JZQQSX9DT3B2AZ9ZS4W5AN5H.json
+│   │   ├── 01JZQQSX9W9YRYQN9HSAJ2WK8V.json
+│   │   ├── 01JZQQSXAQ7QE32JG1DFQWR20R.json
+│   │   ├── 01JZQQSXB16RC1XQG0XQZH5E2V.json
+│   │   ├── 01JZQQSXBB1TKW4S2T5NMHNRRF.json
+│   │   ├── 01JZQQSXBM9JQT31G3JFDYYP70.json
+│   │   ├── 01JZQQSXBYJ2NFCFBE7F0P70ZH.json
+│   │   ├── 01JZQQSXC7P9V1YTBG6KTZAZFQ.json
+│   │   ├── 01JZQQSXCGMVC0CJ0WCW3HRFER.json
+│   │   ├── 01JZQQSXCTJJ9QPBHJGBTMY8BS.json
+│   │   ├── 01JZQQSXD3H5X8QHBMZGFP30VB.json
+│   │   ├── 01JZQQSXDD3Q5XE6Z6QXG8JAF8.json
+│   │   ├── 01JZQQSXDP20WK2KP8SH59V1EQ.json
+│   │   ├── 01JZQQSXE0SQQ7XQ4TXPKPHWZT.json
+│   │   ├── 01JZQQSXE936W4ECBDHHZA87V6.json
+│   │   ├── 01JZQQSXEKZQ1MP05V8H550PTK.json
+│   │   ├── 01JZQQT0KSY5Q4GFPX9GE7Y3K6.json
+│   │   ├── 01JZQQT1AVZFFMWSYBB7FJFBDC.json
+│   │   ├── 01JZQQT1B8PYK8XP9QHR8567WW.json
+│   │   ├── 01JZQQT1BQ704QMVVJVD25VTPZ.json
+│   │   ├── 01JZQQT1CD6ZXPAXNMXH8MFAHB.json
+│   │   ├── 01JZQQT1CQJZ36YYXS4CPNTBFQ.json
+│   │   ├── 01JZQQT1D20KPX85EK8NE64HYM.json
+│   │   ├── 01JZQQT1DCAMZF0WK8J3Z55WXT.json
+│   │   ├── 01JZQQT1DQP85R16T169CF42G2.json
+│   │   ├── 01JZQQT1E1WTSYJAV8QDB07D6A.json
+│   │   ├── 01JZQQT1EBZK0SHEYCJKKJMEMR.json
+│   │   ├── 01JZQQT1EP251NKGAJQRVC5GRK.json
+│   │   ├── 01JZQQT1F1YKWGDGF4KHPF7GD4.json
+│   │   ├── 01JZQQT1FBPNGXT7NKQGA9GK1K.json
+│   │   ├── 01JZQQT1FNREDCAZG8CJJ570GS.json
+│   │   ├── 01JZQQT1FZQRQ5FYK4DF043XRQ.json
+│   │   ├── 01JZQQT1GA97JFD5ABZXJRY5XB.json
+│   │   ├── 01JZQQT1GKPG56ZNAVGS36YX93.json
+│   │   ├── 01JZQQXE0GEE94CR029Z8SF0FJ.json
+│   │   ├── 01JZQQXXHZSWV0YRMSZ8N1XC73.json
+│   │   ├── 01JZQQXY9DQ8NA67CGKKB8E99N.json
+│   │   ├── 01JZQQXY9QZQ9WA6K1N66RGR3W.json
+│   │   ├── 01JZQQXYA4S3K0W0D6D95BCMS4.json
+│   │   ├── 01JZQQXYASNTD9YNXPFHK6AZBC.json
+│   │   ├── 01JZQQXYB4QSV57M9D2P946TYR.json
+│   │   ├── 01JZQQXYBESB9A6HCBABY6H0B3.json
+│   │   ├── 01JZQQXYBQ6DBSZANEAPSVDHRC.json
+│   │   ├── 01JZQQXYC2W1HDEBQ4GJDG6PBP.json
+│   │   ├── 01JZQQXYCC3P82S8802D55GXMM.json
+│   │   ├── 01JZQQXYCP9PQ6E67DTJYZA4R7.json
+│   │   ├── 01JZQQXYD3CRW2H66RD47C3G8M.json
+│   │   ├── 01JZQQXYDE28253770EK7SXCN9.json
+│   │   ├── 01JZQQXYDTTRPCK4FXHGQYNRKJ.json
+│   │   ├── 01JZQQXYE4TDWMDP6J2MJ7KPF9.json
+│   │   ├── 01JZQQXYEDK46PC6CX4CPPZ224.json
+│   │   ├── 01JZQQXYERA29DV1YWQAPS2J1B.json
+│   │   ├── 01JZQQXYF27ST2TVN9R0418AN1.json
+│   │   ├── 01JZQQYV43YMGF1ZYX7992QJC8.json
+│   │   ├── 01JZQQYVV6A2D4P7CTEQ26ZYJ1.json
+│   │   ├── 01JZQQYVVGWPATTVJ6Y79C66M2.json
+│   │   ├── 01JZQQYVVXK5A0TPJXH8SXTMYQ.json
+│   │   ├── 01JZQQYVWN4NYMWYYQ8VH6HC6E.json
+│   │   ├── 01JZQQYVWZG27PPSRJW220THF3.json
+│   │   ├── 01JZQQYVX9ZKN51663QTZGJT1J.json
+│   │   ├── 01JZQQYVXMDD5YGNYS2S5ZA3QD.json
+│   │   ├── 01JZQQYVXZSACRSAJYGF5RGTEN.json
+│   │   ├── 01JZQQYVY8B6DD0DDFCJH5PJDD.json
+│   │   ├── 01JZQQYVYHZ55YSRZQHRN9BRRP.json
+│   │   ├── 01JZQQYVYVP6GJ8ZBT1MF0N17K.json
+│   │   ├── 01JZQQYVZ566K25H7J2NXK6WCD.json
+│   │   ├── 01JZQQYVZE48AWS48NN9XNZ90T.json
+│   │   ├── 01JZQQYVZR7Q64NHF3NGB41KRQ.json
+│   │   ├── 01JZQQYW018J067YVXE2M11VJC.json
+│   │   ├── 01JZQQYW0A65Z2GY5W8VV0649S.json
+│   │   ├── 01JZQQYW0QK11436GH42Q6TVCB.json
+│   │   ├── 01JZQQZ1DEQWRS9W40YEJ39RMX.json
+│   │   ├── 01JZQQZEQT15J4XYY3EPCC3B9D.json
+│   │   ├── 01JZQQZFFAXG43H4ZNRFGZ6S64.json
+│   │   ├── 01JZQQZFFWR27EA58JJQJMVT9N.json
+│   │   ├── 01JZQQZFGAC9GEG0WD4V4P5XPJ.json
+│   │   ├── 01JZQQZFH1ZW1PG17BSGCP99SZ.json
+│   │   ├── 01JZQQZFHCHD93QN0ATFQDGW78.json
+│   │   ├── 01JZQQZFHPJXB088GA7AC0TYM0.json
+│   │   ├── 01JZQQZFJ1WF8PRKD9G1WAJMK5.json
+│   │   ├── 01JZQQZFJBM12KB3HSKJR20SBB.json
+│   │   ├── 01JZQQZFJPYFDDB0K1K88BESPJ.json
+│   │   ├── 01JZQQZFK008MB0KEE7T82PNDK.json
+│   │   ├── 01JZQQZFKCJ7E2HKBMV2FNXY7S.json
+│   │   ├── 01JZQQZFKPP53YXYTP8KQF5VD7.json
+│   │   ├── 01JZQQZFKZYRYEC1W3935TJ1D6.json
+│   │   ├── 01JZQQZFM9XX0NYF0FM0GQHB2Q.json
+│   │   ├── 01JZQQZFMKKKTC4QBPEVP70H5M.json
+│   │   ├── 01JZQQZFMYK8YAQC1S4HBNT1DY.json
+│   │   ├── 01JZQQZFNAZJVGA384V84CZWS4.json
+│   │   ├── 01JZQQZGW657T01NS54SB0REEK.json
+│   │   ├── 01JZQQZHV8G15S41ZYHCZ6VC2F.json
+│   │   ├── 01JZQQZHVJGVB9AQZ08XW263BB.json
+│   │   ├── 01JZQQZHW0MG1H0K6XYGASMXQE.json
+│   │   ├── 01JZQQZHWVZN4G2H1GJ0M37VK1.json
+│   │   ├── 01JZQQZHX5BGR9BTGNGP9BDDX6.json
+│   │   ├── 01JZQQZHXEGJC044MSE6MCNPZC.json
+│   │   ├── 01JZQQZHXRAHNKZ635W99GGFZN.json
+│   │   ├── 01JZQQZHY2WZCBNZ8CXWDEQBRP.json
+│   │   ├── 01JZQQZHYCP7FEC3TT9NB6CFXX.json
+│   │   ├── 01JZQQZHYPA1Z65KWK6J1EBH3D.json
+│   │   ├── 01JZQQZHZ1Z42Q6QBV57MEKRDR.json
+│   │   ├── 01JZQQZHZBSX7S6GFQ2970VNF6.json
+│   │   ├── 01JZQQZHZM3MWQHCC3NK217WJ9.json
+│   │   ├── 01JZQQZHZZCTPEGFG8A1BXZG45.json
+│   │   ├── 01JZQQZJ0A6DBWQ703BVCEDXY3.json
+│   │   ├── 01JZQQZJ0KS0V30FBKVV5BF70H.json
+│   │   ├── 01JZQQZJ0ZKSYJFFFQ2M9M7FQT.json
+│   │   ├── 01JZQQZQ62GCKH2K2RNJ5S0AVE.json
+│   │   ├── 01JZQQZR1JHGBW5GQW8DX20QYD.json
+│   │   ├── 01JZQQZR212Y4KPXQXZYNM1KD3.json
+│   │   ├── 01JZQQZR2GD6Z3W9T56Q11PE6Q.json
+│   │   ├── 01JZQQZR360F2SMQQ38Y4M1QDY.json
+│   │   ├── 01JZQQZR3HHP9M58B7JS4XJF64.json
+│   │   ├── 01JZQQZR3V41P3C0A1WHVP5Q44.json
+│   │   ├── 01JZQQZR47SHYM8WBZQGP90DWJ.json
+│   │   ├── 01JZQQZR4J1WFAKV892FD5A2FX.json
+│   │   ├── 01JZQQZR4Y9JEPMAAJ14N7J9D9.json
+│   │   ├── 01JZQQZR5AB0KVTJ9XG7YGAZCY.json
+│   │   ├── 01JZQQZR5MK2355VQ33RGVHZT4.json
+│   │   ├── 01JZQQZR5YFMF4962XNW4VQ52G.json
+│   │   ├── 01JZQQZR67MTF5CX7B87BA58ER.json
+│   │   ├── 01JZQQZR6H7TT95PPG0VY6445K.json
+│   │   ├── 01JZQQZR6VE6GAWV5V74RHEM8K.json
+│   │   ├── 01JZQQZR7564PNN7V4967EZDV7.json
+│   │   ├── 01JZQQZR7E8X0Z8HB90GWAG7F3.json
+│   │   ├── 01JZQQZSDTZVBB80SV8W1ZJ7EA.json
+│   │   ├── 01JZQR09DDWAZJNMY14YT329MW.json
+│   │   ├── 01JZQR0NWD26QJ956WWB4AZ9XK.json
+│   │   ├── 01JZQR0PM1GWJ40GTTS71VKR7R.json
+│   │   ├── 01JZQR0PMA8Q8BE4RPS7W6WNCJ.json
+│   │   ├── 01JZQR0PMT52668Q2XXQ6W3GK4.json
+│   │   ├── 01JZQR0PNQE430W9GC1NNA2FHA.json
+│   │   ├── 01JZQR0PP1PS8NA2Z5DWFFY63H.json
+│   │   ├── 01JZQR0PPA6711J71KJX564A4Q.json
+│   │   ├── 01JZQR0PPN8EMBETPTGZ6EH1RK.json
+│   │   ├── 01JZQR0PQ00VZAV7B5GC5NZT4C.json
+│   │   ├── 01JZQR0PQA56GV343F1G7D8K7Y.json
+│   │   ├── 01JZQR0PQK3NWNFS03PHKN0FE0.json
+│   │   ├── 01JZQR0PQX2PFPB44EQG32NGG7.json
+│   │   ├── 01JZQR0PR8RNBV0Z5ACZQDAF0D.json
+│   │   ├── 01JZQR0PRJ7XKJCPKPM672NWWB.json
+│   │   ├── 01JZQR0PRVRM5SD02BM9C2447P.json
+│   │   ├── 01JZQR0PS50S1XXF0JY4HAQXG4.json
+│   │   ├── 01JZQR0PSGXKNAPEC3J5V5T7KQ.json
+│   │   ├── 01JZQR0PSS8121R4A9XRKFTDBS.json
+│   │   ├── 01JZQR4PC8V9C8K063H7SZQTP5.json
+│   │   ├── 01JZQR8Z3AZYD0MQ1YGT4D29JK.json
+│   │   ├── 01JZQR917BN5GZH7C7MJQR8N57.json
+│   │   ├── 01JZQR97ET9ZTY9YPAXA98HS8A.json
+│   │   ├── 01JZQR9AQ8GX4YJTPHJ7CNFMVZ.json
+│   │   ├── 01JZQR9H5THM60K5JBTFS1ZNM7.json
+│   │   ├── 01JZQRA5PRYG22T0CK7GD5PBAY.json
+│   │   ├── 01JZQRA98GN4AJ8591R8VT4PDA.json
+│   │   ├── 01JZQRAEEPXQD68AYJ4EG8M0HA.json
+│   │   ├── 01JZQRAH23FXYA68CEHYJ5ME2K.json
+│   │   ├── 01JZQRAN5FK6D0QJGHC7SK8QHG.json
+│   │   ├── 01JZQRAN6EQP9N1QV3W748WEJX.json
+│   │   ├── 01JZQRAR8P4A6V0NRXX51FNM5Y.json
+│   │   ├── 01JZQRAVPCDZ6YPTN1NY6WFRGY.json
+│   │   ├── 01JZQRB55PEZ7126SQJTPGPJEE.json
+│   │   ├── 01JZQRBBS7ZJPZV32FPACKA59Q.json
+│   │   ├── 01JZQRBH47BKD2TXEK8572RSEW.json
+│   │   ├── 01JZQRBH5AKANQGXJXAEMY3R4V.json
+│   │   ├── 01JZQRF4G4TQZFTVKTZKECA4MR.json
+│   │   ├── 01JZQRF4H4XFP42EPQN90YF6W9.json
+│   │   ├── 01JZQRFAF477KC3P7GA4M64WAY.json
+│   │   ├── 01JZQRFDHT4XA6927V7AJSSJ46.json
+│   │   ├── 01JZQRFHGFPMKWGEV3N4SWJQSB.json
+│   │   ├── 01JZQRJ8PHR1TP7CECGJ99ETME.json
+│   │   ├── 01JZQRJBMK6D83RXS9FKTGPPMC.json
+│   │   ├── 01JZQRJBNH563YYMYRDP8TK3P9.json
+│   │   ├── 01JZQRTGVDEZY88GWSWGSQ2TD4.json
+│   │   ├── 01JZQRTNYQVBENT5SA4DS5053T.json
+│   │   ├── 01JZQRV6AW07C1QB0Q3P65V0JJ.json
+│   │   ├── 01JZQRX0C8TRC6EHRMJW9DSGGZ.json
+│   │   ├── 01JZQRY4PKKH0TSSKZ834CEJ0A.json
+│   │   ├── 01JZQRZ30QMPN5K3NGDKH15ZJ7.json
+│   │   ├── 01JZQS01NVHMR6TP3R9KMHKATA.json
+│   │   ├── 01JZQS04WS2ES2RVV956V7V2RK.json
+│   │   ├── 01JZQS0BK4HAMPX7QKHDF8GHJZ.json
+│   │   ├── 01JZQS0FF16M02YBG18H63KGDZ.json
+│   │   ├── 01JZQS0JEHC19QNGA5S96RJERX.json
+│   │   ├── 01JZQS0N3RRWMQ3GXRAR96DWRT.json
+│   │   ├── 01JZQS0TKYNJCXYARJHX0TCHF1.json
+│   │   ├── 01JZQS18T4FFPM0508YWDEMXET.json
+│   │   ├── 01JZQS1DY709D7C0GN18FRD988.json
+│   │   ├── 01JZQS2E958JPM9YMS9EMXN9NJ.json
+│   │   ├── 01JZQS2GTNNQ01NG1WPNX7G4N6.json
+│   │   ├── 01JZQS2M2N6M1GGTVWYRS60CD5.json
+│   │   ├── 01JZQS3Z3DQ0NY56QH0GKZFBGE.json
+│   │   ├── 01JZQS428391T03QGS2SJW0032.json
+│   │   ├── 01JZQS429AQ96GVN2YXKPP3TT9.json
+│   │   ├── 01JZQS44MGEETVCQC0W9YKB2JR.json
+│   │   ├── 01JZQS48V1DT58PE1V1TEN49QM.json
+│   │   ├── 01JZQS4NE5RJJZYPBREYX6XK9D.json
+│   │   ├── 01JZQS4QVW06ZWP7GYKE588HH9.json
+│   │   ├── 01JZQS4VE8X615QBRJY5ZXF8FC.json
+│   │   ├── 01JZQS4VF60A33Q2VH4586GE73.json
+│   │   ├── 01JZQS4YREBEG4KN8E37PGR447.json
+│   │   ├── 01JZQS5249SQZKF5QRQJC657WK.json
+│   │   ├── 01JZQS56ET7ZB55A5T2AVNEQTS.json
+│   │   ├── 01JZQS5EJ2D4QG7JDS1S3D0934.json
+│   │   ├── 01JZQS5HGQJZD66YC1BB2WDYAN.json
+│   │   ├── 01JZQS5MAF1Y9KGNWVM3NYFSM4.json
+│   │   ├── 01JZQS5MBBRRBXPTDR5D9NK6YB.json
+│   │   ├── 01JZQS5P3QFQ8HAM262NAXYPYK.json
+│   │   ├── 01JZQS6F3NY6XR8DMV96JFJDF8.json
+│   │   ├── 01JZQS7SQF2RVEA2KD3HEZ7P0G.json
+│   │   ├── 01JZQS7X1DPF29T4G3SJNS6V7W.json
+│   │   ├── 01JZQSDXBXZ0F3SGJH76DEX7QQ.json
+│   │   ├── 01JZQSHCPSYBNYF5NRG3FB2ZY0.json
+│   │   ├── 01JZQSHEV99WJE9PRRFAQKEJTA.json
+│   │   ├── 01JZQSHEW6QNG33MN3BZT83E5Z.json
+│   │   ├── 01JZQSJ4W4P8ZX8EZAWHDS64ZA.json
+│   │   ├── 01JZQSNW9N6M4KA3V3GF9RQHBF.json
+│   │   ├── 01JZQSNZ5HYZRWH4WSR2HF8215.json
+│   │   ├── 01JZR1G174A2VKR2RNEKJ1GSM4.json
+│   │   ├── 01JZR1G3HD7R76DSM85XT9VDNN.json
+│   │   ├── 01JZR1G3J3ZKVBW9C56YD9TE44.json
+│   │   ├── 01JZR1GBTHDGZPQRJAZSYN79Q1.json
+│   │   ├── 01JZR1GBVGBW5GNYWHTF81VDGB.json
+│   │   ├── 01JZR1GFPYFN23EMHYK8GKKHX7.json
+│   │   ├── 01JZR1GFQZHM7T3SQYGSCPVTC9.json
+│   │   ├── 01JZR1GM9VMDW1YFGR3E5K04GC.json
+│   │   ├── 01JZR1GQQXNE6W2D4Z3YW7596G.json
+│   │   ├── 01JZR1GV6FF698255301H9V667.json
+│   │   ├── 01JZR1GYTGWPYAT85TQ8PHCJSJ.json
+│   │   ├── 01JZR1GYVACAQ8FHKZNXH8TTGJ.json
+│   │   └── 01JZR1H0ZJQ0Q68P04RAZ9G0BE.json
+│   ├── framework
+│   │   ├── cache
+│   │   │   └── data
+│   │   ├── sessions
+│   │   ├── testing
+│   │   └── views
+│   │       ├── 0a9baf65148b4d917b5450109ec3d094.php
+│   │       ├── 159e5fb10fc6cca1e94f3e9664f227c8.php
+│   │       ├── 28868128ccf5c63f0bce12eaa67445e0.php
+│   │       ├── 327239c049278ff128d26f4719d371dc.php
+│   │       ├── 64b4746129c6a7fc1f8dc580dcdc20bd.php
+│   │       ├── 64dfa7e73c563ea31db13a158987cd07.php
+│   │       ├── 6ba223933eabe7d08002e21b803b9d09.php
+│   │       ├── 85bb94d112a8be29a7b3aeb13144a1c3.php
+│   │       ├── 88ebc0754c7033726bbac6c05ebe44fd.php
+│   │       ├── aaf4fc2d55de374024582dc9fcd6014a.php
+│   │       ├── b342d151a23a36ce40c28143d00775fa.php
+│   │       ├── bf6ba5075c82350e97aed939f8f300bf.php
+│   │       ├── c52ee6f702980432e36b24001dcbfaae.php
+│   │       ├── c683cd74525c65570571afd406e3f466.php
+│   │       ├── ca560fc35317cd09d454821c112a1997.php
+│   │       ├── cf2fa44b919df23255f16ef0a4a32adf.php
+│   │       ├── d84e066cd6e7b2537c0715ee88eef22a.php
+│   │       ├── e7ddae2bb167f39ee57e25a30480f3ce.php
+│   │       └── fe830355e7a7ed754afb86ad53eeeb25.php
+│   └── logs
+│       └── laravel.log
+├── structure_projet.txt
+├── tests
+│   ├── Feature
+│   │   ├── Auth
+│   │   │   ├── AuthenticationTest.php
+│   │   │   ├── EmailVerificationTest.php
+│   │   │   ├── PasswordConfirmationTest.php
+│   │   │   ├── PasswordResetTest.php
+│   │   │   ├── PasswordUpdateTest.php
+│   │   │   └── RegistrationTest.php
+│   │   ├── ExampleTest.php
+│   │   └── ProfileTest.php
+│   ├── TestCase.php
+│   └── Unit
+│       └── ExampleTest.php
+├── tsconfig.json
+└── vite.config.js

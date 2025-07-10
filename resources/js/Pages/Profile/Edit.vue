@@ -107,7 +107,7 @@ const updateAvatar = () => {
     avatarForm.processing = true;
     avatarForm.errors = {};
     router.patch(
-        "/api/avatar",
+        "/avatar",
         { avatar: avatarForm.avatar },
         {
             onSuccess: () => {
