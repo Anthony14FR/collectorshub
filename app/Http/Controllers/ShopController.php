@@ -35,6 +35,29 @@ class ShopController extends Controller
         $quantity = $validated['quantity'];
         $totalCost = $item->price * $quantity;
 
+        if ($item->type === 'avatar') {
+            $unlocked = $user->unlocked_avatars;
+            if (is_string($unlocked)) {
+                $unlocked = json_decode($unlocked, true);
+            }
+            $unlocked = $unlocked ?? [];
+            if (in_array($item->image, $unlocked)) {
+                return back()->withErrors([
+                    'message' => 'Avatar déjà débloqué'
+                ]);
+            }
+            if ($user->cash < $item->price) {
+                return back()->withErrors([
+                    'message' => 'Vous n\'avez pas assez d\'argent pour acheter cet avatar'
+                ]);
+            }
+            $unlocked[] = $item->image;
+            $user->unlocked_avatars = $unlocked;
+            $user->cash -= $item->price;
+            $user->save();
+            return redirect()->route('shop.index')->with('success', "Avatar débloqué !");
+        }
+
         if ($user->cash < $totalCost) {
             return back()->withErrors([
                 'message' => 'Vous n\'avez pas assez d\'argent pour acheter cet item'

@@ -34,7 +34,7 @@ class Item extends Model
             if ($item->description && strlen($item->description) > 250) {
                 throw new \Exception('La description ne peut pas dépasser 250 caractères');
             }
-            if (!in_array($item->type, ['heal', 'boost', 'evolution', 'special', 'ball'])) {
+            if (!in_array($item->type, ['heal', 'boost', 'evolution', 'special', 'ball', 'avatar'])) {
                 throw new \Exception('Type d\'item invalide');
             }
             if (!in_array($item->rarity, ['normal', 'rare', 'epic', 'legendary'])) {
@@ -79,6 +79,18 @@ class Item extends Model
                 case 'special':
                     if (!isset($item->effect['type']) || !in_array($item->effect['type'], ['shiny', 'rare', 'legendary'])) {
                         throw new \Exception('Type d\'effet spécial invalide');
+                    }
+                    break;
+
+                case 'avatar':
+                    if (empty($item->image) || !is_string($item->image)) {
+                        throw new \Exception('Un avatar doit avoir un chemin d\'image valide');
+                    }
+                    if ($item->price < 0) {
+                        throw new \Exception('Le prix de l\'avatar ne peut pas être négatif');
+                    }
+                    if (!empty($item->effect) && $item->effect !== []) {
+                        throw new \Exception('Un avatar ne doit pas avoir d\'effet');
                     }
                     break;
             }

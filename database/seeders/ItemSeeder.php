@@ -60,5 +60,17 @@ class ItemSeeder extends Seeder
         foreach ($items as $item) {
             Item::create($item);
         }
+
+        for ($i = 3; $i <= 258; $i++) {
+            Item::create([
+                'name' => 'Avatar ' . $i,
+                'description' => 'Débloque l\'avatar n°' . $i . ' pour votre profil.',
+                'type' => 'avatar',
+                'image' => "/images/trainer/{$i}.png",
+                'effect' => [],
+                'price' => 1000,
+                'rarity' => 'normal',
+            ]);
+        }
     }
 }
