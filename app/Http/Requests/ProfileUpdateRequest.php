@@ -25,6 +25,19 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'avatar' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    $unlocked = $this->user()->unlocked_avatars;
+                    if (is_string($unlocked)) {
+                        $unlocked = json_decode($unlocked, true);
+                    }
+                    $unlocked = $unlocked ?? [];
+                    if ($value && !in_array($value, $unlocked)) {
+                        $fail('Avatar non débloqué.');
+                    }
+                }
+            ],
         ];
     }
 }

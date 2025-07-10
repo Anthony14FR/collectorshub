@@ -34,6 +34,8 @@ class User extends Authenticatable
         'last_login',
         'role',
         'status',
+        'avatar',
+        'unlocked_avatars',
     ];
 
     protected $hidden = [
@@ -56,6 +58,7 @@ class User extends Authenticatable
         'cash' => 'integer',
         'level' => 'integer',
         'experience' => 'integer',
+        'unlocked_avatars' => 'array',
     ];
 
     public function checkPassword(string $password): bool
