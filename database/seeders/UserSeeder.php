@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('admin'),
             'level' => 1,
             'experience' => 12,
-            'cash' => 1000,
+            'cash' => 1000000,
             'last_login' => now(),
             'role' => 'admin',
             'status' => 'active'
@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('user'),
             'level' => 1,
             'experience' => 12,
-            'cash' => 1000,
+            'cash' => 1000000,
             'last_login' => now(),
             'role' => 'user',
             'status' => 'active'
@@ -42,6 +42,6 @@ class UserSeeder extends Seeder
 
         $user->assignRole('user');
 
-        User::factory()->count(8)->create();
+        User::factory()->count(10)->create();
     }
 }

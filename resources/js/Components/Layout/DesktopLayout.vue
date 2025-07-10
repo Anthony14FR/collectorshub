@@ -18,9 +18,10 @@ interface Props {
     pokedex: Pokedex[];
     onOpenPokedexModal: () => void;
     onGoToMarketplace?: () => void;
+    onGoToLeaderboard?: () => void;
 }
 
-const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace } = defineProps<Props>();
+const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToLeaderboard } = defineProps<Props>();
 </script>
 
 <template>
@@ -54,9 +55,19 @@ const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace } = defi
                     @click="onGoToMarketplace"
                     variant="secondary"
                     size="md"
-                    class="w-full"
+                    class="w-full mb-3"
                 >
                     🏪 Accéder au marketplace
+                </Button>
+                
+                <Button
+                    v-if="onGoToLeaderboard"
+                    @click="onGoToLeaderboard"
+                    variant="secondary"
+                    size="md"
+                    class="w-full"
+                >
+                    🏆 Classement
                 </Button>
             </div>
         </SideSection>

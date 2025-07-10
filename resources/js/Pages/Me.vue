@@ -7,10 +7,12 @@ import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import Button from '@/Components/UI/Button.vue';
 import PokemonCard from '@/Components/Cards/PokemonCard.vue';
+import LeaderboardSection from '@/Components/Game/LeaderboardSection.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
+import type { Leaderboards } from '@/types/leaderboard';
 
 interface Props extends PageProps {
     auth: {
@@ -18,13 +20,19 @@ interface Props extends PageProps {
     };
     inventory?: Inventory[];
     pokedex?: Pokedex[];
+    leaderboards?: Leaderboards;
 }
 
-const { auth, inventory = [], pokedex = [] } = defineProps<Props>();
+const { auth, inventory = [], pokedex = [], leaderboards } = defineProps<Props>();
 const pokedexModalOpen = ref(false);
+const leaderboardModalOpen = ref(false);
 
 const goToMarketplace = () => {
     router.visit('/marketplace');
+};
+
+const openLeaderboardModal = () => {
+    leaderboardModalOpen.value = true;
 };
 </script>
 
@@ -42,6 +50,7 @@ const goToMarketplace = () => {
                 :pokedex="pokedex"
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
                 :onGoToMarketplace="goToMarketplace"
+                :onGoToLeaderboard="openLeaderboardModal"
             />
 
             <DesktopLayout
@@ -50,6 +59,7 @@ const goToMarketplace = () => {
                 :pokedex="pokedex"
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
                 :onGoToMarketplace="goToMarketplace"
+                :onGoToLeaderboard="openLeaderboardModal"
             />
         </div>
 
@@ -80,6 +90,27 @@ const goToMarketplace = () => {
                         :show-details="true"
                     />
                 </div>
+            </template>
+        </Modal>
+
+        <Modal :show="leaderboardModalOpen" @close="leaderboardModalOpen = false" max-width="4xl">
+            <template #header>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
+                        <span class="text-lg">🏆</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
+                            Classements
+                        </h3>
+                        <div class="mt-1">
+                            <span class="text-sm font-semibold text-warning">Top 100 des dresseurs</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template #default>
+                <LeaderboardSection v-if="leaderboards" :leaderboards="leaderboards" />
             </template>
         </Modal>
     </div>
