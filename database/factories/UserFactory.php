@@ -25,11 +25,12 @@ class UserFactory extends Factory
         return [
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
-            'password' => Hash::make('password'),
-            'level' => fake()->numberBetween(1, 100),
-            'experience' => fake()->numberBetween(0, 10000),
+            'password' => static::$password ??= Hash::make('user'),
+            'level' => fake()->numberBetween(1, 50),
+            'experience' => fake()->numberBetween(0, 2000),
             'cash' => fake()->numberBetween(0, 1000000),
-            'last_login' => fake()->dateTime(),
+            'role' => 'user',
+            'status' => 'active',
         ];
     }
 

@@ -29,7 +29,9 @@ class InventorySeeder extends Seeder
             return;
         }
 
-        $this->command->info('Ajout de Pokémons à l\'admin...');
+        $pokedexCount = 0;
+        $inventoryCount = 0;
+
         foreach ($pokemons->take(15) as $pokemon) {
             Pokedex::create([
                 'user_id' => $admin->id,
@@ -42,9 +44,9 @@ class InventorySeeder extends Seeder
                 'is_favorite' => (rand(1, 100) <= 20),
                 'obtained_at' => now()
             ]);
+            $pokedexCount++;
         }
 
-        $this->command->info('Ajout de Pokémons à l\'utilisateur...');
         foreach ($users as $user) {
             foreach ($pokemons->take(8) as $pokemon) {
                 Pokedex::create([
@@ -58,50 +60,59 @@ class InventorySeeder extends Seeder
                     'is_favorite' => (rand(1, 100) <= 20),
                     'obtained_at' => now()
                 ]);
+                $pokedexCount++;
             }
         }
 
-        $this->command->info('Ajout d\'items à l\'admin...');
         foreach ($items->take(5) as $item) {
-            Inventory::create([
-                'user_id' => $admin->id,
-                'item_id' => $item->id,
-                'quantity' => rand(1, 10)
-            ]);
+            if ($this->addItemToInventory($admin->id, $item->id, rand(1, 10))) {
+                $inventoryCount++;
+            }
         }
 
         $pokeball = Item::where('name', 'Pokeball')->first();
         $masterball = Item::where('name', 'Masterball')->first();
 
         if ($pokeball) {
-            Inventory::create([
-                'user_id' => $admin->id,
-                'item_id' => $pokeball->id,
-                'quantity' => 100
-            ]);
-            $this->command->info('100 Pokeball ajoutées à l\'admin.');
-        }
-
-        if ($masterball) {
-            Inventory::create([
-                'user_id' => $admin->id,
-                'item_id' => $masterball->id,
-                'quantity' => 100
-            ]);
-            $this->command->info('100 Masterball ajoutées à l\'admin.');
-        }
-
-        $this->command->info('Ajout d\'items à l\'utilisateur...');
-        foreach ($users as $user) {
-            foreach ($items->take(3) as $item) {
-                Inventory::create([
-                    'user_id' => $user->id,
-                    'item_id' => $item->id,
-                    'quantity' => rand(1, 5)
-                ]);
+            if ($this->addItemToInventory($admin->id, $pokeball->id, 100)) {
+                $inventoryCount++;
             }
         }
 
-        $this->command->info('Inventaires remplis avec succès.');
+        if ($masterball) {
+            if ($this->addItemToInventory($admin->id, $masterball->id, 100)) {
+                $inventoryCount++;
+            }
+        }
+
+        foreach ($users as $user) {
+            foreach ($items->take(3) as $item) {
+                if ($this->addItemToInventory($user->id, $item->id, rand(1, 5))) {
+                    $inventoryCount++;
+                }
+            }
+        }
+
+        $this->command->info("{$pokedexCount} Pokemons ajouter aléatoirement | {$inventoryCount} Items ajouter aléatoirement");
+    }
+
+    private function addItemToInventory(int $userId, int $itemId, int $quantity): bool
+    {
+        $existingInventory = Inventory::where('user_id', $userId)
+            ->where('item_id', $itemId)
+            ->first();
+
+        if ($existingInventory) {
+            $newQuantity = min($existingInventory->quantity + $quantity, 999);
+            $existingInventory->update(['quantity' => $newQuantity]);
+            return false;
+        } else {
+            Inventory::create([
+                'user_id' => $userId,
+                'item_id' => $itemId,
+                'quantity' => min($quantity, 100)
+            ]);
+            return true;
+        }
     }
 }
