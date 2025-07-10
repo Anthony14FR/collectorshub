@@ -45,8 +45,16 @@ const filteredItems = computed(() => {
 });
 
 const avatars = computed(() =>
-    props.items.filter((item) => item.type === "avatar")
+    props.items
+        .filter((item) => item.type === "avatar")
+        .sort((a, b) => {
+        // extrait le numéro de l'image
+        const numA = parseInt(a.image.match(/([0-9]+)\.png$/)?.[1] || '0', 10);
+        const numB = parseInt(b.image.match(/([0-9]+)\.png$/)?.[1] || '0', 10);
+        return numA - numB;
+        })
 );
+
 const balls = computed(() =>
     props.items.filter((item) => item.type === "ball")
 );

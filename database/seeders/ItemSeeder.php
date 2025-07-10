@@ -61,16 +61,24 @@ class ItemSeeder extends Seeder
             Item::create($item);
         }
 
-        for ($i = 3; $i <= 258; $i++) {
-            Item::create([
-                'name' => 'Avatar ' . $i,
-                'description' => 'Débloque l\'avatar n°' . $i . ' pour votre profil.',
-                'type' => 'avatar',
-                'image' => "/images/trainer/{$i}.png",
-                'effect' => [],
-                'price' => 1000,
-                'rarity' => 'normal',
-            ]);
+        $avatarDir = public_path('images/trainer');
+        $files = scandir($avatarDir);
+        foreach ($files as $file) {
+            if (
+                preg_match('/^([0-9]+)\.png$/', $file, $matches) &&
+                !in_array($matches[1], ['1', '2'])
+            ) {
+                $id = $matches[1];
+                Item::create([
+                    'name' => 'Avatar ' . $id,
+                    'description' => "Débloque l'avatar n°$id pour votre profil.",
+                    'type' => 'avatar',
+                    'image' => "/images/trainer/$file",
+                    'effect' => [],
+                    'price' => 1000,
+                    'rarity' => 'normal',
+                ]);
+            }
         }
     }
 }
