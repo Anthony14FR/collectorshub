@@ -63,42 +63,58 @@ class InventorySeeder extends Seeder
 
         $this->command->info('Ajout d\'items à l\'admin...');
         foreach ($items->take(5) as $item) {
-            Inventory::create([
-                'user_id' => $admin->id,
-                'item_id' => $item->id,
-                'quantity' => rand(1, 10)
-            ]);
+            Inventory::updateOrCreate(
+                [
+                    'user_id' => $admin->id,
+                    'item_id' => $item->id,
+                ],
+                [
+                    'quantity' => rand(1, 10)
+                ]
+            );
         }
 
         $pokeball = Item::where('name', 'Pokeball')->first();
         $masterball = Item::where('name', 'Masterball')->first();
 
         if ($pokeball) {
-            Inventory::create([
-                'user_id' => $admin->id,
-                'item_id' => $pokeball->id,
-                'quantity' => 100
-            ]);
+            Inventory::updateOrCreate(
+                [
+                    'user_id' => $admin->id,
+                    'item_id' => $pokeball->id,
+                ],
+                [
+                    'quantity' => 100
+                ]
+            );
             $this->command->info('100 Pokeball ajoutées à l\'admin.');
         }
 
         if ($masterball) {
-            Inventory::create([
-                'user_id' => $admin->id,
-                'item_id' => $masterball->id,
-                'quantity' => 100
-            ]);
+            Inventory::updateOrCreate(
+                [
+                    'user_id' => $admin->id,
+                    'item_id' => $masterball->id,
+                ],
+                [
+                    'quantity' => 100
+                ]
+            );
             $this->command->info('100 Masterball ajoutées à l\'admin.');
         }
 
         $this->command->info('Ajout d\'items à l\'utilisateur...');
         foreach ($users as $user) {
             foreach ($items->take(3) as $item) {
-                Inventory::create([
-                    'user_id' => $user->id,
-                    'item_id' => $item->id,
-                    'quantity' => rand(1, 5)
-                ]);
+                Inventory::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'item_id' => $item->id,
+                    ],
+                    [
+                        'quantity' => rand(1, 5)
+                    ]
+                );
             }
         }
 
