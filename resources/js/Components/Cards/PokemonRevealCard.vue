@@ -17,7 +17,6 @@ const cardConfig = computed(() => {
     const isShiny = pokemon.is_shiny;
     const rarity = pokemon.rarity;
 
-    // Configuration pour les Pokémon Shiny
     if (isShiny) {
         return {
             borderGradient: 'from-yellow-400 via-yellow-500 to-yellow-600',
@@ -31,7 +30,6 @@ const cardConfig = computed(() => {
         };
     }
 
-    // Configuration par rareté
     switch (rarity) {
         case 'legendary':
             return {

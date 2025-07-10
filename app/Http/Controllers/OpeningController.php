@@ -75,19 +75,19 @@ class OpeningController extends Controller
         switch ($ballType) {
             case 'Pokeball':
                 $rarityChances = [
-                    'normal' => 70, // 70%
-                    'rare' => 27, // 27%
-                    'epic' => 2.7, // 2.7%
-                    'legendary' => 0.3 // 0.3%
+                    'normal' => 70,
+                    'rare' => 27,
+                    'epic' => 2.7,
+                    'legendary' => 0.3
                 ];
                 break;
 
             case 'Masterball':
                 $rarityChances = [
-                    'normal' => 34, // 34%
-                    'rare' => 60, // 60%
-                    'epic' => 5, // 5%
-                    'legendary' => 100 // 1%
+                    'normal' => 34,
+                    'rare' => 60,
+                    'epic' => 5,
+                    'legendary' => 1
                 ];
                 break;
 

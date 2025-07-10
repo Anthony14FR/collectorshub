@@ -29,7 +29,6 @@ const profileForm = reactive({
     errors: {} as Record<string, string>,
 });
 
-// Formulaire de changement de mot de passe
 const passwordForm = reactive({
     current_password: "",
     password: "",
@@ -45,11 +44,9 @@ const avatarForm = reactive({
     errors: {} as Record<string, string>,
 });
 
-// État d'affichage des formulaires
 const showProfileForm = ref(false);
 const showPasswordForm = ref(false);
 
-// Soumission du formulaire de profil
 const updateProfile = () => {
     profileForm.processing = true;
     profileForm.errors = {};
@@ -74,7 +71,6 @@ const updateProfile = () => {
     );
 };
 
-// Soumission du formulaire de mot de passe
 const updatePassword = () => {
     passwordForm.processing = true;
     passwordForm.errors = {};
@@ -121,7 +117,6 @@ const updateAvatar = () => {
     );
 };
 
-// Annuler les modifications
 const cancelProfileEdit = () => {
     profileForm.username = auth.user.username;
     profileForm.email = auth.user.email;
@@ -188,9 +183,7 @@ const getUserInitial = () => {
             </nav>
         </header>
 
-        <!-- Main Content -->
         <main class="relative z-10 mx-auto max-w-4xl px-6 py-12">
-            <!-- Profile Header -->
             <div class="text-center mb-8">
                 <div class="flex justify-center mb-4">
                     <img
@@ -228,7 +221,6 @@ const getUserInitial = () => {
                     </button>
                 </div>
 
-                <!-- Vue normale -->
                 <div v-if="!showProfileForm" class="grid md:grid-cols-2 gap-6">
                     <div>
                         <label
@@ -359,7 +351,6 @@ const getUserInitial = () => {
                     </button>
                 </div>
 
-                <!-- Vue normale -->
                 <div v-if="!showPasswordForm">
                     <p class="text-gray-400">
                         Votre mot de passe est sécurisé et chiffré. Cliquez sur

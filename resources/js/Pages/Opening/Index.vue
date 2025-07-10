@@ -12,6 +12,25 @@ import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 
+type Rarity = 'normal' | 'rare' | 'epic' | 'legendary';
+
+interface InvocationPokemon {
+    id: number;
+    pokemon_id: number;
+    name: string;
+    level: number;
+    star: number;
+    is_shiny: boolean;
+    rarity: Rarity;
+    types: any[];
+    hp: number;
+    attack: number;
+    defense: number;
+    speed: number;
+    special_attack: number;
+    special_defense: number;
+}
+
 interface Props extends PageProps {
     auth: {
         user: User;
@@ -26,11 +45,10 @@ const isInvoking = ref(false);
 const showEvolutionAnimation = ref(false);
 const showGachaResults = ref(false);
 const showFinalResults = ref(false);
-const invocationResults = ref<any[]>([]);
+const invocationResults = ref<InvocationPokemon[]>([]);
 const revealedBalls = ref<boolean[]>([]);
 const currentBallType = ref('');
 const currentInventory = ref([...inventory]);
-const loadingProgress = ref(0);
 const loadingMessage = ref('Préparation de l\'invocation');
 const transitionToResults = ref(false);
 const ballsReady = ref(false);
@@ -50,7 +68,7 @@ const transformedResults = computed(() => {
         pokemon_id: pokemon.pokemon_id,
         level: pokemon.level,
         star: pokemon.star,
-        nickname: null,
+        nickname: undefined,
         is_favorite: false,
         is_in_team: false,
         obtained_at: new Date().toISOString(),
@@ -70,17 +88,17 @@ const transformedResults = computed(() => {
     }));
 });
 
-const getMaxRarity = () => {
+const getMaxRarity = (): Rarity => {
     if (!invocationResults.value.length) return 'normal';
 
-    const rarityOrder = { 'normal': 0, 'rare': 1, 'epic': 2, 'legendary': 3 };
+    const rarityOrder: Record<Rarity, number> = { 'normal': 0, 'rare': 1, 'epic': 2, 'legendary': 3 };
 
     return invocationResults.value.reduce((maxRarity, pokemon) => {
-        const currentRarityValue = rarityOrder[pokemon.rarity] || 0;
-        const maxRarityValue = rarityOrder[maxRarity] || 0;
+        const currentRarityValue = rarityOrder[pokemon.rarity] ?? 0;
+        const maxRarityValue = rarityOrder[maxRarity] ?? 0;
 
         return currentRarityValue > maxRarityValue ? pokemon.rarity : maxRarity;
-    }, 'normal');
+    }, 'normal' as Rarity);
 };
 
 const hasShinyPokemon = () => {
@@ -99,37 +117,12 @@ const updateInventoryQuantity = (itemName: string, usedQuantity: number) => {
     }
 };
 
-const animateLoading = async () => {
-    const messages = [
-        'Préparation de l\'invocation',
-        'Connexion au monde Pokémon',
-        'Recherche de créatures',
-        'Capture en cours'
-    ];
-
-    let messageIndex = 0;
-    const interval = setInterval(() => {
-        if (loadingProgress.value < 100) {
-            loadingProgress.value += 2;
-            if (loadingProgress.value % 25 === 0) {
-                loadingMessage.value = messages[messageIndex % messages.length];
-                messageIndex++;
-            }
-        } else {
-            clearInterval(interval);
-        }
-    }, 30);
-};
-
 const startInvocation = async (ballType: string, quantity: number) => {
     if (!canInvoke(ballType, quantity)) return;
 
     isInvoking.value = true;
     currentBallType.value = ballType;
-    loadingProgress.value = 0;
-    loadingMessage.value = 'Préparation de l\'invocation';
-
-    animateLoading();
+    loadingMessage.value = 'Invocation en cours...';
 
     try {
         const response = await fetch('/api/opening', {
@@ -156,13 +149,10 @@ const startInvocation = async (ballType: string, quantity: number) => {
 
             updateInventoryQuantity(ballType, quantity);
 
-            await new Promise(resolve => setTimeout(resolve, Math.max(0, 3000 - (loadingProgress.value * 30))));
-            loadingProgress.value = 100;
-
             setTimeout(() => {
                 isInvoking.value = false;
 
-                if (quantity >= 5) {
+                if (quantity >= 1) {
                     showEvolutionAnimation.value = true;
                 } else {
                     transitionToResults.value = true;
@@ -179,22 +169,17 @@ const startInvocation = async (ballType: string, quantity: number) => {
         }
     } catch (error) {
         isInvoking.value = false;
-        loadingProgress.value = 0;
     }
 };
 
-const onEvolutionCompleted = () => {
-    // 1) Laisser l’animation d’évolution encore visible
-    // 2) Faire apparaître les GachaBalls PAR-DESSUS
+    const onEvolutionCompleted = () => {
     transitionToResults.value = true;
     showGachaResults.value = true;
 
-    // Lancer l’animation des balls tout de suite
     setTimeout(() => {
         ballsReady.value = true;
     }, 50);
 
-    // Après 400 ms (le temps que les balls soient bien visibles) on masque l’ancienne animation
     setTimeout(() => {
         showEvolutionAnimation.value = false;
     }, 400);
@@ -406,33 +391,9 @@ const getBallEmoji = (ballType: string) => {
 
         <div v-if="isInvoking" class="fixed inset-0 z-30 flex items-center justify-center bg-black/90 backdrop-blur-sm">
             <div class="text-center">
-                <div class="relative w-48 h-48 mx-auto mb-8">
-                    <div class="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 animate-spin-slow"></div>
-                    <div class="absolute inset-2 rounded-full bg-gradient-to-r from-primary/30 to-accent/30 animate-spin-reverse"></div>
-                    <div class="absolute inset-4 rounded-full bg-gradient-to-r from-primary/40 to-accent/40 animate-spin-slow"></div>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="w-24 h-24 rounded-full bg-base-100/20 backdrop-blur-md flex items-center justify-center">
-                            <img
-                                :src="currentBallType === 'Masterball' ? '/images/items/masterball.png' : '/images/items/pokeball.png'"
-                                alt="Loading"
-                                class="w-16 h-16 object-contain animate-bounce-slow"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="text-2xl font-bold text-white mb-4 animate-pulse">
+                <img src="/images/loading.gif" alt="Chargement..." class="w-32 h-32 mx-auto mb-6 object-contain" />
+                <div class="text-2xl font-bold text-white animate-pulse">
                     {{ loadingMessage }}
-                </div>
-
-                <div class="w-64 mx-auto">
-                    <div class="bg-base-100/20 rounded-full h-2 overflow-hidden backdrop-blur-sm">
-                        <div
-                            class="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300 ease-out rounded-full"
-                            :style="{ width: `${loadingProgress}%` }"
-                        ></div>
-                    </div>
-                    <div class="text-sm text-white/60 mt-2">{{ Math.round(loadingProgress) }}%</div>
                 </div>
             </div>
         </div>
@@ -457,13 +418,20 @@ const getBallEmoji = (ballType: string) => {
             <div class="absolute inset-0 bg-black/60"></div>
 
             <div class="relative text-center max-w-6xl mx-auto px-6">
-                <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent animate-slideDown">
-                    🎁 Vos récompenses vous attendent !
+                <h2 class="text-3xl font-bold mb-2 text-secondary/80 animate-slideDown">
+                    Vos récompenses vous attendent !
                 </h2>
-                <p class="text-white/70 mb-20 animate-slideDown" style="animation-delay: 0.2s;">
+                <p class="text-white/50 mb-20 animate-slideDown" style="animation-delay: 0.2s;">
                     Survolez les balls pour apercevoir leur rareté, puis cliquez pour révéler !
                 </p>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-20 mb-8">
+                <div 
+                    :class="[
+                        'mb-8',
+                        invocationResults.length === 1
+                            ? 'flex justify-center'
+                            : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-20'
+                    ]"
+                >
                     <div
                         v-for="(pokemon, index) in invocationResults"
                         :key="index"
@@ -488,21 +456,21 @@ const getBallEmoji = (ballType: string) => {
                 <div class="flex gap-4 justify-center mt-20 animate-slideUp" style="animation-delay: 1s;">
                     <Button
                         @click="revealAllBalls"
-                        variant="outline"
+                        variant="ghost"
                         size="lg"
                         :disabled="allBallsRevealed"
                         class="bg-white/10 backdrop-blur-sm hover:bg-white/20"
                     >
-                        🎊 Tout révéler
+                        Tout révéler
                     </Button>
                     <Button
                         v-if="allBallsRevealed"
                         @click="closeResults"
-                        variant="outline"
+                        variant="ghost"
                         size="lg"
                         class="bg-white/10 backdrop-blur-sm hover:bg-white/20"
                     >
-                        ✖️ Fermer
+                        Fermer
                     </Button>
                 </div>
             </div>
@@ -551,33 +519,6 @@ const getBallEmoji = (ballType: string) => {
 </template>
 
 <style scoped>
-@keyframes spin-slow {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes spin-reverse {
-    from {
-        transform: rotate(360deg);
-    }
-    to {
-        transform: rotate(0deg);
-    }
-}
-
-@keyframes bounce-slow {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -618,18 +559,6 @@ const getBallEmoji = (ballType: string) => {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.animate-spin-slow {
-    animation: spin-slow 8s linear infinite;
-}
-
-.animate-spin-reverse {
-    animation: spin-reverse 6s linear infinite;
-}
-
-.animate-bounce-slow {
-    animation: bounce-slow 2s ease-in-out infinite;
 }
 
 .animate-fadeIn {

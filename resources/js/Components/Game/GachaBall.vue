@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import RarityBadge from '@/Components/UI/RarityBadge.vue';
 
 interface Props {
     ballType: string;
@@ -13,6 +14,31 @@ const emit = defineEmits<{
     reveal: [index: number];
 }>();
 
+const pingParticles = Array.from({ length: 16 }, (_, i) => ({
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+    animationDelay: `${(Math.random() * 2.5) + (i * 0.1)}s`,
+    animationDuration: `${1.2 + Math.random() * 1.8}s`,
+    transitionInDelay: `${i * 40}ms`,
+    transitionOutDelay: `${(16 - i) * 25}ms`
+}));
+
+const sparkleParticles = Array.from({ length: 8 }, (_, i) => ({
+    left: `${10 + Math.random() * 80}%`,
+    top: `${10 + Math.random() * 80}%`,
+    animationDelay: `${Math.random() * 2.5}s`,
+    animationDuration: `${2 + Math.random() * 2}s`,
+    transitionInDelay: `${i * 60}ms`,
+    transitionOutDelay: `${(8 - i) * 40}ms`
+}));
+
+const revealedShinyParticles = Array.from({ length: 10 }, () => ({
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+    animationDelay: `${Math.random() * 3.5}s`,
+    animationDuration: `${1.8 + Math.random() * 2.2}s`
+}));
+
 const isHovered = ref(false);
 
 const ballImage = computed(() => {
@@ -22,35 +48,36 @@ const ballImage = computed(() => {
 const rarityConfig = computed(() => {
     const configs = {
         normal: {
-            aura: 'shadow-[0_0_40px_rgba(255,255,255,0.9)]',
+            aura: 'shadow-[0_0_25px_rgba(255,255,255,0.7)]',
             border: 'border-white',
-            glow: 'drop-shadow-[0_0_35px_rgba(255,255,255,1)]',
-            bgGlow: 'bg-gradient-radial from-white/30 to-transparent',
+            glow: 'drop-shadow(0 0 35px rgba(255,255,255,1))',
+            bgGlow: 'bg-gradient-radial from-white',
             particle: 'bg-white'
         },
         rare: {
-            aura: 'shadow-[0_0_45px_rgba(59,130,246,1)]',
+            aura: 'shadow-[0_0_30px_rgba(59,130,246,0.8)]',
             border: 'border-blue-400',
-            glow: 'drop-shadow-[0_0_40px_rgba(59,130,246,1)]',
-            bgGlow: 'bg-gradient-radial from-blue-400/40 to-transparent',
+            glow: 'drop-shadow(0 0 25px rgba(59,130,246,1))',
+            bgGlow: 'bg-gradient-radial from-blue-400',
             particle: 'bg-blue-400'
         },
         epic: {
-            aura: 'shadow-[0_0_50px_rgba(168,85,247,1)]',
+            aura: 'shadow-[0_0_35px_rgba(168,85,247,0.8)]',
             border: 'border-purple-400',
-            glow: 'drop-shadow-[0_0_45px_rgba(168,85,247,1)]',
-            bgGlow: 'bg-gradient-radial from-purple-400/40 to-transparent',
+            glow: 'drop-shadow(0 0 30px rgba(168,85,247,1))',
+            bgGlow: 'bg-gradient-radial from-purple-400',
             particle: 'bg-purple-400'
         },
         legendary: {
-            aura: 'shadow-[0_0_60px_rgba(251,146,60,1)]',
+            aura: 'shadow-[0_0_40px_rgba(251,146,60,0.8)]',
             border: 'border-orange-400',
-            glow: 'drop-shadow-[0_0_50px_rgba(251,146,60,1)]',
-            bgGlow: 'bg-gradient-radial from-orange-400/50 to-transparent',
+            glow: 'drop-shadow(0 0 35px rgba(251,146,60,1))',
+            bgGlow: 'bg-gradient-radial from-orange-400',
             particle: 'bg-orange-400'
         }
     };
-    return configs[pokemon.rarity] || configs.normal;
+    const rarityKey = pokemon.rarity as keyof typeof configs;
+    return configs[rarityKey] || configs.normal;
 });
 
 const pokemonImageUrl = computed(() => {
@@ -73,7 +100,7 @@ const handleClick = () => {
 
 <template>
     <div
-        class="relative w-32 h-32 mx-auto cursor-pointer transition-all duration-500 hover:scale-110"
+        class="relative w-32 h-32 mx-auto cursor-pointer transition-all duration-700 ease-in-out hover:scale-110"
         @mouseenter="isHovered = true"
         @mouseleave="isHovered = false"
         @click="handleClick"
@@ -81,117 +108,90 @@ const handleClick = () => {
     >
         <div
             :class="[
-                'absolute -inset-4 rounded-full transition-all duration-700 ease-out z-0',
+                'absolute -inset-2 rounded-full transition-all duration-700 ease-out z-0',
                 rarityConfig.aura,
                 rarityConfig.bgGlow,
-                isHovered && !revealed ? 'opacity-70 scale-120 animate-pulseStrong' : 'opacity-0 scale-100'
+                isHovered && !revealed ? 'opacity-60 scale-110' : 'opacity-0 scale-100'
             ]"
-            style="filter: blur(20px);"
+            style="filter: blur(15px);"
         />
 
         <div
             :class="[
-                'absolute -inset-3 rounded-full transition-all duration-700 ease-out z-0',
+                'absolute -inset-1 rounded-full transition-all duration-700 ease-out z-0',
                 rarityConfig.aura,
-                isHovered && !revealed ? 'opacity-50 scale-110' : 'opacity-0 scale-100'
+                isHovered && !revealed ? 'opacity-40 scale-105' : 'opacity-0 scale-100'
             ]"
-            style="filter: blur(10px);"
+            style="filter: blur(5px);"
         />
 
-        <div
-            :class="[
-                'absolute -inset-1 rounded-full border-3 transition-all duration-700 ease-out z-0',
-                rarityConfig.border,
-                isHovered && !revealed ? 'opacity-60 scale-105 animate-borderPulse' : 'opacity-0 scale-100'
-            ]"
-        />
-
-        <div
-            v-if="isHovered && !revealed"
-            class="absolute -inset-8 pointer-events-none animate-rotateAura"
-        >
+        <div v-if="pokemon.is_shiny" class="absolute inset-0 pointer-events-none z-10">
             <div
-                :class="[
-                    'absolute inset-0 rounded-full',
-                    pokemon.rarity === 'legendary' ? 'bg-gradient-conic from-orange-400/0 via-orange-400/40 to-orange-400/0' :
-                    pokemon.rarity === 'epic' ? 'bg-gradient-conic from-purple-400/0 via-purple-400/40 to-purple-400/0' :
-                    pokemon.rarity === 'rare' ? 'bg-gradient-conic from-blue-400/0 via-blue-400/40 to-blue-400/0' :
-                    'bg-gradient-conic from-white/0 via-white/30 to-white/0'
-                ]"
-            />
-        </div>
-
-        <div v-if="pokemon.is_shiny" class="absolute inset-0 pointer-events-none z-30">
-            <div
-                v-for="i in 12"
-                :key="i"
-                :class="[
-                    'absolute w-1.5 h-1.5 bg-gradient-radial from-yellow-300 to-yellow-500 rounded-full animate-customPing transition-opacity duration-500 ease-out',
-                    isHovered && !revealed ? 'opacity-90' : 'opacity-0'
-                ]"
+                v-for="(particle, i) in pingParticles"
+                :key="`ping-${i}`"
+                class="absolute w-1.5 h-1.5 bg-gradient-radial from-yellow-300 to-yellow-500 rounded-full animate-customPing"
                 :style="{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    animationDelay: `${(Math.random() * 2) + (i * 0.15)}s`,
-                    animationDuration: `${1.5 + Math.random() * 1.5}s`,
-                    transitionDelay: isHovered ? `${i * 50}ms` : `${(12-i) * 30}ms`,
-                    boxShadow: '0 0 8px rgba(255, 215, 0, 0.8)'
+                    left: particle.left,
+                    top: particle.top,
+                    animationDelay: particle.animationDelay,
+                    animationDuration: particle.animationDuration,
+                    boxShadow: '0 0 10px rgba(255, 215, 0, 0.9)',
+                    opacity: isHovered && !revealed ? 0.9 : 0,
+                    transition: 'opacity 0.5s ease-out',
+                    transitionDelay: isHovered ? particle.transitionInDelay : particle.transitionOutDelay
                 }"
             />
 
             <div
-                v-for="i in 6"
-                :key="`move-${i}`"
-                :class="[
-                    'absolute w-1 h-1 bg-gradient-radial from-yellow-300 to-yellow-600 rounded-full animate-sparkle transition-opacity duration-400 ease-out',
-                    isHovered && !revealed ? 'opacity-100' : 'opacity-0'
-                ]"
+                v-for="(particle, i) in sparkleParticles"
+                :key="`sparkle-${i}`"
+                class="absolute w-1 h-1 bg-gradient-radial from-yellow-300 to-yellow-600 rounded-full animate-sparkle"
                 :style="{
-                    left: `${20 + Math.random() * 60}%`,
-                    top: `${20 + Math.random() * 60}%`,
-                    animationDelay: `${Math.random() * 2}s`,
-                    transitionDelay: isHovered ? `${i * 80}ms` : `${(6-i) * 50}ms`,
-                    boxShadow: '0 0 12px rgba(255, 215, 0, 1)'
+                    left: particle.left,
+                    top: particle.top,
+                    animationDelay: particle.animationDelay,
+                    animationDuration: particle.animationDuration,
+                    boxShadow: '0 0 15px rgba(255, 215, 0, 1)',
+                    opacity: isHovered && !revealed ? 1 : 0,
+                    transition: 'opacity 0.4s ease-out',
+                    transitionDelay: isHovered ? particle.transitionInDelay : particle.transitionOutDelay
                 }"
             />
         </div>
 
-        <div v-if="revealed && pokemon.is_shiny" class="absolute inset-0 pointer-events-none z-30">
+        <div v-if="revealed && pokemon.is_shiny" class="absolute inset-0 pointer-events-none z-10">
             <div
-                v-for="i in 8"
+                v-for="(particle, i) in revealedShinyParticles"
                 :key="`revealed-${i}`"
                 class="absolute w-1.5 h-1.5 bg-gradient-radial from-yellow-300 to-yellow-500 rounded-full animate-customPing"
                 :style="{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    animationDelay: `${Math.random() * 3}s`,
-                    animationDuration: `${2 + Math.random() * 2}s`,
-                    boxShadow: '0 0 6px rgba(255, 215, 0, 0.6)'
+                    left: particle.left,
+                    top: particle.top,
+                    animationDelay: particle.animationDelay,
+                    animationDuration: particle.animationDuration,
+                    boxShadow: '0 0 8px rgba(255, 215, 0, 0.7)'
                 }"
             />
         </div>
-
-        <div v-if="revealed && pokemon.is_shiny" class="absolute -inset-3 rounded-full border-2 border-yellow-400/50 animate-pulseStrong z-0" style="filter: blur(4px); box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), inset 0 0 25px rgba(255, 215, 0, 0.3);" />
 
         <div v-if="revealed" :class="['absolute -inset-5 rounded-full opacity-50 animate-pulseStrong z-0', rarityConfig.aura]" style="filter: blur(25px);" />
 
         <div
             :class="[
-                'relative w-full h-full rounded-full flex items-center justify-center transition-all duration-800 ease-out transform z-20',
+                'relative w-full h-full rounded-full flex items-center justify-center transition-all duration-1000 ease-in-out transform z-20',
                 revealed ? 'bg-transparent scale-110' : '',
-                !revealed ? 'bg-gradient-to-br from-base-100/70 to-base-200/50 backdrop-blur-sm' : '',
                 !revealed && isHovered ? 'scale-105' : ''
             ]"
             :style="{
                 border: 'none',
                 outline: 'none',
-                filter: !revealed && isHovered ? rarityConfig.glow : 'none'
+                transition: 'all 0.7s ease-in-out'
             }"
         >
             <div
                 v-if="!revealed"
                 :class="[
-                    'transition-all duration-600 ease-out',
+                    'transition-all duration-800 ease-in-out',
                     isHovered ? 'animate-floatBall' : ''
                 ]"
             >
@@ -200,7 +200,8 @@ const handleClick = () => {
                     :alt="ballType"
                     class="w-20 h-20 object-contain"
                     :style="{
-                        filter: isHovered ? 'brightness(1.2) contrast(1.1)' : 'brightness(1)'
+                        filter: isHovered ? `brightness(1.3) contrast(1.2) ${rarityConfig.glow}` : 'brightness(1) contrast(1) drop-shadow(0px 0px 0px transparent)',
+                        transition: 'filter 0.6s ease-out'
                     }"
                 />
             </div>
@@ -233,18 +234,12 @@ const handleClick = () => {
                     Niv. {{ pokemon.level }}
                 </div>
 
-                <div
-                    :class="[
-                        'text-xs px-3 py-1.5 rounded-full mt-1 inline-block animate-slideUp font-bold',
-                        pokemon.rarity === 'legendary' ? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white shadow-[0_0_20px_rgba(251,146,60,0.8)]' :
-                        pokemon.rarity === 'epic' ? 'bg-gradient-to-r from-purple-500 to-purple-400 text-white shadow-[0_0_20px_rgba(168,85,247,0.8)]' :
-                        pokemon.rarity === 'rare' ? 'bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-[0_0_20px_rgba(59,130,246,0.8)]' :
-                        'bg-gradient-to-r from-gray-400 to-gray-300 text-white shadow-[0_0_15px_rgba(255,255,255,0.5)]'
-                    ]"
+                <RarityBadge
+                    :rarity="pokemon.rarity"
+                    size="xs"
+                    class="mt-1 inline-block animate-slideUp font-bold"
                     :style="{ animationDelay: '0.7s' }"
-                >
-                    {{ pokemon.rarity }}
-                </div>
+                />
             </div>
         </div>
 

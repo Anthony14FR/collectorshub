@@ -72,7 +72,6 @@ const getRarityChances = () => {
 
 <template>
     <div class="relative group">
-        <!-- Particules d'ambiance -->
         <div class="absolute inset-0 pointer-events-none">
             <div
                 v-for="i in 12"
@@ -89,7 +88,6 @@ const getRarityChances = () => {
             />
         </div>
 
-        <!-- Portail principal -->
         <div
             :class="[
                 'relative bg-gradient-to-br backdrop-blur-sm rounded-2xl border-2 p-8 transition-all duration-500 hover:scale-105',
@@ -99,7 +97,6 @@ const getRarityChances = () => {
                 isAnimating ? 'animate-pulse shadow-2xl ' + portalConfig.glowColor : ''
             ]"
         >
-            <!-- Anneaux d'énergie -->
             <div v-if="quantity > 0" class="absolute inset-4 rounded-xl opacity-30 pointer-events-none">
                 <div
                     v-for="i in 3"
@@ -115,7 +112,6 @@ const getRarityChances = () => {
                 />
             </div>
 
-            <!-- En-tête du portail -->
             <div class="text-center mb-8">
                 <div class="text-6xl mb-4 animate-bounce">
                     {{ portalConfig.ballEmoji }}
@@ -128,7 +124,6 @@ const getRarityChances = () => {
                 </div>
             </div>
 
-            <!-- Statistiques de rareté -->
             <div class="bg-base-100/40 backdrop-blur-sm rounded-xl p-4 mb-6">
                 <h3 class="text-sm font-semibold mb-3 text-center text-base-content/80">
                     Chances d'obtention
@@ -145,9 +140,7 @@ const getRarityChances = () => {
                 </div>
             </div>
 
-            <!-- Boutons d'invocation -->
             <div class="space-y-4">
-                <!-- Invocation x1 -->
                 <Button
                     @click="handleInvoke(1)"
                     :disabled="!canInvoke(1)"
@@ -163,7 +156,6 @@ const getRarityChances = () => {
                     </span>
                 </Button>
 
-                <!-- Invocation x10 -->
                 <Button
                     @click="handleInvoke(10)"
                     :disabled="!canInvoke(10)"
@@ -183,7 +175,6 @@ const getRarityChances = () => {
                 </Button>
             </div>
 
-            <!-- Informations supplémentaires -->
             <div class="mt-6 text-center text-xs text-base-content/60">
                 <p>Les {{ ballType }}s sont consommées lors de l'invocation</p>
                 <p class="mt-1">{{ ballType === 'Masterball' ? 'Taux de légendaire augmenté !' : 'Invocation standard' }}</p>

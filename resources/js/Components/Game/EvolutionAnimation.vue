@@ -30,41 +30,25 @@ const containerHeight = ref(400);
 
 const activeIntervals = ref<NodeJS.Timeout[]>([]);
 
-// Différentes lignes d'évolution de starters à 3 évolutions
 const evolutionLines = [
-    // Salamèche → Reptincel → Dracaufeu
+
     [
-        { image: '/images/pokemon-gifs/4.gif', name: 'Salamèche' },
-        { image: '/images/pokemon-gifs/5.gif', name: 'Reptincel' },
-        { image: '/images/pokemon-gifs/6.gif', name: 'Dracaufeu' }
+        { image: '/images/pokemon-gifs/63.gif', name: 'Abra' },
+        { image: '/images/pokemon-gifs/64.gif', name: 'Kadabra' },
+        { image: '/images/pokemon-gifs/65.gif', name: 'Alakazam' }
     ],
-    // Carapuce → Carabaffe → Tortank
     [
-        { image: '/images/pokemon-gifs/7.gif', name: 'Carapuce' },
-        { image: '/images/pokemon-gifs/8.gif', name: 'Carabaffe' },
-        { image: '/images/pokemon-gifs/9.gif', name: 'Tortank' }
+        { image: '/images/pokemon-gifs/92.gif', name: 'Fantominus' },
+        { image: '/images/pokemon-gifs/93.gif', name: 'Spectrum' },
+        { image: '/images/pokemon-gifs/94.gif', name: 'Ectoplasma' }
     ],
-    // Bulbizarre → Herbizarre → Florizarre
     [
-        { image: '/images/pokemon-gifs/1.gif', name: 'Bulbizarre' },
-        { image: '/images/pokemon-gifs/2.gif', name: 'Herbizarre' },
-        { image: '/images/pokemon-gifs/3.gif', name: 'Florizarre' }
+        { image: '/images/pokemon-gifs/147.gif', name: 'Minidraco' },
+        { image: '/images/pokemon-gifs/148.gif', name: 'Draco' },
+        { image: '/images/pokemon-gifs/149.gif', name: 'Dracolosse' }
     ],
-    // Chenipan → Chrysacier → Papilusion
-    [
-        { image: '/images/pokemon-gifs/10.gif', name: 'Chenipan' },
-        { image: '/images/pokemon-gifs/11.gif', name: 'Chrysacier' },
-        { image: '/images/pokemon-gifs/12.gif', name: 'Papilusion' }
-    ],
-    // Aspicot → Coconfort → Dardargnan
-    [
-        { image: '/images/pokemon-gifs/13.gif', name: 'Aspicot' },
-        { image: '/images/pokemon-gifs/14.gif', name: 'Coconfort' },
-        { image: '/images/pokemon-gifs/15.gif', name: 'Dardargnan' }
-    ]
 ];
 
-// Choisir aléatoirement une ligne d'évolution
 const selectedEvolutionLine = evolutionLines[Math.floor(Math.random() * evolutionLines.length)];
 const evolutions = selectedEvolutionLine;
 
@@ -100,18 +84,15 @@ const completeAnimation = () => {
     if (isCompleted.value) return;
     isCompleted.value = true;
 
-    // Commencer le fadeOut immédiatement
     isVisible.value = false;
 
-    // Émettre après le début du fadeOut pour que la page parent puisse réagir
     setTimeout(() => {
         emit('completed');
 
-        // Nettoyer après le fadeOut complet
         setTimeout(() => {
             cleanupAll();
         }, 1000);
-    }, 500); // Délai pour laisser le fadeOut commencer
+    }, 500);
 };
 
 const skipAnimation = () => {
@@ -123,14 +104,10 @@ const addInterval = (interval: NodeJS.Timeout) => {
 };
 
 const updateMessage = async (newMessage: string) => {
-    containerHeight.value = 420;
     textVisible.value = false;
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 200));
     currentMessage.value = newMessage;
-    await new Promise(resolve => setTimeout(resolve, 100));
     textVisible.value = true;
-    await new Promise(resolve => setTimeout(resolve, 300));
-    containerHeight.value = 400;
 };
 
 const evolvePokemon = async () => {
@@ -154,7 +131,6 @@ const addDustParticle = () => {
 };
 
 const addShinyParticle = () => {
-    // Génère des particules autour du Pokémon dans une zone plus large
     const angle = Math.random() * Math.PI * 2;
     const distance = 20 + Math.random() * 35;
     const newParticle = {
@@ -184,9 +160,7 @@ const addShinyWave = () => {
 
 const startEvolution = async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
-    // Rendre le composant visible immédiatement
     isVisible.value = true;
-    // Attendre qu'il soit bien affiché avant de démarrer le script
     await new Promise(resolve => setTimeout(resolve, 1000));
     await updateMessage(`${evolutions[0].name} ressent une énergie mystérieuse...`);
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -241,7 +215,7 @@ const startEvolution = async () => {
         await new Promise(resolve => setTimeout(resolve, 2200));
     }
 
-    await new Promise(resolve => setTimeout(resolve, 500)); // Réduit de 1000ms à 500ms
+    await new Promise(resolve => setTimeout(resolve, 500));
     completeAnimation();
 };
 
@@ -277,7 +251,7 @@ const evolveToNextStage = async () => {
             const fadeIndex = activeIntervals.value.indexOf(quickFadeInterval);
             if (fadeIndex > -1) activeIntervals.value.splice(fadeIndex, 1);
             dustParticles.value = [];
-            isEvolving.value = false; // Désactive l'aura après le fondu
+            isEvolving.value = false;
         }
     }, 30);
     addInterval(quickFadeInterval);
@@ -324,7 +298,7 @@ const failEvolution = async () => {
             const fadeIndex = activeIntervals.value.indexOf(fastFadeInterval);
             if (fadeIndex > -1) activeIntervals.value.splice(fadeIndex, 1);
             dustParticles.value = [];
-            isEvolving.value = false; // Désactive l'aura après le fondu
+            isEvolving.value = false;
         }
     }, 30);
     addInterval(fastFadeInterval);
@@ -373,19 +347,21 @@ onUnmounted(() => {
             :style="{ height: `${containerHeight}px` }"
         >
             <div class="flex flex-col items-center justify-center h-full">
-                <div class="mb-8 h-16 flex items-center justify-center transition-all duration-1000 ease-out" :style="{ transitionDelay: isVisible ? '400ms' : '0ms' }">
-                    <h2
-                        class="text-3xl font-bold transition-opacity duration-500 ease-out"
-                        :class="[
-                            { 'opacity-0': !textVisible, 'opacity-100': textVisible },
-                            currentMessage === 'L\'évolution a échoué...' ? 'text-red-300/90' : 'text-white/90'
-                        ]"
-                        :style="{
-                            textShadow: '0 1px 6px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 255, 255, 0.05)'
-                        }"
-                    >
-                        {{ currentMessage }}
-                    </h2>
+                <div class="mb-6 h-32 flex items-center justify-center transition-all duration-1000 ease-out overflow-hidden" :style="{ transitionDelay: isVisible ? '400ms' : '0ms' }">
+                    <div class="w-full max-w-xl px-4">
+                        <h2
+                            class="text-3xl font-bold transition-opacity duration-200 ease-in-out text-center"
+                            :class="[
+                                { 'opacity-0': !textVisible, 'opacity-100': textVisible },
+                                currentMessage === 'L\'évolution a échoué...' ? 'text-red-300/90' : 'text-white/90'
+                            ]"
+                            :style="{
+                                textShadow: '0 1px 6px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 255, 255, 0.05)'
+                            }"
+                        >
+                            {{ currentMessage }}
+                        </h2>
+                    </div>
                 </div>
 
                 <div class="relative">
@@ -436,7 +412,6 @@ onUnmounted(() => {
                             transitionDelay: isVisible ? '700ms' : '0ms'
                         }"
                     >
-                        <!-- Aura dorée autour du Pokémon -->
                         <div
                             v-if="showShinyEffect"
                             class="absolute -inset-8 rounded-full pointer-events-none"
@@ -468,7 +443,6 @@ onUnmounted(() => {
                     </div>
                 </div>
 
-                <!-- Poussière dorée flottante - SORTIE du conteneur pour éviter l'overflow -->
                 <div
                     v-if="showShinyEffect"
                     class="fixed inset-0 pointer-events-none z-[9998]"
