@@ -11,7 +11,6 @@ interface Props {
 
 const { auth } = defineProps<Props>();
 
-// Correction pour s'assurer d'avoir un tableau d'avatars
 const unlockedAvatars = Array.isArray(auth.user.unlocked_avatars)
     ? auth.user.unlocked_avatars
     : JSON.parse(auth.user.unlocked_avatars);
@@ -21,7 +20,6 @@ console.log(
     unlockedAvatars.length,
     unlockedAvatars
 );
-// Formulaire de mise à jour du profil
 const profileForm = reactive({
     username: auth.user.username,
     email: auth.user.email,
@@ -37,7 +35,6 @@ const passwordForm = reactive({
     errors: {} as Record<string, string>,
 });
 
-// Ajout du formulaire de changement d'avatar
 const avatarForm = reactive({
     avatar: auth.user.avatar,
     processing: false,
@@ -61,7 +58,6 @@ const updateProfile = () => {
             onSuccess: () => {
                 profileForm.processing = false;
                 showProfileForm.value = false;
-                // Message de succès pourrait être ajouté ici
             },
             onError: (errors: Record<string, string>) => {
                 profileForm.processing = false;
@@ -89,7 +85,6 @@ const updatePassword = () => {
                 passwordForm.password = "";
                 passwordForm.password_confirmation = "";
                 showPasswordForm.value = false;
-                // Message de succès pourrait être ajouté ici
             },
             onError: (errors: Record<string, string>) => {
                 passwordForm.processing = false;
@@ -153,13 +148,11 @@ const getUserInitial = () => {
     <div
         class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
     >
-        <!-- Header -->
         <header class="relative">
             <div
                 class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"
             ></div>
 
-            <!-- Navigation -->
             <nav
                 class="relative z-10 flex items-center justify-between p-6 lg:px-8"
             >
@@ -205,7 +198,6 @@ const getUserInitial = () => {
                 </p>
             </div>
 
-            <!-- Profile Information Section -->
             <div
                 class="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 mb-8"
             >
@@ -255,7 +247,6 @@ const getUserInitial = () => {
                     </div>
                 </div>
 
-                <!-- Formulaire d'édition -->
                 <form
                     v-if="showProfileForm"
                     @submit.prevent="updateProfile"
@@ -331,7 +322,6 @@ const getUserInitial = () => {
                 </form>
             </div>
 
-            <!-- Password Section -->
             <div
                 class="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 mb-8"
             >
@@ -358,7 +348,6 @@ const getUserInitial = () => {
                     </p>
                 </div>
 
-                <!-- Formulaire de changement de mot de passe -->
                 <form
                     v-if="showPasswordForm"
                     @submit.prevent="updatePassword"
@@ -457,7 +446,6 @@ const getUserInitial = () => {
                 </form>
             </div>
 
-            <!-- Section modification avatar -->
             <div
                 class="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 mb-8"
             >
@@ -509,7 +497,6 @@ const getUserInitial = () => {
                 </form>
             </div>
 
-            <!-- Account Information (Read-only) -->
             <div
                 class="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10"
             >
