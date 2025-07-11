@@ -20,9 +20,21 @@ interface Props {
   onGoToMarketplace?: () => void;
   onGoToLeaderboard?: () => void;
   onOpenTeamManagementModal?: () => void;
+  onOpenBadgesModal?: () => void;
+  hasUnclaimedSuccesses?: boolean;
 }
 
-const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToLeaderboard, onOpenTeamManagementModal } = defineProps<Props>();
+const { 
+  user, 
+  inventory, 
+  pokedex, 
+  onOpenPokedexModal, 
+  onGoToMarketplace, 
+  onGoToLeaderboard, 
+  onOpenTeamManagementModal,
+  onOpenBadgesModal,
+  hasUnclaimedSuccesses,
+} = defineProps<Props>();
 
 const goToInvocation = () => {
   router.visit('/opening');
@@ -97,6 +109,31 @@ const goToShop = () => {
             size="sm"
           >
             <span class="text-xl">🏪</span>
+          </Button>
+        </div>
+
+        <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm relative">
+          <div v-if="hasUnclaimedSuccesses" class="absolute top-2 right-2">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+            </span>
+          </div>
+          <div>
+            <h3 class="mb-1 bg-gradient-to-r from-info to-info/80 bg-clip-text text-base font-bold text-transparent">
+              Badges
+            </h3>
+            <p class="text-xs text-base-content/70">
+              Vos succès et récompenses
+            </p>
+          </div>
+          <Button
+            v-if="onOpenBadgesModal"
+            @click="onOpenBadgesModal"
+            variant="primary"
+            size="sm"
+          >
+            <span class="text-xl">🏆</span>
           </Button>
         </div>
 

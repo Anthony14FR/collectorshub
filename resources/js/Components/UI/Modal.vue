@@ -71,6 +71,10 @@ const maxWidthClasses = {
             <slot name="header" />
           </div>
 
+          <div v-if="$slots.tabs" class="border-b border-primary/20 flex-shrink-0 px-6">
+            <slot name="tabs" />
+          </div>
+
           <div :class="['flex-1 overflow-y-auto modal-content', maxWidth === 'xs' ? 'p-3' : 'p-6']">
             <slot>Modal content goes here.</slot>
           </div>

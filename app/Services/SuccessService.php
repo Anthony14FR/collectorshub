@@ -49,6 +49,15 @@ class SuccessService
                 'is_claimed' => true,
                 'claimed_at' => now()
             ]);
+
+            $success = $userSuccess->success;
+            if ($success) {
+                $user->cash += $success->cash_reward;
+                $user->experience += $success->xp_reward;
+                $user->save();
+                $this->checkLevelUp($user);
+            }
+
             return true;
         }
 
@@ -57,15 +66,67 @@ class SuccessService
 
     public function claimAllSuccesses(User $user): int
     {
-        $unclaimedSuccesses = $user->userSuccesses()->where('is_claimed', false)->get();
-        $count = $unclaimedSuccesses->count();
+        $unclaimedSuccesses = $user->userSuccesses()->with('success')->where('is_claimed', false)->get();
+        if ($unclaimedSuccesses->isEmpty()) {
+            return 0;
+        }
+
+        $totalCashReward = 0;
+        $totalXpReward = 0;
+
+        foreach ($unclaimedSuccesses as $userSuccess) {
+            $totalCashReward += $userSuccess->success->cash_reward;
+            $totalXpReward += $userSuccess->success->xp_reward;
+        }
 
         $user->userSuccesses()->where('is_claimed', false)->update([
             'is_claimed' => true,
             'claimed_at' => now()
         ]);
 
-        return $count;
+        $user->cash += $totalCashReward;
+        $user->experience += $totalXpReward;
+        $user->save();
+        $this->checkLevelUp($user);
+
+
+        return $unclaimedSuccesses->count();
+    }
+
+    public function checkLevelUp(User $user): void
+    {
+        $experienceNeededForNextLevel = $this->getTotalExperienceForLevel($user->level + 1);
+
+        if ($experienceNeededForNextLevel > 0 && $user->experience >= $experienceNeededForNextLevel) {
+            $user->level++;
+            $user->save();
+
+            $this->checkLevelUp($user);
+        }
+    }
+
+    public function getTotalExperienceForLevel(int $level): int
+    {
+        if ($level <= 1) {
+            return 0;
+        }
+
+        $totalExperience = 0;
+        for ($i = 1; $i < $level; $i++) {
+            $totalExperience += $this->getExperienceForLevelUp($i);
+        }
+        return $totalExperience;
+    }
+
+    private function getExperienceForLevelUp(int $level): int
+    {
+        $experience = 100 * pow($level, 1.5);
+
+        if ($experience < 1000) {
+            return (int) round($experience, -1);
+        }
+
+        return (int) round($experience, -2);
     }
 
     public function getSuccessProgress(User $user): array

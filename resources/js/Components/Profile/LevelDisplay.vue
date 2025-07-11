@@ -11,17 +11,11 @@ interface Props {
 const { user, responsive = false } = defineProps<Props>();
 
 const experienceProgress = computed(() => {
-  const currentLevelExp = (user.level - 1) * 1000;
-  const nextLevelExp = user.level * 1000;
-  const progressInLevel = user.experience - currentLevelExp;
-  const expNeededForLevel = nextLevelExp - currentLevelExp;
-
-  return Math.min((progressInLevel / expNeededForLevel) * 100, 100);
+  return user.experience_percentage;
 });
 
 const experienceForNextLevel = computed(() => {
-  const nextLevelExp = user.level * 1000;
-  return nextLevelExp - user.experience;
+  return user.experience_for_next_level - user.experience;
 });
 </script>
 
@@ -73,15 +67,18 @@ const experienceForNextLevel = computed(() => {
 
         <div class="flex items-center gap-2">
           <div class="text-center">
-            <span class="text-lg font-bold text-base-content/80">{{ (user.level * 1000).toLocaleString() }}</span>
+            <span class="text-lg font-bold text-base-content/80">{{ user.experience_for_next_level.toLocaleString() }}</span>
           </div>
           <div class="h-px bg-gradient-to-l from-transparent via-primary/40 to-primary/10 w-20"></div>
         </div>
       </div>
 
       <div class="mt-2 text-center">
-        <p class="text-xs text-base-content/50">
-          {{ experienceForNextLevel.toLocaleString() }} EXP pour le niveau {{ user.level + 1 }}
+        <p class="text-xs text-base-content/50" v-if="user.level < 100">
+          Encore {{ (user.experience_for_next_level - user.experience).toLocaleString() }} EXP pour le niveau {{ user.level + 1 }}
+        </p>
+        <p class="text-xs text-base-content/50" v-else>
+          Niveau maximum atteint
         </p>
       </div>
     </div>
@@ -116,11 +113,14 @@ const experienceForNextLevel = computed(() => {
         <div class="mb-1">
           <span class="font-bold text-success">{{ user.experience.toLocaleString() }}</span>
           <span class="text-base-content/50 mx-1">/</span>
-          <span class="font-bold text-base-content/80">{{ (user.level * 1000).toLocaleString() }}</span>
+          <span class="font-bold text-base-content/80">{{ user.experience_for_next_level.toLocaleString() }}</span>
           <span class="text-base-content/50 ml-1">EXP</span>
         </div>
-        <p class="text-base-content/50 text-xs">
-          {{ experienceForNextLevel.toLocaleString() }} pour niveau {{ user.level + 1 }}
+        <p class="text-base-content/50 text-xs" v-if="user.level < 100">
+          {{ (user.experience_for_next_level - user.experience).toLocaleString() }} pour niveau {{ user.level + 1 }}
+        </p>
+        <p class="text-base-content/50 text-xs" v-else>
+          Niveau maximum atteint
         </p>
       </div>
     </div>

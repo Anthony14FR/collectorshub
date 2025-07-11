@@ -14,6 +14,9 @@ export type User = {
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
+    experience_for_current_level: number;
+    experience_for_next_level: number;
+    experience_percentage: number;
 }
 
 export type PokedexEntry = {
