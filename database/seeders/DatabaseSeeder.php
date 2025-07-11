@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             PokemonSeeder::class,
+            SuccessSeeder::class,
             PokedexSeeder::class,
             ItemSeeder::class,
             PromoCodeSeeder::class,

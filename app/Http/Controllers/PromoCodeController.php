@@ -155,7 +155,7 @@ class PromoCodeController extends Controller
 
         foreach ($promoCode->items as $item) {
             $quantity = $item->pivot->quantity;
-            
+
             $rewards['items'][] = [
                 'id' => $item->id,
                 'name' => $item->name,

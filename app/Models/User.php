@@ -92,4 +92,40 @@ class User extends Authenticatable
             ->withPivot(['is_used', 'used_at'])
             ->withTimestamps();
     }
+
+    public function successes()
+    {
+        return $this->belongsToMany(Success::class, 'user_successes')
+                    ->withTimestamps()
+                    ->withPivot('unlocked_at', 'is_claimed', 'claimed_at');
+    }
+
+    public function userSuccesses()
+    {
+        return $this->hasMany(UserSuccess::class);
+    }
+
+    public function unclaimedSuccesses()
+    {
+        return $this->userSuccesses()
+                    ->where('is_claimed', false)
+                    ->with('success');
+    }
+
+    public function claimedSuccesses()
+    {
+        return $this->userSuccesses()
+                    ->where('is_claimed', true)
+                    ->with('success');
+    }
+
+    public function hasSuccess($successKey): bool
+    {
+        return $this->successes()->where('key', $successKey)->exists();
+    }
+
+    public function getUnclaimedCount(): int
+    {
+        return $this->userSuccesses()->where('is_claimed', false)->count();
+    }
 }
