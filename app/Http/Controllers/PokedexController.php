@@ -55,7 +55,7 @@ class PokedexController extends Controller
     public function removeFromTeam(Request $request, $id)
     {
         $userId = Auth::id();
-        
+
         $pokemon = Pokedex::where('user_id', $userId)
             ->where('id', $id)
             ->where('is_in_team', true)

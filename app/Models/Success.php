@@ -11,7 +11,7 @@ class Success extends Model
 
     protected $fillable = [
         'key',
-        'title', 
+        'title',
         'description',
         'image',
         'type',

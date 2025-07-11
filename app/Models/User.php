@@ -10,8 +10,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Success;
-use App\Models\UserSuccess;
 
 class User extends Authenticatable
 {
