@@ -22,7 +22,7 @@ class MeController extends Controller
         $pokedex = $user->pokedex()->with('pokemon')->get();
         $inventory = $user->inventory()->with('item')->get();
         $leaderboards = $this->leaderboardService->getAllLeaderboards($user, 100);
-        $all_pokemons = Pokemon::all();
+        $allPokemons = Pokemon::all();
 
         return Inertia::render('Me', [
             'user' => $user,
