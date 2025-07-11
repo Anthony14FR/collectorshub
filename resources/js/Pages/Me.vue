@@ -44,7 +44,7 @@ const openLeaderboardModal = () => {
 
         <BackgroundEffects />
 
-        <div class="relative z-10 h-screen w-screen overflow-hidden">
+        <div class="relative z-10 h-screen w-screen overflow-y-auto lg:overflow-hidden">
             <MobileLayout
                 :user="auth.user"
                 :inventory="inventory"
