@@ -4,10 +4,16 @@ namespace App\Services;
 
 use App\Models\Success;
 use App\Models\User;
-use App\Models\UserSuccess;
 
 class SuccessService
 {
+    protected $xpService;
+
+    public function __construct(XpService $xpService)
+    {
+        $this->xpService = $xpService;
+    }
+
     public function checkAndUnlockSuccesses(User $user)
     {
         $successes = Success::all();
@@ -53,9 +59,8 @@ class SuccessService
             $success = $userSuccess->success;
             if ($success) {
                 $user->cash += $success->cash_reward;
-                $user->experience += $success->xp_reward;
                 $user->save();
-                $this->checkLevelUp($user);
+                $user->addXp($success->xp_reward);
             }
 
             return true;
@@ -85,54 +90,86 @@ class SuccessService
         ]);
 
         $user->cash += $totalCashReward;
-        $user->experience += $totalXpReward;
         $user->save();
-        $this->checkLevelUp($user);
-
+        $user->addXp($totalXpReward);
 
         return $unclaimedSuccesses->count();
     }
 
-    public function checkLevelUp(User $user): void
+    private function userHasSuccess(User $user, Success $success): bool
     {
-        $experienceNeededForNextLevel = $this->getTotalExperienceForLevel($user->level + 1);
-
-        if ($experienceNeededForNextLevel > 0 && $user->experience >= $experienceNeededForNextLevel) {
-            $user->level++;
-            $user->save();
-
-            $this->checkLevelUp($user);
-        }
+        return $user->userSuccesses()->where('success_id', $success->id)->exists();
     }
 
-    public function getTotalExperienceForLevel(int $level): int
+    private function unlockSuccess(User $user, Success $success): void
     {
-        if ($level <= 1) {
-            return 0;
-        }
-
-        $totalExperience = 0;
-        for ($i = 1; $i < $level; $i++) {
-            $totalExperience += $this->getExperienceForLevelUp($i);
-        }
-        return $totalExperience;
+        $user->userSuccesses()->create([
+            'success_id' => $success->id,
+            'unlocked_at' => now(),
+            'is_claimed' => false,
+        ]);
     }
 
-    private function getExperienceForLevelUp(int $level): int
+    private function checkPokedexRequirements(User $user, array $requirements): bool
     {
-        $experience = 100 * pow($level, 1.5);
-
-        if ($experience < 1000) {
-            return (int) round($experience, -1);
+        if (isset($requirements['count'])) {
+            $count = $user->pokedex()->count();
+            return $count >= $requirements['count'];
         }
 
-        return (int) round($experience, -2);
+        if (isset($requirements['types'])) {
+            $typeCounts = [];
+            foreach ($user->pokedex as $pokedexEntry) {
+                $pokemon = $pokedexEntry->pokemon;
+                if ($pokemon) {
+                    $types = $pokemon->types;
+                    foreach ($types as $type) {
+                        if (!isset($typeCounts[$type])) {
+                            $typeCounts[$type] = 0;
+                        }
+                        $typeCounts[$type]++;
+                    }
+                }
+            }
+
+            foreach ($requirements['types'] as $type => $requiredCount) {
+                if (!isset($typeCounts[$type]) || $typeCounts[$type] < $requiredCount) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private function checkCaptureRequirements(User $user, array $requirements): bool
+    {
+        if (isset($requirements['pokemon_id'])) {
+            return $user->pokedex()->where('pokemon_id', $requirements['pokemon_id'])->exists();
+        }
+
+        return false;
+    }
+
+    private function checkRarityRequirements(User $user, array $requirements): bool
+    {
+        if (isset($requirements['rarity']) && isset($requirements['count'])) {
+            $count = $user->pokedex()
+                ->whereHas('pokemon', function ($query) use ($requirements) {
+                    $query->where('rarity', $requirements['rarity']);
+                })
+                ->count();
+            return $count >= $requirements['count'];
+        }
+
+        return false;
     }
 
     public function getSuccessProgress(User $user): array
     {
         $totalSuccesses = Success::count();
-        $unlockedSuccesses = $user->successes()->count();
+        $unlockedSuccesses = $user->userSuccesses()->count();
         $claimedSuccesses = $user->userSuccesses()->where('is_claimed', true)->count();
         $unclaimedSuccesses = $user->userSuccesses()->where('is_claimed', false)->count();
 
@@ -143,90 +180,5 @@ class SuccessService
             'unclaimed' => $unclaimedSuccesses,
             'percentage' => $totalSuccesses > 0 ? round(($unlockedSuccesses / $totalSuccesses) * 100, 2) : 0
         ];
-    }
-
-    private function checkPokedexRequirements(User $user, array $requirements): bool
-    {
-        $pokedexCount = $this->getPokedexCount($user, $requirements);
-        return $pokedexCount >= ($requirements['count'] ?? 0);
-    }
-
-    private function checkCaptureRequirements(User $user, array $requirements): bool
-    {
-        $captureCount = $this->getCaptureCount($user, $requirements);
-        return $captureCount >= ($requirements['count'] ?? 0);
-    }
-
-    private function checkRarityRequirements(User $user, array $requirements): bool
-    {
-        $rarityCount = $this->getRarityCount($user, $requirements);
-        return $rarityCount >= ($requirements['count'] ?? 0);
-    }
-
-    private function getPokedexCount(User $user, array $requirements): int
-    {
-        $query = $user->pokedex();
-
-        if (isset($requirements['shiny'])) {
-            $query->whereHas('pokemon', function ($q) use ($requirements) {
-                $q->where('is_shiny', $requirements['shiny']);
-            });
-        }
-
-        if (isset($requirements['rarity'])) {
-            $query->whereHas('pokemon', function ($q) use ($requirements) {
-                $q->where('rarity', $requirements['rarity']);
-            });
-        }
-
-        return $query->distinct('pokemon_id')->count();
-    }
-
-    private function getCaptureCount(User $user, array $requirements): int
-    {
-        $query = $user->pokedex();
-
-        if (isset($requirements['shiny'])) {
-            $query->whereHas('pokemon', function ($q) use ($requirements) {
-                $q->where('is_shiny', $requirements['shiny']);
-            });
-        }
-
-        if (isset($requirements['rarity'])) {
-            $query->whereHas('pokemon', function ($q) use ($requirements) {
-                $q->where('rarity', $requirements['rarity']);
-            });
-        }
-
-        return $query->count();
-    }
-
-    private function getRarityCount(User $user, array $requirements): int
-    {
-        $query = $user->pokedex()->whereHas('pokemon', function ($q) use ($requirements) {
-            $q->where('rarity', $requirements['rarity']);
-
-            if (isset($requirements['shiny'])) {
-                $q->where('is_shiny', $requirements['shiny']);
-            }
-        });
-
-        return $query->count();
-    }
-
-    private function userHasSuccess(User $user, Success $success): bool
-    {
-        return $user->successes()->where('success_id', $success->id)->exists();
-    }
-
-    private function unlockSuccess(User $user, Success $success)
-    {
-        UserSuccess::create([
-            'user_id' => $user->id,
-            'success_id' => $success->id,
-            'unlocked_at' => now(),
-            'is_claimed' => false,
-            'claimed_at' => null
-        ]);
     }
 }

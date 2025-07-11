@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\XpService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -63,48 +64,24 @@ class User extends Authenticatable
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
 
-    public function getTotalExperienceForLevel(int $level): int
-    {
-        if ($level <= 1) {
-            return 0;
-        }
-
-        $totalExperience = 0;
-        for ($i = 1; $i < $level; $i++) {
-            $experienceForLevelI = 100 * pow($i, 1.5);
-            if ($experienceForLevelI < 1000) {
-                $totalExperience += round($experienceForLevelI, -1);
-            } else {
-                $totalExperience += round($experienceForLevelI, -2);
-            }
-        }
-        return $totalExperience;
-    }
-
     public function getExperienceForCurrentLevelAttribute(): int
     {
-        return $this->getTotalExperienceForLevel($this->level);
+        return app(XpService::class)->getTotalExperienceForLevel($this->level);
     }
 
     public function getExperienceForNextLevelAttribute(): int
     {
-        return $this->getTotalExperienceForLevel($this->level + 1);
+        return app(XpService::class)->getTotalExperienceForLevel($this->level + 1);
     }
 
     public function getExperiencePercentageAttribute(): float
     {
-        $xpForCurrentLevel = $this->getTotalExperienceForLevel($this->level);
-        $xpForNextLevel = $this->getTotalExperienceForLevel($this->level + 1);
+        return app(XpService::class)->getExperiencePercentage($this);
+    }
 
-        $xpNeededForLevelUp = $xpForNextLevel - $xpForCurrentLevel;
-
-        if ($xpNeededForLevelUp === 0) {
-            return 100;
-        }
-
-        $currentLevelProgress = $this->experience - $xpForCurrentLevel;
-
-        return round(($currentLevelProgress / $xpNeededForLevelUp) * 100, 2);
+    public function addXp(int $xp): void
+    {
+        app(XpService::class)->addXp($this, $xp);
     }
 
     public function checkPassword(string $password): bool
