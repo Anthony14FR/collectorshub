@@ -8,7 +8,6 @@ export default [
     files: ['resources/js/**/*.js'],
     rules: {
       'indent': ['error', 2],
-      'no-unused-vars': 'warn',
       'no-console': 'warn'
     }
   },
@@ -26,7 +25,6 @@ export default [
     },
     rules: {
       'indent': ['error', 2],
-      '@typescript-eslint/no-unused-vars': 'warn',
       'no-console': 'warn'
     }
   },
@@ -51,7 +49,6 @@ export default [
       'vue/script-indent': ['error', 2],
       'vue/no-unused-components': 'warn',
       'no-console': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn'
     }
   }
 ]; 
