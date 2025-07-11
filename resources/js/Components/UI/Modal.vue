@@ -3,9 +3,10 @@
 interface Props {
     show: boolean;
     maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
+    fixedHeight?: boolean;
 }
 
-const { maxWidth = 'md' } = defineProps<Props>();
+const { maxWidth = 'md', fixedHeight = false } = defineProps<Props>();
 const emit = defineEmits(['close']);
 
 const close = () => {
@@ -49,7 +50,8 @@ const maxWidthClasses = {
                 leave-to-class="opacity-0 scale-95"
             >
                 <div v-if="show" :class="[
-                    'relative w-full max-h-[90vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col',
+                    'relative w-full bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col',
+                    fixedHeight ? 'h-[600px]' : 'max-h-[90vh]',
                     maxWidthClasses[maxWidth]
                 ]">
                     <button
@@ -69,7 +71,7 @@ const maxWidthClasses = {
                         <slot name="header" />
                     </div>
 
-                    <div :class="['flex-1 overflow-y-auto', maxWidth === 'xs' ? 'p-3' : 'p-6']">
+                    <div :class="['flex-1 overflow-y-auto modal-content', maxWidth === 'xs' ? 'p-3' : 'p-6']">
                         <slot>Modal content goes here.</slot>
                     </div>
 
