@@ -10,7 +10,6 @@ import { router } from '@inertiajs/vue3';
 
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
-import type { Marketplace } from '@/types/marketplace';
 import type { Pokedex } from '@/types/pokedex';
 
 interface Props {
@@ -22,7 +21,7 @@ interface Props {
     onGoToLeaderboard?: () => void;
 }
 
-const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace } = defineProps<Props>();
+const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToLeaderboard } = defineProps<Props>();
 
 const goToInvocation = () => {
     router.visit('/opening');
@@ -44,8 +43,8 @@ const goToInvocation = () => {
         </SideSection>
 
         <SideSection position="left" :top="false">
-            <div class="grid grid-cols-1 gap-3 h-full">
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col justify-center items-center p-4">
+            <div class="grid grid-cols-1 gap-3">
+                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden flex flex-col justify-center items-center p-4">
                     <div class="text-center mb-3">
                         <div class="w-12 h-12 bg-gradient-to-br from-accent/20 to-accent/40 rounded-full flex items-center justify-center mb-2 mx-auto">
                             <span class="text-xl">⚡</span>
@@ -66,7 +65,7 @@ const goToInvocation = () => {
                     </Button>
                 </div>
 
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col justify-center items-center p-4">
+                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden flex flex-col justify-center items-center p-4">
                     <div class="text-center mb-3">
                         <div class="w-12 h-12 bg-gradient-to-br from-warning/20 to-warning/40 rounded-full flex items-center justify-center mb-2 mx-auto">
                             <span class="text-xl">🏪</span>
@@ -85,6 +84,28 @@ const goToInvocation = () => {
                         class="w-full !bg-gradient-to-r !from-warning/10 !to-warning/20 !border-warning/30 !text-warning hover:!from-warning/20 hover:!to-warning/30"
                     >
                         🏪 Marketplace
+                    </Button>
+                </div>
+
+                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden flex flex-col justify-center items-center p-4">
+                    <div class="text-center mb-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/40 rounded-full flex items-center justify-center mb-2 mx-auto">
+                            <span class="text-xl">🏆</span>
+                        </div>
+                        <h3 class="text-base font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-1">
+                            Classement
+                        </h3>
+                        <p class="text-xs text-base-content/70">Top 100 dresseurs</p>
+                    </div>
+
+                    <Button
+                        v-if="onGoToLeaderboard"
+                        @click="onGoToLeaderboard"
+                        variant="secondary"
+                        size="sm"
+                        class="w-full !bg-gradient-to-r !from-primary/10 !to-primary/20 !border-primary/30 !text-primary hover:!from-primary/20 hover:!to-primary/30"
+                    >
+                        🏆 Classement
                     </Button>
                 </div>
             </div>

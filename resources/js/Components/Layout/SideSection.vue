@@ -11,7 +11,7 @@ const positionClasses = {
     left: 'left-8',
     right: 'right-8'
 };
-const topClasses = top ? 'top-8' : 'top-24 max-h-[500px] overflow-hidden';
+const topClasses = top ? 'top-8' : 'top-24';
 </script>
 
 <template>
