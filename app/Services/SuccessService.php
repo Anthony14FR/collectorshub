@@ -156,9 +156,7 @@ class SuccessService
 
     private function userHasSuccess(User $user, Success $success): bool
     {
-        return UserSuccess::where('user_id', $user->id)
-                              ->where('success_id', $success->id)
-                              ->exists();
+        return $user->successes()->where('success_id', $success->id)->exists();
     }
 
     private function unlockSuccess(User $user, Success $success)

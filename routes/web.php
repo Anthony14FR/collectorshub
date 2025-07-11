@@ -8,8 +8,8 @@ use App\Http\Controllers\PokemonController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\ShopController;
-use App\Models\Pokedex;
 use App\Http\Controllers\SuccessController;
+use App\Models\Pokedex;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/marketplace/cancel/{listingId}', [MarketplaceController::class, 'cancelListing'])->name('marketplace.cancel');
     Route::get('/marketplace/listings', [MarketplaceController::class, 'getListings'])->name('marketplace.listings');
 
+
     // Routes pour Opening
     Route::get('/opening', [OpeningController::class, 'index'])->name('opening.index');
 
@@ -66,14 +67,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/shop/buy', [ShopController::class, 'buyItem'])->name('shop.buy');
 
     // Routes pour Success
-    Route::get('/successes', [SuccessController::class, 'index'])->name('successes.index');
-    Route::get('/successes/user', [SuccessController::class, 'userSuccesses'])->name('successes.user');
-    Route::get('/successes/unclaimed', [SuccessController::class, 'unclaimed'])->name('successes.unclaimed');
-    Route::post('/successes/{successId}/claim', [SuccessController::class, 'claim'])->name('successes.claim');
-    Route::post('/successes/claim-all', [SuccessController::class, 'claimAll'])->name('successes.claim-all');
-    Route::get('/successes/notifications', [SuccessController::class, 'notifications'])->name('successes.notifications');
+    Route::get('/success', [SuccessController::class, 'index'])->name('success.index');
+    Route::post('/success/{successId}/claim', [SuccessController::class, 'claim'])->name('success.claim');
+    Route::post('/success/claim-all', [SuccessController::class, 'claimAll'])->name('success.claim-all');
 });
 
-require __DIR__.'/admin.php';
-require __DIR__.'/auth.php';
-require __DIR__.'/api.php';
+require __DIR__ . '/admin.php';
+require __DIR__ . '/auth.php';
+require __DIR__ . '/api.php';

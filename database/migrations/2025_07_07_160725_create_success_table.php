@@ -18,6 +18,8 @@ return new class extends Migration
             $table->text('description');
             $table->string('type');
             $table->json('requirements');
+            $table->integer('cash_reward')->default(0);
+            $table->integer('xp_reward')->default(0);
             $table->timestamps();
         });
     }

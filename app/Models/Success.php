@@ -15,11 +15,15 @@ class Success extends Model
         'description',
         'image',
         'type',
-        'requirements'
+        'requirements',
+        'cash_reward',
+        'xp_reward'
     ];
 
     protected $casts = [
-        'requirements' => 'array'
+        'requirements' => 'array',
+        'cash_reward' => 'integer',
+        'xp_reward' => 'integer'
     ];
 
     protected $appends = ['image_url'];
