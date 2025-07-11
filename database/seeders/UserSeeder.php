@@ -28,7 +28,9 @@ class UserSeeder extends Seeder
             'cash' => 1000000,
             'last_login' => now(),
             'role' => 'admin',
-            'status' => 'active'
+            'status' => 'active',
+            'avatar' => '/images/trainer/2.png',
+            'unlocked_avatars' => json_encode(['/images/trainer/1.png', '/images/trainer/2.png']),
         ]);
 
         $admin->assignRole($adminRole);
@@ -42,7 +44,9 @@ class UserSeeder extends Seeder
             'cash' => 1000000,
             'last_login' => now(),
             'role' => 'user',
-            'status' => 'active'
+            'status' => 'active',
+            'avatar' => '/images/trainer/2.png',
+            'unlocked_avatars' => json_encode(['/images/trainer/1.png', '/images/trainer/2.png']),
         ]);
 
         $user->assignRole($userRole);

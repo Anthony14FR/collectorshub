@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Item;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 
 class ItemSeeder extends Seeder
 {
@@ -60,5 +61,25 @@ class ItemSeeder extends Seeder
         foreach ($items as $item) {
             Item::create($item);
         }
+
+        $avatarDir = public_path('images/trainer');
+        $files = collect(File::files($avatarDir))
+            ->reject(function ($file) {
+                $basename = pathinfo($file, PATHINFO_FILENAME);
+                return in_array($basename, ['1', '2']);
+            });
+        $files->each(function ($file) {
+            $basename = pathinfo($file, PATHINFO_FILENAME);
+            $relativePath = '/images/trainer/' . basename($file);
+            Item::create([
+                'name' => 'Avatar ' . $basename,
+                'description' => "Débloque l'avatar $basename pour votre profil.",
+                'type' => 'avatar',
+                'image' => $relativePath,
+                'effect' => [],
+                'price' => 1000,
+                'rarity' => 'normal',
+            ]);
+        });
     }
 }
