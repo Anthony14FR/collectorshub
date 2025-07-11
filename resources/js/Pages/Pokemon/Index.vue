@@ -6,15 +6,15 @@ import { useVirtualList } from '@vueuse/core';
 import { computed, ref } from 'vue';
 
 interface Props {
-    auth: {
-        user: {
-            id: number;
-            username: string;
-            level: number;
-            cash: number;
-        };
+  auth: {
+    user: {
+      id: number;
+      username: string;
+      level: number;
+      cash: number;
     };
-    pokemons: Pokemon[];
+  };
+  pokemons: Pokemon[];
 }
 
 const { auth, pokemons } = defineProps<Props>();
@@ -25,162 +25,162 @@ const selectedGeneration = ref('');
 const searchQuery = ref('');
 
 const uniqueTypes = computed(() => {
-    const types = new Set<string>();
-    pokemons.forEach(pokemon => {
-        pokemon.types.forEach(type => types.add(type.name));
-    });
-    return Array.from(types).sort();
+  const types = new Set<string>();
+  pokemons.forEach(pokemon => {
+    pokemon.types.forEach(type => types.add(type.name));
+  });
+  return Array.from(types).sort();
 });
 
 const uniqueGenerations = computed(() => {
-    const generations = new Set<number>();
-    pokemons.forEach(pokemon => generations.add(pokemon.generation));
-    return Array.from(generations).sort((a, b) => a - b);
+  const generations = new Set<number>();
+  pokemons.forEach(pokemon => generations.add(pokemon.generation));
+  return Array.from(generations).sort((a, b) => a - b);
 });
 
 const filteredPokemons = computed(() => {
-    return pokemons.filter(pokemon => {
-        const matchesSearch = searchQuery.value === '' ||
-            pokemon.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+  return pokemons.filter(pokemon => {
+    const matchesSearch = searchQuery.value === '' ||
+      pokemon.name.toLowerCase().includes(searchQuery.value.toLowerCase());
 
-        const matchesType = selectedType.value === '' ||
-            pokemon.types.some(type => type.name === selectedType.value);
+    const matchesType = selectedType.value === '' ||
+      pokemon.types.some(type => type.name === selectedType.value);
 
-        const matchesRarity = selectedRarity.value === '' ||
-            pokemon.rarity === selectedRarity.value;
+    const matchesRarity = selectedRarity.value === '' ||
+      pokemon.rarity === selectedRarity.value;
 
-        const matchesGeneration = selectedGeneration.value === '' ||
-            pokemon.generation.toString() === selectedGeneration.value;
+    const matchesGeneration = selectedGeneration.value === '' ||
+      pokemon.generation.toString() === selectedGeneration.value;
 
-        return matchesSearch && matchesType && matchesRarity && matchesGeneration;
-    });
+    return matchesSearch && matchesType && matchesRarity && matchesGeneration;
+  });
 });
 
 const pokemonRows = computed(() => {
-    const itemsPerRow = 3;
-    const rows = [];
+  const itemsPerRow = 3;
+  const rows = [];
 
-    for (let i = 0; i < filteredPokemons.value.length; i += itemsPerRow) {
-        rows.push(filteredPokemons.value.slice(i, i + itemsPerRow));
-    }
+  for (let i = 0; i < filteredPokemons.value.length; i += itemsPerRow) {
+    rows.push(filteredPokemons.value.slice(i, i + itemsPerRow));
+  }
 
-    return rows;
+  return rows;
 });
 
 const { list, containerProps, wrapperProps } = useVirtualList(
-    pokemonRows,
-    {
-        itemHeight: 440,
-        overscan: 2,
-    },
+  pokemonRows,
+  {
+    itemHeight: 440,
+    overscan: 2,
+  },
 );
 
 const clearFilters = () => {
-    selectedType.value = '';
-    selectedRarity.value = '';
-    selectedGeneration.value = '';
-    searchQuery.value = '';
+  selectedType.value = '';
+  selectedRarity.value = '';
+  selectedGeneration.value = '';
+  searchQuery.value = '';
 };
 </script>
 
 <template>
 
-    <Head title="Pokédex - Tous les Pokémons" />
+  <Head title="Pokédex - Tous les Pokémons" />
 
-    <div class="pokemon-discovery-world">
-        <div class="world-background">
-            <div class="sky-gradient"></div>
-            <div class="clouds cloud-1"></div>
-            <div class="clouds cloud-2"></div>
-            <div class="clouds cloud-3"></div>
-            <div class="mountains"></div>
-            <div class="grass-field"></div>
-            <div class="floating-particles">
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-            </div>
-        </div>
-
-        <div class="ui-overlay">
-            <div class="header-zone">
-                <div class="header-content">
-                    <Link href="/me" class="back-button">
-                    ← Retour
-                    </Link>
-
-                    <div class="title-section">
-                        <h1 class="main-title">Pokédex National</h1>
-                        <p class="subtitle">{{ filteredPokemons.length }} Pokémons disponibles</p>
-                    </div>
-
-                    <div class="user-info">
-                        <span class="username">{{ auth.user.username }}</span>
-                        <span class="level">Niv. {{ auth.user.level }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filters-zone">
-                <div class="filters-panel">
-                    <div class="search-section">
-                        <input v-model="searchQuery" type="text" placeholder="Rechercher un Pokémon..."
-                            class="search-input" />
-                    </div>
-
-                    <div class="filter-grid">
-                        <select v-model="selectedType" class="filter-select">
-                            <option value="">Tous les types</option>
-                            <option v-for="type in uniqueTypes" :key="type" :value="type">
-                                {{ type }}
-                            </option>
-                        </select>
-
-                        <select v-model="selectedRarity" class="filter-select">
-                            <option value="">Toutes les raretés</option>
-                            <option value="normal">Normal</option>
-                            <option value="rare">Rare</option>
-                            <option value="epic">Épique</option>
-                            <option value="legendary">Légendaire</option>
-                        </select>
-
-                        <select v-model="selectedGeneration" class="filter-select">
-                            <option value="">Toutes les générations</option>
-                            <option v-for="gen in uniqueGenerations" :key="gen" :value="gen.toString()">
-                                Génération {{ gen }}
-                            </option>
-                        </select>
-
-                        <button @click="clearFilters" class="clear-filters-btn">
-                            🗑️ Effacer
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pokemons-zone">
-                <div v-if="filteredPokemons.length > 0" v-bind="containerProps" class="virtual-container">
-                    <div v-bind="wrapperProps" class="virtual-wrapper">
-                        <div v-for="{ data: pokemonRow, index } in list" :key="`row-${index}`" class="virtual-row">
-                            <CardPokemon v-for="pokemon in pokemonRow" :key="pokemon.id" :pokemon="pokemon"
-                                class="pokemon-card" />
-                        </div>
-                    </div>
-                </div>
-
-                <div v-else class="no-results">
-                    <div class="no-results-icon">🔍</div>
-                    <h3>Aucun Pokémon trouvé</h3>
-                    <p>Essayez de modifier vos filtres de recherche.</p>
-                    <button @click="clearFilters" class="reset-search-btn">
-                        Réinitialiser la recherche
-                    </button>
-                </div>
-            </div>
-        </div>
+  <div class="pokemon-discovery-world">
+    <div class="world-background">
+      <div class="sky-gradient"></div>
+      <div class="clouds cloud-1"></div>
+      <div class="clouds cloud-2"></div>
+      <div class="clouds cloud-3"></div>
+      <div class="mountains"></div>
+      <div class="grass-field"></div>
+      <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+      </div>
     </div>
+
+    <div class="ui-overlay">
+      <div class="header-zone">
+        <div class="header-content">
+          <Link href="/me" class="back-button">
+            ← Retour
+          </Link>
+
+          <div class="title-section">
+            <h1 class="main-title">Pokédex National</h1>
+            <p class="subtitle">{{ filteredPokemons.length }} Pokémons disponibles</p>
+          </div>
+
+          <div class="user-info">
+            <span class="username">{{ auth.user.username }}</span>
+            <span class="level">Niv. {{ auth.user.level }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters-zone">
+        <div class="filters-panel">
+          <div class="search-section">
+            <input v-model="searchQuery" type="text" placeholder="Rechercher un Pokémon..."
+                   class="search-input" />
+          </div>
+
+          <div class="filter-grid">
+            <select v-model="selectedType" class="filter-select">
+              <option value="">Tous les types</option>
+              <option v-for="type in uniqueTypes" :key="type" :value="type">
+                {{ type }}
+              </option>
+            </select>
+
+            <select v-model="selectedRarity" class="filter-select">
+              <option value="">Toutes les raretés</option>
+              <option value="normal">Normal</option>
+              <option value="rare">Rare</option>
+              <option value="epic">Épique</option>
+              <option value="legendary">Légendaire</option>
+            </select>
+
+            <select v-model="selectedGeneration" class="filter-select">
+              <option value="">Toutes les générations</option>
+              <option v-for="gen in uniqueGenerations" :key="gen" :value="gen.toString()">
+                Génération {{ gen }}
+              </option>
+            </select>
+
+            <button @click="clearFilters" class="clear-filters-btn">
+              🗑️ Effacer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pokemons-zone">
+        <div v-if="filteredPokemons.length > 0" v-bind="containerProps" class="virtual-container">
+          <div v-bind="wrapperProps" class="virtual-wrapper">
+            <div v-for="{ data: pokemonRow, index } in list" :key="`row-${index}`" class="virtual-row">
+              <CardPokemon v-for="pokemon in pokemonRow" :key="pokemon.id" :pokemon="pokemon"
+                           class="pokemon-card" />
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="no-results">
+          <div class="no-results-icon">🔍</div>
+          <h3>Aucun Pokémon trouvé</h3>
+          <p>Essayez de modifier vos filtres de recherche.</p>
+          <button @click="clearFilters" class="reset-search-btn">
+            Réinitialiser la recherche
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>

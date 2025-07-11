@@ -26,11 +26,11 @@ const getStars = () => {
     return props.listing.pokemon.star;
   }
   switch(pokemon.rarity) {
-    case 'normal': return 1;
-    case 'rare': return 2;
-    case 'epic': return 3;
-    case 'legendary': return 4;
-    default: return 1;
+  case 'normal': return 1;
+  case 'rare': return 2;
+  case 'epic': return 3;
+  case 'legendary': return 4;
+  default: return 1;
   }
 };
 </script> 
