@@ -117,33 +117,4 @@ const openLeaderboardModal = () => {
 </template>
 
 <style>
-
-#app {
-    overflow: hidden !important;
-    height: 100vh !important;
-    width: 100vw !important;
-}
-
-::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
-* {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
-@keyframes spin-slow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.animate-spin-slow {
-    animation: spin-slow 10s linear infinite;
-}
-
-.bg-gradient-radial {
-    background: radial-gradient(circle, var(--tw-gradient-stops));
-}
 </style>

@@ -13,7 +13,11 @@ class OpeningController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Opening/Index');
+        $inventory = Auth::user()->inventory()->with('item')->get();
+
+        return Inertia::render('Opening/Index', [
+            'inventory' => $inventory
+        ]);
     }
 
     public function open(Request $request)
@@ -71,19 +75,19 @@ class OpeningController extends Controller
         switch ($ballType) {
             case 'Pokeball':
                 $rarityChances = [
-                    'normal' => 70, // 70%
-                    'rare' => 27, // 27%
-                    'epic' => 2.7, // 2.7%
-                    'legendary' => 0.3 // 0.3%
+                    'normal' => 70,
+                    'rare' => 27,
+                    'epic' => 2.7,
+                    'legendary' => 0.3
                 ];
                 break;
 
             case 'Masterball':
                 $rarityChances = [
-                    'normal' => 34, // 34%
-                    'rare' => 60, // 60%
-                    'epic' => 5, // 5%
-                    'legendary' => 1 // 1%
+                    'normal' => 34,
+                    'rare' => 60,
+                    'epic' => 5,
+                    'legendary' => 1
                 ];
                 break;
 
@@ -126,7 +130,8 @@ class OpeningController extends Controller
             'pokemon_id' => $pokemon->id,
             'name' => $pokemon->name,
             'types' => $pokemon->types,
-            'rarity' => $pokemon->rarity
+            'rarity' => $pokemon->rarity,
+            'is_shiny' => $pokemon->is_shiny
         ];
     }
 }

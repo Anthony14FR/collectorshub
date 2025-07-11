@@ -6,6 +6,7 @@ import GameInventory from '@/Components/Game/GameInventory.vue';
 import UserMenu from '@/Components/Profile/UserMenu.vue';
 import PokedexSection from '@/Components/Game/PokedexSection.vue';
 import Button from '@/Components/UI/Button.vue';
+import { router } from '@inertiajs/vue3';
 
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
@@ -21,7 +22,11 @@ interface Props {
     onGoToLeaderboard?: () => void;
 }
 
-const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToLeaderboard } = defineProps<Props>();
+const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace } = defineProps<Props>();
+
+const goToInvocation = () => {
+    router.visit('/opening');
+};
 </script>
 
 <template>
@@ -39,36 +44,49 @@ const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToL
         </SideSection>
 
         <SideSection position="left" :top="false">
-            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col justify-center items-center p-6">
-                <div class="text-center mb-4">
-                    <div class="w-16 h-16 bg-gradient-to-br from-warning/20 to-warning/40 rounded-full flex items-center justify-center mb-3 mx-auto">
-                        <span class="text-3xl">🏪</span>
+            <div class="grid grid-cols-1 gap-3 h-full">
+                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col justify-center items-center p-4">
+                    <div class="text-center mb-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-accent/20 to-accent/40 rounded-full flex items-center justify-center mb-2 mx-auto">
+                            <span class="text-xl">⚡</span>
+                        </div>
+                        <h3 class="text-base font-bold bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent mb-1">
+                            Invocation
+                        </h3>
+                        <p class="text-xs text-base-content/70">Invoquez de nouveaux Pokémon</p>
                     </div>
-                    <h3 class="text-lg font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1">
-                        Marketplace
-                    </h3>
-                    <p class="text-xs text-base-content/70">Achetez et vendez vos Pokémon</p>
+
+                    <Button
+                        @click="goToInvocation"
+                        variant="secondary"
+                        size="sm"
+                        class="w-full !bg-gradient-to-r !from-accent/10 !to-accent/20 !border-accent/30 !text-accent hover:!from-accent/20 hover:!to-accent/30"
+                    >
+                        ⚡ Invoquer
+                    </Button>
                 </div>
 
-                <Button
-                    v-if="onGoToMarketplace"
-                    @click="onGoToMarketplace"
-                    variant="secondary"
-                    size="md"
-                    class="w-full mb-3"
-                >
-                    🏪 Accéder au marketplace
-                </Button>
-                
-                <Button
-                    v-if="onGoToLeaderboard"
-                    @click="onGoToLeaderboard"
-                    variant="secondary"
-                    size="md"
-                    class="w-full"
-                >
-                    🏆 Classement
-                </Button>
+                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col justify-center items-center p-4">
+                    <div class="text-center mb-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-warning/20 to-warning/40 rounded-full flex items-center justify-center mb-2 mx-auto">
+                            <span class="text-xl">🏪</span>
+                        </div>
+                        <h3 class="text-base font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1">
+                            Marketplace
+                        </h3>
+                        <p class="text-xs text-base-content/70">Achetez et vendez</p>
+                    </div>
+
+                    <Button
+                        v-if="onGoToMarketplace"
+                        @click="onGoToMarketplace"
+                        variant="secondary"
+                        size="sm"
+                        class="w-full !bg-gradient-to-r !from-warning/10 !to-warning/20 !border-warning/30 !text-warning hover:!from-warning/20 hover:!to-warning/30"
+                    >
+                        🏪 Marketplace
+                    </Button>
+                </div>
             </div>
         </SideSection>
 

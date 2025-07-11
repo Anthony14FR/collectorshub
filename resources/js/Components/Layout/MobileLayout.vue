@@ -4,6 +4,7 @@ import GameInventory from '@/Components/Game/GameInventory.vue';
 import UserMenu from '@/Components/Profile/UserMenu.vue';
 import TrainerProfile from '@/Components/Profile/TrainerProfile.vue';
 import Button from '@/Components/UI/Button.vue';
+import { router } from '@inertiajs/vue3';
 
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
@@ -19,7 +20,11 @@ interface Props {
     onGoToLeaderboard?: () => void;
 }
 
-const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToLeaderboard } = defineProps<Props>();
+const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace } = defineProps<Props>();
+
+const goToInvocation = () => {
+    router.visit('/opening');
+};
 </script>
 
 <template>
@@ -42,6 +47,30 @@ const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToL
         <div class="flex-1 grid grid-cols-1 gap-4 min-h-0 overflow-hidden">
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
                 <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-accent/20 to-accent/40 rounded-lg flex items-center justify-center">
+                        <span class="text-lg">⚡</span>
+                    </div>
+                    <h3 class="text-lg font-bold bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent">
+                        Invocation
+                    </h3>
+                </div>
+
+                <p class="text-sm text-base-content/70">
+                    Invoquez de nouveaux Pokémon avec vos balls
+                </p>
+
+                <Button
+                    @click="goToInvocation"
+                    variant="secondary"
+                    size="md"
+                    class="w-full max-w-xs !bg-gradient-to-r !from-accent/10 !to-accent/20 !border-accent/30 !text-accent hover:!from-accent/20 hover:!to-accent/30"
+                >
+                    ⚡ Invoquer
+                </Button>
+            </div>
+
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
+                <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
                         <span class="text-lg">🏪</span>
                     </div>
@@ -59,19 +88,9 @@ const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToL
                     @click="onGoToMarketplace"
                     variant="secondary"
                     size="md"
-                    class="w-full max-w-xs"
+                    class="w-full max-w-xs !bg-gradient-to-r !from-warning/10 !to-warning/20 !border-warning/30 !text-warning hover:!from-warning/20 hover:!to-warning/30"
                 >
-                    🏪 Accéder au marketplace
-                </Button>
-                
-                <Button
-                    v-if="onGoToLeaderboard"
-                    @click="onGoToLeaderboard"
-                    variant="secondary"
-                    size="md"
-                    class="w-full max-w-xs mt-2"
-                >
-                    🏆 Classement
+                    🏪 Marketplace
                 </Button>
             </div>
 
@@ -91,12 +110,11 @@ const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToL
 
                 <Button
                     variant="secondary"
-                    icon="collection"
                     size="md"
                     @click="onOpenPokedexModal"
-                    class="w-full max-w-xs"
+                    class="w-full max-w-xs !bg-gradient-to-r !from-secondary/10 !to-accent/20 !border-secondary/30 !text-secondary hover:!from-secondary/20 hover:!to-accent/30"
                 >
-                    Voir tous mes Pokémon
+                    📚 Voir mes Pokémon
                 </Button>
             </div>
         </div>
