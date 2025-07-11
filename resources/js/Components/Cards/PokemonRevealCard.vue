@@ -105,7 +105,6 @@ onMounted(() => {
             isRevealed ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         ]"
     >
-        <!-- Particules spéciales pour les Pokémon rares -->
         <div
             v-if="showSpecialEffects && isSpecial"
             class="absolute inset-0 pointer-events-none z-10"
@@ -126,7 +125,6 @@ onMounted(() => {
             />
         </div>
 
-        <!-- Auréole pour les légendaires -->
         <div
             v-if="pokemon.rarity === 'legendary'"
             class="absolute -inset-2 rounded-xl opacity-30"
@@ -134,7 +132,6 @@ onMounted(() => {
             style="filter: blur(4px);"
         />
 
-        <!-- Carte principale -->
         <div
             :class="[
                 'relative bg-gradient-to-br backdrop-blur-sm rounded-xl border-2 p-4 transition-all duration-300 hover:scale-105',
@@ -143,12 +140,10 @@ onMounted(() => {
                 isSpecial ? 'shadow-xl ' + cardConfig.shadowColor : 'shadow-lg shadow-base-300/20'
             ]"
         >
-            <!-- Badge spécial en haut à droite -->
             <div class="absolute top-2 right-2 text-2xl z-10">
                 {{ cardConfig.effectEmoji }}
             </div>
 
-            <!-- Image du Pokémon -->
             <div class="relative mb-3">
                 <div
                     :class="[
@@ -166,7 +161,6 @@ onMounted(() => {
                     />
                 </div>
 
-                <!-- Effet brillant pour les Shiny -->
                 <div
                     v-if="pokemon.is_shiny"
                     class="absolute inset-0 rounded-full opacity-20"
@@ -174,7 +168,6 @@ onMounted(() => {
                 />
             </div>
 
-            <!-- Nom du Pokémon -->
             <h3
                 :class="[
                     'text-lg font-bold text-center mb-1 transition-colors duration-300',
@@ -185,19 +178,16 @@ onMounted(() => {
                 <span v-if="pokemon.is_shiny" class="text-yellow-400 ml-1">✨</span>
             </h3>
 
-            <!-- Niveau et ID -->
             <div class="text-center mb-2">
                 <div class="text-xs text-base-content/70">
                     #{{ pokemon.pokedex_id }} • Niveau {{ pokemon.level || 1 }}
                 </div>
             </div>
 
-            <!-- Badge de rareté -->
             <div class="flex justify-center mb-2">
                 <RarityBadge :rarity="pokemon.rarity" size="xs" />
             </div>
 
-            <!-- Types -->
             <div class="flex flex-wrap gap-1 justify-center mb-3">
                 <PokemonTypeBadge
                     v-for="type in pokemon.types"
@@ -207,7 +197,6 @@ onMounted(() => {
                 />
             </div>
 
-            <!-- Statistiques -->
             <div class="grid grid-cols-2 gap-1 text-xs">
                 <div class="bg-base-100/30 rounded-lg p-1.5 text-center">
                     <div class="font-semibold text-error">{{ pokemon.hp }}</div>
@@ -227,7 +216,6 @@ onMounted(() => {
                 </div>
             </div>
 
-            <!-- Message spécial pour les Pokémon rares -->
             <div
                 v-if="isSpecial"
                 class="mt-3 text-center"
