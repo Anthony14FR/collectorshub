@@ -52,25 +52,21 @@ const maxWidthClasses = {
                     'relative w-full max-h-[90vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col',
                     maxWidthClasses[maxWidth]
                 ]">
+                    <button
+                        @click="close"
+                        :class="[
+                            'absolute top-4 right-4 z-20 rounded-xl bg-base-200/50 hover:bg-base-200 transition-colors duration-200 flex items-center justify-center font-bold hover:text-error',
+                            'w-10 h-10 text-2xl'
+                        ]"
+                    >
+                        ×
+                    </button>
 
-                    <div :class="[
-                        'bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-primary/20 flex items-center justify-between flex-shrink-0',
+                    <div v-if="$slots.header" :class="[
+                        'bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-primary/20 flex-shrink-0',
                         maxWidth === 'xs' ? 'px-3 py-2' : 'px-8 py-6'
                     ]">
-                        <div class="flex-1">
-                            <slot name="header">
-                                <h3 :class="maxWidth === 'xs' ? 'text-sm font-bold' : 'text-xl font-bold tracking-wider'">Modal Title</h3>
-                            </slot>
-                        </div>
-                        <button
-                            @click="close"
-                            :class="[
-                                'rounded-xl bg-base-200/50 hover:bg-base-200 transition-colors duration-200 flex items-center justify-center font-bold hover:text-error',
-                                maxWidth === 'xs' ? 'w-6 h-6 text-lg' : 'w-10 h-10 text-2xl'
-                            ]"
-                        >
-                            ×
-                        </button>
+                        <slot name="header" />
                     </div>
 
                     <div :class="['flex-1 overflow-y-auto', maxWidth === 'xs' ? 'p-3' : 'p-6']">

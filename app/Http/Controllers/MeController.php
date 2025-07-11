@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pokemon;
 use App\Services\LeaderboardService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -21,10 +22,12 @@ class MeController extends Controller
         $pokedex = $user->pokedex()->with('pokemon')->get();
         $inventory = $user->inventory()->with('item')->get();
         $leaderboards = $this->leaderboardService->getAllLeaderboards($user, 100);
+        $allPokemons = Pokemon::all();
 
         return Inertia::render('Me', [
             'user' => $user,
             'pokedex' => $pokedex,
+            'all_pokemons' => $allPokemons,
             'inventory' => $inventory,
             'leaderboards' => $leaderboards,
         ]);
