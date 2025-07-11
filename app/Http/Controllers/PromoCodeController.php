@@ -17,7 +17,7 @@ class PromoCodeController extends Controller
     {
         $promoCodes = PromoCode::with(['items', 'users'])->get();
         return Inertia::render('PromoCodes/Index', [
-            'promoCodes' => $promoCodes
+            'promoCodes' => $promoCodes,
         ]);
     }
 
@@ -92,13 +92,21 @@ class PromoCodeController extends Controller
                 ->first();
 
             if (!$promoCode) {
-                return response()->json(['message' => 'Invalid or expired promo code'], 404);
+                return redirect()->route('promocodes.index')->with('flash', [
+                    'type' => 'error',
+                    'title' => 'Code Invalide',
+                    'message' => 'Ce code promotionnel est invalide ou a expiré.'
+                ]);
             }
 
             if (!$promoCode->is_global) {
                 $canUse = $promoCode->users()->where('users.id', $userId)->exists();
                 if (!$canUse) {
-                    return response()->json(['message' => 'This code is not available for your account'], 403);
+                    return redirect()->route('promocodes.index')->with('flash', [
+                        'type' => 'error',
+                        'title' => 'Accès Refusé',
+                        'message' => 'Ce code n\'est pas disponible pour votre compte.'
+                    ]);
                 }
             }
 
@@ -108,17 +116,27 @@ class PromoCodeController extends Controller
                 ->first();
 
             if ($usageRecord) {
-                return response()->json(['message' => 'You have already used this code'], 400);
+                return redirect()->route('promocodes.index')->with('flash', [
+                    'type' => 'error',
+                    'title' => 'Code Déjà Utilisé',
+                    'message' => 'Vous avez déjà utilisé ce code promotionnel.'
+                ]);
             }
 
             $rewards = $this->processRewards($promoCode, $userId);
 
-            return response()->json([
-                'message' => 'Promo code successfully used',
+            return redirect()->route('promocodes.index')->with('flash', [
+                'type' => 'success',
+                'title' => 'Félicitations !',
+                'message' => 'Vos récompenses ont été ajoutées à votre compte.',
                 'rewards' => $rewards
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error using promo code', 'error' => $e->getMessage()], 500);
+            return redirect()->route('promocodes.index')->with('flash', [
+                'type' => 'error',
+                'title' => 'Erreur Serveur',
+                'message' => 'Une erreur inattendue est survenue.'
+            ]);
         }
     }
 
@@ -137,8 +155,16 @@ class PromoCodeController extends Controller
 
         foreach ($promoCode->items as $item) {
             $quantity = $item->pivot->quantity;
+            
             $rewards['items'][] = [
+                'id' => $item->id,
                 'name' => $item->name,
+                'description' => $item->description,
+                'type' => $item->type,
+                'rarity' => $item->rarity,
+                'image_url' => $item->image_url,
+                'effect' => $item->effect,
+                'price' => $item->price,
                 'quantity' => $quantity
             ];
 
