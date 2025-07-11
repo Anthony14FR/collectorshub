@@ -29,7 +29,7 @@ const formatPrice = (price: number) => {
             SAC
         </Button>
 
-        <Modal :show="isModalOpen" @close="isModalOpen = false">
+        <Modal :show="isModalOpen" @close="isModalOpen = false" max-width="4xl">
             <template #header>
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-gradient-to-br from-success/20 to-primary/20 rounded-lg flex items-center justify-center">
@@ -76,7 +76,7 @@ const formatPrice = (price: number) => {
                         <span class="text-lg">📦</span>
                         Objets
                     </h5>
-                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
                         <div
                             v-for="item in inventory"
                             :key="item.id"
