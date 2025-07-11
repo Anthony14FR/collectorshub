@@ -26,6 +26,10 @@ const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToL
 const goToInvocation = () => {
     router.visit('/opening');
 };
+
+const goToShop = () => {
+    router.visit('/shop');
+};
 </script>
 
 <template>
@@ -40,73 +44,86 @@ const goToInvocation = () => {
 
         <SideSection position="left" :top="true">
             <GameInventory :inventory="inventory" :cash="user.cash" />
+            <Button
+                variant="outline"
+                size="sm"
+                class="w-full mt-2"
+                @click="goToShop"
+            >
+                🛍️ Boutique
+            </Button>
         </SideSection>
 
-        <SideSection position="left" :top="false">
-            <div class="grid grid-cols-1 gap-3">
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden flex flex-col justify-center items-center p-4">
-                    <div class="text-center mb-3">
-                        <div class="w-12 h-12 bg-gradient-to-br from-accent/20 to-accent/40 rounded-full flex items-center justify-center mb-2 mx-auto">
-                            <span class="text-xl">⚡</span>
-                        </div>
-                        <h3 class="text-base font-bold bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent mb-1">
+        <SideSection position="left" :top="false" class="top-34">
+            <div class="grid grid-cols-1 gap-3 ">
+                <div
+                    class="relative h-40 overflow-hidden rounded-xl bg-base-100/60 p-4 flex flex-col justify-end"
+                    style="background-image: url('/images/background/invocation.png'); background-size: cover; background-position: center;"
+                >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                    <div class="relative z-10">
+                        <h3 class="mb-1 text-lg font-bold text-white flex items-center">
+                            <img src="/images/items/pokeball.png" alt="pokeball" class="w-6 h-6 mr-2">
                             Invocation
                         </h3>
-                        <p class="text-xs text-base-content/70">Invoquez de nouveaux Pokémon</p>
+                        <p class="mb-3 text-xs text-white/80">
+                            Invoquez de nouveaux Pokémon
+                        </p>
+                        <Button
+                            @click="goToInvocation"
+                            variant="invocation"
+                            size="sm"
+                            class="w-full"
+                        >
+                            Invoquer maintenant
+                        </Button>
                     </div>
-
-                    <Button
-                        @click="goToInvocation"
-                        variant="secondary"
-                        size="sm"
-                        class="w-full !bg-gradient-to-r !from-accent/10 !to-accent/20 !border-accent/30 !text-accent hover:!from-accent/20 hover:!to-accent/30"
-                    >
-                        ⚡ Invoquer
-                    </Button>
                 </div>
 
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden flex flex-col justify-center items-center p-4">
-                    <div class="text-center mb-3">
-                        <div class="w-12 h-12 bg-gradient-to-br from-warning/20 to-warning/40 rounded-full flex items-center justify-center mb-2 mx-auto">
-                            <span class="text-xl">🏪</span>
-                        </div>
-                        <h3 class="text-base font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1">
+                <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm">
+                    <div>
+                        <h3 class="mb-1 bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-base font-bold text-transparent">
                             Marketplace
                         </h3>
-                        <p class="text-xs text-base-content/70">Achetez et vendez</p>
+                        <p class="text-xs text-base-content/70">
+                            Achetez et vendez
+                        </p>
                     </div>
-
                     <Button
                         v-if="onGoToMarketplace"
                         @click="onGoToMarketplace"
-                        variant="secondary"
+                        variant="marketplace"
                         size="sm"
-                        class="w-full !bg-gradient-to-r !from-warning/10 !to-warning/20 !border-warning/30 !text-warning hover:!from-warning/20 hover:!to-warning/30"
                     >
-                        🏪 Marketplace
+                        <span class="text-xl">🏪</span>
                     </Button>
                 </div>
 
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden flex flex-col justify-center items-center p-4">
-                    <div class="text-center mb-3">
-                        <div class="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/40 rounded-full flex items-center justify-center mb-2 mx-auto">
-                            <span class="text-xl">🏆</span>
+                <div class="rounded-xl bg-gradient-to-r from-primary/20 to-primary/40" style="background-image: url('/images/background/leaderboard.jpg'); background-size: cover; background-position: center;">
+                    <div class="flex h-full flex-col rounded-[11px] bg-base-100/80 p-4">
+                        <div class="flex-grow">
+                            <div class="flex items-center">
+                                <span class="text-4xl">🏆</span>
+                                <div class="ml-3">
+                                    <h3 class="mb-1 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-base font-bold text-transparent">
+                                        Classement
+                                    </h3>
+                                    <p class="text-xs text-base-content/70">
+                                        Top 100 dresseurs
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-base font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-1">
-                            Classement
-                        </h3>
-                        <p class="text-xs text-base-content/70">Top 100 dresseurs</p>
+                        <Button
+                            v-if="onGoToLeaderboard"
+                            @click="onGoToLeaderboard"
+                            variant="leaderboard"
+                            size="sm"
+                            class="mt-3"
+                        >
+                            Voir le classement
+                        </Button>
                     </div>
-
-                    <Button
-                        v-if="onGoToLeaderboard"
-                        @click="onGoToLeaderboard"
-                        variant="secondary"
-                        size="sm"
-                        class="w-full !bg-gradient-to-r !from-primary/10 !to-primary/20 !border-primary/30 !text-primary hover:!from-primary/20 hover:!to-primary/30"
-                    >
-                        🏆 Classement
-                    </Button>
                 </div>
             </div>
         </SideSection>
