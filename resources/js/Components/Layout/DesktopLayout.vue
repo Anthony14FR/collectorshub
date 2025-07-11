@@ -10,7 +10,6 @@ import { router } from '@inertiajs/vue3';
 
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
-import type { Marketplace } from '@/types/marketplace';
 import type { Pokedex } from '@/types/pokedex';
 
 interface Props {
