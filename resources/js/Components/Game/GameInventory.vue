@@ -20,7 +20,7 @@ const formatPrice = (price: number) => {
 <template>
     <div class="relative">
         <Button
-            variant="primary"
+            variant="secondary"
             icon="collection"
             size="md"
             @click="isModalOpen = true"

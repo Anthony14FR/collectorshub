@@ -7,6 +7,7 @@ import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import LeaderboardSection from '@/Components/Game/LeaderboardSection.vue';
 import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
+import TeamManagementModal from '@/Components/Game/TeamManagementModal.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
@@ -27,6 +28,7 @@ interface Props extends PageProps {
 const { auth, inventory = [], pokedex = [], all_pokemons = [], leaderboards } = defineProps<Props>();
 const pokedexModalOpen = ref(false);
 const leaderboardModalOpen = ref(false);
+const teamManagementModalOpen = ref(false);
 
 const goToMarketplace = () => {
     router.visit('/marketplace');
@@ -35,6 +37,10 @@ const goToMarketplace = () => {
 const openLeaderboardModal = () => {
     leaderboardModalOpen.value = true;
 };
+
+const openTeamManagementModal = () => {
+    teamManagementModalOpen.value = true;
+}
 </script>
 
 <template>
@@ -52,6 +58,7 @@ const openLeaderboardModal = () => {
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
                 :onGoToMarketplace="goToMarketplace"
                 :onGoToLeaderboard="openLeaderboardModal"
+                :onOpenTeamManagementModal="openTeamManagementModal"
             />
 
             <DesktopLayout
@@ -61,6 +68,7 @@ const openLeaderboardModal = () => {
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
                 :onGoToMarketplace="goToMarketplace"
                 :onGoToLeaderboard="openLeaderboardModal"
+                :onOpenTeamManagementModal="openTeamManagementModal"
             />
         </div>
 
@@ -69,6 +77,12 @@ const openLeaderboardModal = () => {
             :user-pokedex="pokedex" 
             :all-pokemons="all_pokemons" 
             :on-close="() => pokedexModalOpen = false" 
+        />
+
+        <TeamManagementModal 
+            :show="teamManagementModalOpen"
+            :user-pokemons="pokedex"
+            :on-close="() => teamManagementModalOpen = false"
         />
 
         <Modal :show="leaderboardModalOpen" @close="leaderboardModalOpen = false" max-width="4xl">

@@ -10,6 +10,9 @@ export type Pokedex = {
     hp_left?: number;
     is_in_team: boolean;
     is_favorite: boolean;
+    team_position?: number | null;
     obtained_at: string;
+    created_at: string;
+    updated_at: string;
     pokemon: Pokemon;
 }
