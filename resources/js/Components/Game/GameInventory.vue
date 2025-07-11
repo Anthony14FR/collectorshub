@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Modal from '@/Components/UI/Modal.vue';
 import Button from '@/Components/UI/Button.vue';
 import type { Inventory } from '@/types/inventory';
@@ -11,6 +11,11 @@ interface Props {
 
 const { inventory = [], cash = 0 } = defineProps<Props>();
 const isModalOpen = ref(false);
+
+// Filtrer les avatars de l'inventaire
+const filteredInventory = computed(() => {
+    return inventory.filter(item => item.item.type !== 'avatar');
+});
 
 const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR').format(price) + ' ₽';
@@ -40,7 +45,7 @@ const formatPrice = (price: number) => {
                             Mon Inventaire
                         </h3>
                         <div class="mt-1">
-                            <span class="text-sm font-semibold text-success">{{ inventory.length }} objets</span>
+                            <span class="text-sm font-semibold text-success">{{ filteredInventory.length }} objets</span>
                         </div>
                     </div>
                 </div>
@@ -63,7 +68,7 @@ const formatPrice = (price: number) => {
                     </div>
                 </div>
 
-                <div v-if="inventory.length === 0" class="text-center py-8">
+                <div v-if="filteredInventory.length === 0" class="text-center py-8">
                     <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-base-200/50 to-base-300/50 rounded-full flex items-center justify-center">
                         <span class="text-2xl opacity-50">🎒</span>
                     </div>
@@ -78,7 +83,7 @@ const formatPrice = (price: number) => {
                     </h5>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
                         <div
-                            v-for="item in inventory"
+                            v-for="item in filteredInventory"
                             :key="item.id"
                             class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-3 border border-success/30 hover:border-success/50 shadow-lg shadow-success/10 hover:shadow-xl hover:shadow-success/20 transition-all duration-300 hover:scale-105 cursor-pointer"
                         >
