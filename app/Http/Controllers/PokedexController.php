@@ -26,60 +26,46 @@ class PokedexController extends Controller
 
     public function addToTeam(Request $request, $id)
     {
-        $userId = $request->user()->id;
+        $request->validate([
+            'position' => 'required|integer|min:1|max:6',
+        ]);
+
+        $userId = Auth::id();
 
         $teamCount = Pokedex::where('user_id', $userId)
             ->where('is_in_team', true)
             ->count();
 
         if ($teamCount >= 6) {
-            return response()->json(['error' => 'You can only have up to 6 Pokémon in your team.'], 400);
+            return back()->withErrors(['message' => 'Vous ne pouvez avoir que 6 Pokémon dans votre équipe.']);
         }
 
         $pokemon = Pokedex::where('user_id', $userId)
             ->where('id', $id)
-            ->first();
+            ->firstOrFail();
 
-        if (!$pokemon) {
-            return response()->json(['error' => 'Pokemon not found in your collection.'], 404);
-        }
-
-        $pokemon->update(['is_in_team' => true]);
-
-        return Inertia::render('Pokedex/Team', [
-            'message' => 'Pokemon added to your team.',
-            'pokemon' => $pokemon
+        $pokemon->update([
+            'is_in_team' => true,
+            'team_position' => $request->position,
         ]);
+
+        return redirect()->back()->with('success', 'Pokémon ajouté à l\'équipe !');
     }
 
     public function removeFromTeam(Request $request, $id)
     {
-        $userId = $request->user()->id;
+        $userId = Auth::id();
+        
         $pokemon = Pokedex::where('user_id', $userId)
             ->where('id', $id)
-            ->first();
-
-        if (!$pokemon) {
-            return response()->json(['error' => 'Pokemon not found in your collection.'], 404);
-        }
-
-        if (!$pokemon->is_in_team) {
-            return response()->json(['error' => 'Pokemon is not in your team.'], 400);
-        }
-
-        $teamCount = Pokedex::where('user_id', $userId)
             ->where('is_in_team', true)
-            ->count();
+            ->firstOrFail();
 
-        if ($teamCount <= 1) {
-            return response()->json(['error' => 'You cannot have an empty team.'], 400);
-        }
-
-        $pokemon->update(['is_in_team' => false]);
-
-        return Inertia::render('Pokedex/Team', [
-            'message' => 'Pokemon removed from your team.',
-            'pokemon' => $pokemon
+        $pokemon->update([
+            'is_in_team' => false,
+            'team_position' => null,
         ]);
+
+        return redirect()->back()->with('success', 'Pokémon retiré de l\'équipe.');
     }
 }

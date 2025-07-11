@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { User } from '@/types/user';
+import Button from '@/Components/UI/Button.vue';
 
 interface Props {
     user: User;
     trainerImageId?: number;
+    onOpenPokedexModal?: () => void;
 }
 
-const { user, trainerImageId = 2 } = defineProps<Props>();
+const { user, trainerImageId = 2, onOpenPokedexModal } = defineProps<Props>();
 </script>
 
 <template>
@@ -29,6 +31,15 @@ const { user, trainerImageId = 2 } = defineProps<Props>();
                 {{ user.username }}
             </h2>
             <div class="text-lg text-base-content/70">Maître Dresseur</div>
+             <Button
+                v-if="onOpenPokedexModal"
+                @click="onOpenPokedexModal"
+                variant="secondary"
+                size="sm"
+                class="mt-4"
+            >
+                🛡️ Gérer l'équipe
+            </Button>
         </div>
     </div>
 </template>

@@ -19,9 +19,10 @@ interface Props {
     onOpenPokedexModal: () => void;
     onGoToMarketplace?: () => void;
     onGoToLeaderboard?: () => void;
+    onOpenTeamManagementModal?: () => void;
 }
 
-const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToLeaderboard } = defineProps<Props>();
+const { user, inventory, pokedex, onOpenPokedexModal, onGoToMarketplace, onGoToLeaderboard, onOpenTeamManagementModal } = defineProps<Props>();
 
 const goToInvocation = () => {
     router.visit('/opening');
@@ -39,7 +40,7 @@ const goToShop = () => {
         </div>
 
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-            <TrainerProfile :user="user" :trainer-image-id="2" />
+            <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" />
         </div>
 
         <SideSection position="left" :top="true">
