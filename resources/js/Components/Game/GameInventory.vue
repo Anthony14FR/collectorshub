@@ -12,7 +12,6 @@ interface Props {
 const { inventory = [], cash = 0 } = defineProps<Props>();
 const isModalOpen = ref(false);
 
-// Filtrer les avatars de l'inventaire
 const filteredInventory = computed(() => {
     return inventory.filter(item => item.item.type !== 'avatar');
 });
