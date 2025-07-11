@@ -27,7 +27,7 @@ class MeController extends Controller
         return Inertia::render('Me', [
             'user' => $user,
             'pokedex' => $pokedex,
-            'all_pokemons' => $all_pokemons,
+            'all_pokemons' => $allPokemons,
             'inventory' => $inventory,
             'leaderboards' => $leaderboards,
         ]);
