@@ -1,87 +1,87 @@
 <script setup lang="ts">
 
 interface Props {
-    show: boolean;
-    maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
-    fixedHeight?: boolean;
+  show: boolean;
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
+  fixedHeight?: boolean;
 }
 
 const { maxWidth = 'md', fixedHeight = false } = defineProps<Props>();
 const emit = defineEmits(['close']);
 
 const close = () => {
-    emit('close');
+  emit('close');
 };
 
 const maxWidthClasses = {
-    xs: 'max-w-xs',
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-    '2xl': 'max-w-2xl',
-    '3xl': 'max-w-3xl',
-    '4xl': 'max-w-4xl',
-    '5xl': 'max-w-5xl',
-    '6xl': 'max-w-6xl',
-    '7xl': 'max-w-7xl'
+  xs: 'max-w-xs',
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
+  '3xl': 'max-w-3xl',
+  '4xl': 'max-w-4xl',
+  '5xl': 'max-w-5xl',
+  '6xl': 'max-w-6xl',
+  '7xl': 'max-w-7xl'
 };
 </script>
 
 <template>
-    <Transition
+  <Transition
+    enter-active-class="transition ease-out duration-300"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition ease-in duration-200"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="close">
+
+      <div class="absolute inset-0 bg-base-100/80 backdrop-blur-md"></div>
+
+      <Transition
         enter-active-class="transition ease-out duration-300"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
         leave-active-class="transition ease-in duration-200"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-    >
-        <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="close">
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+      >
+        <div v-if="show" :class="[
+          'relative w-full bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col',
+          fixedHeight ? 'h-[600px]' : 'max-h-[90vh]',
+          maxWidthClasses[maxWidth]
+        ]">
+          <button
+            @click="close"
+            :class="[
+              'absolute top-4 right-4 z-20 rounded-xl bg-base-200/50 hover:bg-base-200 transition-colors duration-200 flex items-center justify-center font-bold hover:text-error',
+              'w-10 h-10 text-2xl'
+            ]"
+          >
+            ×
+          </button>
 
-            <div class="absolute inset-0 bg-base-100/80 backdrop-blur-md"></div>
+          <div v-if="$slots.header" :class="[
+            'bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-primary/20 flex-shrink-0',
+            maxWidth === 'xs' ? 'px-3 py-2' : 'px-8 py-6'
+          ]">
+            <slot name="header" />
+          </div>
 
-            <Transition
-                enter-active-class="transition ease-out duration-300"
-                enter-from-class="opacity-0 scale-95"
-                enter-to-class="opacity-100 scale-100"
-                leave-active-class="transition ease-in duration-200"
-                leave-from-class="opacity-100 scale-100"
-                leave-to-class="opacity-0 scale-95"
-            >
-                <div v-if="show" :class="[
-                    'relative w-full bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-primary/20 rounded-3xl shadow-2xl shadow-primary/20 overflow-hidden flex flex-col',
-                    fixedHeight ? 'h-[600px]' : 'max-h-[90vh]',
-                    maxWidthClasses[maxWidth]
-                ]">
-                    <button
-                        @click="close"
-                        :class="[
-                            'absolute top-4 right-4 z-20 rounded-xl bg-base-200/50 hover:bg-base-200 transition-colors duration-200 flex items-center justify-center font-bold hover:text-error',
-                            'w-10 h-10 text-2xl'
-                        ]"
-                    >
-                        ×
-                    </button>
+          <div :class="['flex-1 overflow-y-auto modal-content', maxWidth === 'xs' ? 'p-3' : 'p-6']">
+            <slot>Modal content goes here.</slot>
+          </div>
 
-                    <div v-if="$slots.header" :class="[
-                        'bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-primary/20 flex-shrink-0',
-                        maxWidth === 'xs' ? 'px-3 py-2' : 'px-8 py-6'
-                    ]">
-                        <slot name="header" />
-                    </div>
-
-                    <div :class="['flex-1 overflow-y-auto modal-content', maxWidth === 'xs' ? 'p-3' : 'p-6']">
-                        <slot>Modal content goes here.</slot>
-                    </div>
-
-                    <div class="absolute top-6 right-16 w-6 h-6 border-2 border-success/20 rounded-full animate-pulse pointer-events-none"></div>
-                    <div class="absolute bottom-6 left-6 w-4 h-4 border-2 border-primary/30 rounded-full animate-pulse delay-500 pointer-events-none"></div>
-                    <div class="absolute top-12 left-12 w-2 h-2 bg-accent/40 rounded-full blur-sm animate-pulse opacity-60 delay-1000 pointer-events-none"></div>
-                </div>
-            </Transition>
+          <div class="absolute top-6 right-16 w-6 h-6 border-2 border-success/20 rounded-full animate-pulse pointer-events-none"></div>
+          <div class="absolute bottom-6 left-6 w-4 h-4 border-2 border-primary/30 rounded-full animate-pulse delay-500 pointer-events-none"></div>
+          <div class="absolute top-12 left-12 w-2 h-2 bg-accent/40 rounded-full blur-sm animate-pulse opacity-60 delay-1000 pointer-events-none"></div>
         </div>
-    </Transition>
+      </Transition>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>

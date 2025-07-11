@@ -16,13 +16,13 @@ import type { Pokemon } from '@/types/pokemon';
 import type { Leaderboards } from '@/types/leaderboard';
 
 interface Props extends PageProps {
-    auth: {
-        user: User;
-    };
-    inventory?: Inventory[];
-    pokedex?: Pokedex[];
-    all_pokemons?: Pokemon[];
-    leaderboards?: Leaderboards;
+  auth: {
+    user: User;
+  };
+  inventory?: Inventory[];
+  pokedex?: Pokedex[];
+  all_pokemons?: Pokemon[];
+  leaderboards?: Leaderboards;
 }
 
 const { auth, inventory = [], pokedex = [], all_pokemons = [], leaderboards } = defineProps<Props>();
@@ -31,81 +31,81 @@ const leaderboardModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 
 const goToMarketplace = () => {
-    router.visit('/marketplace');
+  router.visit('/marketplace');
 };
 
 const openLeaderboardModal = () => {
-    leaderboardModalOpen.value = true;
+  leaderboardModalOpen.value = true;
 };
 
 const openTeamManagementModal = () => {
-    teamManagementModalOpen.value = true;
+  teamManagementModalOpen.value = true;
 }
 </script>
 
 <template>
-    <Head title="Mon Profil" />
+  <Head title="Mon Profil" />
 
-    <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
 
-        <BackgroundEffects />
+    <BackgroundEffects />
 
-        <div class="relative z-10 h-screen w-screen overflow-y-auto lg:overflow-hidden">
-            <MobileLayout
-                :user="auth.user"
-                :inventory="inventory"
-                :pokedex="pokedex"
-                :onOpenPokedexModal="() => pokedexModalOpen = true"
-                :onGoToMarketplace="goToMarketplace"
-                :onGoToLeaderboard="openLeaderboardModal"
-                :onOpenTeamManagementModal="openTeamManagementModal"
-            />
+    <div class="relative z-10 h-screen w-screen overflow-y-auto lg:overflow-hidden">
+      <MobileLayout
+        :user="auth.user"
+        :inventory="inventory"
+        :pokedex="pokedex"
+        :onOpenPokedexModal="() => pokedexModalOpen = true"
+        :onGoToMarketplace="goToMarketplace"
+        :onGoToLeaderboard="openLeaderboardModal"
+        :onOpenTeamManagementModal="openTeamManagementModal"
+      />
 
-            <DesktopLayout
-                :user="auth.user"
-                :inventory="inventory"
-                :pokedex="pokedex"
-                :onOpenPokedexModal="() => pokedexModalOpen = true"
-                :onGoToMarketplace="goToMarketplace"
-                :onGoToLeaderboard="openLeaderboardModal"
-                :onOpenTeamManagementModal="openTeamManagementModal"
-            />
-        </div>
-
-        <PokedexModal 
-            :show="pokedexModalOpen" 
-            :user-pokedex="pokedex" 
-            :all-pokemons="all_pokemons" 
-            :on-close="() => pokedexModalOpen = false" 
-        />
-
-        <TeamManagementModal 
-            :show="teamManagementModalOpen"
-            :user-pokemons="pokedex"
-            :on-close="() => teamManagementModalOpen = false"
-        />
-
-        <Modal :show="leaderboardModalOpen" @close="leaderboardModalOpen = false" max-width="4xl">
-            <template #header>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-                        <span class="text-lg">🏆</span>
-                    </div>
-                    <div class="flex flex-col">
-                        <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
-                            Classements
-                        </h3>
-                        <div class="mt-1">
-                            <span class="text-sm font-semibold text-warning">Top 100 des dresseurs</span>
-                        </div>
-                    </div>
-                </div>
-            </template>
-            <template #default>
-                <LeaderboardSection v-if="leaderboards" :leaderboards="leaderboards" />
-            </template>
-        </Modal>
+      <DesktopLayout
+        :user="auth.user"
+        :inventory="inventory"
+        :pokedex="pokedex"
+        :onOpenPokedexModal="() => pokedexModalOpen = true"
+        :onGoToMarketplace="goToMarketplace"
+        :onGoToLeaderboard="openLeaderboardModal"
+        :onOpenTeamManagementModal="openTeamManagementModal"
+      />
     </div>
+
+    <PokedexModal 
+      :show="pokedexModalOpen" 
+      :user-pokedex="pokedex" 
+      :all-pokemons="all_pokemons" 
+      :on-close="() => pokedexModalOpen = false" 
+    />
+
+    <TeamManagementModal 
+      :show="teamManagementModalOpen"
+      :user-pokemons="pokedex"
+      :on-close="() => teamManagementModalOpen = false"
+    />
+
+    <Modal :show="leaderboardModalOpen" @close="leaderboardModalOpen = false" max-width="4xl">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
+            <span class="text-lg">🏆</span>
+          </div>
+          <div class="flex flex-col">
+            <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
+              Classements
+            </h3>
+            <div class="mt-1">
+              <span class="text-sm font-semibold text-warning">Top 100 des dresseurs</span>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #default>
+        <LeaderboardSection v-if="leaderboards" :leaderboards="leaderboards" />
+      </template>
+    </Modal>
+  </div>
 </template>
 
 <style>
