@@ -44,16 +44,18 @@ const filteredItems = computed(() => {
     return props.items.filter((item) => item.type === selectedTypeFilter.value);
 });
 
-const avatars = computed(() =>
-    props.items
+const avatars = computed(() => {
+    return props.items
         .filter((item) => item.type === "avatar")
         .sort((a, b) => {
-        // extrait le numéro de l'image
-        const numA = parseInt(a.image.match(/([0-9]+)\.png$/)?.[1] || '0', 10);
-        const numB = parseInt(b.image.match(/([0-9]+)\.png$/)?.[1] || '0', 10);
-        return numA - numB;
-        })
-);
+            const baseA = a.image.split("/").pop().split(".")[0];
+            const baseB = b.image.split("/").pop().split(".")[0];
+            const numA = Number(baseA);
+            const numB = Number(baseB);
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+            return 0;
+        });
+});
 
 const balls = computed(() =>
     props.items.filter((item) => item.type === "ball")
@@ -129,55 +131,88 @@ const getRarityColor = (rarity) => {
 <template>
     <Head title="Boutique" />
 
-    <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+    <div
+        class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative"
+    >
         <BackgroundEffects />
 
         <div class="relative z-10 h-screen w-screen overflow-hidden">
             <div class="flex justify-center pt-4 mb-4">
                 <div class="text-center">
-                    <h1 class="text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
+                    <h1
+                        class="text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider"
+                    >
                         BOUTIQUE
                     </h1>
-                    <p class="text-xs text-base-content/70 uppercase tracking-wider">
+                    <p
+                        class="text-xs text-base-content/70 uppercase tracking-wider"
+                    >
                         ITEMS & OBJETS SPÉCIAUX
                     </p>
                 </div>
             </div>
 
             <div class="absolute left-8 top-20 w-64">
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-                    <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                <div
+                    class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4"
+                >
+                    <div
+                        class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20"
+                    >
                         <h3 class="text-sm font-bold tracking-wider">
                             NAVIGATION
                         </h3>
                     </div>
                     <div class="p-3">
                         <Link href="/me">
-                            <Button variant="secondary" size="sm" class="w-full mb-2">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                class="w-full mb-2"
+                            >
                                 Retour au profil
                             </Button>
                         </Link>
-                        <Button @click="showInventoryModal = true" variant="outline" size="sm" class="w-full">
+                        <Button
+                            @click="showInventoryModal = true"
+                            variant="outline"
+                            size="sm"
+                            class="w-full"
+                        >
                             Mon inventaire
                         </Button>
                     </div>
                 </div>
 
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-                    <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
+                <div
+                    class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden"
+                >
+                    <div
+                        class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20"
+                    >
                         <h3 class="text-sm font-bold tracking-wider">
                             FILTRES
                         </h3>
                     </div>
                     <div class="p-3">
-                        <Select v-model="selectedTypeFilter" :options="typeOptions" label="Type d'item" variant="default" size="sm" />
+                        <Select
+                            v-model="selectedTypeFilter"
+                            :options="typeOptions"
+                            label="Type d'item"
+                            variant="default"
+                            size="sm"
+                        />
                     </div>
                 </div>
             </div>
 
             <div class="absolute right-8 top-20 w-64">
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-                    <div class="bg-gradient-to-r from-success/10 to-success/5 px-3 py-2 border-b border-success/20">
+                <div
+                    class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden"
+                >
+                    <div
+                        class="bg-gradient-to-r from-success/10 to-success/5 px-3 py-2 border-b border-success/20"
+                    >
                         <h4 class="text-xs font-bold tracking-wider">
                             PORTE-MONNAIE
                         </h4>
@@ -193,16 +228,25 @@ const getRarityColor = (rarity) => {
                 </div>
             </div>
 
-            <div class="absolute top-32 left-1/2 -translate-x-1/2 w-[800px] max-h-[600px]">
+            <div
+                class="absolute top-32 left-1/2 -translate-x-1/2 w-[800px] max-h-[600px]"
+            >
                 <div v-if="$page.props.flash?.success" class="mb-4">
-                    <Alert type="success" :message="$page.props.flash.success" />
+                    <Alert
+                        type="success"
+                        :message="$page.props.flash.success"
+                    />
                 </div>
                 <div v-if="$page.props.errors?.message" class="mb-4">
                     <Alert type="error" :message="$page.props.errors.message" />
                 </div>
 
-                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
-                    <div class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20 flex gap-4">
+                <div
+                    class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col"
+                >
+                    <div
+                        class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20 flex gap-4"
+                    >
                         <button
                             @click="activeTab = 'items'"
                             :class="
@@ -237,98 +281,174 @@ const getRarityColor = (rarity) => {
 
                     <div class="flex-1 overflow-y-auto p-4">
                         <div v-if="activeTab === 'items'">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div v-for="item in nonAvatarNonBallItems" :key="item.id" class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group">
+                            <div
+                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                            >
+                                <div
+                                    v-for="item in nonAvatarNonBallItems"
+                                    :key="item.id"
+                                    class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group"
+                                >
                                     <div class="flex items-start gap-3 mb-3">
-                                        <div class="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1">
-                                            <img :src="getItemImage(item)" :alt="item.name" class="w-full h-full object-contain" />
+                                        <div
+                                            class="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1"
+                                        >
+                                            <img
+                                                :src="getItemImage(item)"
+                                                :alt="item.name"
+                                                class="w-full h-full object-contain"
+                                            />
                                         </div>
                                         <div class="flex-1">
                                             <h4 class="font-bold text-sm mb-1">
                                                 {{ item.name }}
                                             </h4>
-                                            <div class="flex items-center gap-2">
-                                                <span :class="getRarityColor(item.rarity)" class="text-xs font-semibold capitalize">
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
+                                                <span
+                                                    :class="
+                                                        getRarityColor(
+                                                            item.rarity
+                                                        )
+                                                    "
+                                                    class="text-xs font-semibold capitalize"
+                                                >
                                                     {{ item.rarity }}
                                                 </span>
-                                                <span class="text-xs text-base-content/50">
+                                                <span
+                                                    class="text-xs text-base-content/50"
+                                                >
                                                     {{ item.type }}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <p class="text-xs text-base-content/70 mb-3 line-clamp-2">
+                                    <p
+                                        class="text-xs text-base-content/70 mb-3 line-clamp-2"
+                                    >
                                         {{ item.description }}
                                     </p>
 
-                                    <div class="flex items-center justify-between mb-3">
-                                        <div class="text-xs text-base-content/60">
+                                    <div
+                                        class="flex items-center justify-between mb-3"
+                                    >
+                                        <div
+                                            class="text-xs text-base-content/60"
+                                        >
                                             Dans mon inventaire:
                                             <span class="font-semibold">
                                                 {{
-                                                    getInventoryQuantity(item.id)
+                                                    getInventoryQuantity(
+                                                        item.id
+                                                    )
                                                 }}
                                             </span>
                                         </div>
                                         <div class="flex items-center gap-1">
-                                            <span class="text-warning text-sm">₽</span>
-                                            <span class="font-bold text-warning">
-                                                {{
-                                                    formatPrice(item.price)
-                                                }}
+                                            <span class="text-warning text-sm"
+                                                >₽</span
+                                            >
+                                            <span
+                                                class="font-bold text-warning"
+                                            >
+                                                {{ formatPrice(item.price) }}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <Button @click="openBuyModal(item)" variant="primary" size="sm" class="w-full">
+                                    <Button
+                                        @click="openBuyModal(item)"
+                                        variant="primary"
+                                        size="sm"
+                                        class="w-full"
+                                    >
                                         Acheter
                                     </Button>
                                 </div>
                             </div>
                         </div>
                         <div v-else-if="activeTab === 'balls'">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div v-for="item in balls" :key="item.id" class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group">
+                            <div
+                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                            >
+                                <div
+                                    v-for="item in balls"
+                                    :key="item.id"
+                                    class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group"
+                                >
                                     <div class="flex items-start gap-3 mb-3">
-                                        <div class="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1">
-                                            <img :src="getItemImage(item)" :alt="item.name" class="w-full h-full object-contain" />
+                                        <div
+                                            class="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1"
+                                        >
+                                            <img
+                                                :src="getItemImage(item)"
+                                                :alt="item.name"
+                                                class="w-full h-full object-contain"
+                                            />
                                         </div>
                                         <div class="flex-1">
                                             <h4 class="font-bold text-sm mb-1">
                                                 {{ item.name }}
                                             </h4>
-                                            <div class="flex items-center gap-2">
-                                                <span :class="getRarityColor(item.rarity)" class="text-xs font-semibold capitalize">
+                                            <div
+                                                class="flex items-center gap-2"
+                                            >
+                                                <span
+                                                    :class="
+                                                        getRarityColor(
+                                                            item.rarity
+                                                        )
+                                                    "
+                                                    class="text-xs font-semibold capitalize"
+                                                >
                                                     {{ item.rarity }}
                                                 </span>
-                                                <span class="text-xs text-base-content/50">
+                                                <span
+                                                    class="text-xs text-base-content/50"
+                                                >
                                                     {{ item.type }}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <p class="text-xs text-base-content/70 mb-3 line-clamp-2">
+                                    <p
+                                        class="text-xs text-base-content/70 mb-3 line-clamp-2"
+                                    >
                                         {{ item.description }}
                                     </p>
 
-                                    <div class="flex items-center justify-between mb-3">
-                                        <div class="text-xs text-base-content/60">
+                                    <div
+                                        class="flex items-center justify-between mb-3"
+                                    >
+                                        <div
+                                            class="text-xs text-base-content/60"
+                                        >
                                             Dans mon inventaire:
-                                            <span class="font-semibold">{{getInventoryQuantity(item.id)}}</span>
+                                            <span class="font-semibold">{{
+                                                getInventoryQuantity(item.id)
+                                            }}</span>
                                         </div>
                                         <div class="flex items-center gap-1">
-                                            <span class="text-warning text-sm">₽</span>
-                                            <span class="font-bold text-warning">
-                                                {{
-                                                    formatPrice(item.price)
-                                                }}
+                                            <span class="text-warning text-sm"
+                                                >₽</span
+                                            >
+                                            <span
+                                                class="font-bold text-warning"
+                                            >
+                                                {{ formatPrice(item.price) }}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <Button @click="openBuyModal(item)" variant="primary" size="sm" class="w-full">
+                                    <Button
+                                        @click="openBuyModal(item)"
+                                        variant="primary"
+                                        size="sm"
+                                        class="w-full"
+                                    >
                                         Acheter
                                     </Button>
                                 </div>
@@ -336,10 +456,14 @@ const getRarityColor = (rarity) => {
                         </div>
                         <div v-else>
                             <div class="grid grid-cols-3 gap-6">
-                                <div v-for="avatar in avatars" :key="avatar.id" class="flex flex-col items-center bg-white/10 rounded-xl p-4 shadow">
+                                <div
+                                    v-for="avatar in avatars"
+                                    :key="avatar.id"
+                                    class="flex flex-col items-center bg-white/10 rounded-xl p-4 shadow"
+                                >
                                     <img
                                         :src="avatar.image"
-                                        :alt="avatar.name"
+                                        alt="avatar"
                                         class="w-16 h-16 rounded-full border-4 mb-2"
                                         :class="
                                             props.user.unlocked_avatars.includes(
@@ -349,14 +473,9 @@ const getRarityColor = (rarity) => {
                                                 : 'border-gray-400'
                                         "
                                     />
-                                    <span class="font-semibold mb-1">
-                                        {{
-                                            avatar.name
-                                        }}
-                                    </span>
-                                    <span class="text-sm text-gray-400 mb-2">
-                                        {{ avatar.price }} 💰
-                                    </span>
+                                    <span class="text-sm text-gray-400 mb-2"
+                                        >{{ avatar.price }} 💰</span
+                                    >
                                     <Button
                                         v-if="
                                             !props.user.unlocked_avatars.includes(
@@ -368,20 +487,31 @@ const getRarityColor = (rarity) => {
                                         @click="openBuyModal(avatar)"
                                         >Acheter</Button
                                     >
-                                    <span v-else class="text-green-500 font-bold">Débloqué</span>
+                                    <span
+                                        v-else
+                                        class="text-green-500 font-bold"
+                                        >Débloqué</span
+                                    >
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div v-if="filteredItems.length === 0" class="text-center py-8">
+                    <div
+                        v-if="filteredItems.length === 0"
+                        class="text-center py-8"
+                    >
                         <p class="text-2xl mb-2">📦</p>
                         <p class="text-sm mb-1">Aucun item trouvé</p>
-                        <p class="opacity-70 text-xs">Essayez un autre filtre</p>
+                        <p class="opacity-70 text-xs">
+                            Essayez un autre filtre
+                        </p>
                     </div>
                 </div>
 
-                <div class="shrink-0 bg-gradient-to-r from-warning/10 to-warning/5 px-3 py-2 border-t border-warning/20">
+                <div
+                    class="shrink-0 bg-gradient-to-r from-warning/10 to-warning/5 px-3 py-2 border-t border-warning/20"
+                >
                     <div class="text-xs text-center text-base-content/70">
                         {{ filteredItems.length }} item{{
                             filteredItems.length > 1 ? "s" : ""
@@ -394,18 +524,26 @@ const getRarityColor = (rarity) => {
             <Modal :show="showModal" @close="showModal = false">
                 <template #header>
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1">
-                            <img :src="getItemImage(selectedItem)" :alt="selectedItem?.name" class="w-full h-full object-contain" />
+                        <div
+                            class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1"
+                        >
+                            <img
+                                :src="getItemImage(selectedItem)"
+                                :alt="selectedItem?.name"
+                                class="w-full h-full object-contain"
+                            />
                         </div>
                         <div class="flex flex-col">
-                            <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            <h3
+                                class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+                            >
                                 Acheter {{ selectedItem?.name }}
                             </h3>
                             <div class="mt-1">
-                                <span class="text-sm font-semibold text-primary">
-                                    {{
-                                        formatPrice(selectedItem?.price)
-                                    }}
+                                <span
+                                    class="text-sm font-semibold text-primary"
+                                >
+                                    {{ formatPrice(selectedItem?.price) }}
                                     ₽
                                 </span>
                             </div>
@@ -419,14 +557,22 @@ const getRarityColor = (rarity) => {
                             <p class="text-sm text-base-content/80 mb-3">
                                 {{ selectedItem.description }}
                             </p>
-                            <div v-if="!isAvatar" class="flex items-center justify-between mb-4">
+                            <div
+                                v-if="!isAvatar"
+                                class="flex items-center justify-between mb-4"
+                            >
                                 <span>Quantité :</span>
                                 <div class="flex items-center gap-2">
-                                    <Button @click="quantity = Math.max(1, quantity - 1)" variant="ghost" size="xs">-</Button>
+                                    <Button
+                                        @click="
+                                            quantity = Math.max(1, quantity - 1)
+                                        "
+                                        variant="ghost"
+                                        size="xs"
+                                        >-</Button
+                                    >
                                     <span class="font-bold text-lg">
-                                        {{
-                                            quantity
-                                        }}
+                                        {{ quantity }}
                                     </span>
                                     <Button
                                         @click="
@@ -441,29 +587,43 @@ const getRarityColor = (rarity) => {
                                     >
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between text-lg font-bold">
+                            <div
+                                class="flex items-center justify-between text-lg font-bold"
+                            >
                                 <span>Total:</span>
                                 <span class="text-warning">
-                                    {{
-                                        formatPrice(selectedItem.price)
-                                    }}
+                                    {{ formatPrice(selectedItem.price) }}
                                     ₽
                                 </span>
                             </div>
                         </div>
 
-                        <div v-if="!canAfford" class="bg-error/10 text-error p-3 rounded-xl border border-error/20">
+                        <div
+                            v-if="!canAfford"
+                            class="bg-error/10 text-error p-3 rounded-xl border border-error/20"
+                        >
                             <div class="flex items-center gap-2">
                                 <span>Solde insuffisant</span>
                             </div>
                         </div>
 
                         <div class="flex gap-3">
-                            <Button @click="showModal = false" variant="outline" size="lg" class="flex-1">
+                            <Button
+                                @click="showModal = false"
+                                variant="outline"
+                                size="lg"
+                                class="flex-1"
+                            >
                                 Annuler
                             </Button>
 
-                            <Button @click="buyItem" variant="primary" size="lg" class="flex-1" :disabled="!canAfford">
+                            <Button
+                                @click="buyItem"
+                                variant="primary"
+                                size="lg"
+                                class="flex-1"
+                                :disabled="!canAfford"
+                            >
                                 {{ canAfford ? "Confirmer" : "Impossible" }}
                             </Button>
                         </div>
@@ -471,29 +631,52 @@ const getRarityColor = (rarity) => {
                 </template>
             </Modal>
 
-            <Modal :show="showInventoryModal" @close="showInventoryModal = false" max-width="4xl">
+            <Modal
+                :show="showInventoryModal"
+                @close="showInventoryModal = false"
+                max-width="4xl"
+            >
                 <template #header>
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 bg-gradient-to-br from-success/20 to-success/40 rounded-lg flex items-center justify-center">
+                        <div
+                            class="w-8 h-8 bg-gradient-to-br from-success/20 to-success/40 rounded-lg flex items-center justify-center"
+                        >
                             <span class="text-lg">📦</span>
                         </div>
                         <div class="flex flex-col">
-                            <h3 class="text-xl font-bold bg-gradient-to-r from-success to-success/80 bg-clip-text text-transparent">
+                            <h3
+                                class="text-xl font-bold bg-gradient-to-r from-success to-success/80 bg-clip-text text-transparent"
+                            >
                                 Mon Inventaire
                             </h3>
                             <div class="mt-1">
-                                <span class="text-sm font-semibold text-success">{{ inventory.length }} types d'items</span>
+                                <span class="text-sm font-semibold text-success"
+                                    >{{ inventory.length }} types d'items</span
+                                >
                             </div>
                         </div>
                     </div>
                 </template>
 
                 <template #default>
-                    <div v-if="inventory.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[60vh] overflow-y-auto p-2">
-                        <div v-for="inventoryItem in inventory" :key="inventoryItem.id" class="bg-base-200/30 backdrop-blur-sm rounded-xl p-3 border border-base-300/20">
+                    <div
+                        v-if="inventory.length > 0"
+                        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[60vh] overflow-y-auto p-2"
+                    >
+                        <div
+                            v-for="inventoryItem in inventory"
+                            :key="inventoryItem.id"
+                            class="bg-base-200/30 backdrop-blur-sm rounded-xl p-3 border border-base-300/20"
+                        >
                             <div class="flex items-center gap-2 mb-2">
-                                <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1">
-                                    <img :src="getItemImage(inventoryItem.item)" :alt="inventoryItem.item.name" class="w-full h-full object-contain" />
+                                <div
+                                    class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1"
+                                >
+                                    <img
+                                        :src="getItemImage(inventoryItem.item)"
+                                        :alt="inventoryItem.item.name"
+                                        class="w-full h-full object-contain"
+                                    />
                                 </div>
                                 <div class="flex-1">
                                     <h4 class="font-bold text-xs">

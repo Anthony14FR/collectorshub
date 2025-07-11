@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Item;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 
 class ItemSeeder extends Seeder
 {
@@ -62,23 +63,23 @@ class ItemSeeder extends Seeder
         }
 
         $avatarDir = public_path('images/trainer');
-        $files = scandir($avatarDir);
-        foreach ($files as $file) {
-            if (
-                preg_match('/^([0-9]+)\.png$/', $file, $matches) &&
-                !in_array($matches[1], ['1', '2'])
-            ) {
-                $id = $matches[1];
-                Item::create([
-                    'name' => 'Avatar ' . $id,
-                    'description' => "Débloque l'avatar n°$id pour votre profil.",
-                    'type' => 'avatar',
-                    'image' => "/images/trainer/$file",
-                    'effect' => [],
-                    'price' => 1000,
-                    'rarity' => 'normal',
-                ]);
-            }
-        }
+        $files = collect(File::files($avatarDir))
+            ->reject(function ($file) {
+                $basename = pathinfo($file, PATHINFO_FILENAME);
+                return in_array($basename, ['1', '2']);
+            });
+        $files->each(function ($file) {
+            $basename = pathinfo($file, PATHINFO_FILENAME);
+            $relativePath = '/images/trainer/' . basename($file);
+            Item::create([
+                'name' => 'Avatar ' . $basename,
+                'description' => "Débloque l'avatar $basename pour votre profil.",
+                'type' => 'avatar',
+                'image' => $relativePath,
+                'effect' => [],
+                'price' => 1000,
+                'rarity' => 'normal',
+            ]);
+        });
     }
 }
