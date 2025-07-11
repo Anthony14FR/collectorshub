@@ -8,12 +8,14 @@ import Modal from '@/Components/UI/Modal.vue';
 import LeaderboardSection from '@/Components/Game/LeaderboardSection.vue';
 import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
 import TeamManagementModal from '@/Components/Game/TeamManagementModal.vue';
+import BadgesModal from '@/Components/Profile/BadgesModal.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
 import type { Leaderboards } from '@/types/leaderboard';
+import type { Success, UserSuccess } from '@/types/success';
 
 interface Props extends PageProps {
   auth: {
@@ -23,12 +25,33 @@ interface Props extends PageProps {
   pokedex?: Pokedex[];
   all_pokemons?: Pokemon[];
   leaderboards?: Leaderboards;
+  successes?: Success[];
+  unclaimed_successes?: UserSuccess[];
+  claimed_successes?: UserSuccess[];
+  progress?: {
+    total: number;
+    unlocked: number;
+    claimed: number;
+    unclaimed: number;
+    percentage: number;
+  };
 }
 
-const { auth, inventory = [], pokedex = [], all_pokemons = [], leaderboards } = defineProps<Props>();
+const { 
+  auth, 
+  inventory = [], 
+  pokedex = [], 
+  all_pokemons = [], 
+  leaderboards,
+  successes = [],
+  unclaimed_successes = [],
+  claimed_successes = [],
+  progress = { total: 0, unlocked: 0, claimed: 0, unclaimed: 0, percentage: 0 },
+} = defineProps<Props>();
 const pokedexModalOpen = ref(false);
 const leaderboardModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
+const badgesModalOpen = ref(false);
 
 const goToMarketplace = () => {
   router.visit('/marketplace');
@@ -40,6 +63,10 @@ const openLeaderboardModal = () => {
 
 const openTeamManagementModal = () => {
   teamManagementModalOpen.value = true;
+}
+
+const openBadgesModal = () => {
+  badgesModalOpen.value = true;
 }
 </script>
 
@@ -59,6 +86,8 @@ const openTeamManagementModal = () => {
         :onGoToMarketplace="goToMarketplace"
         :onGoToLeaderboard="openLeaderboardModal"
         :onOpenTeamManagementModal="openTeamManagementModal"
+        :onOpenBadgesModal="openBadgesModal"
+        :has-unclaimed-successes="unclaimed_successes.length > 0"
       />
 
       <DesktopLayout
@@ -69,6 +98,8 @@ const openTeamManagementModal = () => {
         :onGoToMarketplace="goToMarketplace"
         :onGoToLeaderboard="openLeaderboardModal"
         :onOpenTeamManagementModal="openTeamManagementModal"
+        :onOpenBadgesModal="openBadgesModal"
+        :has-unclaimed-successes="unclaimed_successes.length > 0"
       />
     </div>
 
@@ -105,6 +136,15 @@ const openTeamManagementModal = () => {
         <LeaderboardSection v-if="leaderboards" :leaderboards="leaderboards" />
       </template>
     </Modal>
+
+    <BadgesModal
+      :show="badgesModalOpen"
+      :on-close="() => badgesModalOpen = false"
+      :successes="successes"
+      :unclaimed_successes="unclaimed_successes"
+      :claimed_successes="claimed_successes"
+      :progress="progress"
+    />
   </div>
 </template>
 
