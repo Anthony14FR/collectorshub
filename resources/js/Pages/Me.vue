@@ -5,12 +5,14 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
 import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import Button from '@/Components/UI/Button.vue';
-import PokemonCard from '@/Components/Cards/PokemonCard.vue';
+import LeaderboardSection from '@/Components/Game/LeaderboardSection.vue';
+import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
+import type { Pokemon } from '@/types/pokemon';
+import type { Leaderboards } from '@/types/leaderboard';
 
 interface Props extends PageProps {
     auth: {
@@ -18,13 +20,20 @@ interface Props extends PageProps {
     };
     inventory?: Inventory[];
     pokedex?: Pokedex[];
+    all_pokemons?: Pokemon[];
+    leaderboards?: Leaderboards;
 }
 
-const { auth, inventory = [], pokedex = [] } = defineProps<Props>();
+const { auth, inventory = [], pokedex = [], all_pokemons = [], leaderboards } = defineProps<Props>();
 const pokedexModalOpen = ref(false);
+const leaderboardModalOpen = ref(false);
 
 const goToMarketplace = () => {
     router.visit('/marketplace');
+};
+
+const openLeaderboardModal = () => {
+    leaderboardModalOpen.value = true;
 };
 </script>
 
@@ -42,6 +51,7 @@ const goToMarketplace = () => {
                 :pokedex="pokedex"
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
                 :onGoToMarketplace="goToMarketplace"
+                :onGoToLeaderboard="openLeaderboardModal"
             />
 
             <DesktopLayout
@@ -50,69 +60,39 @@ const goToMarketplace = () => {
                 :pokedex="pokedex"
                 :onOpenPokedexModal="() => pokedexModalOpen = true"
                 :onGoToMarketplace="goToMarketplace"
+                :onGoToLeaderboard="openLeaderboardModal"
             />
         </div>
 
-        <Modal :show="pokedexModalOpen" @close="pokedexModalOpen = false" max-width="7xl">
+        <PokedexModal 
+            :show="pokedexModalOpen" 
+            :user-pokedex="pokedex" 
+            :all-pokemons="all_pokemons" 
+            :on-close="() => pokedexModalOpen = false" 
+        />
+
+        <Modal :show="leaderboardModalOpen" @close="leaderboardModalOpen = false" max-width="4xl">
             <template #header>
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
-                        <span class="text-lg">📚</span>
+                    <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
+                        <span class="text-lg">🏆</span>
                     </div>
                     <div class="flex flex-col">
-                        <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                            Pokédex Complet
+                        <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
+                            Classements
                         </h3>
                         <div class="mt-1">
-                            <span class="text-sm font-semibold text-primary">{{ pokedex.length }} Pokémon capturés</span>
+                            <span class="text-sm font-semibold text-warning">Top 100 des dresseurs</span>
                         </div>
                     </div>
                 </div>
             </template>
             <template #default>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 max-h-[70vh] overflow-y-auto p-2">
-                    <PokemonCard
-                        v-for="pokemon in pokedex"
-                        :key="pokemon.id"
-                        :entry="pokemon"
-                        size="large"
-                        variant="modal"
-                        :show-details="true"
-                    />
-                </div>
+                <LeaderboardSection v-if="leaderboards" :leaderboards="leaderboards" />
             </template>
         </Modal>
     </div>
 </template>
 
 <style>
-
-#app {
-    overflow: hidden !important;
-    height: 100vh !important;
-    width: 100vw !important;
-}
-
-::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
-* {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
-@keyframes spin-slow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.animate-spin-slow {
-    animation: spin-slow 10s linear infinite;
-}
-
-.bg-gradient-radial {
-    background: radial-gradient(circle, var(--tw-gradient-stops));
-}
 </style>

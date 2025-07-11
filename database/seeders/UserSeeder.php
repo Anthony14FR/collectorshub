@@ -11,37 +11,49 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $adminRole = Role::create(['name' => 'admin']);
-        $userRole = Role::create(['name' => 'user']);
+        $numberOfUsers = 10;
+
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $userRole = Role::firstOrCreate(['name' => 'user']);
+
+        $hashedAdminPassword = Hash::make('admin');
+        $hashedUserPassword = Hash::make('user');
 
         $admin = User::create([
             'username' => 'admin',
             'email' => 'admin@orus.com',
-            'password' => Hash::make('admin'),
+            'password' => $hashedAdminPassword,
             'level' => 1,
             'experience' => 12,
-            'cash' => 1000,
+            'cash' => 1000000,
             'last_login' => now(),
             'role' => 'admin',
             'status' => 'active'
         ]);
 
-        $admin->assignRole('admin');
+        $admin->assignRole($adminRole);
 
         $user = User::create([
             'username' => 'user',
             'email' => 'user@orus.com',
-            'password' => Hash::make('user'),
+            'password' => $hashedUserPassword,
             'level' => 1,
             'experience' => 12,
-            'cash' => 1000,
+            'cash' => 1000000,
             'last_login' => now(),
             'role' => 'user',
             'status' => 'active'
         ]);
 
-        $user->assignRole('user');
+        $user->assignRole($userRole);
 
-        User::factory()->count(8)->create();
+        $users = User::factory()
+            ->state(['password' => $hashedUserPassword])
+            ->count($numberOfUsers)
+            ->create();
+
+        foreach ($users as $factoryUser) {
+            $factoryUser->assignRole($userRole);
+        }
     }
 }

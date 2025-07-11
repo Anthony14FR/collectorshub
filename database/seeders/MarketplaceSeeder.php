@@ -17,8 +17,6 @@ class MarketplaceSeeder extends Seeder
             return;
         }
 
-        $this->command->info('Création des annonces marketplace...');
-
         foreach ($users as $user) {
             $availablePokemons = $user->pokedex()
                 ->where('is_in_team', false)

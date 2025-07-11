@@ -48,3 +48,9 @@
   --depth: 5;
   --noise: 0;
 }
+
+
+
+#app {
+    overflow-x: hidden!important;
+}

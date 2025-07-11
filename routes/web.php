@@ -7,6 +7,7 @@ use App\Http\Controllers\PokedexController;
 use App\Http\Controllers\PokemonController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
+use App\Http\Controllers\ShopController;
 use App\Models\Pokedex;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/avatar', [ProfileController::class, 'updateAvatar'])->name('avatar.update');
 
     // Routes pour Pokedex
     Route::get('/pokedex/user-pokemons', [PokedexController::class, 'getUserPokemons'])->name('pokedex.user-pokemons');
@@ -57,6 +59,10 @@ Route::middleware('auth')->group(function () {
 
     // Routes pour Opening
     Route::get('/opening', [OpeningController::class, 'index'])->name('opening.index');
+
+    // Routes pour Shop
+    Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+    Route::post('/shop/buy', [ShopController::class, 'buyItem'])->name('shop.buy');
 });
 
 require __DIR__.'/admin.php';
