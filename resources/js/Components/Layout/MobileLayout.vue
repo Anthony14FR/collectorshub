@@ -4,6 +4,7 @@ import GameInventory from '@/Components/Game/GameInventory.vue';
 import UserMenu from '@/Components/Profile/UserMenu.vue';
 import TrainerProfile from '@/Components/Profile/TrainerProfile.vue';
 import Button from '@/Components/UI/Button.vue';
+import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import { router } from '@inertiajs/vue3';
 
 import type { User } from '@/types/user';
@@ -41,6 +42,10 @@ const goToInvocation = () => {
 const goToShop = () => {
   router.visit('/shop');
 };
+
+const goToPokemonUpgrade = () => {
+  router.visit('/pokemon-upgrade');
+};
 </script>
 
 <template>
@@ -72,10 +77,9 @@ const goToShop = () => {
     </div>
 
     <div class="grid grid-cols-1 gap-4">
-      <!-- Invocation Card -->
       <div
         class="relative h-40 overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 flex flex-col justify-end"
-        style="background-image: url('/images/background/invocation.png'); background-size: cover; background-position: center;"
+        style="background-image: url('/images/background/invocation.gif'); background-size: cover; background-position: center;"
       >
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div class="relative z-10">
@@ -97,7 +101,6 @@ const goToShop = () => {
         </div>
       </div>
 
-      <!-- Marketplace Card -->
       <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm">
         <div>
           <h3 class="mb-1 bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-base font-bold text-transparent">
@@ -118,7 +121,7 @@ const goToShop = () => {
       </div>
 
       <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm relative">
-        <div v-if="hasUnclaimedSuccesses" class="absolute top-2 right-2">
+        <div v-if="hasUnclaimedSuccesses" class="absolute top-3 right-3 z-10">
           <span class="relative flex h-3 w-3">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
             <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
@@ -140,6 +143,41 @@ const goToShop = () => {
         >
           <span class="text-xl">🏆</span>
         </Button>
+      </div>
+
+      <div
+        class="relative h-40 overflow-hidden rounded-xl bg-base-100/60 backdrop-blur-sm p-4"
+        style="background-image: url('/images/background/upgrade.gif'); background-size: cover; background-position: center;"
+      >
+        <div class="absolute inset-0 bg-gradient-to-br from-warning/80 via-warning/40 to-transparent" />
+        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/30 to-transparent rounded-bl-full" />
+        
+        <div class="relative z-10 h-full flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2">
+              <div>
+                <StarsBadge :stars="6" />
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-white drop-shadow-sm">
+                  Amélioration
+                </h3>
+              </div>
+            </div>
+          </div>
+          <p class="text-sm text-white/90 drop-shadow-sm">Augmentez le niveau d'étoiles de vos Pokémon</p>
+          
+          <div class="flex">
+            <Button
+              @click="goToPokemonUpgrade"
+              variant="secondary"
+              size="sm"
+              class="shadow-lg w-full"
+            >
+              Améliorer
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 flex flex-col items-center justify-center text-center space-y-4">
@@ -166,7 +204,6 @@ const goToShop = () => {
         </Button>
       </div>
 
-      <!-- Classement Card -->
       <div class="rounded-xl bg-gradient-to-r from-primary/20 to-primary/40 p-0.5" style="background-image: url('/images/background/leaderboard.jpg'); background-size: cover; background-position: center;">
         <div class="flex h-full flex-col rounded-[11px] bg-base-100/80 p-4 backdrop-blur-sm">
           <div class="flex-grow">
