@@ -17,6 +17,16 @@ export type User = {
     experience_for_current_level: number;
     experience_for_next_level: number;
     experience_percentage: number;
+    claimed_level_rewards?: string[];
+}
+
+export type LevelReward = {
+    type: string;
+    level: number;
+    cash: number;
+    pokeballs: number;
+    masterballs: number;
+    is_available: boolean;
 }
 
 export type PokedexEntry = {

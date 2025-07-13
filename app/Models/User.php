@@ -37,6 +37,7 @@ class User extends Authenticatable
         'status',
         'avatar',
         'unlocked_avatars',
+        'claimed_level_rewards',
     ];
 
     protected $hidden = [
@@ -60,6 +61,7 @@ class User extends Authenticatable
         'level' => 'integer',
         'experience' => 'integer',
         'unlocked_avatars' => 'array',
+        'claimed_level_rewards' => 'array',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
