@@ -7,6 +7,7 @@ import UserMenu from '@/Components/Profile/UserMenu.vue';
 import PokedexSection from '@/Components/Game/PokedexSection.vue';
 import Button from '@/Components/UI/Button.vue';
 import { router } from '@inertiajs/vue3';
+import StarsBadge from '@/Components/UI/StarsBadge.vue';
 
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
@@ -43,13 +44,17 @@ const goToInvocation = () => {
 const goToShop = () => {
   router.visit('/shop');
 };
+
+const goToPokemonUpgrade = () => {
+  router.visit('/pokemon-upgrade');
+};
 </script>
 
 <template>
   <div class="hidden lg:block h-screen w-screen overflow-hidden relative">
-    <div class="flex justify-center pt-8 mb-8">
-      <LevelDisplay :user="user" />
-    </div>
+    <div class="flex justify-center pt-8 mb-8 max-[1200px]:scale-75">
+  <LevelDisplay :user="user" />
+</div>
 
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
       <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" />
@@ -71,7 +76,7 @@ const goToShop = () => {
       <div class="grid grid-cols-1 gap-3 ">
         <div
           class="relative h-40 overflow-hidden rounded-xl bg-base-100/60 p-4 flex flex-col justify-end"
-          style="background-image: url('/images/background/invocation.png'); background-size: cover; background-position: center;"
+          style="background-image: url('/images/background/invocation.gif'); background-size: cover; background-position: center;"
         >
           <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
           <div class="relative z-10">
@@ -113,7 +118,7 @@ const goToShop = () => {
         </div>
 
         <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm relative">
-          <div v-if="hasUnclaimedSuccesses" class="absolute top-2 right-2">
+          <div v-if="hasUnclaimedSuccesses" class="absolute top-3 right-3 z-10">
             <span class="relative flex h-3 w-3">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
               <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
@@ -172,6 +177,43 @@ const goToShop = () => {
 
     <SideSection position="right" :top="false">
       <PokedexSection :pokedex="pokedex" :onOpenModal="onOpenPokedexModal" />
+    </SideSection>
+    <SideSection position="right" :top="false" class="top-80">
+      <div 
+        class="relative h-40 overflow-hidden rounded-xl bg-base-100/60 backdrop-blur-sm"
+        style="background-image: url('/images/background/upgrade.gif'); background-size: cover; background-position: center;"
+      >
+        <div class="absolute inset-0 bg-gradient-to-br from-warning/80 via-warning/40 to-transparent" />
+        
+        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/30 to-transparent rounded-bl-full" />
+        
+        <div class="relative z-10 h-full flex flex-col justify-between p-4">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="">
+                <StarsBadge :stars="6" />
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-white drop-shadow-sm">
+                  Amélioration
+                </h3>
+              </div>
+            </div>
+          </div>
+          <p>Augmentez le niveau d'étoiles de vos Pokémon</p>
+          
+          <div class="flex">
+            <Button
+              @click="goToPokemonUpgrade"
+              variant="secondary"
+              size="sm"
+              class="shadow-lg w-full"
+            >
+              Améliorer
+            </Button>
+          </div>
+        </div>
+      </div>
     </SideSection>
   </div>
 </template>

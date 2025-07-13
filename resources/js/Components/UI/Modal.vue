@@ -4,9 +4,10 @@ interface Props {
   show: boolean;
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
   fixedHeight?: boolean;
+  zIndex?: number;
 }
 
-const { maxWidth = 'md', fixedHeight = false } = defineProps<Props>();
+const { maxWidth = 'md', fixedHeight = false, zIndex = 50 } = defineProps<Props>();
 const emit = defineEmits(['close']);
 
 const close = () => {
@@ -37,7 +38,7 @@ const maxWidthClasses = {
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="close">
+    <div v-if="show" class="fixed inset-0 flex items-center justify-center p-4" :style="{ zIndex }" @click.self="close">
 
       <div class="absolute inset-0 bg-base-100/80 backdrop-blur-md"></div>
 

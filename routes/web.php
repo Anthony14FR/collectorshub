@@ -6,6 +6,7 @@ use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokedexController;
 use App\Http\Controllers\PokemonController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PokemonUpgradeController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SuccessController;
@@ -58,6 +59,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/marketplace/cancel/{listingId}', [MarketplaceController::class, 'cancelListing'])->name('marketplace.cancel');
     Route::get('/marketplace/listings', [MarketplaceController::class, 'getListings'])->name('marketplace.listings');
 
+    // Routes pour Pokemon Upgrade
+    Route::prefix('pokemon-upgrade')->name('pokemon-upgrade.')->group(function () {
+        Route::get('/', [PokemonUpgradeController::class, 'index'])->name('index');
+        Route::get('/requirements/{pokedexId}', [PokemonUpgradeController::class, 'getUpgradeRequirements'])->name('requirements');
+        Route::post('/slot-pokemons/{pokedexId}', [PokemonUpgradeController::class, 'getAvailablePokemonsForSlot'])->name('slot-pokemons');
+        Route::post('/upgrade', [PokemonUpgradeController::class, 'upgrade'])->name('upgrade');
+        Route::get('/upgradable-pokemons', [PokemonUpgradeController::class, 'getUpgradablePokemons'])->name('upgradable-pokemons');
+    });
 
     // Routes pour Opening
     Route::get('/opening', [OpeningController::class, 'index'])->name('opening.index');
