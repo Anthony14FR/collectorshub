@@ -415,22 +415,22 @@ const getRewardColor = (type: string) => {
                       <div class="text-xs opacity-80">Cash</div>
                     </div>
                     <div class="text-center w-20">
-                  <div class="font-bold text-white">{{ reward.pokeballs ? reward.pokeballs : '0' }}</div>
-    <div class="text-xs opacity-80">Pokéballs</div>
-  </div>
-  <div class="text-center w-20">
-    <div class="font-bold text-white">{{ reward.masterballs ? reward.masterballs : '0' }}</div>
+                      <div class="font-bold text-white">{{ reward.pokeballs ? reward.pokeballs : '0' }}</div>
+                      <div class="text-xs opacity-80">Pokéballs</div>
+                    </div>
+                    <div class="text-center w-20">
+                      <div class="font-bold text-white">{{ reward.masterballs ? reward.masterballs : '0' }}</div>
                       <div class="text-xs opacity-80">Masterballs</div>
                     </div>
                     <div class="flex justify-end w-28">
-    <Button
-      @click="() => claimReward(reward.level, reward.type)"
-      variant="primary"
-      size="sm"
-      class="bg-white/20 hover:bg-white/30 text-white border-white/30"
-    >
-      Récupérer
-    </Button>
+                      <Button
+                        @click="() => claimReward(reward.level, reward.type)"
+                        variant="primary"
+                        size="sm"
+                        class="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                      >
+                        Récupérer
+                      </Button>
                     </div>
                   </div>
                 </div>
