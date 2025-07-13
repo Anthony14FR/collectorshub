@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Pokedex;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,27 +32,42 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'username' => 'required|string|max:255|unique:'.User::class,
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'username' => ['required', 'string', 'min:3', 'max:20', 'regex:/^[a-zA-Z0-9]+$/', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'avatar' => 'required|in:/images/trainer/1.png,/images/trainer/2.png',
+            'starter_pokemon' => ['required', 'integer', 'in:1,4,7'], // Bulbizarre, Salamèche, Carapuce
+            'terms' => ['required', 'accepted'],
+        ], [
+            'username.regex' => 'Le nom d\'utilisateur ne peut contenir que des lettres et des chiffres.',
+            'username.unique' => 'Ce nom d\'utilisateur est déjà pris.',
+            'email.unique' => 'Cette adresse email est déjà utilisée.',
+            'starter_pokemon.in' => 'Veuillez choisir un starter valide.',
+            'terms.accepted' => 'Vous devez accepter les conditions d\'utilisation.',
         ]);
 
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'last_login' => now(),
-            'avatar' => $request->avatar,
-            'unlocked_avatars' => json_encode(["/images/trainer/1.png", "/images/trainer/2.png"]),
+            'cash' => 1000, // Argent de départ
+            'level' => 1,
+            'exp' => 0,
         ]);
 
-        $user->assignRole('user');
+        // Ajouter le Pokémon starter au Pokédex de l'utilisateur
+        Pokedex::create([
+            'user_id' => $user->id,
+            'pokemon_id' => $request->starter_pokemon,
+            'captured_at' => now(),
+            'is_shiny' => false,
+            'level' => 5, // Niveau de départ du starter
+        ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('me', absolute: false));
+        // Rediriger vers la page de vérification d'email
+        return redirect(route('verification.notice'));
     }
 }
