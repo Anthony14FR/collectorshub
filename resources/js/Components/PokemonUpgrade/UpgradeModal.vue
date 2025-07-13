@@ -87,7 +87,7 @@ const getTotalRequiredMaterials = (): number => {
 const loadUpgradeData = async () => {
   loading.value = true;
   try {
-    const response = await fetch(route('pokemon-upgrade.requirements', { pokedexId: pokemon.id }));
+    const response = await fetch(route('requirements', { pokedexId: pokemon.id }));
     upgradeData.value = await response.json();
   } catch (error) {
     console.error('Erreur lors du chargement des données d\'upgrade:', error);

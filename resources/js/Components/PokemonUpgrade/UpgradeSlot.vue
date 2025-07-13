@@ -59,13 +59,6 @@ const getPlaceholderName = () => {
           class="w-10 sm:w-12 md:w-14 h-10 sm:h-12 md:h-14 object-contain"
           style="image-rendering: pixelated;"
         />
-        
-        <button
-          @click.stop="emit('remove', selectedPokemon)"
-          class="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 w-4 sm:w-5 h-4 sm:h-5 bg-error text-error-content rounded-full flex items-center justify-center text-xs hover:scale-110 transition-transform"
-        >
-          ×
-        </button>
 
         <div v-if="selectedPokemon.pokemon?.is_shiny" class="absolute -top-0.5 sm:-top-1 -left-0.5 sm:-left-1">
           <span class="text-yellow-400 text-xs">✨</span>

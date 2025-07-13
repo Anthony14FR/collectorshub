@@ -11,7 +11,7 @@ class PokedexSeeder extends Seeder
 {
     public function run()
     {
-        $pokemon = Pokemon::first();
+        $pokemon = Pokemon::find(1);
         $admin = User::where('username', 'admin')->first();
 
         if (!$pokemon) {
@@ -38,10 +38,6 @@ class PokedexSeeder extends Seeder
 
         if (!$pikachu) {
             $pikachu = Pokemon::first();
-        }
-
-        if (!$pikachu) {
-            return;
         }
 
         for ($i = 0; $i < 170; $i++) {

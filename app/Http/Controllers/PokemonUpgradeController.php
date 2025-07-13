@@ -73,7 +73,7 @@ class PokemonUpgradeController extends Controller
         }
 
         $available = $this->upgradeService->getAvailablePokemonsForSlot(
-            Auth::user(),
+            auth()->user(),
             $requirement,
             $pokedexEntry->id,
             $pokedexEntry->pokemon->is_shiny,
@@ -154,18 +154,13 @@ class PokemonUpgradeController extends Controller
         }
 
         try {
-            DB::beginTransaction();
-            
-            $result = $this->upgradeService->upgradePokemon($pokedexEntry, $request->materials, Auth::user());
-            $upgradedPokemon = $result->load('pokemon');
-            
-            DB::commit();
-            
-            return back()->with('success', 'Pokémon amélioré avec succès !');
-            
+            DB::transaction(function () use ($pokedexEntry, $request) {
+                $this->upgradeService->upgradePokemon($pokedexEntry, $request->materials, Auth::user());
+            });
         } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors(['error' => $e->getMessage()]);
+            return back()->withErrors(['error' => 'Erreur lors de l\'amélioration : ' . $e->getMessage()]);
         }
+
+        return back()->with('success', 'Pokémon amélioré avec succès !');
     }
 }

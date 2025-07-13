@@ -174,7 +174,7 @@ const fetchUpgradablePokemons = async () => {
   loading.value = true;
   try {
     console.log('Récupération des Pokémon upgradables...');
-    const response = await fetch(route('pokemon-upgrade.upgradable-pokemons'));
+    const response = await fetch(route('upgradable-pokemons'));
     const data = await response.json();
     console.log('Réponse du serveur:', data);
     upgradableIds.value = data.upgradableIds || [];
@@ -206,7 +206,7 @@ onMounted(() => {
     <BackgroundEffects />
 
     <div class="relative z-10 min-h-screen">
-      <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+      <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-16">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 sm:pt-6 mb-4 sm:mb-6">
           <div class="flex items-center gap-2 sm:gap-4">
             <Button @click="goBack" variant="outline" size="sm" class="shrink-0">
@@ -260,7 +260,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <div class="flex-1 p-3 sm:p-4 lg:p-6">
+          <div class="flex-1 p-3 sm:p-4 lg:p-6 min-h-[600px]">
             <div v-if="loading" class="flex justify-center items-center py-12 sm:py-20">
               <div class="loading loading-spinner loading-lg"></div>
             </div>
@@ -311,18 +311,9 @@ onMounted(() => {
                 ←
               </Button>
               
-              <div class="flex gap-1 overflow-x-auto px-4 sm:px-0">
-                <span v-for="page in totalPages" :key="page">
-                  <Button 
-                    v-if="(Math.abs(page - currentPage) <= 1 || page === 1 || page === totalPages) && totalPages <= 7"
-                    @click="changePage(page)"
-                    :variant="page === currentPage ? 'primary' : 'outline'"
-                    size="sm"
-                    class="min-w-[2rem] sm:min-w-[2.5rem] px-1 sm:px-2 text-xs sm:text-sm"
-                  > 
-                    {{ page }}
-                  </Button>
-                  <span v-else-if="Math.abs(page - currentPage) === 2" class="text-base-content/50 flex items-center px-1">...</span>
+              <div class="flex gap-1 items-center">
+                <span class="text-sm text-base-content/70 px-2">
+                  Page {{ currentPage }} sur {{ totalPages }}
                 </span>
               </div>
               
@@ -368,10 +359,15 @@ onMounted(() => {
 </template>
 
 <style scoped>
-:deep(input), :deep(select), .h-[42px] {
+:deep(input),
+:deep(select) {
   height: 42px !important;
   min-height: 42px !important;
   max-height: 42px !important;
   box-sizing: border-box !important;
+}
+
+.h-\[42px\] {
+  height: 42px !important;
 }
 </style>

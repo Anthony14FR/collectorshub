@@ -60,13 +60,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/marketplace/listings', [MarketplaceController::class, 'getListings'])->name('marketplace.listings');
 
     // Routes pour Pokemon Upgrade
-    Route::prefix('pokemon-upgrade')->name('pokemon-upgrade.')->group(function () {
-        Route::get('/', [PokemonUpgradeController::class, 'index'])->name('index');
-        Route::get('/requirements/{pokedexId}', [PokemonUpgradeController::class, 'getUpgradeRequirements'])->name('requirements');
-        Route::post('/slot-pokemons/{pokedexId}', [PokemonUpgradeController::class, 'getAvailablePokemonsForSlot'])->name('slot-pokemons');
-        Route::post('/upgrade', [PokemonUpgradeController::class, 'upgrade'])->name('upgrade');
-        Route::get('/upgradable-pokemons', [PokemonUpgradeController::class, 'getUpgradablePokemons'])->name('upgradable-pokemons');
-    });
+    Route::get('/pokemon-upgrade', [PokemonUpgradeController::class, 'index'])->name('pokemon-upgrade.index');
+    Route::post('/pokemon-upgrade/upgrade', [PokemonUpgradeController::class, 'upgrade'])->name('pokemon-upgrade.upgrade');
 
     // Routes pour Opening
     Route::get('/opening', [OpeningController::class, 'index'])->name('opening.index');
