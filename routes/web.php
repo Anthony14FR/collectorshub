@@ -73,10 +73,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/success/claim-all', [SuccessController::class, 'claimAll'])->name('success.claim-all');
 
     // Routes pour LevelRewards
-    Route::get('/level-rewards', [LevelRewardController::class, 'index'])->name('level-rewards.index');
     Route::post('/level-rewards/claim', [LevelRewardController::class, 'claim'])->name('level-rewards.claim');
-    Route::get('/level-rewards/available', [LevelRewardController::class, 'getAvailableRewards'])->name('level-rewards.available');
-    Route::get('/level-rewards/next', [LevelRewardController::class, 'getNextRewards'])->name('level-rewards.next');
+    Route::post('/level-rewards/claim-all', [LevelRewardController::class, 'claimAll'])->name('level-rewards.claim-all');
 });
 
 require __DIR__ . '/admin.php';

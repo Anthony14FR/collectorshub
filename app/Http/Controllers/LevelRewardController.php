@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Services\LevelRewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 
 class LevelRewardController extends Controller
 {
@@ -14,22 +13,6 @@ class LevelRewardController extends Controller
     public function __construct(LevelRewardService $levelRewardService)
     {
         $this->levelRewardService = $levelRewardService;
-    }
-
-    public function index()
-    {
-        $user = Auth::user();
-        
-        $availableRewards = $this->levelRewardService->getAvailableRewards($user);
-        $claimedRewards = $this->levelRewardService->getClaimedRewards($user);
-        $nextRewards = $this->levelRewardService->getNextRewards($user);
-
-        return Inertia::render('LevelRewards/Index', [
-            'user' => $user,
-            'availableRewards' => $availableRewards,
-            'claimedRewards' => $claimedRewards,
-            'nextRewards' => $nextRewards,
-        ]);
     }
 
     public function claim(Request $request)
@@ -85,38 +68,18 @@ class LevelRewardController extends Controller
         $user->refresh();
         
         Auth::setUser($user);
-
-        $message = 'Récompense réclamée avec succès ! Vous avez reçu ' . $reward['cash'] . '$';
-        if ($reward['pokeballs'] > 0) {
-            $message .= ' et ' . $reward['pokeballs'] . ' Pokeballs';
-        }
-        if ($reward['masterballs'] > 0) {
-            $message .= ' et ' . $reward['masterballs'] . ' Masterballs';
-        }
-        $message .= ' !';
-
-        return back()->with('success', $message);
+        return back();
     }
 
-    public function getAvailableRewards()
+    public function claimAll()
     {
         $user = Auth::user();
         $availableRewards = $this->levelRewardService->getAvailableRewards($user);
-
-        return response()->json([
-            'success' => true,
-            'rewards' => $availableRewards
-        ]);
-    }
-
-    public function getNextRewards()
-    {
-        $user = Auth::user();
-        $nextRewards = $this->levelRewardService->getNextRewards($user);
-
-        return response()->json([
-            'success' => true,
-            'rewards' => $nextRewards
-        ]);
+        foreach ($availableRewards as $reward) {
+            $this->levelRewardService->distributeSpecificReward($user, $reward['level'], $reward['type']);
+        }
+        $user->refresh();
+        Auth::setUser($user);
+        return back();
     }
 }
