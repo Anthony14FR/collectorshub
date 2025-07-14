@@ -8,6 +8,7 @@ Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('users', UserController::class);
+        Route::post('/cache/clear', [DashboardController::class, 'clearCache'])->name('cache.clear');
     });

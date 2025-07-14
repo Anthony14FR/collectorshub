@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -30,5 +32,25 @@ class DashboardController extends Controller
         return Inertia::render('Admin/Dashboard', [
             'stats' => $stats
         ]);
+    }
+
+    public function clearCache(Request $request)
+    {
+        try {
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('route:clear');
+            Artisan::call('view:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cache vidé avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du vidage du cache'
+            ], 500);
+        }
     }
 }

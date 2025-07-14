@@ -83,7 +83,7 @@ const getStatusColor = (status: string) => {
               ➕ Nouvel utilisateur
             </Button>
             <Button
-              @click="router.visit('/admin/dashboard')"
+              @click="router.visit('/admin/')"
               variant="outline"
               size="sm"
               class="w-full"
