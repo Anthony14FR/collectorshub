@@ -44,6 +44,8 @@ class ExpeditionService
                     'status' => 'available'
                 ]);
 
+                $userExpedition->setRelation('expedition', $expedition);
+
                 $activeExpeditions->push($userExpedition);
             }
         }

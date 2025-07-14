@@ -10,7 +10,7 @@ class ExpeditionSeeder extends Seeder
 {
     private $availableTypes = [
         'Normal', 'Feu', 'Eau', 'Electrik', 'Plante', 'Glace', 'Combat', 'Poison',
-        'Sol', 'Vol', 'Psy', 'Insecte', 'Roche', 'Spectre', 'Dragon', 'Tenebres', 'Acier', 'Fee'
+        'Sol', 'Vol', 'Psy', 'Insecte', 'Roche', 'Spectre', 'Dragon', 'Acier', 'Fee'
     ];
 
     private $expeditionTemplates = [
