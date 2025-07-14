@@ -1,28 +1,33 @@
 <script setup lang="ts">
-import type { User } from "@/types/user";
-import { Head, Link, router } from "@inertiajs/vue3";
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from 'vue';
+import { Head, router, Link } from '@inertiajs/vue3';
+import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import Button from '@/Components/UI/Button.vue';
+import Input from '@/Components/UI/Input.vue';
+import Modal from '@/Components/UI/Modal.vue';
+import Alert from '@/Components/UI/Alert.vue';
+import type { PageProps } from '@/types';
+import type { User } from '@/types/user';
 
-interface Props {
+interface Props extends PageProps {
   auth: {
     user: User;
   };
+  mustVerifyEmail?: boolean;
+  status?: string;
 }
 
-const { auth } = defineProps<Props>();
+const props = defineProps<Props>();
 
-const unlockedAvatars = Array.isArray(auth.user.unlocked_avatars)
-  ? auth.user.unlocked_avatars
-  : JSON.parse(auth.user.unlocked_avatars);
+const unlockedAvatars = Array.isArray(props.auth.user.unlocked_avatars)
+  ? props.auth.user.unlocked_avatars
+  : props.auth.user.unlocked_avatars 
+    ? JSON.parse(props.auth.user.unlocked_avatars)
+    : [];
 
-console.log(
-  "Nombre d'avatars débloqués :",
-  unlockedAvatars.length,
-  unlockedAvatars
-);
 const profileForm = reactive({
-  username: auth.user.username,
-  email: auth.user.email,
+  username: props.auth.user.username,
+  email: props.auth.user.email,
   processing: false,
   errors: {} as Record<string, string>,
 });
@@ -36,87 +41,96 @@ const passwordForm = reactive({
 });
 
 const avatarForm = reactive({
-  avatar: auth.user.avatar,
+  avatar: props.auth.user.avatar,
   processing: false,
   errors: {} as Record<string, string>,
 });
 
-const showProfileForm = ref(false);
-const showPasswordForm = ref(false);
+
+const showProfileModal = ref(false);
+const showPasswordModal = ref(false);
+const showAvatarModal = ref(false);
+const showAlert = ref(false);
+const alertType = ref<'success' | 'error'>('success');
+const alertMessage = ref('');
+
+const formattedJoinDate = computed(() => {
+  return new Date(props.auth.user.created_at).toLocaleDateString("fr-FR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+});
+
 
 const updateProfile = () => {
   profileForm.processing = true;
   profileForm.errors = {};
 
-  router.patch(
-    "/profile",
-    {
-      username: profileForm.username,
-      email: profileForm.email,
+  router.patch("/profile", {
+    username: profileForm.username,
+    email: profileForm.email,
+  }, {
+    onSuccess: () => {
+      profileForm.processing = false;
+      showProfileModal.value = false;
+      showSuccessAlert("Profil mis à jour avec succès !");
     },
-    {
-      onSuccess: () => {
-        profileForm.processing = false;
-        showProfileForm.value = false;
-      },
-      onError: (errors: Record<string, string>) => {
-        profileForm.processing = false;
-        profileForm.errors = errors;
-      },
-    }
-  );
+    onError: (errors: Record<string, string>) => {
+      profileForm.processing = false;
+      profileForm.errors = errors;
+    },
+  });
 };
 
 const updatePassword = () => {
   passwordForm.processing = true;
   passwordForm.errors = {};
 
-  router.patch(
-    "/password",
-    {
-      current_password: passwordForm.current_password,
-      password: passwordForm.password,
-      password_confirmation: passwordForm.password_confirmation,
+  router.put("/password", {
+    current_password: passwordForm.current_password,
+    password: passwordForm.password,
+    password_confirmation: passwordForm.password_confirmation,
+  }, {
+    onSuccess: () => {
+      passwordForm.processing = false;
+      passwordForm.current_password = "";
+      passwordForm.password = "";
+      passwordForm.password_confirmation = "";
+      showPasswordModal.value = false;
+      showSuccessAlert("Mot de passe mis à jour avec succès !");
     },
-    {
-      onSuccess: () => {
-        passwordForm.processing = false;
-        passwordForm.current_password = "";
-        passwordForm.password = "";
-        passwordForm.password_confirmation = "";
-        showPasswordForm.value = false;
-      },
-      onError: (errors: Record<string, string>) => {
-        passwordForm.processing = false;
-        passwordForm.errors = errors;
-      },
-    }
-  );
+    onError: (errors: Record<string, string>) => {
+      passwordForm.processing = false;
+      passwordForm.errors = errors;
+    },
+  });
 };
 
 const updateAvatar = () => {
   avatarForm.processing = true;
   avatarForm.errors = {};
-  router.patch(
-    "/avatar",
-    { avatar: avatarForm.avatar },
-    {
-      onSuccess: () => {
-        avatarForm.processing = false;
-      },
-      onError: (errors: Record<string, string>) => {
-        avatarForm.processing = false;
-        avatarForm.errors = errors;
-      },
-    }
-  );
+  
+  router.patch("/avatar", { 
+    avatar: avatarForm.avatar 
+  }, {
+    onSuccess: () => {
+      avatarForm.processing = false;
+      showAvatarModal.value = false;
+      showSuccessAlert("Avatar mis à jour avec succès !");
+    },
+    onError: (errors: Record<string, string>) => {
+      avatarForm.processing = false;
+      avatarForm.errors = errors;
+    },
+  });
 };
 
 const cancelProfileEdit = () => {
-  profileForm.username = auth.user.username;
-  profileForm.email = auth.user.email;
+  profileForm.username = props.auth.user.username;
+  profileForm.email = props.auth.user.email;
   profileForm.errors = {};
-  showProfileForm.value = false;
+  showProfileModal.value = false;
 };
 
 const cancelPasswordEdit = () => {
@@ -124,484 +138,313 @@ const cancelPasswordEdit = () => {
   passwordForm.password = "";
   passwordForm.password_confirmation = "";
   passwordForm.errors = {};
-  showPasswordForm.value = false;
+  showPasswordModal.value = false;
 };
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("fr-FR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+const selectAvatar = (avatarPath: string) => {
+  avatarForm.avatar = avatarPath;
 };
 
-const getUserInitial = () => {
-  return auth.user?.username?.charAt(0)?.toUpperCase() || "?";
+const showSuccessAlert = (message: string) => {
+  alertType.value = 'success';
+  alertMessage.value = message;
+  showAlert.value = true;
+  setTimeout(() => {
+    showAlert.value = false;
+  }, 4000);
+};
+
+const goToProfile = () => {
+  router.visit('/me');
 };
 </script>
 
 <template>
-  <Head title="Mon Profil" />
+  <Head title="Éditer mon profil" />
 
-  <div
-    class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
-  >
-    <header class="relative">
-      <div
-        class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"
-      ></div>
+  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+    <BackgroundEffects />
 
-      <nav
-        class="relative z-10 flex items-center justify-between p-6 lg:px-8"
-      >
-        <div class="flex lg:flex-1">
-          <Link
-            href="/"
-            class="text-2xl font-bold text-white hover:text-blue-300 transition-colors"
-          >
-            CollectorsHub
-          </Link>
-        </div>
-
-        <div class="flex items-center space-x-4">
-          <Link
-            href="/me"
-            class="text-white text-sm hover:text-blue-300 transition-colors"
-          >
-            ← Retour au profil
-          </Link>
-        </div>
-      </nav>
-    </header>
-
-    <main class="relative z-10 mx-auto max-w-4xl px-6 py-12">
-      <div class="text-center mb-8">
-        <div class="flex justify-center mb-4">
-          <img
-            :src="
-              auth.user.avatar
-                ? auth.user.avatar
-                : '/images/trainer/1.png'
-            "
-            alt="Avatar utilisateur"
-            class="w-24 h-24 rounded-full border-4 border-blue-500 bg-gray-800 object-cover"
-            style="image-rendering: pixelated"
-          />
-        </div>
-        <h1 class="text-3xl font-bold text-white mb-2">
-          Éditer mon profil
+    <div class="relative z-10 h-screen w-screen overflow-y-auto lg:overflow-hidden">
+      <div class="lg:hidden flex items-center justify-between p-4 bg-base-100/60 backdrop-blur-sm border-b border-base-300/30">
+        <Button @click="goToProfile" variant="outline" size="sm">
+          ← Retour
+        </Button>
+        <h1 class="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          Mon Profil
         </h1>
-        <p class="text-gray-400">
-          Modifiez vos informations personnelles
-        </p>
+        <div class="w-20"></div>
       </div>
 
-      <div
-        class="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 mb-8"
-      >
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-semibold text-white">
-            Informations personnelles
-          </h2>
-          <button
-            @click="showProfileForm = !showProfileForm"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            {{ showProfileForm ? "Annuler" : "Modifier" }}
-          </button>
-        </div>
-
-        <div v-if="!showProfileForm" class="grid md:grid-cols-2 gap-6">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Nom d'utilisateur
-            </label>
-            <div
-              class="bg-gray-800/50 border border-gray-600 rounded-md p-3 text-white"
-            >
-              {{ auth.user.username }}
-            </div>
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Adresse email
-            </label>
-            <div
-              class="bg-gray-800/50 border border-gray-600 rounded-md p-3 text-white"
-            >
-              {{ auth.user.email }}
-              <span
-                v-if="auth.user.email_verified_at"
-                class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-900/50 text-green-300 border border-green-500"
-              >
-                ✓ Vérifiée
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <form
-          v-if="showProfileForm"
-          @submit.prevent="updateProfile"
-          class="space-y-6"
-        >
-          <div class="grid md:grid-cols-2 gap-6">
-            <div>
-              <label
-                for="username"
-                class="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Nom d'utilisateur
-              </label>
-              <input
-                id="username"
-                v-model="profileForm.username"
-                type="text"
-                required
-                class="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="Votre nom d'utilisateur"
-              />
-              <div
-                v-if="profileForm.errors.username"
-                class="mt-2 text-sm text-red-400"
-              >
-                {{ profileForm.errors.username }}
-              </div>
-            </div>
-
-            <div>
-              <label
-                for="email"
-                class="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Adresse email
-              </label>
-              <input
-                id="email"
-                v-model="profileForm.email"
-                type="email"
-                required
-                class="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                placeholder="votre@email.com"
-              />
-              <div
-                v-if="profileForm.errors.email"
-                class="mt-2 text-sm text-red-400"
-              >
-                {{ profileForm.errors.email }}
-              </div>
-            </div>
-          </div>
-
-          <div class="flex space-x-4">
-            <button
-              type="submit"
-              :disabled="profileForm.processing"
-              class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <span v-if="profileForm.processing"
-              >Enregistrement...</span
-              >
-              <span v-else>Enregistrer</span>
-            </button>
-            <button
-              type="button"
-              @click="cancelProfileEdit"
-              class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div
-        class="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 mb-8"
-      >
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-semibold text-white">
-            Mot de passe
-          </h2>
-          <button
-            @click="showPasswordForm = !showPasswordForm"
-            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-          >
-            {{
-              showPasswordForm
-                ? "Annuler"
-                : "Changer le mot de passe"
-            }}
-          </button>
-        </div>
-
-        <div v-if="!showPasswordForm">
-          <p class="text-gray-400">
-            Votre mot de passe est sécurisé et chiffré. Cliquez sur
-            "Changer le mot de passe" pour le modifier.
+      <div class="hidden lg:flex justify-center pt-8 mb-8">
+        <div class="text-center">
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-2 tracking-wider">
+            ⚙️ PROFIL
+          </h1>
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
+            MODIFIER VOS INFORMATIONS
           </p>
         </div>
+      </div>
 
-        <form
-          v-if="showPasswordForm"
-          @submit.prevent="updatePassword"
-          class="space-y-6"
-        >
-          <div>
-            <label
-              for="current_password"
-              class="block text-sm font-medium text-gray-300 mb-2"
-            >
-              Mot de passe actuel
-            </label>
-            <input
-              id="current_password"
-              v-model="passwordForm.current_password"
-              type="password"
-              required
-              class="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-              placeholder="Votre mot de passe actuel"
-            />
-            <div
-              v-if="passwordForm.errors.current_password"
-              class="mt-2 text-sm text-red-400"
-            >
-              {{ passwordForm.errors.current_password }}
-            </div>
-          </div>
+      <div class="absolute top-20 lg:top-32 left-1/2 -translate-x-1/2 w-[400px] z-30">
+        <div v-if="showAlert" class="mb-2">
+          <Alert :type="alertType" :message="alertMessage" dismissible @dismiss="showAlert = false" />
+        </div>
+      </div>
 
-          <div class="grid md:grid-cols-2 gap-6">
-            <div>
-              <label
-                for="password"
-                class="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Nouveau mot de passe
-              </label>
-              <input
-                id="password"
-                v-model="passwordForm.password"
-                type="password"
-                required
-                class="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                placeholder="Nouveau mot de passe"
-              />
-              <div
-                v-if="passwordForm.errors.password"
-                class="mt-2 text-sm text-red-400"
-              >
-                {{ passwordForm.errors.password }}
+      <div class="flex justify-center p-4 lg:p-8">
+        <div class="w-full max-w-4xl">
+          <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-6">
+            <div class="p-4 lg:p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/20">
+              <div class="flex items-center gap-4">
+                <div class="relative">
+                  <img
+                    :src="auth.user.avatar || '/images/trainer/1.png'"
+                    :alt="auth.user.username"
+                    class="w-16 h-16 lg:w-20 lg:h-20 rounded-full border-4 border-primary/30 bg-base-200 object-cover"
+                    style="image-rendering: pixelated"
+                  />
+                  <button 
+                    @click="showAvatarModal = true"
+                    class="absolute -bottom-1 -right-1 w-6 h-6 lg:w-8 lg:h-8 bg-primary text-primary-content rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors"
+                  >
+                    <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex-1">
+                  <h2 class="text-xl lg:text-2xl font-bold">{{ auth.user.username }}</h2>
+                  <p class="text-sm text-base-content/70">{{ auth.user.email }}</p>
+                  <div class="flex items-center gap-3 mt-2">
+                    <span class="text-xs bg-gradient-to-r from-primary/20 to-secondary/20 px-3 py-1 rounded-full">
+                      Niveau {{ auth.user.level || 1 }}
+                    </span>
+                    <span class="text-xs bg-gradient-to-r from-accent/20 to-success/20 px-3 py-1 rounded-full">
+                      {{ auth.user.cash || 0 }} 💰
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div>
-              <label
-                for="password_confirmation"
-                class="block text-sm font-medium text-gray-300 mb-2"
-              >
-                Confirmer le nouveau mot de passe
-              </label>
-              <input
-                id="password_confirmation"
-                v-model="passwordForm.password_confirmation"
-                type="password"
-                required
-                class="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                placeholder="Confirmer le mot de passe"
-              />
-              <div
-                v-if="passwordForm.errors.password_confirmation"
-                class="mt-2 text-sm text-red-400"
-              >
-                {{ passwordForm.errors.password_confirmation }}
+            <div class="p-4 lg:p-6 space-y-6">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold flex items-center gap-2">
+                      <span class="text-xl">👤</span>
+                      Informations personnelles
+                    </h3>
+                    <Button @click="showProfileModal = true" variant="secondary" size="sm">
+                      Modifier
+                    </Button>
+                  </div>
+                  <div class="space-y-3">
+                    <div>
+                      <label class="text-sm font-medium text-base-content/70">Nom d'utilisateur</label>
+                      <div class="mt-1 p-3 bg-base-200/50 rounded-lg">{{ auth.user.username }}</div>
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-base-content/70">Email</label>
+                      <div class="mt-1 p-3 bg-base-200/50 rounded-lg">{{ auth.user.email }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold flex items-center gap-2">
+                      <span class="text-xl">🔐</span>
+                      Sécurité
+                    </h3>
+                    <Button @click="showPasswordModal = true" variant="secondary" size="sm">
+                      Changer
+                    </Button>
+                  </div>
+                  <div class="space-y-3">
+                    <div>
+                      <label class="text-sm font-medium text-base-content/70">Mot de passe</label>
+                      <div class="mt-1 p-3 bg-base-200/50 rounded-lg">••••••••</div>
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-base-content/70">Membre depuis</label>
+                      <div class="mt-1 p-3 bg-base-200/50 rounded-lg">{{ formattedJoinDate }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-6 border-t border-base-300/30">
+                <div class="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl">
+                  <div class="text-2xl font-bold text-primary">{{ auth.user.level || 1 }}</div>
+                  <div class="text-sm text-base-content/70">Niveau</div>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-xl">
+                  <div class="text-2xl font-bold text-secondary">{{ auth.user.xp || 0 }}</div>
+                  <div class="text-sm text-base-content/70">Expérience</div>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl">
+                  <div class="text-2xl font-bold text-accent">{{ auth.user.cash || 0 }}</div>
+                  <div class="text-sm text-base-content/70">Cash</div>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-br from-success/10 to-success/5 rounded-xl">
+                  <div class="text-2xl font-bold text-success">{{ unlockedAvatars.length }}</div>
+                  <div class="text-sm text-base-content/70">Avatars</div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="flex space-x-4">
-            <button
-              type="submit"
-              :disabled="passwordForm.processing"
-              class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <span v-if="passwordForm.processing"
-              >Mise à jour...</span
-              >
-              <span v-else>Mettre à jour le mot de passe</span>
-            </button>
-            <button
-              type="button"
-              @click="cancelPasswordEdit"
-              class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div
-        class="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10 mb-8"
-      >
-        <h2 class="text-xl font-semibold text-white mb-6">
-          Changer d'avatar
-        </h2>
-        <form @submit.prevent="updateAvatar">
-          <div class="flex space-x-4 mb-4 overflow-x-auto max-w-full">
-            <label
-              v-for="avatar in unlockedAvatars"
-              :key="avatar"
-              class="cursor-pointer flex flex-col items-center p-2"
-              style="min-width: 72px;"
-            >
-              <input
-                type="radio"
-                v-model="avatarForm.avatar"
-                :value="avatar"
-                class="hidden"
-              />
-              <img
-                :src="avatar"
-                :alt="'Avatar'"
-                class="w-14 h-14 rounded-full border-4 transition-all duration-150"
-                :class="avatarForm.avatar === avatar
-                  ? 'border-blue-500 scale-110'
-                  : 'border-gray-600 opacity-70 hover:opacity-100'"
-              />
-              <span
-                v-if="avatarForm.avatar === avatar"
-                class="text-xs text-blue-400 font-bold mt-1"
-              >Choisi</span
-              >
-            </label>
-          </div>
-          <button
-            type="submit"
-            :disabled="avatarForm.processing"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            Enregistrer l'avatar
-          </button>
-          <div
-            v-if="avatarForm.errors.avatar"
-            class="mt-2 text-sm text-red-400"
-          >
-            {{ avatarForm.errors.avatar }}
-          </div>
-        </form>
-      </div>
-
-      <div
-        class="bg-white/5 backdrop-blur-sm rounded-xl p-8 border border-white/10"
-      >
-        <h2 class="text-xl font-semibold text-white mb-6">
-          Informations du compte
-        </h2>
-
-        <div class="grid md:grid-cols-3 gap-6">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Niveau
-            </label>
-            <div
-              class="bg-gray-800/50 border border-gray-600 rounded-md p-3 text-white"
-            >
-              {{ auth.user.level }}
-            </div>
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Expérience
-            </label>
-            <div
-              class="bg-gray-800/50 border border-gray-600 rounded-md p-3 text-white"
-            >
-              {{ auth.user.experience }} XP
-            </div>
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Cash
-            </label>
-            <div
-              class="bg-gray-800/50 border border-gray-600 rounded-md p-3 text-white"
-            >
-              {{ auth.user.cash }} $
-            </div>
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Rôle
-            </label>
-            <div
-              class="bg-gray-800/50 border border-gray-600 rounded-md p-3 text-white"
-            >
-              {{ auth.user.role }}
-            </div>
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Membre depuis
-            </label>
-            <div
-              class="bg-gray-800/50 border border-gray-600 rounded-md p-3 text-white"
-            >
-              {{ formatDate(auth.user.created_at) }}
-            </div>
-          </div>
-
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Statut
-            </label>
-            <div
-              class="bg-gray-800/50 border border-gray-600 rounded-md p-3"
-            >
-              <span
-                :class="{
-                  'bg-green-900/50 text-green-300 border-green-500':
-                    auth.user.status === 'active',
-                  'bg-yellow-900/50 text-yellow-300 border-yellow-500':
-                    auth.user.status === 'suspended',
-                  'bg-red-900/50 text-red-300 border-red-500':
-                    auth.user.status === 'banned',
-                }"
-                class="inline-flex items-center px-3 py-1 rounded-full text-sm border"
-              >
-                {{
-                  auth.user.status === "active"
-                    ? "🟢 Actif"
-                    : auth.user.status === "suspended"
-                      ? "🟡 Suspendu"
-                      : "🔴 Banni"
-                }}
-              </span>
-            </div>
+          <div class="text-center">
+            <Button @click="goToProfile" variant="outline" size="lg" class="min-w-48">
+              ← Retour au profil
+            </Button>
           </div>
         </div>
       </div>
-    </main>
+    </div>
+
+    <Modal :show="showProfileModal" @close="cancelProfileEdit">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
+            <span class="text-lg">👤</span>
+          </div>
+          <h3 class="text-xl font-bold">Modifier le profil</h3>
+        </div>
+      </template>
+      <template #default>
+        <form @submit.prevent="updateProfile" class="space-y-6">
+          <div>
+            <Input
+              v-model="profileForm.username"
+              label="Nom d'utilisateur"
+              type="text"
+              required
+              :error="profileForm.errors.username"
+            />
+          </div>
+          <div>
+            <Input
+              v-model="profileForm.email"
+              label="Email"
+              type="email"
+              required
+              :error="profileForm.errors.email"
+            />
+          </div>
+          <div class="flex gap-3 justify-end">
+            <Button @click="cancelProfileEdit" variant="outline" type="button">
+              Annuler
+            </Button>
+            <Button type="submit" :disabled="profileForm.processing">
+              {{ profileForm.processing ? 'Enregistrement...' : 'Enregistrer' }}
+            </Button>
+          </div>
+        </form>
+      </template>
+    </Modal>
+
+    <Modal :show="showPasswordModal" @close="cancelPasswordEdit">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-error/20 rounded-lg flex items-center justify-center">
+            <span class="text-lg">🔐</span>
+          </div>
+          <h3 class="text-xl font-bold">Changer le mot de passe</h3>
+        </div>
+      </template>
+      <template #default>
+        <form @submit.prevent="updatePassword" class="space-y-6">
+          <div>
+            <Input
+              v-model="passwordForm.current_password"
+              label="Mot de passe actuel"
+              type="password"
+              required
+              :error="passwordForm.errors.current_password"
+            />
+          </div>
+          <div>
+            <Input
+              v-model="passwordForm.password"
+              label="Nouveau mot de passe"
+              type="password"
+              required
+              :error="passwordForm.errors.password"
+            />
+          </div>
+          <div>
+            <Input
+              v-model="passwordForm.password_confirmation"
+              label="Confirmer le nouveau mot de passe"
+              type="password"
+              required
+            />
+          </div>
+          <div class="flex gap-3 justify-end">
+            <Button @click="cancelPasswordEdit" variant="outline" type="button">
+              Annuler
+            </Button>
+            <Button type="submit" :disabled="passwordForm.processing">
+              {{ passwordForm.processing ? 'Mise à jour...' : 'Mettre à jour' }}
+            </Button>
+          </div>
+        </form>
+      </template>
+    </Modal>
+
+    <Modal :show="showAvatarModal" @close="showAvatarModal = false">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-gradient-to-br from-accent/20 to-primary/20 rounded-lg flex items-center justify-center">
+            <span class="text-lg">🎭</span>
+          </div>
+          <h3 class="text-xl font-bold">Choisir un avatar</h3>
+        </div>
+      </template>
+      <template #default>
+        <div class="space-y-6">
+          <div class="grid grid-cols-4 lg:grid-cols-6 gap-4">
+            <div
+              v-for="avatar in unlockedAvatars"
+              :key="avatar"
+              @click="selectAvatar(avatar)"
+              :class="[
+                'relative cursor-pointer rounded-xl border-3 transition-all duration-200 overflow-hidden',
+                avatarForm.avatar === avatar 
+                  ? 'border-primary shadow-lg shadow-primary/30 scale-105' 
+                  : 'border-base-300/30 hover:border-primary/50 hover:scale-105'
+              ]"
+            >
+              <img
+                :src="avatar"
+                alt="Avatar"
+                class="w-full h-full object-cover aspect-square"
+                style="image-rendering: pixelated"
+              />
+              <div
+                v-if="avatarForm.avatar === avatar"
+                class="absolute inset-0 bg-primary/20 flex items-center justify-center"
+              >
+                <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-3 justify-end">
+            <Button @click="showAvatarModal = false" variant="outline" type="button">
+              Annuler
+            </Button>
+            <Button @click="updateAvatar" :disabled="avatarForm.processing">
+              {{ avatarForm.processing ? 'Mise à jour...' : 'Confirmer' }}
+            </Button>
+          </div>
+        </div>
+      </template>
+    </Modal>
   </div>
 </template>
