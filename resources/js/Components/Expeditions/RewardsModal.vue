@@ -22,11 +22,19 @@
             <div class="flex items-center gap-3">
               <div v-if="reward.type === 'cash'" 
                    class="w-8 h-8 bg-warning/20 rounded-full flex items-center justify-center">
-                <span class="text-warning text-sm font-bold">💰</span>
+                <span class="text-warning text-sm font-bold">$</span>
               </div>
               <div v-else-if="reward.type === 'xp'" 
-                   class="w-8 h-8 bg-info/20 rounded-full flex items-center justify-center">
-                <span class="text-info text-sm font-bold">⭐</span>
+                   class="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
+                <span class="text-success text-xs font-bold">XP</span>
+              </div>
+              <div v-else-if="reward.type === 'pokeball'" 
+                   class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                <img src="/images/items/pokeball.png" alt="Pokeball" class="w-5 h-5 object-contain">
+              </div>
+              <div v-else-if="reward.type === 'masterball'" 
+                   class="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center">
+                <img src="/images/items/masterball.png" alt="Masterball" class="w-5 h-5 object-contain">
               </div>
               <div v-else 
                    class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
@@ -88,4 +96,4 @@ const getRewardLabel = (type) => {
     return type
   }
 }
-</script> 
+</script>
