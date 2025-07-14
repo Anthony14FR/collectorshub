@@ -46,12 +46,14 @@ class RegisteredUserController extends Controller
             'unlocked_avatars' => json_encode(["/images/trainer/1.png", "/images/trainer/2.png"]),
         ]);
 
+        $user = $user->fresh();
+
         $user->assignRole('user');
 
-        event(new Registered($user));
+        $user->sendEmailVerificationNotification();
 
         Auth::login($user);
 
-        return redirect(route('me', absolute: false));
+        return redirect(route('verification.notice', absolute: false));
     }
 }
