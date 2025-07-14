@@ -26,11 +26,11 @@ const getStars = computed(() => {
 
 const rarityBorderClass = computed(() => {
   switch (pokemon.pokemon.rarity) {
-    case 'normal': return 'border-base-300';
-    case 'rare': return 'border-blue-400';
-    case 'epic': return 'border-purple-500';
-    case 'legendary': return 'border-yellow-500';
-    default: return 'border-base-300';
+  case 'normal': return 'border-base-300';
+  case 'rare': return 'border-blue-400';
+  case 'epic': return 'border-purple-500';
+  case 'legendary': return 'border-yellow-500';
+  default: return 'border-base-300';
   }
 });
 </script>

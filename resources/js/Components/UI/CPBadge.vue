@@ -18,14 +18,14 @@ const sizeClasses = {
 
 const getVariantClasses = () => {
   switch(variant) {
-    case 'filled':
-      return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-    case 'outlined':
-      return 'bg-transparent text-orange-400 border-orange-500/50 border-2';
-    case 'gradient':
-      return 'bg-gradient-to-r from-orange-500/20 to-yellow-500/20 text-orange-300 border-orange-400/40 shadow-lg shadow-orange-500/10';
-    default:
-      return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+  case 'filled':
+    return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+  case 'outlined':
+    return 'bg-transparent text-orange-400 border-orange-500/50 border-2';
+  case 'gradient':
+    return 'bg-gradient-to-r from-orange-500/20 to-yellow-500/20 text-orange-300 border-orange-400/40 shadow-lg shadow-orange-500/10';
+  default:
+    return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
   }
 };
 

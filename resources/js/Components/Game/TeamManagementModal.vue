@@ -74,18 +74,18 @@ const filteredAvailablePokemons = computed(() => {
 
   return filtered.sort((a, b) => {
     switch (sortFilter.value) {
-      case 'cp':
-        return b.cp - a.cp;
-      case 'level':
-        return b.level - a.level;
-      case 'name':
-        return a.pokemon.name.localeCompare(b.pokemon.name);
-      case 'rarity':
-        const rarityOrder = { 'legendary': 4, 'epic': 3, 'rare': 2, 'normal': 1 };
-        return (rarityOrder[b.pokemon.rarity as keyof typeof rarityOrder] || 0) - 
-               (rarityOrder[a.pokemon.rarity as keyof typeof rarityOrder] || 0);
-      default:
-        return 0;
+    case 'cp':
+      return b.cp - a.cp;
+    case 'level':
+      return b.level - a.level;
+    case 'name':
+      return a.pokemon.name.localeCompare(b.pokemon.name);
+    case 'rarity':
+      const rarityOrder = { 'legendary': 4, 'epic': 3, 'rare': 2, 'normal': 1 };
+      return (rarityOrder[b.pokemon.rarity as keyof typeof rarityOrder] || 0) - 
+        (rarityOrder[a.pokemon.rarity as keyof typeof rarityOrder] || 0);
+    default:
+      return 0;
     }
   });
 });

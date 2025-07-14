@@ -33,10 +33,12 @@ class Pokedex extends Model
     public function calculateCP(): int
     {
         $pokemon = $this->pokemon;
-        
-        if (!$pokemon) return 0;
 
-        $baseCP = $pokemon->hp + $pokemon->attack + $pokemon->defense + 
+        if (!$pokemon) {
+            return 0;
+        }
+
+        $baseCP = $pokemon->hp + $pokemon->attack + $pokemon->defense +
                   $pokemon->special_attack + $pokemon->special_defense + $pokemon->speed;
 
         $finalCP = $baseCP;
