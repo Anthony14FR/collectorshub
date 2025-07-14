@@ -55,15 +55,6 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        $user = Auth::user();
-        if ($user && !$user->hasVerifiedEmail()) {
-            Auth::logout();
-            
-            throw ValidationException::withMessages([
-                'login' => 'Votre compte n\'est pas encore vérifié. Veuillez vérifier votre adresse email avant de vous connecter. Vous pouvez demander un nouveau lien de vérification si nécessaire.',
-            ]);
-        }
-
         RateLimiter::clear($this->throttleKey());
     }
 
