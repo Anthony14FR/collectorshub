@@ -15,7 +15,7 @@
             "npm run lint-fix"
         ],
         "*.php": [
-            "composer cs-check"
+            "composer cs"
         ]
     },
     "devDependencies": {
