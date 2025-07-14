@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { User } from '@/types/user';
 import { Head, Link, router } from '@inertiajs/vue3';
+import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import Button from '@/Components/UI/Button.vue';
 
 interface PaginatedUsers {
   data: User[];
@@ -29,171 +31,241 @@ const deleteUser = (userId: number) => {
 
 const getRoleColor = (role: string) => {
   switch (role) {
-  case 'admin': return 'bg-red-100 text-red-800';
-  case 'premium': return 'bg-yellow-100 text-yellow-800';
-  default: return 'bg-gray-100 text-gray-800';
+  case 'admin': return 'text-error bg-error/10 border-error/30';
+  case 'premium': return 'text-warning bg-warning/10 border-warning/30';
+  default: return 'text-info bg-info/10 border-info/30';
   }
 };
 
 const getStatusColor = (status: string) => {
   switch (status) {
-  case 'active': return 'bg-green-100 text-green-800';
-  case 'suspended': return 'bg-orange-100 text-orange-800';
-  case 'banned': return 'bg-red-100 text-red-800';
-  default: return 'bg-gray-100 text-gray-800';
+  case 'active': return 'text-success bg-success/10 border-success/30';
+  case 'suspended': return 'text-warning bg-warning/10 border-warning/30';
+  case 'banned': return 'text-error bg-error/10 border-error/30';
+  default: return 'text-base-content/70 bg-base-200/50 border-base-300/30';
   }
 };
 </script>
 
 <template>
-
   <Head title="Gestion des utilisateurs" />
 
-  <div class="min-h-screen bg-gray-100 py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Header -->
-      <div class="bg-white shadow rounded-lg mb-6">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-gray-900">Gestion des utilisateurs</h1>
-            <div class="flex items-center space-x-3">
-              <Link href="/me"
-                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                ← Retour
-              </Link>
-              <Link href="/admin/users/create"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                Nouvel utilisateur
-              </Link>
+  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+    <BackgroundEffects />
+
+    <div class="relative z-10 h-screen w-screen overflow-hidden">
+      <div class="flex justify-center pt-4 mb-4">
+        <div class="text-center">
+          <h1 class="text-2xl font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent mb-1 tracking-wider">
+            👥 GESTION UTILISATEURS
+          </h1>
+          <p class="text-xs text-base-content/70 uppercase tracking-wider">
+            {{ users.total }} utilisateur{{ users.total > 1 ? 's' : '' }} enregistré{{ users.total > 1 ? 's' : '' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="absolute right-8 top-20 w-64">
+        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
+          <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+              <span class="text-lg">⚙️</span>
+              ACTIONS
+            </h3>
+          </div>
+          <div class="p-3 space-y-2">
+            <Button
+              @click="router.visit('/admin/users/create')"
+              variant="secondary"
+              size="sm"
+              class="w-full"
+            >
+              ➕ Nouvel utilisateur
+            </Button>
+            <Button
+              @click="router.visit('/admin/')"
+              variant="outline"
+              size="sm"
+              class="w-full"
+            >
+              ← Dashboard
+            </Button>
+            <Button
+              @click="router.visit('/me')"
+              variant="ghost"
+              size="sm"
+              class="w-full"
+            >
+              🏠 Profil
+            </Button>
+          </div>
+        </div>
+
+        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+          <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+              <span class="text-lg">📊</span>
+              STATISTIQUES
+            </h3>
+          </div>
+          <div class="p-3 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-base-content/70">Total</span>
+              <span class="text-sm font-bold text-info">{{ users.total }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-base-content/70">Page</span>
+              <span class="text-sm font-bold">{{ users.current_page }}/{{ users.last_page }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-base-content/70">Par page</span>
+              <span class="text-sm font-bold">{{ users.per_page }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Users Table -->
-      <div class="bg-white shadow rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Utilisateur
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rôle / Statut
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Niveau / XP
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Cash
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Dernière connexion
-                </th>
-                <th
-                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="user in users.data" :key="user.id" class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
-                    <div class="text-sm text-gray-500">{{ user.email }}</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="space-y-1">
-                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                          :class="getRoleColor(user.role)">
-                      {{ user.role }}
-                    </span>
-                    <br>
-                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                          :class="getStatusColor(user.status)">
-                      {{ user.status }}
-                    </span>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <div>Niveau {{ user.level }}</div>
-                  <div class="text-xs text-gray-500">{{ user.experience }} XP</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ user.cash.toLocaleString() }} ₽
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ user.last_login ? new Date(user.last_login).toLocaleDateString('fr-FR') :
-                    'Jamais' }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                  <Link :href="`/admin/users/${user.id}`"
-                        class="text-blue-600 hover:text-blue-900 transition-colors">
-                    Voir
-                  </Link>
-                  <Link :href="`/admin/users/${user.id}/edit`"
-                        class="text-indigo-600 hover:text-indigo-900 transition-colors">
-                    Modifier
-                  </Link>
-                  <button @click="deleteUser(user.id)"
-                          class="text-red-600 hover:text-red-900 transition-colors">
-                    Supprimer
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[900px] h-[700px]">
+        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
+          <div class="shrink-0 p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+              <span class="text-lg">📋</span>
+              LISTE DES UTILISATEURS
+            </h3>
+          </div>
 
-        <!-- Pagination -->
-        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6" v-if="users.last_page > 1">
-          <div class="flex items-center justify-between">
-            <div class="flex-1 flex justify-between sm:hidden">
-              <Link v-if="users.current_page > 1"
-                    :href="users.links.find(link => link.label === '&laquo; Previous')?.url || ''"
-                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Précédent
-              </Link>
-              <Link v-if="users.current_page < users.last_page"
-                    :href="users.links.find(link => link.label === 'Next &raquo;')?.url || ''"
-                    class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Suivant
-              </Link>
+          <div class="flex-1 overflow-y-auto">
+            <table class="w-full">
+              <thead class="sticky z-50 top-0 bg-base-200/80 backdrop-blur-sm border-b border-base-300/30">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
+                    Utilisateur
+                  </th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
+                    Rôle / Statut
+                  </th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
+                    Niveau / XP
+                  </th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
+                    Cash
+                  </th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
+                    Dernière connexion
+                  </th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-base-300/20">
+                <tr v-for="user in users.data" :key="user.id" 
+                    class="hover:bg-base-200/30 transition-colors">
+                  <td class="px-4 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-sm font-bold">
+                        {{ user.username.charAt(0).toUpperCase() }}
+                      </div>
+                      <div>
+                        <div class="font-semibold text-base-content">{{ user.username }}</div>
+                        <div class="text-xs text-base-content/60">{{ user.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td class="px-4 py-4">
+                    <div class="space-y-1">
+                      <span :class="[
+                        'inline-flex px-2 py-1 text-xs font-semibold rounded-full border',
+                        getRoleColor(user.role)
+                      ]">
+                        {{ user.role }}
+                      </span>
+                      <br>
+                      <span :class="[
+                        'inline-flex px-2 py-1 text-xs font-semibold rounded-full border',
+                        getStatusColor(user.status)
+                      ]">
+                        {{ user.status }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <td class="px-4 py-4">
+                    <div class="text-sm">
+                      <div class="font-semibold">Niveau {{ user.level || 1 }}</div>
+                      <div class="text-xs text-base-content/60">{{ (user.experience || 0).toLocaleString() }} XP</div>
+                    </div>
+                  </td>
+
+                  <td class="px-4 py-4">
+                    <div class="text-sm font-semibold text-success">
+                      {{ (user.cash || 0).toLocaleString() }} 💰
+                    </div>
+                  </td>
+
+                  <td class="px-4 py-4">
+                    <div class="text-xs text-base-content/60">
+                      {{ user.last_login ? 
+                        new Date(user.last_login).toLocaleDateString('fr-FR') :
+                        'Jamais' }}
+                    </div>
+                  </td>
+
+                  <td class="px-4 py-4">
+                    <div class="flex justify-center gap-1">
+                      <Button
+                        @click="router.visit(`/admin/users/${user.id}`)"
+                        variant="ghost"
+                        size="sm"
+                        class="text-info hover:text-info hover:bg-info/10"
+                        title="Voir"
+                      >
+                        👁️
+                      </Button>
+                      <Button
+                        @click="router.visit(`/admin/users/${user.id}/edit`)"
+                        variant="ghost"
+                        size="sm"
+                        class="text-warning hover:text-warning hover:bg-warning/10"
+                        title="Modifier"
+                      >
+                        ✏️
+                      </Button>
+                      <Button
+                        @click="deleteUser(user.id)"
+                        variant="ghost"
+                        size="sm"
+                        class="text-error hover:text-error hover:bg-error/10"
+                        title="Supprimer"
+                      >
+                        🗑️
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div v-if="users.last_page > 1" class="shrink-0 bg-gradient-to-r from-info/10 to-info/5 px-4 py-3 border-t border-info/20">
+            <div class="flex justify-center items-center gap-2">
+              <template v-for="link in users.links" :key="link.label">
+                <Button
+                  v-if="link.url"
+                  @click="router.visit(link.url)"
+                  :variant="link.active ? 'primary' : 'ghost'"
+                  size="sm"
+                  class="min-w-[2.5rem]"
+                  v-html="link.label"
+                />
+                <span v-else class="px-3 py-2 text-base-content/50 text-sm" v-html="link.label" />
+              </template>
             </div>
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p class="text-sm text-gray-700">
-                  Affichage de <span class="font-medium">{{ (users.current_page - 1) * users.per_page
-                    + 1 }}</span>
-                  à <span class="font-medium">{{ Math.min(users.current_page * users.per_page,
-                                                          users.total) }}</span>
-                  sur <span class="font-medium">{{ users.total }}</span> résultats
-                </p>
-              </div>
-              <div>
-                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                  <template v-for="link in users.links" :key="link.label">
-                    <Link v-if="link.url" :href="link.url" :class="[
-                      'relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors',
-                      link.active
-                        ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                    ]" v-html="link.label" />
-                    <span v-else :class="[
-                      'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                      'bg-white border-gray-300 text-gray-300 cursor-default'
-                    ]" v-html="link.label" />
-                  </template>
-                </nav>
-              </div>
+            <div class="text-xs text-center text-base-content/70 mt-2">
+              Affichage de {{ (users.current_page - 1) * users.per_page + 1 }}
+              à {{ Math.min(users.current_page * users.per_page, users.total) }}
+              sur {{ users.total }} résultats
             </div>
           </div>
         </div>
@@ -201,5 +273,3 @@ const getStatusColor = (status: string) => {
     </div>
   </div>
 </template>
-
-<style scoped></style>
