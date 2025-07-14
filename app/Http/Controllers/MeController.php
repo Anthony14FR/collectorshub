@@ -6,7 +6,6 @@ use App\Models\Pokemon;
 use App\Models\Success;
 use App\Services\LeaderboardService;
 use App\Services\SuccessService;
-use App\Services\LevelRewardService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -14,13 +13,11 @@ class MeController extends Controller
 {
     protected LeaderboardService $leaderboardService;
     protected SuccessService $successService;
-    protected LevelRewardService $levelRewardService;
 
-    public function __construct(LeaderboardService $leaderboardService, SuccessService $successService, LevelRewardService $levelRewardService)
+    public function __construct(LeaderboardService $leaderboardService, SuccessService $successService)
     {
         $this->leaderboardService = $leaderboardService;
         $this->successService = $successService;
-        $this->levelRewardService = $levelRewardService;
     }
 
     public function index()
@@ -36,9 +33,6 @@ class MeController extends Controller
         $otherSuccesses = Success::whereNotIn('id', $user->userSuccesses()->pluck('success_id'))->get();
         $progress = $this->successService->getSuccessProgress($user);
 
-        $levelRewardsToClaim = $this->levelRewardService->getAvailableRewards($user);
-        $levelRewardsPreview = $this->levelRewardService->getPreviewRewards($user);
-
         return Inertia::render('Me', [
             'user' => $user,
             'pokedex' => $pokedex,
@@ -49,8 +43,6 @@ class MeController extends Controller
             'unclaimed_successes' => $unclaimedSuccesses,
             'claimed_successes' => $claimedSuccesses,
             'progress' => $progress,
-            'level_rewards_to_claim' => $levelRewardsToClaim,
-            'level_rewards_preview' => $levelRewardsPreview,
         ]);
     }
 }
