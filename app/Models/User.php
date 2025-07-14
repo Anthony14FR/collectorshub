@@ -154,4 +154,16 @@ class User extends Authenticatable
     {
         return $this->userSuccesses()->where('is_claimed', false)->count();
     }
+
+    public function userExpeditions(): HasMany
+    {
+        return $this->hasMany(UserExpedition::class);
+    }
+
+    public function expeditions(): BelongsToMany
+    {
+        return $this->belongsToMany(Expedition::class, 'user_expeditions')
+            ->withPivot('date', 'status', 'started_at', 'ends_at', 'claimed_at')
+            ->withTimestamps();
+    }
 }

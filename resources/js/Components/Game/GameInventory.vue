@@ -25,19 +25,18 @@ const formatPrice = (price: number) => {
   <div class="relative">
     <Button
       variant="secondary"
-      icon="collection"
       size="md"
       @click="isModalOpen = true"
       class="w-full"
     >
-      SAC
+      <img src="/images/icons/bag.webp" alt="Sac" class="w-6 h-6 mr-2" /> SAC
     </Button>
 
     <Modal :show="isModalOpen" @close="isModalOpen = false" max-width="4xl">
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-gradient-to-br from-success/20 to-primary/20 rounded-lg flex items-center justify-center">
-            <span class="text-lg">🎒</span>
+            <img src="/images/icons/bag.webp" alt="Sac" class="w-6 h-6" />
           </div>
           <div class="flex flex-col">
             <h3 class="text-xl font-bold bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
@@ -69,7 +68,7 @@ const formatPrice = (price: number) => {
 
         <div v-if="filteredInventory.length === 0" class="text-center py-8">
           <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-base-200/50 to-base-300/50 rounded-full flex items-center justify-center">
-            <span class="text-2xl opacity-50">🎒</span>
+            <img src="/images/icons/bag.webp" alt="Sac vide" class="w-10 h-10 opacity-50" />
           </div>
           <p class="text-base-content/70 mb-2">Votre sac est vide</p>
           <p class="text-sm text-base-content/50">Explorez pour trouver des objets !</p>
@@ -77,7 +76,7 @@ const formatPrice = (price: number) => {
 
         <div v-else>
           <h5 class="font-bold text-base-content mb-3 flex items-center gap-2">
-            <span class="text-lg">📦</span>
+            <img src="/images/icons/bag.webp" alt="Objets" class="w-6 h-6" />
             Objets
           </h5>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
@@ -88,7 +87,7 @@ const formatPrice = (price: number) => {
             >
               <div class="text-center">
                 <div class="w-12 h-12 mx-auto mb-2 bg-gradient-to-br from-success/20 to-primary/20 rounded-lg flex items-center justify-center">
-                  <span class="text-lg">📦</span>
+                  <img :src="item.item.image" :alt="item.item.name" class="w-8 h-8" />
                 </div>
                 <h4 class="font-bold text-sm mb-1">{{ item.item.name }}</h4>
                 <p class="text-xs opacity-70 mb-2">{{ item.item.description }}</p>

@@ -160,6 +160,30 @@ const logout = () => {
               <span class="font-medium">Gacha</span>
             </Link>
 
+            <Link
+              href="/expeditions"
+              class="flex items-center gap-3 p-3 rounded-xl hover:bg-warning/10 transition-all duration-300 group"
+            >
+              <div
+                class="w-8 h-8 bg-warning/20 rounded-lg flex items-center justify-center group-hover:bg-warning/30 transition-colors"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                  ></path>
+                </svg>
+              </div>
+              <span class="font-medium">Expéditions</span>
+            </Link>
+
             <button
               @click="logout"
               class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-error/10 transition-all duration-300 group text-left"

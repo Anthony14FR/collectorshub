@@ -22,10 +22,6 @@ const { pokedex = [], onOpenModal } = defineProps<Props>();
       <div class="w-12 h-12 bg-white rounded-full border-4 border-black/30 flex items-center justify-center">
         <div class="w-8 h-8 bg-cyan-300 rounded-full border-2 border-cyan-500 shadow-inner" />
       </div>
-      <div class="ml-4">
-        <div class="w-8 h-2 bg-red-500 rounded-full mb-1" />
-        <div class="w-5 h-2 bg-yellow-400 rounded-full" />
-      </div>
     </div>
     <div class="flex-1 flex flex-col justify-between p-4 bg-black/30 ">
       <div>

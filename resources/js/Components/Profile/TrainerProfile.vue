@@ -37,7 +37,7 @@ const showTeamCP = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center space-y-4">
+  <div class="flex flex-col items-center space-y-4 mt-24">
     <div v-if="showTeamCP" class="mb-2">
       <CPBadge 
         :cp="teamCP"

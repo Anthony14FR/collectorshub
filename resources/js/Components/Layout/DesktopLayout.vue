@@ -75,11 +75,11 @@ const goToPokemonUpgrade = () => {
         class="w-full mt-2"
         @click="goToShop"
       >
-        🛍️ Boutique
+        <img src="/images/icons/shop.webp" alt="Boutique" class="w-6 h-6 mr-2" /> Boutique
       </Button>
     </SideSection>
 
-    <SideSection position="left" :top="false" class="top-34">
+    <SideSection position="left" :top="false" class="top-36">
       <div class="grid grid-cols-1 gap-3 ">
         <div
           class="relative h-40 overflow-hidden rounded-xl bg-base-100/60 p-4 flex flex-col justify-end"
@@ -105,8 +105,12 @@ const goToPokemonUpgrade = () => {
           </div>
         </div>
 
-        <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm">
-          <div>
+        <div
+          class="flex flex-row items-center justify-between overflow-hidden rounded-xl p-4 backdrop-blur-sm relative"
+          style="background-image: url('/images/marketplace.jpg'); background-size: cover; background-position: center;"
+        >
+          <div class="absolute inset-0 bg-black/60" />
+          <div class="relative z-10">
             <h3 class="mb-1 bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-base font-bold text-transparent">
               Marketplace
             </h3>
@@ -117,21 +121,26 @@ const goToPokemonUpgrade = () => {
           <Button
             v-if="onGoToMarketplace"
             @click="onGoToMarketplace"
-            variant="marketplace"
+            variant="secondary"
             size="sm"
+            class="relative z-10"
           >
-            <span class="text-xl">🏪</span>
+            <img src="/images/icons/marketplace.png" alt="Marketplace" class="w-10 h-10" />
           </Button>
         </div>
 
-        <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm relative">
-          <div v-if="hasUnclaimedSuccesses" class="absolute top-3 right-3 z-10">
+        <div
+          class="flex flex-row items-center justify-between overflow-hidden rounded-xl p-4 backdrop-blur-sm relative"
+          style="background-image: url('/images/badge.jpg'); background-size: cover; background-position: center;"
+        >
+          <div class="absolute inset-0 bg-black/60" />
+          <div v-if="hasUnclaimedSuccesses" class="absolute top-3 right-3 z-20">
             <span class="relative flex h-3 w-3">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
               <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
             </span>
           </div>
-          <div>
+          <div class="relative z-10">
             <h3 class="mb-1 bg-gradient-to-r from-info to-info/80 bg-clip-text text-base font-bold text-transparent">
               Badges
             </h3>
@@ -142,10 +151,11 @@ const goToPokemonUpgrade = () => {
           <Button
             v-if="onOpenBadgesModal"
             @click="onOpenBadgesModal"
-            variant="primary"
+            variant="secondary"
             size="sm"
+            class="relative z-10"
           >
-            <span class="text-xl">🏆</span>
+            <img src="/images/icons/success.webp" alt="Badges" class="w-10 h-10" />
           </Button>
         </div>
 
@@ -153,7 +163,7 @@ const goToPokemonUpgrade = () => {
           <div class="flex h-full flex-col rounded-[11px] bg-base-100/80 p-4">
             <div class="flex-grow">
               <div class="flex items-center">
-                <span class="text-4xl">🏆</span>
+                <img src="/images/icons/classement.png" alt="Classement" class="w-10 h-10" />
                 <div class="ml-3">
                   <h3 class="mb-1 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-base font-bold text-transparent">
                     Classement

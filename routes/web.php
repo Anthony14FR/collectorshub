@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\ExpeditionController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokedexController;
 use App\Http\Controllers\PokemonController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PokemonUpgradeController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SuccessController;
@@ -79,6 +80,10 @@ Route::middleware('auth')->group(function () {
     // Routes pour LevelRewards
     Route::post('/level-rewards/claim', [LevelRewardController::class, 'claim'])->name('level-rewards.claim');
     Route::post('/level-rewards/claim-all', [LevelRewardController::class, 'claimAll'])->name('level-rewards.claim-all');
+  
+    // Routes pour Expeditions
+    Route::get('/expeditions', [ExpeditionController::class, 'index'])->name('expeditions.index');
+    Route::get('/expeditions/{expedition}', [ExpeditionController::class, 'show'])->name('expeditions.show');
 });
 
 require __DIR__ . '/admin.php';
