@@ -187,4 +187,35 @@ class LevelRewardService
         }
         return $claimed;
     }
+
+
+    public function getPreviewRewards(User $user): array
+    {
+        $currentLevel = $user->level;
+        $claimedRewards = $user->claimed_level_rewards ?? [];
+        
+        $previousRewards = [];
+        for ($level = max(1, $currentLevel - 5); $level < $currentLevel; $level++) {
+            $milestones = $this->getMilestonesForLevel($level);
+            foreach ($milestones as $milestone) {
+                $rewardKey = $milestone['type'] . '_' . $milestone['level'];
+                if (in_array($rewardKey, $claimedRewards)) {
+                    $previousRewards[] = array_merge($milestone, ['is_claimed' => true]);
+                }
+            }
+        }
+        
+        $nextRewards = [];
+        for ($level = $currentLevel + 1; $level <= $currentLevel + 5; $level++) {
+            $milestones = $this->getMilestonesForLevel($level);
+            foreach ($milestones as $milestone) {
+                $nextRewards[] = array_merge($milestone, ['is_claimed' => false]);
+            }
+        }
+        
+        return [
+            'previous' => $previousRewards,
+            'next' => $nextRewards
+        ];
+    }
 } 

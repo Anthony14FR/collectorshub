@@ -22,6 +22,7 @@ interface Props {
     onOpenTeamManagementModal?: () => void;
     onOpenBadgesModal?: () => void;
     hasUnclaimedSuccesses?: boolean;
+    level_rewards_preview?: LevelRewardPreview;
 }
 
 const {
@@ -35,6 +36,7 @@ const {
     onOpenTeamManagementModal,
     onOpenBadgesModal,
     hasUnclaimedSuccesses,
+    level_rewards_preview,
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -53,6 +55,7 @@ const goToShop = () => {
                 :user="user"
                 :responsive="true"
                 :level_rewards_to_claim="level_rewards_to_claim"
+                :level_rewards_preview="level_rewards_preview"
             />
         </div>
 

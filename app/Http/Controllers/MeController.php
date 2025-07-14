@@ -37,6 +37,7 @@ class MeController extends Controller
         $progress = $this->successService->getSuccessProgress($user);
 
         $levelRewardsToClaim = $this->levelRewardService->getAvailableRewards($user);
+        $levelRewardsPreview = $this->levelRewardService->getPreviewRewards($user);
 
         return Inertia::render('Me', [
             'user' => $user,
@@ -49,6 +50,7 @@ class MeController extends Controller
             'claimed_successes' => $claimedSuccesses,
             'progress' => $progress,
             'level_rewards_to_claim' => $levelRewardsToClaim,
+            'level_rewards_preview' => $levelRewardsPreview,
         ]);
     }
 }

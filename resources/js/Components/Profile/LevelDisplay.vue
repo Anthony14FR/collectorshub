@@ -10,12 +10,14 @@ interface Props {
   user: User;
   responsive?: boolean;
   level_rewards_to_claim?: LevelReward[];
+  level_rewards_preview?: LevelRewardPreview;
 }
 
 const {
   user,
   responsive = false,
   level_rewards_to_claim = [],
+  level_rewards_preview,
 } = defineProps<Props>();
 
 const experienceProgress = computed(() => {
@@ -157,14 +159,9 @@ const getRewardColor = (type: string) => {
         <div class="absolute top-3 right-3 z-20">
           <Button
             @click="openModal"
-            :disabled="!hasAvailableReward"
             variant="primary"
             size="sm"
             class="relative group"
-            :class="{
-              'opacity-50 cursor-not-allowed':
-                !hasAvailableReward,
-            }"
           >
             <span class="text-xl">🎁</span>
           </Button>
@@ -321,12 +318,12 @@ const getRewardColor = (type: string) => {
         </div>
       </div>
     </div>
-
-    <Modal :show="modalOpen" @close="closeModal" max-width="2xl">
+    
+    <Modal :show="modalOpen" @close="closeModal" max-width="4xl">
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-            <span class="text-lg">🎁</span>
+            <span class="text-lg">🏆</span>
           </div>
           <div class="flex flex-col">
             <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
@@ -341,102 +338,145 @@ const getRewardColor = (type: string) => {
 
       <template #default>
         <div class="space-y-6">
-          <div class="flex justify-center">
+          <div v-if="level_rewards_to_claim.length > 0" class="flex justify-center">
             <Button
               @click="claimAllRewards"
-              variant="success"
-              size="lg"
-              class="shadow-lg"
+              variant="primary" 
+              class="w-full max-w-xs"
             >
-              <span class="text-lg mr-2">🎯</span>
-              <span class="font-bold">Tout Récupérer</span>
+              <span class="text-xl mr-2">⚡</span>
+              Tout réclamer ({{ level_rewards_to_claim.length }})
             </Button>
           </div>
-
-          <div class="space-y-4 max-h-96 overflow-y-auto">
-            <div
-              v-for="tier in rewardsByTier"
-              :key="tier.tier"
-              class="bg-gradient-to-br from-base-200/50 to-base-300/30 rounded-xl border border-base-300"
-            >
-              <div
-                class="flex items-center justify-between p-4 cursor-pointer hover:bg-base-200/30 transition-colors rounded-t-xl"
-                @click="toggleTier(tier.tier)"
+          <div v-if="level_rewards_to_claim.length > 0">
+            <h4 class="text-lg font-semibold mb-4 text-warning">Récompenses Disponibles</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div 
+                v-for="reward in level_rewards_to_claim" 
+                :key="`available-${reward.type}-${reward.level}`"
+                class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-warning/40 transition-all duration-200 group"
               >
-                <div class="flex items-center gap-3">
-                  <h4 class="text-lg font-bold text-base-content">
-                    Niveaux {{ tier.range }}
-                  </h4>
-                  <Badge variant="primary" size="sm">
-                    {{ tier.rewards.length }} récompenses
-                  </Badge>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm text-base-content/60">
-                    {{
-                      isTierOpen(tier.tier)
-                        ? "Masquer"
-                        : "Afficher"
-                    }}
-                  </span>
-                  <div
-                    class="w-5 h-5 flex items-center justify-center transition-transform duration-200"
-                    :class="{
-                      'rotate-180': isTierOpen(tier.tier),
-                    }"
-                  >
-                    <span class="text-lg">▼</span>
+                <div class="flex items-start gap-3">
+                  <div class="w-14 h-14 shrink-0 bg-warning/20 rounded-lg overflow-hidden flex items-center justify-center animate-pulse">
+                    <span class="text-2xl">{{ getRewardIcon(reward.type) }}</span>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="font-bold text-base-content group-hover:text-warning transition-colors">
+                      Niveau {{ reward.level }}
+                    </h3>
+                    <p class="text-xs text-base-content/70 mb-3 capitalize">
+                      {{ reward.type.replace('_', ' ').replace('milestone', 'Palier').replace('regular level', 'Niveau standard') }}
+                    </p>
+                    <div class="flex justify-between items-center mb-3">
+                      <div class="flex gap-2 flex-wrap">
+                        <span class="text-xs px-2 py-0.5 bg-success/10 text-success rounded-full">
+                          +{{ reward.cash.toLocaleString() }} Cash
+                        </span>
+                        <span v-if="reward.pokeballs > 0" class="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
+                          +{{ reward.pokeballs }} Pokéballs
+                        </span>
+                        <span v-if="reward.masterballs > 0" class="text-xs px-2 py-0.5 bg-accent/10 text-accent rounded-full">
+                          +{{ reward.masterballs }} Masterballs
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      @click="() => claimReward(reward.level, reward.type)"
+                      variant="outline"
+                      size="sm"
+                      class="w-full"
+                    >
+                      Récupérer
+                    </Button>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div
-                v-show="isTierOpen(tier.tier)"
-                class="p-4 pt-0 space-y-2 border-t border-base-300/50"
+          <div v-if="level_rewards_preview?.next?.length > 0">
+            <h4 class="text-lg font-semibold mb-4 text-primary">Prochaines Récompenses</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div 
+                v-for="reward in level_rewards_preview.next.slice(0, 4)" 
+                :key="`next-${reward.type}-${reward.level}`"
+                class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group opacity-60"
               >
-                <div
-                  v-for="reward in tier.rewards"
-                  :key="`${reward.type}_${reward.level}`"
-                  class="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r"
-                  :class="getRewardColor(reward.type)"
-                >
-                  <div class="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r" :class="getRewardColor(reward.type)">
-                    <div class="flex items-center gap-2 w-48 min-w-[12rem]">
-                      <span class="text-2xl">{{ getRewardIcon(reward.type) }}</span>
-                      <div>
-                        <div class="font-bold text-white">Niveau {{ reward.level }}</div>
-                        <div class="text-sm text-white/80">
-                          {{ reward.type.replace('_', ' ').replace('milestone', 'Palier').replace('regular level', 'Niveau standard') }}
-                        </div>
+                <div class="flex items-start gap-3">
+                  <div class="w-14 h-14 shrink-0 bg-primary/20 rounded-lg overflow-hidden flex items-center justify-center">
+                    <span class="text-2xl opacity-60">{{ getRewardIcon(reward.type) }}</span>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="font-bold text-base-content group-hover:text-primary transition-colors">
+                      Niveau {{ reward.level }}
+                    </h3>
+                    <p class="text-xs text-base-content/70 mb-2 capitalize">
+                      {{ reward.type.replace('_', ' ').replace('milestone', 'Palier').replace('regular level', 'Niveau standard') }}
+                    </p>
+                    <div class="flex justify-between items-center">
+                      <div class="flex gap-2 flex-wrap">
+                        <span class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
+                          {{ reward.cash.toLocaleString() }} Cash
+                        </span>
+                        <span v-if="reward.pokeballs > 0" class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
+                          {{ reward.pokeballs }} PB
+                        </span>
+                        <span v-if="reward.masterballs > 0" class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
+                          {{ reward.masterballs }} MB
+                        </span>
                       </div>
-                    </div>
-                    <div class="text-center w-20">
-                      <div class="font-bold text-white">{{ reward.cash ? reward.cash.toLocaleString() + '$' : '0' }}</div>
-                      <div class="text-xs opacity-80">Cash</div>
-                    </div>
-                    <div class="text-center w-20">
-                      <div class="font-bold text-white">{{ reward.pokeballs ? reward.pokeballs : '0' }}</div>
-                      <div class="text-xs opacity-80">Pokéballs</div>
-                    </div>
-                    <div class="text-center w-20">
-                      <div class="font-bold text-white">{{ reward.masterballs ? reward.masterballs : '0' }}</div>
-                      <div class="text-xs opacity-80">Masterballs</div>
-                    </div>
-                    <div class="flex justify-end w-28">
-                      <Button
-                        @click="() => claimReward(reward.level, reward.type)"
-                        variant="primary"
-                        size="sm"
-                        class="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                      >
-                        Récupérer
-                      </Button>
+                      <span class="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
+                        Niveau {{ reward.level }}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <div class="bg-base-100/50 rounded-xl p-4" v-if="level_rewards_preview?.previous?.length > 0">
+            <h4 class="text-lg font-semibold mb-4 text-success">Récemment Réclamées</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div 
+                v-for="reward in level_rewards_preview.previous.slice(-4)" 
+                :key="`claimed-${reward.type}-${reward.level}`"
+                class="bg-base-300/50 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-success/40 transition-all duration-200 group opacity-80"
+              >
+                <div class="flex items-start gap-3">
+                  <div class="w-14 h-14 shrink-0 bg-success/20 rounded-lg overflow-hidden flex items-center justify-center">
+                    <span class="text-2xl opacity-70">{{ getRewardIcon(reward.type) }}</span>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="font-bold text-base-content group-hover:text-success transition-colors">
+                      Niveau {{ reward.level }}
+                    </h3>
+                    <p class="text-xs text-base-content/70 mb-2 capitalize">
+                      {{ reward.type.replace('_', ' ').replace('milestone', 'Palier').replace('regular level', 'Niveau standard') }}
+                    </p>
+                    <div class="flex justify-between items-center">
+                      <div class="flex gap-2 flex-wrap">
+                        <span class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
+                          {{ reward.cash.toLocaleString() }} Cash
+                        </span>
+                        <span v-if="reward.pokeballs > 0" class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
+                          {{ reward.pokeballs }} PB
+                        </span>
+                        <span v-if="reward.masterballs > 0" class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
+                          {{ reward.masterballs }} MB
+                        </span>
+                      </div>
+                      <span class="text-xs px-2 py-0.5 bg-success/10 text-success rounded-full">
+                        Réclamé
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
         </div>
       </template>
     </Modal>

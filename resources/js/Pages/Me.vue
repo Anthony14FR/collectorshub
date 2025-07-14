@@ -30,6 +30,7 @@ interface Props extends PageProps {
     unclaimed_successes?: UserSuccess[];
     claimed_successes?: UserSuccess[];
     level_rewards_to_claim?: LevelReward[];
+    level_rewards_preview?: LevelRewardPreview;
     progress?: {
         total: number;
         unlocked: number;
@@ -49,6 +50,7 @@ const {
     unclaimed_successes = [],
     claimed_successes = [],
     level_rewards_to_claim = [],
+    level_rewards_preview,
     progress = {
         total: 0,
         unlocked: 0,
@@ -95,6 +97,7 @@ const openBadgesModal = () => {
                 :inventory="inventory"
                 :pokedex="pokedex"
                 :level_rewards_to_claim="level_rewards_to_claim"
+                :level_rewards_preview="level_rewards_preview"
                 :onOpenPokedexModal="() => (pokedexModalOpen = true)"
                 :onGoToMarketplace="goToMarketplace"
                 :onGoToLeaderboard="openLeaderboardModal"
@@ -108,6 +111,7 @@ const openBadgesModal = () => {
                 :inventory="inventory"
                 :pokedex="pokedex"
                 :level_rewards_to_claim="level_rewards_to_claim"
+                :level_rewards_preview="level_rewards_preview"
                 :onOpenPokedexModal="() => (pokedexModalOpen = true)"
                 :onGoToMarketplace="goToMarketplace"
                 :onGoToLeaderboard="openLeaderboardModal"

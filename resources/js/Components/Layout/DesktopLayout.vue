@@ -24,6 +24,7 @@ interface Props {
     onOpenTeamManagementModal?: () => void;
     onOpenBadgesModal?: () => void;
     hasUnclaimedSuccesses?: boolean;
+    level_rewards_preview?: LevelRewardPreview;
 }
 
 const {
@@ -31,6 +32,7 @@ const {
     inventory,
     pokedex,
     level_rewards_to_claim = [],
+    level_rewards_preview,
     onOpenPokedexModal,
     onGoToMarketplace,
     onGoToLeaderboard,
@@ -54,6 +56,7 @@ const goToShop = () => {
             <LevelDisplay
                 :user="user"
                 :level_rewards_to_claim="level_rewards_to_claim"
+                :level_rewards_preview="level_rewards_preview"
             />
         </div>
 

@@ -29,6 +29,11 @@ export type LevelReward = {
     is_available: boolean;
 }
 
+export type LevelRewardPreview = {
+    previous: LevelReward[];
+    next: LevelReward[];
+}
+
 export type PokedexEntry = {
     id: number;
     user_id: number;
