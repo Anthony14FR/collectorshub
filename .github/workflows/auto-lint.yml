@@ -37,7 +37,7 @@ jobs:
         
       - name: Get changed files
         id: changed-files-js
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46
         with:
           files: |
             resources/js/**/*.{js,ts,vue}
@@ -84,7 +84,7 @@ jobs:
         
       - name: Get changed files
         id: changed-files-php
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@v46
         with:
           files: |
             **/*.php
