@@ -227,7 +227,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="absolute top-32 left-1/2 -translate-x-1/2 w-[700px] max-h-[600px]">
+      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[800px]">
         <div v-if="props.flash?.success" class="mb-4">
           <Alert type="success" :message="props.flash.success" />
         </div>
@@ -243,7 +243,7 @@ onMounted(() => {
             </h3>
           </div>
 
-          <div class="flex-1 overflow-y-auto p-4">
+          <div class="flex-1 overflow-y-auto p-4" >
             <div v-if="loading" class="flex justify-center items-center py-12">
               <Spinner size="md" />
             </div>

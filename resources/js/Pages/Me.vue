@@ -59,10 +59,18 @@ const {
         percentage: 0,
     },
 } = defineProps<Props>();
+
 const pokedexModalOpen = ref(false);
 const leaderboardModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 const badgesModalOpen = ref(false);
+
+const userTeamPokemons = computed(() => {
+  return pokedex
+    .filter(p => p.is_in_team)
+    .sort((a, b) => (a.team_position || 0) - (b.team_position || 0))
+    .slice(0, 6);
+});
 
 const goToMarketplace = () => {
     router.visit("/marketplace");
@@ -178,5 +186,3 @@ const openBadgesModal = () => {
         />
     </div>
 </template>
-
-<style></style>

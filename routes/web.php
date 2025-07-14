@@ -7,6 +7,7 @@ use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokedexController;
 use App\Http\Controllers\PokemonController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PokemonUpgradeController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SuccessController;
@@ -59,6 +60,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/marketplace/cancel/{listingId}', [MarketplaceController::class, 'cancelListing'])->name('marketplace.cancel');
     Route::get('/marketplace/listings', [MarketplaceController::class, 'getListings'])->name('marketplace.listings');
 
+    // Routes pour Pokemon Upgrade
+    Route::get('/pokemon-upgrade', [PokemonUpgradeController::class, 'index'])->name('pokemon-upgrade.index');
+    Route::post('/pokemon-upgrade/upgrade', [PokemonUpgradeController::class, 'upgrade'])->name('pokemon-upgrade.upgrade');
 
     // Routes pour Opening
     Route::get('/opening', [OpeningController::class, 'index'])->name('opening.index');

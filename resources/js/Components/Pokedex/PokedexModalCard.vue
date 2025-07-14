@@ -4,6 +4,7 @@ import type { Pokedex } from '@/types/pokedex';
 import CountBadge from '@/Components/UI/CountBadge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
+import CPBadge from '@/Components/UI/CPBadge.vue';
 
 interface DisplayPokemon {
   pokedexInfo: Pokedex | null;
@@ -39,7 +40,12 @@ const getImagePath = () => {
     ? (displayPokemon.pokemon.id - 1000) + '_S' 
     : displayPokemon.pokemon.id;
   return `/images/pokemon-gifs/${pokemonId}.gif`;
-}
+};
+
+const getPokemonCP = () => {
+  if (!displayPokemon.pokedexInfo) return 0;
+  return displayPokemon.pokedexInfo.cp;
+};
 </script>
 
 <template>
@@ -66,11 +72,13 @@ const getImagePath = () => {
         <div class="absolute -top-1 -left-1">
           <StarsBadge :stars="getStars(displayPokemon.pokedexInfo)" size="sm" />
         </div>
-        <div v-if="displayPokemon.pokemon.is_shiny" class="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
+        <div class="absolute -top-1 -right-1">
+          <CPBadge :cp="getPokemonCP()" size="xs" :show-label="false" />
+        </div>
+        <div v-if="displayPokemon.pokemon.is_shiny" class="absolute top-4 -right-1 w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
           <span class="text-yellow-400 text-sm">✨</span>
         </div>
         <h4 class="font-bold text-base-content truncate">{{ displayPokemon.pokedexInfo.nickname || displayPokemon.pokemon.name }}</h4>
-        <p class="text-xs text-base-content/70 mb-1">Niv. {{ displayPokemon.pokedexInfo.level }}</p>
         <RarityBadge :rarity="displayPokemon.pokemon.rarity" size="xs" />
       </div>
             
@@ -80,4 +88,4 @@ const getImagePath = () => {
       </div>
     </div>
   </div>
-</template> 
+</template>

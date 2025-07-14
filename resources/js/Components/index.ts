@@ -13,6 +13,7 @@ export { default as RarityBadge } from './UI/RarityBadge.vue';
 export { default as StarsBadge } from './UI/StarsBadge.vue';
 export { default as Select } from './UI/Select.vue';
 export { default as Spinner } from './UI/Spinner.vue';
+export { default as CPBadge } from './UI/CPBadge.vue';
 
 // Game Components  
 export { default as GameInventory } from './Game/GameInventory.vue';

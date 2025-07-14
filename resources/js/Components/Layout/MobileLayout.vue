@@ -46,22 +46,95 @@ const goToInvocation = () => {
 const goToShop = () => {
     router.visit("/shop");
 };
+
+const goToPokemonUpgrade = () => {
+  router.visit('/pokemon-upgrade');
+};
 </script>
 
 <template>
-    <div class="lg:hidden flex flex-col p-4">
-        <div class="shrink-0 mb-6">
-            <LevelDisplay
+  <div class="lg:hidden flex flex-col p-4">
+    <div class="shrink-0 mb-6">
+               <LevelDisplay
                 :user="user"
                 :responsive="true"
                 :level_rewards_to_claim="level_rewards_to_claim"
                 :level_rewards_preview="level_rewards_preview"
             />
-        </div>
+    </div>
 
-        <div class="shrink-0 grid grid-cols-2 gap-4 mb-6">
-            <GameInventory :inventory="inventory" :cash="user.cash" />
-            <UserMenu :user="user" />
+    <div class="shrink-0 grid grid-cols-2 gap-4 mb-6">
+      <GameInventory :inventory="inventory" :cash="user.cash" />
+      <UserMenu :user="user" />
+    </div>
+
+    <div class="shrink-0 mb-6">
+      <Button
+        variant="outline"
+        size="md"
+        class="w-full"
+        @click="goToShop"
+      >
+        🛍️ Boutique
+      </Button>
+    </div>
+
+    <div class="shrink-0 flex justify-center mb-6">
+      <div class="scale-75">
+        <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" :team-pokemons="teamPokemons" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+      <div
+        class="relative h-40 overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 flex flex-col justify-end"
+        style="background-image: url('/images/background/invocation.gif'); background-size: cover; background-position: center;"
+      >
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div class="relative z-10">
+          <h3 class="mb-1 text-lg font-bold text-white flex items-center">
+            <img src="/images/items/pokeball.png" alt="pokeball" class="w-6 h-6 mr-2">
+            Invocation
+          </h3>
+          <p class="mb-3 text-xs text-white/80">
+            Invoquez de nouveaux Pokémon
+          </p>
+          <Button
+            @click="goToInvocation"
+            variant="invocation"
+            size="sm"
+            class="w-full"
+          >
+            Invoquer maintenant
+          </Button>
+        </div>
+      </div>
+
+      <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm">
+        <div>
+          <h3 class="mb-1 bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-base font-bold text-transparent">
+            Marketplace
+          </h3>
+          <p class="text-xs text-base-content/70">
+            Achetez et vendez
+          </p>
+        </div>
+        <Button
+          v-if="onGoToMarketplace"
+          @click="onGoToMarketplace"
+          variant="marketplace"
+          size="sm"
+        >
+          <span class="text-xl">🏪</span>
+        </Button>
+      </div>
+
+      <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm relative">
+        <div v-if="hasUnclaimedSuccesses" class="absolute top-3 right-3 z-10">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+          </span>
         </div>
 
         <div class="shrink-0 mb-6">
@@ -86,7 +159,6 @@ const goToShop = () => {
         </div>
 
         <div class="grid grid-cols-1 gap-4">
-            <!-- Invocation Card -->
             <div
                 class="relative h-40 overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 flex flex-col justify-end"
                 style="
@@ -123,7 +195,6 @@ const goToShop = () => {
                 </div>
             </div>
 
-            <!-- Marketplace Card -->
             <div
                 class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm"
             >
@@ -213,7 +284,6 @@ const goToShop = () => {
                 </Button>
             </div>
 
-            <!-- Classement Card -->
             <div
                 class="rounded-xl bg-gradient-to-r from-primary/20 to-primary/40 p-0.5"
                 style="

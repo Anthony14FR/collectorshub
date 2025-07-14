@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import LevelDisplay from "@/Components/Profile/LevelDisplay.vue";
-import TrainerProfile from "@/Components/Profile/TrainerProfile.vue";
-import SideSection from "@/Components/Layout/SideSection.vue";
-import GameInventory from "@/Components/Game/GameInventory.vue";
-import UserMenu from "@/Components/Profile/UserMenu.vue";
-import PokedexSection from "@/Components/Game/PokedexSection.vue";
-import Button from "@/Components/UI/Button.vue";
-import { router } from "@inertiajs/vue3";
-
+import LevelDisplay from '@/Components/Profile/LevelDisplay.vue';
+import TrainerProfile from '@/Components/Profile/TrainerProfile.vue';
+import SideSection from '@/Components/Layout/SideSection.vue';
+import GameInventory from '@/Components/Game/GameInventory.vue';
+import UserMenu from '@/Components/Profile/UserMenu.vue';
+import PokedexSection from '@/Components/Game/PokedexSection.vue';
+import Button from '@/Components/UI/Button.vue';
+import { router } from '@inertiajs/vue3';
+import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { User } from "@/types/user";
 import type { Inventory } from "@/types/inventory";
 import type { Pokedex } from "@/types/pokedex";
@@ -48,10 +48,14 @@ const goToInvocation = () => {
 const goToShop = () => {
     router.visit("/shop");
 };
+
+const goToPokemonUpgrade = () => {
+  router.visit('/pokemon-upgrade');
+};
 </script>
 
 <template>
-    <div class="hidden lg:block h-screen w-screen overflow-hidden relative">
+  <div class="hidden lg:block h-screen w-screen overflow-hidden relative">
         <div class="flex justify-center pt-8 mb-8">
             <LevelDisplay
                 :user="user"
@@ -60,8 +64,25 @@ const goToShop = () => {
             />
         </div>
 
+    <div class="absolute top-1/2 mt-10 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+      <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" :team-pokemons="teamPokemons" />
+    </div>
+
+    <SideSection position="left" :top="true">
+      <GameInventory :inventory="inventory" :cash="user.cash" />
+      <Button
+        variant="outline"
+        size="sm"
+        class="w-full mt-2"
+        @click="goToShop"
+      >
+        🛍️ Boutique
+      </Button>
+    </SideSection>
+
         <div
             class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
+          style="background-image: url('/images/background/invocation.gif'); background-size: cover; background-position: center;"
         >
             <TrainerProfile
                 :user="user"
@@ -119,29 +140,30 @@ const goToShop = () => {
                         </Button>
                     </div>
                 </div>
-
-                <div
-                    class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm"
-                >
-                    <div>
-                        <h3
-                            class="mb-1 bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-base font-bold text-transparent"
-                        >
-                            Marketplace
-                        </h3>
-                        <p class="text-xs text-base-content/70">
-                            Achetez et vendez
-                        </p>
-                    </div>
-                    <Button
-                        v-if="onGoToMarketplace"
-                        @click="onGoToMarketplace"
-                        variant="marketplace"
-                        size="sm"
-                    >
-                        <span class="text-xl">🏪</span>
-                    </Button>
-                </div>
+        <div class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm relative">
+          <div v-if="hasUnclaimedSuccesses" class="absolute top-3 right-3 z-10">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+            </span>
+          </div>
+          <div>
+            <h3 class="mb-1 bg-gradient-to-r from-info to-info/80 bg-clip-text text-base font-bold text-transparent">
+              Badges
+            </h3>
+            <p class="text-xs text-base-content/70">
+              Vos succès et récompenses
+            </p>
+          </div>
+          <Button
+            v-if="onOpenBadgesModal"
+            @click="onOpenBadgesModal"
+            variant="primary"
+            size="sm"
+          >
+            <span class="text-xl">🏆</span>
+          </Button>
+        </div>
 
                 <div
                     class="flex flex-row items-center justify-between overflow-hidden rounded-xl border border-base-300/30 bg-base-100/60 p-4 backdrop-blur-sm relative"
@@ -222,12 +244,45 @@ const goToShop = () => {
         <SideSection position="right" :top="true">
             <UserMenu :user="user" />
         </SideSection>
-
-        <SideSection position="right" :top="false">
-            <PokedexSection
-                :pokedex="pokedex"
-                :onOpenModal="onOpenPokedexModal"
-            />
-        </SideSection>
-    </div>
+    <SideSection position="right" :top="false">
+      <PokedexSection :pokedex="pokedex" :onOpenModal="onOpenPokedexModal" />
+    </SideSection>
+    <SideSection position="right" :top="false" class="top-80">
+      <div 
+        class="relative h-40 overflow-hidden rounded-xl bg-base-100/60 backdrop-blur-sm"
+        style="background-image: url('/images/background/upgrade.gif'); background-size: cover; background-position: center;"
+      >
+        <div class="absolute inset-0 bg-gradient-to-br from-warning/80 via-warning/40 to-transparent" />
+        
+        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/30 to-transparent rounded-bl-full" />
+        
+        <div class="relative z-10 h-full flex flex-col justify-between p-4">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="">
+                <StarsBadge :stars="6" />
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-white drop-shadow-sm">
+                  Amélioration
+                </h3>
+              </div>
+            </div>
+          </div>
+          <p>Augmentez le niveau d'étoiles de vos Pokémon</p>
+          
+          <div class="flex">
+            <Button
+              @click="goToPokemonUpgrade"
+              variant="secondary"
+              size="sm"
+              class="shadow-lg w-full"
+            >
+              Améliorer
+            </Button>
+          </div>
+        </div>
+      </div>
+    </SideSection>
+  </div>
 </template>
