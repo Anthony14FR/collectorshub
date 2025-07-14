@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Pokedex extends Model
@@ -102,6 +103,19 @@ class Pokedex extends Model
     public function statBoost(): HasOne
     {
         return $this->hasOne(StatBoost::class);
+    }
+
+    public function expeditionPokemons(): HasMany
+    {
+        return $this->hasMany(ExpeditionPokemon::class);
+    }
+
+    public function isInExpedition(): bool
+    {
+        return $this->expeditionPokemons()
+            ->where('claimed_at', null)
+            ->where('ends_at', '>', now())
+            ->exists();
     }
 
     protected static function boot()
