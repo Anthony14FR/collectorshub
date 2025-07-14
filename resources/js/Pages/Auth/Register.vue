@@ -106,8 +106,8 @@ const submit = () => {
       <div class="w-full max-w-md">
         <div class="text-center mb-8">
           <Link href="/"
-            class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:from-secondary hover:to-primary transition-all duration-300 tracking-wider">
-          🎮 CollectorsHub
+                class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:from-secondary hover:to-primary transition-all duration-300 tracking-wider">
+            🎮 CollectorsHub
           </Link>
           <h2 class="mt-6 text-2xl font-bold text-base-content tracking-wider">
             INSCRIPTION
@@ -115,7 +115,7 @@ const submit = () => {
           <p class="mt-2 text-sm text-base-content/70">
             Ou
             <Link href="/login" class="font-medium text-primary hover:text-secondary transition-colors">
-            connectez-vous à votre compte existant
+              connectez-vous à votre compte existant
             </Link>
           </p>
         </div>
@@ -138,7 +138,7 @@ const submit = () => {
             </div>
             <div class="mt-2 w-full bg-base-300/30 rounded-full h-1.5">
               <div class="bg-gradient-to-r from-accent to-accent/80 h-1.5 rounded-full transition-all duration-500"
-                :style="{ width: progressPercentage + '%' }"></div>
+                   :style="{ width: progressPercentage + '%' }"></div>
             </div>
           </div>
 
@@ -153,17 +153,17 @@ const submit = () => {
                 <label v-for="id in AVATAR_OPTIONS" :key="id" class="cursor-pointer flex flex-col items-center group">
                   <input type="radio" v-model="form.avatar" :value="AVATAR_PATH(id)" class="hidden" />
                   <div class="relative transition-all duration-300"
-                    :class="form.avatar === AVATAR_PATH(id) ? 'scale-110' : 'scale-100 group-hover:scale-105'">
+                       :class="form.avatar === AVATAR_PATH(id) ? 'scale-110' : 'scale-100 group-hover:scale-105'">
                     <img :src="AVATAR_PATH(id)" :alt="`Avatar ${id}`"
-                      class="w-20 h-20 rounded-full border-4 transition-all duration-300"
-                      :class="form.avatar === AVATAR_PATH(id) ? 'border-accent shadow-lg shadow-accent/30' : 'border-base-300 opacity-70 group-hover:opacity-100 group-hover:border-accent/50'" />
+                         class="w-20 h-20 rounded-full border-4 transition-all duration-300"
+                         :class="form.avatar === AVATAR_PATH(id) ? 'border-accent shadow-lg shadow-accent/30' : 'border-base-300 opacity-70 group-hover:opacity-100 group-hover:border-accent/50'" />
                     <div v-if="form.avatar === AVATAR_PATH(id)"
-                      class="absolute -top-2 -right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center shadow-lg">
+                         class="absolute -top-2 -right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center shadow-lg">
                       <span class="text-xs">✓</span>
                     </div>
                   </div>
                   <span v-if="form.avatar === AVATAR_PATH(id)"
-                    class="text-xs text-accent mt-2 font-bold tracking-wider">CHOISI</span>
+                        class="text-xs text-accent mt-2 font-bold tracking-wider">CHOISI</span>
                 </label>
               </div>
 
@@ -187,8 +187,8 @@ const submit = () => {
               <div class="space-y-4">
                 <div>
                   <Input id="username" ref="nameInput" v-model="form.username" type="text" required
-                    label="Nom d'utilisateur" placeholder="Votre nom d'utilisateur" variant="default" size="md"
-                    :state="form.errors.username ? 'error' : 'default'" />
+                         label="Nom d'utilisateur" placeholder="Votre nom d'utilisateur" variant="default" size="md"
+                         :state="form.errors.username ? 'error' : 'default'" />
                   <div v-if="form.errors.username" class="mt-2 text-sm text-error">
                     {{ form.errors.username }}
                   </div>
@@ -196,8 +196,8 @@ const submit = () => {
 
                 <div>
                   <Input id="email" v-model="form.email" type="email" required label="Adresse email"
-                    placeholder="votre@email.com" variant="default" size="md"
-                    :state="form.errors.email ? 'error' : 'default'" />
+                         placeholder="votre@email.com" variant="default" size="md"
+                         :state="form.errors.email ? 'error' : 'default'" />
                   <div v-if="form.errors.email" class="mt-2 text-sm text-error">
                     {{ form.errors.email }}
                   </div>
@@ -223,8 +223,8 @@ const submit = () => {
               <div class="space-y-4">
                 <div>
                   <Input id="password" v-model="form.password" type="password" required label="Mot de passe"
-                    placeholder="••••••••" variant="default" size="md"
-                    :state="form.errors.password ? 'error' : 'default'" />
+                         placeholder="••••••••" variant="default" size="md"
+                         :state="form.errors.password ? 'error' : 'default'" />
                   <div v-if="form.errors.password" class="mt-2 text-sm text-error">
                     {{ form.errors.password }}
                   </div>
@@ -232,8 +232,8 @@ const submit = () => {
 
                 <div>
                   <Input id="password_confirmation" v-model="form.password_confirmation" type="password" required
-                    label="Confirmer le mot de passe" placeholder="••••••••" variant="default" size="md"
-                    :state="form.errors.password_confirmation ? 'error' : 'default'" />
+                         label="Confirmer le mot de passe" placeholder="••••••••" variant="default" size="md"
+                         :state="form.errors.password_confirmation ? 'error' : 'default'" />
                   <div v-if="form.errors.password_confirmation" class="mt-2 text-sm text-error">
                     {{ form.errors.password_confirmation }}
                   </div>
@@ -295,10 +295,10 @@ const submit = () => {
                 <Button @click="submit" :disabled="form.processing || !canSubmit" variant="primary" size="md">
                   <span v-if="form.processing" class="flex items-center justify-center">
                     <svg class="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-                      viewBox="0 0 24 24">
+                         viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                       </path>
                     </svg>
                     Inscription...
@@ -312,7 +312,7 @@ const submit = () => {
 
         <div class="text-center mt-6">
           <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors">
-          ← Retour à l'accueil
+            ← Retour à l'accueil
           </Link>
         </div>
       </div>
