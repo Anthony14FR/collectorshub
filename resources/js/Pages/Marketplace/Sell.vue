@@ -191,11 +191,13 @@
                     @click="selectPokemon(pokemon)"
                     class="cursor-pointer group"
                   >
-                    <PokemonCard
-                      :entry="pokemon"
-                      size="large"
-                      variant="modal"
-                      :show-details="true"
+                    <PokedexModalCard 
+                      :displayPokemon="{
+                        pokedexInfo: pokemon, 
+                        pokemon: pokemon.pokemon, 
+                        owned: true, 
+                        count: 1 
+                      }" 
                     />
                     <div class="mt-2 text-xs text-center text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                       Cliquer pour sélectionner
@@ -366,7 +368,7 @@ import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import Spinner from '@/Components/UI/Spinner.vue';
 import MyListingsSection from '@/Components/Game/MyListingsSection.vue';
 import SelectedPokemonCard from '@/Components/Cards/SelectedPokemonCard.vue';
-import PokemonCard from '@/Components/Cards/PokemonCard.vue';
+import PokedexModalCard from '@/Components/Pokedex/PokedexModalCard.vue';
 
 interface Props {
   userPokemons: PokedexEntry[];

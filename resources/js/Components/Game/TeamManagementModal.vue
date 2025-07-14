@@ -3,10 +3,11 @@ import { ref, computed, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import type { Pokedex } from '@/types/pokedex';
 import Modal from '@/Components/UI/Modal.vue';
-import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Select from '@/Components/UI/Select.vue';
 import PokedexModalCard from '@/Components/Pokedex/PokedexModalCard.vue';
+import CPBadge from '@/Components/UI/CPBadge.vue';
+import { calculateTeamCP } from '@/utils/cp';
 
 interface Props {
   show: boolean;
@@ -21,6 +22,7 @@ const processing = ref(false);
 const searchQuery = ref('');
 const rarityFilter = ref('all');
 const shinyFilter = ref('all');
+const sortFilter = ref('cp');
 
 const rarities = [
   { value: 'all', label: 'Toutes les raretés' },
@@ -34,7 +36,13 @@ const shinyOptions = [
   { value: 'all', label: 'Tous' },
   { value: 'shiny', label: 'Shiny seulement' },
   { value: 'not_shiny', label: 'Non-Shiny' },
-]
+];
+
+const sortOptions = [
+  { value: 'cp', label: 'CP' },
+  { value: 'name', label: 'Nom (A → Z)' },
+  { value: 'rarity', label: 'Rareté' },
+];
 
 watch(() => props.userPokemons, (newPokemons) => {
   localPokemons.value = JSON.parse(JSON.stringify(newPokemons));
@@ -42,8 +50,12 @@ watch(() => props.userPokemons, (newPokemons) => {
 
 const team = computed(() => localPokemons.value.filter(p => p.is_in_team).sort((a,b) => (a.team_position ?? 99) - (b.team_position ?? 99)));
 
+const teamCP = computed(() => {
+  return calculateTeamCP(team.value);
+});
+
 const filteredAvailablePokemons = computed(() => {
-  return localPokemons.value
+  let filtered = localPokemons.value
     .filter(p => !p.is_in_team)
     .filter(p => {
       if (!searchQuery.value) return true;
@@ -59,6 +71,23 @@ const filteredAvailablePokemons = computed(() => {
       if (shinyFilter.value === 'not_shiny') return !p.pokemon.is_shiny;
       return false;
     });
+
+  return filtered.sort((a, b) => {
+    switch (sortFilter.value) {
+      case 'cp':
+        return b.cp - a.cp;
+      case 'level':
+        return b.level - a.level;
+      case 'name':
+        return a.pokemon.name.localeCompare(b.pokemon.name);
+      case 'rarity':
+        const rarityOrder = { 'legendary': 4, 'epic': 3, 'rare': 2, 'normal': 1 };
+        return (rarityOrder[b.pokemon.rarity as keyof typeof rarityOrder] || 0) - 
+               (rarityOrder[a.pokemon.rarity as keyof typeof rarityOrder] || 0);
+      default:
+        return 0;
+    }
+  });
 });
 
 const addToTeam = (pokemon: Pokedex) => {
@@ -101,22 +130,21 @@ const removeFromTeam = (pokemon: Pokedex) => {
 <template>
   <Modal :show="show" max-width="5xl" @close="onClose">
     <template #header>
-      <h2 class="text-2xl font-bold">Gérer mon équipe</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold">Gérer mon équipe</h2>
+        <div class="mr-16" v-if="team.length > 0">
+          <CPBadge :cp="teamCP" size="lg" variant="gradient" />
+        </div>
+      </div>
     </template>
     <div class="p-4 bg-base-100/70">
       <div class="mb-8">
         <h3 class="text-lg font-semibold mb-4 text-base-content">Mon Équipe ({{ team.length }}/6)</h3>
-        <div class="grid grid-cols-6 gap-4">
-          <div v-for="n in 6" :key="`team-slot-${n}`" class="aspect-square bg-base-200/50 rounded-xl border-2 border-dashed border-base-300/50 flex items-center justify-center p-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div v-for="n in 6" :key="`team-slot-${n}`" class="bg-base-200/50 rounded-xl border-2 border-dashed border-base-300/50 flex items-center justify-center p-2">
             <div v-if="team[n-1]" @click="removeFromTeam(team[n-1])" class="text-center w-full h-full relative group cursor-pointer">
-              <img 
-                :src="`/images/pokemon-gifs/${team[n-1].pokemon.is_shiny ? (team[n-1].pokemon.id - 1000) + '_S' : team[n-1].pokemon.id}.gif`" 
-                :alt="team[n-1].pokemon.name"
-                class="w-16 h-16 object-contain mx-auto"
-                style="image-rendering: pixelated;"
-              >
-              <p class="text-xs font-bold mt-1 truncate">{{ team[n-1].nickname || team[n-1].pokemon.name }}</p>
-              <div class="absolute inset-0 bg-black/70 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <PokedexModalCard :displayPokemon="{pokedexInfo: team[n-1], pokemon: team[n-1].pokemon, owned: true, count: 1 }" />
+              <div class="absolute inset-0 bg-black/70 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 <span class="text-white font-bold text-lg tracking-wider">Retirer</span>
               </div>
             </div>
@@ -132,6 +160,7 @@ const removeFromTeam = (pokemon: Pokedex) => {
             <Input type="text" v-model="searchQuery" placeholder="Rechercher..." size="sm"/>
             <Select v-model="rarityFilter" :options="rarities" size="sm"/>
             <Select v-model="shinyFilter" :options="shinyOptions" size="sm"/>
+            <Select v-model="sortFilter" :options="sortOptions" size="sm"/>
           </div>
         </div>
                 
@@ -151,4 +180,4 @@ const removeFromTeam = (pokemon: Pokedex) => {
       </div>
     </div>
   </Modal>
-</template> 
+</template>

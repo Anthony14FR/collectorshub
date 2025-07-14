@@ -6,6 +6,7 @@ import Button from '@/Components/UI/Button.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
+import CPBadge from '@/Components/UI/CPBadge.vue';
 
 interface Props {
   listing: MarketplaceListing;
@@ -42,13 +43,16 @@ const getStars = () => {
         <img
           :src="getPokemonImageUrl(pokemon)"
           :alt="pokemon.name"
-          class="w-24 h-24 object-contain group-hover:scale-110 transition-transform duration-300"
+          class="w-32 h-32 object-contain group-hover:scale-110 transition-transform duration-300"
           style="image-rendering: pixelated;"
         />
-        <div class="absolute -top-2 -left-2">
+        <div v-if="listing.pokemon.cp" class="absolute top-0 left-4">
+          <CPBadge :cp="listing.pokemon.cp" size="xs" :show-label="false" />
+        </div>
+        <div class="absolute -bottom-2 -left-2">
           <StarsBadge :stars="getStars()" size="sm" />
         </div>
-        <div v-if="pokemon.is_shiny" class="absolute -top-2 -right-2 w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
+        <div v-if="pokemon.is_shiny" class="absolute -bottom-2 left-11 w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
           <span class="text-yellow-400 text-xs">✨</span>
         </div>
       </div>

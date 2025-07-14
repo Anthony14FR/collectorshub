@@ -19,7 +19,8 @@ class Pokedex extends Model
         'hp_left',
         'is_in_team',
         'is_favorite',
-        'obtained_at'
+        'obtained_at',
+        'cp'
     ];
 
     protected $casts = [
@@ -27,6 +28,64 @@ class Pokedex extends Model
         'is_favorite' => 'boolean',
         'obtained_at' => 'datetime'
     ];
+
+
+    public function calculateCP(): int
+    {
+        $pokemon = $this->pokemon;
+        
+        if (!$pokemon) return 0;
+
+        $baseCP = $pokemon->hp + $pokemon->attack + $pokemon->defense + 
+                  $pokemon->special_attack + $pokemon->special_defense + $pokemon->speed;
+
+        $finalCP = $baseCP;
+
+        if ($pokemon->is_shiny) {
+            $finalCP = floor($finalCP * 1.1);
+        }
+
+        $stars = $this->star ?? 1;
+        $starMultiplier = $this->getStarMultiplier($stars);
+        $finalCP = floor($finalCP * $starMultiplier);
+
+        $rarityMultiplier = $this->getRarityMultiplier($pokemon->rarity ?? 'normal');
+        $finalCP = floor($finalCP * $rarityMultiplier);
+
+        return $finalCP * 10;
+    }
+
+    private function getStarMultiplier(int $stars): float
+    {
+        return match ($stars) {
+            0 => 1.0,
+            1 => 1.50,
+            2 => 2.00,
+            3 => 2.50,
+            4 => 3.00,
+            5 => 3.50,
+            6 => 5.00,
+            default => 1.0,
+        };
+    }
+
+    private function getRarityMultiplier(string $rarity): float
+    {
+        return match (strtolower($rarity)) {
+            'normal' => 1.10,
+            'rare' => 1.50,
+            'epic' => 2.25,
+            'legendary' => 4.0,
+            default => 1.10,
+        };
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($pokedex) {
+            $pokedex->cp = $pokedex->calculateCP();
+        });
+    }
 
     public function user(): BelongsTo
     {
