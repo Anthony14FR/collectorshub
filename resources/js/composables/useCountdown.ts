@@ -40,13 +40,19 @@ export function useCountdown(endTime: string | Date) {
       return 'Terminé'
     }
 
-    const parts = []
-    if (days > 0) parts.push(`${days}j`)
-    if (hours > 0) parts.push(`${hours}h`)
-    if (minutes > 0) parts.push(`${minutes}m`)
-    if (seconds > 0) parts.push(`${seconds}s`)
-
-    return parts.join(' ')
+    if (days > 0) {
+      return `${days}j ${hours}h ${minutes}m`
+    }
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`
+    }
+    
+    if (minutes > 0) {
+      return `${minutes}m ${seconds}s`
+    }
+    
+    return `${seconds}s`
   })
 
   const formattedEndTime = computed(() => {

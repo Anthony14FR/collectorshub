@@ -119,7 +119,7 @@
                     </span>
                   </div>
                   <div class="text-xs text-base-content/60">
-                    {{ Math.floor(expedition.expedition.duration_minutes / 60) }}h{{ expedition.expedition.duration_minutes % 60 > 0 ? ` ${expedition.expedition.duration_minutes % 60}min` : '' }}
+                    {{ formatDuration(expedition.expedition.duration_minutes) }}
                   </div>
                 </div>
 
@@ -243,7 +243,6 @@ const claim = async (userExpeditionId) => {
       showRewardsModal.value = true
       router.reload({ only: ['expeditions'] })
     } else {
-      // Gestion des erreurs du serveur (400, 500, etc.)
       const errorMessage = data.message || `Erreur ${response.status}: ${response.statusText}`
       showToastMessage(errorMessage, 'error')
       console.error('Erreur serveur:', {
@@ -299,5 +298,41 @@ const onExpeditionSuccess = (message) => {
 
 const onExpeditionError = (message) => {
   showToastMessage(message, 'error')
+}
+
+const formatDuration = (minutes) => {
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  
+  if (hours > 0) {
+    if (remainingMinutes > 0) {
+      const wholeMinutes = Math.floor(remainingMinutes)
+      const seconds = Math.round((remainingMinutes - wholeMinutes) * 60)
+      
+      if (wholeMinutes > 0 && seconds > 0) {
+        return `${hours}h ${wholeMinutes}min ${seconds}s`
+      } else if (wholeMinutes > 0) {
+        return `${hours}h ${wholeMinutes}min`
+      } else if (seconds > 0) {
+        return `${hours}h ${seconds}s`
+      }
+    }
+    return `${hours}h`
+  }
+  
+  if (minutes >= 1) {
+    const wholeMinutes = Math.floor(minutes)
+    const seconds = Math.round((minutes - wholeMinutes) * 60)
+    
+    if (wholeMinutes > 0 && seconds > 0) {
+      return `${wholeMinutes}min ${seconds}s`
+    } else if (wholeMinutes > 0) {
+      return `${wholeMinutes}min`
+    } else if (seconds > 0) {
+      return `${seconds}s`
+    }
+  }
+  
+  return `${Math.round(minutes * 60)}s`
 }
 </script> 

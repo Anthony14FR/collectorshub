@@ -78,6 +78,10 @@ const getRewardLabel = (type) => {
     return 'Cash'
   case 'xp':
     return 'Expérience'
+  case 'pokeball':
+    return 'Pokeball'
+  case 'masterball':
+    return 'Masterball'
   case 'item':
     return 'Objet'
   default:
