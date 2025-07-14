@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Item;
-use App\Models\Inventory;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class LevelRewardService
@@ -143,49 +142,45 @@ class LevelRewardService
     }
 
     public function getAvailableRewards(User $user): array
-{
-    $availableRewards = [];
-    $claimedRewards = $user->claimed_level_rewards ?? [];
+    {
+        $availableRewards = [];
+        $claimedRewards = $user->claimed_level_rewards ?? [];
 
-    for ($level = 1; $level <= $user->level; $level++) {
-        $milestones = $this->getMilestonesForLevel($level);
+        for ($level = 1; $level <= $user->level; $level++) {
+            $milestones = $this->getMilestonesForLevel($level);
 
-        // On ne garde que les rewards non réclamées pour ce niveau
-        $unclaimed = [];
-        foreach ($milestones as $milestone) {
-            $rewardKey = $milestone['type'] . '_' . $milestone['level'];
-            if (!in_array($rewardKey, $claimedRewards)) {
-                $unclaimed[] = $milestone;
+            $unclaimed = [];
+            foreach ($milestones as $milestone) {
+                $rewardKey = $milestone['type'] . '_' . $milestone['level'];
+                if (!in_array($rewardKey, $claimedRewards)) {
+                    $unclaimed[] = $milestone;
+                }
+            }
+
+            if (count($unclaimed) === 1) {
+                $milestone = $unclaimed[0];
+                $availableRewards[] = [
+                    'types' => [$milestone['type']],
+                    'level' => $milestone['level'],
+                    'cash' => $milestone['cash'],
+                    'pokeballs' => $milestone['pokeballs'],
+                    'masterballs' => $milestone['masterballs'],
+                    'is_available' => true
+                ];
+            } elseif (count($unclaimed) > 1) {
+                $availableRewards[] = [
+                    'types' => array_column($unclaimed, 'type'),
+                    'level' => $level,
+                    'cash' => array_sum(array_column($unclaimed, 'cash')),
+                    'pokeballs' => array_sum(array_column($unclaimed, 'pokeballs')),
+                    'masterballs' => array_sum(array_column($unclaimed, 'masterballs')),
+                    'is_available' => true
+                ];
             }
         }
 
-        if (count($unclaimed) === 1) {
-            // Une seule reward non claim, on la met telle quelle
-            $milestone = $unclaimed[0];
-            $availableRewards[] = [
-                'types' => [$milestone['type']],
-                'level' => $milestone['level'],
-                'cash' => $milestone['cash'],
-                'pokeballs' => $milestone['pokeballs'],
-                'masterballs' => $milestone['masterballs'],
-                'is_available' => true
-            ];
-        } elseif (count($unclaimed) > 1) {
-            // Plusieurs rewards à ce niveau, on les fusionne
-            $availableRewards[] = [
-                'types' => array_column($unclaimed, 'type'),
-                'level' => $level,
-                'cash' => array_sum(array_column($unclaimed, 'cash')),
-                'pokeballs' => array_sum(array_column($unclaimed, 'pokeballs')),
-                'masterballs' => array_sum(array_column($unclaimed, 'masterballs')),
-                'is_available' => true
-            ];
-        }
-        // Sinon, rien à ajouter pour ce niveau
+        return $availableRewards;
     }
-
-    return $availableRewards;
-}
 
     public function getClaimedRewards(User $user): array
     {
@@ -240,4 +235,4 @@ class LevelRewardService
             'next' => $nextRewards
         ];
     }
-} 
+}
