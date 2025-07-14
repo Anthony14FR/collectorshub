@@ -64,6 +64,7 @@ class XpService
         $experienceNeededForNextLevel = $this->getTotalExperienceForLevel($user->level + 1);
 
         if ($experienceNeededForNextLevel > 0 && $user->experience >= $experienceNeededForNextLevel) {
+            $oldLevel = $user->level;
             $user->level++;
             $user->save();
 
