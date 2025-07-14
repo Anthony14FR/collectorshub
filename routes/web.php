@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExpeditionController;
+use App\Http\Controllers\LevelRewardController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\OpeningController;
@@ -75,6 +76,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/success', [SuccessController::class, 'index'])->name('success.index');
     Route::post('/success/{successId}/claim', [SuccessController::class, 'claim'])->name('success.claim');
     Route::post('/success/claim-all', [SuccessController::class, 'claimAll'])->name('success.claim-all');
+
+    // Routes pour LevelRewards
+    Route::post('/level-rewards/claim', [LevelRewardController::class, 'claim'])->name('level-rewards.claim');
+    Route::post('/level-rewards/claim-all', [LevelRewardController::class, 'claimAll'])->name('level-rewards.claim-all');
 
     // Routes pour Expeditions
     Route::get('/expeditions', [ExpeditionController::class, 'index'])->name('expeditions.index');

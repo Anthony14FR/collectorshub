@@ -10,6 +10,7 @@ import { router } from '@inertiajs/vue3';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
+import type { LevelReward } from "@/types/user";
 
 interface Props {
   user: User;
@@ -22,6 +23,8 @@ interface Props {
   onOpenBadgesModal?: () => void;
   hasUnclaimedSuccesses?: boolean;
   teamPokemons?: Pokedex[];
+  level_rewards_to_claim?: LevelReward[];
+  level_rewards_preview?: LevelRewardPreview;
 }
 
 const { 
@@ -35,6 +38,8 @@ const {
   onOpenBadgesModal,
   hasUnclaimedSuccesses,
   teamPokemons,
+  level_rewards_to_claim = [],
+  level_rewards_preview,
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -53,7 +58,7 @@ const goToPokemonUpgrade = () => {
 <template>
   <div class="lg:hidden flex flex-col p-4">
     <div class="shrink-0 mb-6">
-      <LevelDisplay :user="user" :responsive="true" />
+      <LevelDisplay :user="user" :responsive="true" :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview" />
     </div>
 
     <div class="shrink-0 grid grid-cols-2 gap-4 mb-6">
