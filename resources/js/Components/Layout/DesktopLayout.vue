@@ -55,8 +55,8 @@ const goToPokemonUpgrade = () => {
 <template>
   <div class="hidden lg:block h-screen w-screen overflow-hidden relative">
     <div class="flex justify-center pt-8 mb-8 max-[1200px]:scale-75">
-  <LevelDisplay :user="user" />
-</div>
+      <LevelDisplay :user="user" />
+    </div>
 
     <div class="absolute top-1/2 mt-10 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
       <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" :team-pokemons="teamPokemons" />

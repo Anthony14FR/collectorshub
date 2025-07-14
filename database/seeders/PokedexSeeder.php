@@ -55,7 +55,7 @@ class PokedexSeeder extends Seeder
         }
 
         $randomPokemons = Pokemon::where('id', '!=', $pikachu->id)->take(5)->get();
-        
+
         foreach ($randomPokemons as $pokemon) {
             for ($i = 0; $i < 2; $i++) {
                 Pokedex::create([
