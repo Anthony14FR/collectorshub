@@ -2,7 +2,7 @@
   <div v-if="show" class="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-4" @click.self="$emit('close')">
     <div class="absolute inset-0 bg-base-100/80 backdrop-blur-md"></div>
     
-    <div class="relative w-full max-w-sm sm:max-w-2xl md:max-w-5xl max-h-[85vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-warning/20 rounded-2xl sm:rounded-3xl shadow-2xl shadow-warning/20 overflow-hidden flex flex-col">
+    <div class="relative w-full max-w-sm sm:max-w-2xl md:max-w-5xl h-[85vh] bg-gradient-to-br from-base-100/95 to-base-200/90 backdrop-blur-lg border-2 border-warning/20 rounded-2xl sm:rounded-3xl shadow-2xl shadow-warning/20 overflow-hidden flex flex-col">
       
       <div class="bg-gradient-to-r from-warning/20 to-warning/30 border-b border-warning/20 px-4 sm:px-6 md:px-8 py-4 sm:py-6 flex-shrink-0">
         <div class="flex items-center gap-3 mb-4">
@@ -79,25 +79,38 @@
           </div>
         </div>
 
-        <div class="flex-1 overflow-auto p-4 sm:p-6">
-          <div v-if="filteredPokemons.length === 0" class="text-center py-12">
-            <div class="w-16 h-16 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-base-content/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
+        <div class="flex-1 overflow-hidden flex flex-col">
+          <div v-if="filteredPokemons.length === 0" class="flex-1 flex items-center justify-center">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-base-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-base-content/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <p class="text-base-content/60 text-sm">Aucun Pokémon éligible trouvé</p>
             </div>
-            <p class="text-base-content/60 text-sm">Aucun Pokémon éligible trouvé</p>
           </div>
           
-          <div v-else class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3">
-            <SimplePokemonCard
-              v-for="pokemon in filteredPokemons"
-              :key="pokemon.id"
-              :entry="pokemon"
-              :selected="selectedPokemons.includes(pokemon.id)"
-              size="small"
-              @click="togglePokemon(pokemon)"
-            />
+          <div v-else class="flex-1 p-4 sm:p-6 overflow-hidden">
+            <VirtualScroller
+              :items="pokemonRows"
+              :item-size="140"
+              class="h-full"
+              style="height: 100%;"
+            >
+              <template #item="{ item: rowPokemons }">
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3 p-2" style="height: 140px;">
+                  <SimplePokemonCard
+                    v-for="pokemon in rowPokemons"
+                    :key="pokemon.id"
+                    :entry="pokemon"
+                    :selected="selectedPokemons.includes(pokemon.id)"
+                    size="small"
+                    @click="togglePokemon(pokemon)"
+                  />
+                </div>
+              </template>
+            </VirtualScroller>
           </div>
         </div>
       </div>
@@ -164,6 +177,7 @@ const searchQuery = ref('')
 const rarityFilter = ref('all')
 const typeFilter = ref('all')
 const loading = ref(false)
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1280)
 
 const rarityOptions = [
   { value: 'all', label: 'Toutes les raretés' },
@@ -219,6 +233,28 @@ const filteredPokemons = computed(() => {
   return filtered
 })
 
+const itemsPerRow = computed(() => {
+  if (windowWidth.value >= 1280) return 8
+  if (windowWidth.value >= 1024) return 6
+  if (windowWidth.value >= 768) return 5
+  if (windowWidth.value >= 640) return 4
+  return 3
+})
+
+const pokemonRows = computed(() => {
+  const rows = []
+  const pokemons = filteredPokemons.value
+  const itemsPerRowValue = itemsPerRow.value
+  
+  for (let i = 0; i < pokemons.length; i += itemsPerRowValue) {
+    rows.push(pokemons.slice(i, i + itemsPerRowValue))
+  }
+  
+  return rows
+})
+
+
+
 const selectedPokemonDetails = computed(() => {
   return selectedPokemons.value.map(id => 
     props.eligiblePokemons?.find(p => p.id === id)
@@ -262,7 +298,6 @@ const startExpedition = async () => {
       emit('success', data.message)
       emit('close')
     } else {
-      // Gestion des erreurs du serveur (400, 500, etc.)
       const errorMessage = data.message || `Erreur ${response.status}: ${response.statusText}`
       emit('error', errorMessage)
       console.error('Erreur serveur:', {
@@ -279,12 +314,26 @@ const startExpedition = async () => {
   }
 }
 
+const updateWindowWidth = () => {
+  if (typeof window !== 'undefined') {
+    windowWidth.value = window.innerWidth
+  }
+}
+
 watch(() => props.show, (newShow) => {
-  if (!newShow) {
+  if (newShow) {
+    updateWindowWidth()
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', updateWindowWidth)
+    }
+  } else {
     selectedPokemons.value = []
     searchQuery.value = ''
     rarityFilter.value = 'all'
     typeFilter.value = 'all'
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', updateWindowWidth)
+    }
   }
 })
 </script> 

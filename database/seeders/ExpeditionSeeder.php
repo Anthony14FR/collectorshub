@@ -29,7 +29,7 @@ class ExpeditionSeeder extends Seeder
                 'Collectez des ressources dans la nature',
                 'Patrouille de routine dans la région'
             ],
-            'duration' => 60,
+            'duration' => 0.5,
             'pokemon_requirements' => [
                 'normal' => [1, 5],
                 'rare' => [0, 2],
@@ -58,7 +58,7 @@ class ExpeditionSeeder extends Seeder
                 'Exploration avancée de territoires hostiles',
                 'Raid coordonné contre des Pokémons sauvages'
             ],
-            'duration' => 180,
+            'duration' => 1,
             'pokemon_requirements' => [
                 'normal' => [3, 5],
                 'rare' => [1, 4],
@@ -87,7 +87,7 @@ class ExpeditionSeeder extends Seeder
                 'Conquête d\'un territoire stratégique',
                 'Opération spéciale de grande envergure'
             ],
-            'duration' => 360,
+            'duration' => 1.5,
             'pokemon_requirements' => [
                 'normal' => [5, 10],
                 'rare' => [3, 6],
@@ -117,7 +117,7 @@ class ExpeditionSeeder extends Seeder
                 'Conquête légendaire d\'une importance capitale',
                 'Le défi suprême pour les dresseurs d\'élite'
             ],
-            'duration' => 720,
+            'duration' => 2,
             'pokemon_requirements' => [
                 'normal' => [1, 5],
                 'rare' => [5, 10],
