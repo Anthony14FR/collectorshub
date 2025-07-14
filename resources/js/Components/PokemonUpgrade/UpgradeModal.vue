@@ -71,7 +71,7 @@ const materialSlots = computed(() => {
 const canUpgrade = computed(() => {
   const validMaterials = selectedMaterials.value.filter(m => m !== null && m !== undefined);
   return upgradeData.value?.canUpgrade && 
-         validMaterials.length === getTotalRequiredMaterials();
+    validMaterials.length === getTotalRequiredMaterials();
 });
 
 const getTotalRequiredMaterials = (): number => {

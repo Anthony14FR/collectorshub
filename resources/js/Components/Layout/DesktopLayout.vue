@@ -12,6 +12,7 @@ import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
+import type { LevelReward } from "@/types/user";
 
 interface Props {
   user: User;
@@ -24,6 +25,8 @@ interface Props {
   onOpenBadgesModal?: () => void;
   hasUnclaimedSuccesses?: boolean;
   teamPokemons?: Pokedex[];
+  level_rewards_to_claim?: LevelReward[];
+  level_rewards_preview?: LevelRewardPreview;
 }
 
 const { 
@@ -37,6 +40,8 @@ const {
   onOpenBadgesModal,
   hasUnclaimedSuccesses,
   teamPokemons,
+  level_rewards_to_claim = [],
+  level_rewards_preview,
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -55,8 +60,8 @@ const goToPokemonUpgrade = () => {
 <template>
   <div class="hidden lg:block h-screen w-screen overflow-hidden relative">
     <div class="flex justify-center pt-8 mb-8 max-[1200px]:scale-75">
-  <LevelDisplay :user="user" />
-</div>
+      <LevelDisplay :user="user" :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview" />
+    </div>
 
     <div class="absolute top-1/2 mt-10 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
       <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" :team-pokemons="teamPokemons" />
