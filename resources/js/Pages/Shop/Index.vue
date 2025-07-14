@@ -88,7 +88,6 @@ const handleTabChange = (tab) => {
         </div>
       </div>
 
-      <!-- Right Sidebar -->
       <div class="absolute right-8 top-20 w-64">
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
           <div class="bg-gradient-to-r from-success/10 to-success/5 px-3 py-2 border-b border-success/20">
@@ -111,7 +110,7 @@ const handleTabChange = (tab) => {
           <Alert type="error" :message="$page.props.errors.message" />
         </div>
 
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
+        <div class="bg-base-100/60 -mt-12 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
           <ShopItemsList 
             :items="items"
             :inventory="inventory"
