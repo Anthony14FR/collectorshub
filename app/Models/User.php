@@ -39,6 +39,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'status',
         'avatar',
         'unlocked_avatars',
+        'google_id',
+        'google_avatar',
+        'discord_id',
+        'discord_username',
+        'discord_avatar',
+        'provider',
+        'provider_verified_at',
     ];
 
     protected $hidden = [
@@ -62,6 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'level' => 'integer',
         'experience' => 'integer',
         'unlocked_avatars' => 'array',
+        'provider_verified_at' => 'datetime',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
@@ -171,5 +179,18 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
+
+    /**
+     * Determine if the user has verified their email address.
+     * OAuth users are considered automatically verified.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        if ($this->provider) {
+            return true;
+        }
+        
+        return !is_null($this->email_verified_at);
     }
 }
