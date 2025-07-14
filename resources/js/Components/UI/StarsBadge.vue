@@ -1,13 +1,14 @@
 <script setup lang="ts">
 interface Props {
   stars: number;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg';
   maxStars?: number;
 }
 
 const { stars, size = 'sm', maxStars = 6 } = defineProps<Props>();
 
 const sizeClasses = {
+  xxs: 'h-3 px-1.5 text-[8px]',
   xs: 'h-4 px-1.5 text-xs',
   sm: 'h-5 px-2 text-xs',
   md: 'h-6 px-3 text-sm',

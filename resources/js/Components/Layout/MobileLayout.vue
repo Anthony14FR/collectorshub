@@ -21,6 +21,7 @@ interface Props {
   onOpenTeamManagementModal?: () => void;
   onOpenBadgesModal?: () => void;
   hasUnclaimedSuccesses?: boolean;
+  teamPokemons?: Pokedex[];
 }
 
 const { 
@@ -32,7 +33,8 @@ const {
   onGoToLeaderboard, 
   onOpenTeamManagementModal,
   onOpenBadgesModal,
-  hasUnclaimedSuccesses
+  hasUnclaimedSuccesses,
+  teamPokemons,
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -72,7 +74,7 @@ const goToPokemonUpgrade = () => {
 
     <div class="shrink-0 flex justify-center mb-6">
       <div class="scale-75">
-        <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" />
+        <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" :team-pokemons="teamPokemons" />
       </div>
     </div>
 

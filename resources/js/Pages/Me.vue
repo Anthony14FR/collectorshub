@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
@@ -48,10 +48,18 @@ const {
   claimed_successes = [],
   progress = { total: 0, unlocked: 0, claimed: 0, unclaimed: 0, percentage: 0 },
 } = defineProps<Props>();
+
 const pokedexModalOpen = ref(false);
 const leaderboardModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 const badgesModalOpen = ref(false);
+
+const userTeamPokemons = computed(() => {
+  return pokedex
+    .filter(p => p.is_in_team)
+    .sort((a, b) => (a.team_position || 0) - (b.team_position || 0))
+    .slice(0, 6);
+});
 
 const goToMarketplace = () => {
   router.visit('/marketplace');
@@ -82,6 +90,7 @@ const openBadgesModal = () => {
         :user="auth.user"
         :inventory="inventory"
         :pokedex="pokedex"
+        :team-pokemons="userTeamPokemons"
         :onOpenPokedexModal="() => pokedexModalOpen = true"
         :onGoToMarketplace="goToMarketplace"
         :onGoToLeaderboard="openLeaderboardModal"
@@ -94,6 +103,7 @@ const openBadgesModal = () => {
         :user="auth.user"
         :inventory="inventory"
         :pokedex="pokedex"
+        :team-pokemons="userTeamPokemons"
         :onOpenPokedexModal="() => pokedexModalOpen = true"
         :onGoToMarketplace="goToMarketplace"
         :onGoToLeaderboard="openLeaderboardModal"
@@ -147,6 +157,3 @@ const openBadgesModal = () => {
     />
   </div>
 </template>
-
-<style>
-</style>
