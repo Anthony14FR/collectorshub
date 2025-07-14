@@ -9,7 +9,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
             min-height: 100vh;
         }
         
@@ -25,7 +25,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -76,7 +76,7 @@
         }
         
         .username {
-            color: #4f46e5;
+            color: #22c55e;
         }
         
         .message {
@@ -135,15 +135,6 @@
             justify-content: center;
         }
         
-        .pokeball-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ef4444 50%, white 50%);
-            border: 2px solid #374151;
-            margin-right: 10px;
-        }
-        
         .app-url {
             color: #6b7280;
             font-size: 12px;
@@ -194,8 +185,7 @@
             
             <div class="security-notice">
                 <div class="security-title">
-                    <div class="pokeball-icon"></div>
-                    Sécurité de votre compte
+                    🎯 Sécurité de votre compte
                 </div>
                 <div>
                     Ce lien de vérification expirera dans <strong>60 minutes</strong>.<br>
@@ -219,4 +209,4 @@
         </div>
     </div>
 </body>
-</html> 
+</html>

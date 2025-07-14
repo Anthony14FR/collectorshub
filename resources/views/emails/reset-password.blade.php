@@ -9,7 +9,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             min-height: 100vh;
         }
         
@@ -25,7 +25,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             color: white;
             text-align: center;
             padding: 40px 20px;
@@ -88,7 +88,7 @@
         
         .reset-button {
             display: inline-block;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             color: white !important;
             text-decoration: none;
             padding: 15px 40px;
@@ -133,15 +133,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        
-        .pokeball-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6 50%, white 50%);
-            border: 2px solid #374151;
-            margin-right: 10px;
         }
         
         .app-url {
@@ -193,8 +184,7 @@
             
             <div class="security-notice">
                 <div class="security-title">
-                    <div class="pokeball-icon"></div>
-                    Sécurité de votre compte
+                    🔐 Sécurité de votre compte
                 </div>
                 <div>
                     Ce lien de récupération expirera dans <strong>60 minutes</strong>.<br>
@@ -219,4 +209,4 @@
         </div>
     </div>
 </body>
-</html> 
+</html>
