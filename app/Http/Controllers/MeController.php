@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Pokemon;
 use App\Models\Success;
 use App\Services\LeaderboardService;
-use App\Services\SuccessService;
 use App\Services\LevelRewardService;
+use App\Services\SuccessService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
