@@ -3,7 +3,9 @@ import { computed } from 'vue';
 import type { User } from '@/types/user';
 import Button from '@/Components/UI/Button.vue';
 import TeamPokemonCard from '@/Components/Profile/TeamPokemonCard.vue';
+import CPBadge from '@/Components/UI/CPBadge.vue';
 import type { Pokedex } from '@/types/pokedex';
+import { calculateTeamCP } from '@/utils/cp';
 
 interface Props {
   user: User;
@@ -23,10 +25,28 @@ const displayRightTeam = computed(() => {
   const team = teamPokemons ? [...teamPokemons] : [];
   return Array(3).fill(null).map((_, i) => team[i + 3] || null);
 });
+
+const teamCP = computed(() => {
+  if (!teamPokemons || teamPokemons.length === 0) return 0;
+  return calculateTeamCP(teamPokemons);
+});
+
+const showTeamCP = computed(() => {
+  return teamPokemons && teamPokemons.length > 0;
+});
 </script>
 
 <template>
   <div class="flex flex-col items-center space-y-4">
+    <div v-if="showTeamCP" class="mb-2">
+      <CPBadge 
+        :cp="teamCP"
+        size="lg"
+        variant="gradient"
+        :show-label="true"
+      />
+    </div>
+
     <div class="relative flex items-center justify-center">
       <div class="absolute -left-20 sm:-left-24 md:-left-28 lg:-left-20 xl:-left-24 2xl:-left-28 flex flex-col space-y-2">
         <template v-for="(pokemon, index) in displayLeftTeam" :key="index">

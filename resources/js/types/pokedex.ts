@@ -12,6 +12,7 @@ export type Pokedex = {
     is_favorite: boolean;
     team_position?: number | null;
     obtained_at: string;
+    cp: number;
     created_at: string;
     updated_at: string;
     pokemon: Pokemon;

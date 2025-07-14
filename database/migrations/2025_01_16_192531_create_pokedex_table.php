@@ -15,6 +15,7 @@ return new class () extends Migration {
             $table->foreignId('user_id')->constrained();
             $table->foreignId('pokemon_id')->constrained('pokemon');
             $table->string('nickname', 50)->nullable();
+            $table->integer('cp')->default(0);
             $table->integer('level')->default(1);
             $table->integer('star')->default(0);
             $table->integer('hp_left')->nullable();
