@@ -7,11 +7,15 @@
         "lint": "eslint resources/js",
         "lint-fix": "eslint resources/js --fix",
         "prepare": "husky",
-        "pre-commit": "lint-staged"
+        "pre-commit": "lint-staged",
+        "cs-check": "composer cs-check"
     },
     "lint-staged": {
         "resources/js/**/*.{js,ts,vue}": [
             "npm run lint-fix"
+        ],
+        "*.php": [
+            "composer cs-check"
         ]
     },
     "devDependencies": {
