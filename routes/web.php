@@ -6,7 +6,6 @@ use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokedexController;
-use App\Http\Controllers\PokemonController;
 use App\Http\Controllers\PokemonUpgradeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
@@ -40,11 +39,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/pokedex/user-pokemons', [PokedexController::class, 'getUserPokemons'])->name('pokedex.user-pokemons');
     Route::post('/pokedex/{id}/add-to-team', [PokedexController::class, 'addToTeam'])->name('pokedex.add-to-team');
     Route::post('/pokedex/{id}/remove-from-team', [PokedexController::class, 'removeFromTeam'])->name('pokedex.remove-from-team');
-
-    // Routes pour Pokemon
-    Route::get('/pokemon', action: [PokemonController::class, 'index'])->name('pokemon.index');
-    Route::get('/pokemon/search', [PokemonController::class, 'search'])->name('pokemon.search');
-    Route::get('/pokemon/{idOrName}', [PokemonController::class, 'show'])->name('pokemon.show');
 
     // Routes pour PromoCode
     Route::get('/promocodes', [PromoCodeController::class, 'index'])->name('promocodes.index');
