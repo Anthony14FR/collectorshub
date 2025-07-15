@@ -430,7 +430,7 @@ const getBallEmoji = (ballType: string) => {
       />
       <div class="absolute inset-0 bg-black/60"></div>
 
-      <div class="relative text-center max-w-6xl mx-auto px-6">
+      <div class="relative text-center max-w-6xl mx-auto px-6 h-full flex flex-col justify-center">
         <h2 class="sm:text-3xl text-xl font-bold mb-2 text-secondary/80 animate-slideDown">
           Vos récompenses vous attendent !
         </h2>
@@ -442,7 +442,7 @@ const getBallEmoji = (ballType: string) => {
             'mb-8',
             invocationResults.length === 1
               ? 'flex justify-center'
-              : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:space-y-0 xs:space-y-4 sm:gap-4 md:gap-20'
+              : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-x-2 gap-y-24 sm:gap-x-4 sm:gap-y-8 md:gap-x-6 md:gap-y-8 lg:gap-12'
           ]"
         >
           <div
@@ -466,10 +466,10 @@ const getBallEmoji = (ballType: string) => {
             />
           </div>
         </div>
-        <div class="flex gap-4 justify-center sm:mt-20 -mt-20 animate-slideUp" style="animation-delay: 1s;">
+        <div class="flex gap-4 justify-center sm:mt-20 mt-5 animate-slideUp" style="animation-delay: 1s;">
           <Button
             @click="revealAllBalls"
-            variant="ghost"
+            variant="outline"
             size="lg"
             :disabled="allBallsRevealed"
             class="bg-white/10 backdrop-blur-sm hover:bg-white/20"

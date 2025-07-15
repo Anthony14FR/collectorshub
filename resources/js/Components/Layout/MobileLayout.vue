@@ -62,15 +62,17 @@ const goToPokemonUpgrade = () => {
       <LevelDisplay :user="user" :responsive="true" :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview" />
     </div>
 
-    <div class="px-3 py-3 space-y-3">
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-base-100/80 backdrop-blur-sm rounded-xl border border-base-300/30 p-3">
-          <GameInventory :inventory="inventory" :cash="user.cash" />
-        </div>
-        <div class="bg-base-100/80 backdrop-blur-sm rounded-xl border border-base-300/30 p-3">
-          <UserMenu :user="user" />
-        </div>
+    <div class="space-y-3">
+      <div class="relative mx-5">
+        <GameInventory :inventory="inventory" :cash="user.cash" />
       </div>
+
+      <div class="relative mx-5">
+        <UserMenu :user="user" />
+      </div>
+    </div>
+
+    <div class="px-3 py-3 space-y-3 relative">
 
       <div class="flex justify-center bg-base-100/60 backdrop-blur-sm rounded-2xl border border-base-300/20 p-4">
         <div class="scale-90 -my-2">
@@ -102,7 +104,7 @@ const goToPokemonUpgrade = () => {
               <h3 class="text-sm font-bold text-warning">Market</h3>
             </div>
             <p class="text-xs text-white/80 mb-auto">Acheter & vendre</p>
-            <Button v-if="onGoToMarketplace" @click="onGoToMarketplace" variant="marketplace" size="sm" class="w-full text-xs py-1.5">
+            <Button v-if="onGoToMarketplace" @click="onGoToMarketplace" variant="invocation" size="sm" class="w-full text-xs py-1.5">
               Explorer
             </Button>
           </div>

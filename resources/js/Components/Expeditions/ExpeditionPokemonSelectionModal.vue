@@ -124,7 +124,7 @@
       </div>
       
       <div v-else class="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-transparent">
-        <div class="grid grid-cols-2 sm:grid-cols-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2 p-2">
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 p-2">
           <div
             v-for="pokemon in filteredPokemons"
             :key="pokemon.id"
@@ -432,6 +432,7 @@ const startExpedition = async () => {
     const data = await response.json()
 
     if (response.ok && data.success) {
+      emit('success', data.message)
       emit('close')
     }
   } catch (error) {

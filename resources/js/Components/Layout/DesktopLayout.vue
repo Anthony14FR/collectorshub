@@ -199,7 +199,7 @@ const goToPokemonUpgrade = () => {
     <SideSection position="right" :top="false">
       <PokedexSection :pokedex="pokedex" :onOpenModal="onOpenPokedexModal" />
     </SideSection>
-    <SideSection position="right" :top="false" class="top-80">
+    <SideSection position="right" :top="false" class="top-74">
       <div 
         class="relative h-40 overflow-hidden border-2 border-warning bg-base-100/60 backdrop-blur-sm"
         style="background-image: url('/images/background/upgrade.gif'); background-size: cover; background-position: center;"
@@ -236,7 +236,7 @@ const goToPokemonUpgrade = () => {
         </div>
       </div>
     </SideSection>
-    <SideSection position="right" :top="false" class="top-[500px]">
+    <SideSection position="right" :top="false" class="top-[475px]">
       <div
         class="relative h-40 overflow-hidden  border-2 border-info bg-base-100/60 p-4 flex flex-col justify-end"
         style="background-image: url('/images/background/expeditions.gif'); background-size: cover; background-position: center;"

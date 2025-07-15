@@ -215,12 +215,12 @@ const handleClick = () => {
           <img
             :src="pokemonImageUrl"
             :alt="pokemon.name"
-            class="w-24 h-24 object-contain mx-auto animate-bounceIn"
+            class="w-10 h-24 sm:w-24 object-contain mx-auto animate-bounceIn"
             style="image-rendering: pixelated;"
           />
         </div>
 
-        <div class="text-xs font-bold animate-slideUp text-white drop-shadow-lg" :style="{ animationDelay: '0.5s' }">
+        <div class="text-xs font-bold animate-slideUp text-white sm:mt-0 -mt-6 drop-shadow-lg" :style="{ animationDelay: '0.5s' }">
           {{ pokemon.name }}
         </div>
 

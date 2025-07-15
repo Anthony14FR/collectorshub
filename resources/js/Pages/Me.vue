@@ -90,11 +90,11 @@ const goToExpeditions = () => {
 <template>
   <Head title="Mon Profil" />
 
-  <div class="h-screen w-screen bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="">
 
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-x-hidden">
+    <div class="relative z-50 h-screen w-screen overflow-x-hidden">
       <MobileLayout
         :user="auth.user"
         :inventory="inventory"
