@@ -107,12 +107,6 @@ docker-dev:
 
 docker-up-prod:
 	@echo "🏭 Démarrage de l'environnement de production..."
-	@if [ ! -f .env.production ]; then \
-		echo "❌ Fichier .env.production manquant !"; \
-		echo "📝 Créez le fichier: cp env.production.example .env.production"; \
-		echo "✏️  Puis éditez-le avec vos vraies valeurs"; \
-		exit 1; \
-	fi
 	docker compose -f docker-compose.prod.yml build
 	docker compose -f docker-compose.prod.yml up -d
 	@echo "⏳ Attente que les services soient prêts..."
