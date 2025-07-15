@@ -45,3 +45,8 @@ export * from '../utils/marketplace';
 
 // Types
 export type * from '../types/marketplace'; 
+
+
+// Leaderboard Components
+export { default as PodiumCard } from './Leaderboard/PodiumCard.vue';
+export { default as LeaderboardRow } from './Leaderboard/LeaderboardRow.vue';

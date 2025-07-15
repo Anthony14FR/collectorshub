@@ -5,7 +5,6 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
 import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import LeaderboardSection from '@/Components/Game/LeaderboardSection.vue';
 import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
 import TeamManagementModal from '@/Components/Game/TeamManagementModal.vue';
 import BadgesModal from '@/Components/Profile/BadgesModal.vue';
@@ -25,7 +24,6 @@ interface Props extends PageProps {
   inventory?: Inventory[];
   pokedex?: Pokedex[];
   all_pokemons?: Pokemon[];
-  leaderboards?: Leaderboards;
   successes?: Success[];
   unclaimed_successes?: UserSuccess[];
   claimed_successes?: UserSuccess[];
@@ -44,8 +42,7 @@ const {
   auth, 
   inventory = [], 
   pokedex = [], 
-  all_pokemons = [], 
-  leaderboards,
+  all_pokemons = [],
   successes = [],
   unclaimed_successes = [],
   claimed_successes = [],
@@ -55,7 +52,6 @@ const {
 } = defineProps<Props>();
 
 const pokedexModalOpen = ref(false);
-const leaderboardModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 const badgesModalOpen = ref(false);
 
@@ -70,8 +66,8 @@ const goToMarketplace = () => {
   router.visit('/marketplace');
 };
 
-const openLeaderboardModal = () => {
-  leaderboardModalOpen.value = true;
+const goToLeaderboard = () => {
+  router.visit('/leaderboard');
 };
 
 const openTeamManagementModal = () => {
@@ -104,7 +100,7 @@ const goToExpeditions = () => {
         :team-pokemons="userTeamPokemons"
         :onOpenPokedexModal="() => pokedexModalOpen = true"
         :onGoToMarketplace="goToMarketplace"
-        :onGoToLeaderboard="openLeaderboardModal"
+        :onGoToLeaderboard="goToLeaderboard"
         :onOpenTeamManagementModal="openTeamManagementModal"
         :onOpenBadgesModal="openBadgesModal"
         :has-unclaimed-successes="unclaimed_successes.length > 0"
@@ -120,7 +116,7 @@ const goToExpeditions = () => {
         :team-pokemons="userTeamPokemons"
         :onOpenPokedexModal="() => pokedexModalOpen = true"
         :onGoToMarketplace="goToMarketplace"
-        :onGoToLeaderboard="openLeaderboardModal"
+        :onGoToLeaderboard="goToLeaderboard"
         :onOpenTeamManagementModal="openTeamManagementModal"
         :onOpenBadgesModal="openBadgesModal"
         :has-unclaimed-successes="unclaimed_successes.length > 0"
@@ -140,27 +136,6 @@ const goToExpeditions = () => {
       :user-pokemons="pokedex"
       :on-close="() => teamManagementModalOpen = false"
     />
-
-    <Modal :show="leaderboardModalOpen" @close="leaderboardModalOpen = false" max-width="4xl">
-      <template #header>
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-            <span class="text-lg">🏆</span>
-          </div>
-          <div class="flex flex-col">
-            <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
-              Classements
-            </h3>
-            <div class="mt-1">
-              <span class="text-sm font-semibold text-warning">Top 100 des dresseurs</span>
-            </div>
-          </div>
-        </div>
-      </template>
-      <template #default>
-        <LeaderboardSection v-if="leaderboards" :leaderboards="leaderboards" />
-      </template>
-    </Modal>
 
     <BadgesModal
       :show="badgesModalOpen"

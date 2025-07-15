@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExpeditionController;
+use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LevelRewardController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MeController;
@@ -78,6 +79,9 @@ Route::middleware('auth')->group(function () {
     // Routes pour Expeditions
     Route::get('/expeditions', [ExpeditionController::class, 'index'])->name('expeditions.index');
     Route::get('/expeditions/{expedition}', [ExpeditionController::class, 'show'])->name('expeditions.show');
+
+    // Routes pour Leaderboard
+    Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
 });
 
 require __DIR__ . '/admin.php';
