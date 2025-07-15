@@ -20,10 +20,13 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = $this->userService->getUsersWithPagination();
+        $filters = request()->only(['role', 'status']);
+
+        $users = $this->userService->getUsersWithPagination(10, $filters);
 
         return Inertia::render('Admin/Users/Index', [
-            'users' => $users
+            'users' => $users,
+            'filters' => $filters
         ]);
     }
 

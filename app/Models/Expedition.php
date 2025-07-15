@@ -87,4 +87,59 @@ class Expedition extends Model
 
         return $count >= $requirement->quantity;
     }
+
+    public function getParticipantsCount(): int
+    {
+        return $this->userExpeditions()->count();
+    }
+
+    public function getActiveParticipantsCount(): int
+    {
+        return $this->userExpeditions()->where('status', 'in_progress')->count();
+    }
+
+    public function getCompletedParticipantsCount(): int
+    {
+        return $this->userExpeditions()->where('status', 'completed')->count();
+    }
+
+    public function getRarityColor(): string
+    {
+        return match($this->rarity) {
+            'normal' => '#6B7280',
+            'rare' => '#3B82F6',
+            'epic' => '#8B5CF6',
+            'legendary' => '#F59E0B',
+            default => '#6B7280'
+        };
+    }
+
+    public function getFormattedDuration(): string
+    {
+        if ($this->duration_minutes < 1) {
+            return round($this->duration_minutes * 60) . ' secondes';
+        } elseif ($this->duration_minutes < 60) {
+            return $this->duration_minutes . ' minute' . ($this->duration_minutes > 1 ? 's' : '');
+        } else {
+            $hours = floor($this->duration_minutes / 60);
+            $minutes = $this->duration_minutes % 60;
+
+            $formatted = $hours . ' heure' . ($hours > 1 ? 's' : '');
+            if ($minutes > 0) {
+                $formatted .= ' ' . $minutes . ' minute' . ($minutes > 1 ? 's' : '');
+            }
+
+            return $formatted;
+        }
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeByRarity($query, string $rarity)
+    {
+        return $query->where('rarity', $rarity);
+    }
 }

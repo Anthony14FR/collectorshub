@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -46,9 +47,21 @@ class UserService
         return $user->delete();
     }
 
-    public function getUsersWithPagination(int $perPage = 10)
+    public function getUsersWithPagination(int $perPage = 10, array $filters = [])
     {
-        return User::orderBy('created_at', 'desc')->paginate($perPage);
+        $query = User::query();
+
+        if (isset($filters['role']) && $filters['role'] !== '') {
+            $query->where('role', $filters['role']);
+        }
+
+        if (isset($filters['status']) && $filters['status'] !== '') {
+            $query->where('status', $filters['status']);
+        }
+
+        $query->orderBy('created_at', 'desc');
+
+        return $query->paginate($perPage);
     }
 
     public function getUserWithDetails(User $user): User
@@ -58,6 +71,7 @@ class UserService
 
     public function canDeleteUser(User $user): bool
     {
-        return $user->id !== auth()->id();
+        $authUser = Auth::user();
+        return $authUser ? $user->id !== $authUser->id : true;
     }
 }

@@ -18,6 +18,7 @@ interface Props {
     total_users: number;
     active_users: number;
     total_pokemons: number;
+    total_expeditions: number;
     marketplace_listings: number;
     pending_tickets: number;
     shop_items: number;
@@ -34,6 +35,15 @@ const adminSections = ref([
     route: '/admin/users',
     color: 'info',
     stat: props.stats?.total_users || 0,
+    statLabel: 'Total'
+  },
+  {
+    title: 'Expéditions',
+    description: 'Gérer les expéditions et leurs récompenses',
+    icon: '🗺️',
+    route: '/admin/expeditions',
+    color: 'primary',
+    stat: props.stats?.total_expeditions || 0,
     statLabel: 'Total'
   },
   {
@@ -268,6 +278,10 @@ onMounted(() => {
               <span class="text-xs text-base-content/70">Pokémon</span>
               <span class="text-sm font-bold text-error">{{ props.stats?.total_pokemons || 0 }}</span>
             </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-base-content/70">Expéditions</span>
+              <span class="text-sm font-bold text-primary">{{ props.stats?.total_expeditions || 0 }}</span>
+            </div>
           </div>
         </div>
 
@@ -376,9 +390,10 @@ onMounted(() => {
                 <div class="flex items-start justify-between mb-3">
                   <div class="text-2xl">{{ section.icon }}</div>
                   <div class="text-right">
-                    <div :class="[
+                    <div                     :class="[
                       'text-lg font-bold',
                       section.color === 'info' ? 'text-info' :
+                      section.color === 'primary' ? 'text-primary' :
                       section.color === 'warning' ? 'text-warning' :
                       section.color === 'error' ? 'text-error' :
                       section.color === 'success' ? 'text-success' :
