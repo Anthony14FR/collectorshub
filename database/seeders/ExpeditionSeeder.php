@@ -185,6 +185,11 @@ class ExpeditionSeeder extends Seeder
 
         foreach ($template as $type => $range) {
             $amount = rand($range[0], $range[1]);
+
+            if ($type === 'cash') {
+                $amount = ceil($amount / 100) * 100;
+            }
+
             $rewards[] = [
                 'type' => $type,
                 'amount' => $amount
