@@ -49,11 +49,11 @@ const claimAllSuccesses = async () => {
           <span class="text-lg">🏆</span>
         </div>
         <div class="flex flex-col">
-          <h3 class="text-xl font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent">
+          <h3 class="sm:text-xl text-lg font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent">
             Mes Succès
           </h3>
-          <div class="mt-1">
-            <span class="text-sm font-semibold text-info">Badges et récompenses</span>
+          <div class="sm:mt-1 mt-0">
+            <span class="sm:text-sm text-xs font-semibold text-info">Badges et récompenses</span>
           </div>
         </div>
       </div>
@@ -63,21 +63,21 @@ const claimAllSuccesses = async () => {
       <div class="flex">
         <button 
           @click="activeTab = 'unclaimed'" 
-          class="px-4 py-3 text-sm font-medium transition-colors duration-200"
+          class="px-4 py-3 sm:text-sm text-xs font-medium transition-colors duration-200"
           :class="activeTab === 'unclaimed' ? 'text-info border-b-2 border-info' : 'text-base-content/70 hover:text-base-content'"
         >
           À réclamer ({{ unclaimed_successes.length }})
         </button>
         <button 
           @click="activeTab = 'claimed'" 
-          class="px-4 py-3 text-sm font-medium transition-colors duration-200"
+          class="px-4 py-3 sm:text-sm text-xs font-medium transition-colors duration-200"
           :class="activeTab === 'claimed' ? 'text-success border-b-2 border-success' : 'text-base-content/70 hover:text-base-content'"
         >
           Réclamés ({{ claimed_successes.length }})
         </button>
         <button 
           @click="activeTab = 'locked'" 
-          class="px-4 py-3 text-sm font-medium transition-colors duration-200"
+          class="px-4 py-3 sm:text-sm text-xs font-medium transition-colors duration-200"
           :class="activeTab === 'locked' ? 'text-base-content border-b-2 border-base-content' : 'text-base-content/70 hover:text-base-content'"
         >
           Verrouillés ({{ successes.length }})
@@ -105,7 +105,7 @@ const claimAllSuccesses = async () => {
               <div 
                 v-for="item in unclaimed_successes" 
                 :key="item.id"
-                class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-info/40 transition-all duration-200 group"
+                class="bg-base-200/30 backdrop-blur-sm p-4 border border-base-300/20 hover:border-info/40 transition-all duration-200 group"
               >
                 <div class="flex items-start gap-3">
                   <div class="w-14 h-14 shrink-0 bg-base-300/50 rounded-lg overflow-hidden flex items-center justify-center">
@@ -122,12 +122,12 @@ const claimAllSuccesses = async () => {
                     <p class="text-xs text-base-content/70 mb-2">
                       {{ item.success.description }}
                     </p>
-                    <div class="flex justify-between items-center">
+                    <div class="flex sm:flex-row flex-col justify-between sm:items-center">
                       <div class="flex gap-2">
-                        <span v-if="item.success.cash_reward > 0" class="text-xs px-2 py-0.5 bg-success/10 text-success rounded-full">
+                        <span v-if="item.success.cash_reward > 0" class="sm:text-xs text-[10px] px-2 py-0.5 bg-success/10 text-success rounded-full">
                           +{{ item.success.cash_reward }} Cash
                         </span>
-                        <span v-if="item.success.xp_reward > 0" class="text-xs px-2 py-0.5 bg-info/10 text-info rounded-full">
+                        <span v-if="item.success.xp_reward > 0" class="sm:text-xs text-[10px] px-2 py-0.5 bg-info/10 text-info rounded-full">
                           +{{ item.success.xp_reward }} XP
                         </span>
                       </div>
@@ -136,6 +136,7 @@ const claimAllSuccesses = async () => {
                         variant="primary"
                         size="sm"
                         :disabled="loading"
+                        class="sm:mt-0 mt-2"
                       >
                         Réclamer
                       </Button>

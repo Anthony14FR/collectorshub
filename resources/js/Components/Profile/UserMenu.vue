@@ -23,7 +23,7 @@ const logout = () => {
       MENU
     </Button>
 
-    <Modal :show="isModalOpen" @close="isModalOpen = false">
+    <Modal :show="isModalOpen" @close="isModalOpen = false" :max-width="'lg'">
       <template #header>
         <div class="flex items-center gap-3">
           <div
@@ -40,20 +40,16 @@ const logout = () => {
         <div class="space-y-6">
           <div
             class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-primary/20">
-            <div class="flex items-center gap-4">
-              <div class="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
+            <div class="flex items-center gap-3 sm:gap-4">
+              <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
                 <img
-                  :src="
-                    user.avatar
-                      ? user.avatar
-                      : '/images/trainer/1.png'
-                  "
+                  :src="user.avatar ? user.avatar : '/images/trainer/1.png'"
                   :alt="user.username"
-                  class="w-12 h-12 rounded-full object-cover"
+                  class="w-8 h-8 sm:w-12 sm:h-12 rounded-full object-cover"
                 />
               </div>
               <div>
-                <h4 class="font-bold text-lg">
+                <h4 class="font-bold text-base sm:text-lg">
                   {{ user.username }}
                 </h4>
                 <p class="text-sm opacity-70">
@@ -76,10 +72,10 @@ const logout = () => {
           <div class="space-y-3">
             <Link
               href="/profile"
-              class="flex items-center gap-3 p-3 rounded-xl hover:bg-primary/10 transition-all duration-300 group"
+              class="flex items-center gap-3 p-4 sm:p-3 rounded-xl hover:bg-primary/10 transition-all duration-300 group touch-manipulation"
             >
               <div
-                class="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center group-hover:bg-primary/30 transition-colors"
+                class="w-10 h-10 sm:w-8 sm:h-8 bg-primary/20 rounded-lg flex items-center justify-center group-hover:bg-primary/30 transition-colors"
               >
                 <svg
                   class="w-4 h-4"
@@ -158,6 +154,30 @@ const logout = () => {
                 </svg>
               </div>
               <span class="font-medium">Gacha</span>
+            </Link>
+
+            <Link
+              href="/expeditions"
+              class="flex items-center gap-3 p-3 rounded-xl hover:bg-warning/10 transition-all duration-300 group"
+            >
+              <div
+                class="w-8 h-8 bg-warning/20 rounded-lg flex items-center justify-center group-hover:bg-warning/30 transition-colors"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                  ></path>
+                </svg>
+              </div>
+              <span class="font-medium">Expéditions</span>
             </Link>
 
             <button

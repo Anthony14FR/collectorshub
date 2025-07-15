@@ -1,18 +1,16 @@
-export interface LeaderboardEntry {
+export interface LeaderboardUser {
     rank: number;
     id: number;
     username: string;
-    value: number;
     level: number;
+    avatar?: string;
+    background?: string;
+    value?: number;
+    team_cp?: number;
+    team_pokemons?: any[];
 }
 
 export interface LeaderboardData {
-    top: LeaderboardEntry[];
-    current_user: LeaderboardEntry;
+    top: LeaderboardUser[];
+    current_user: LeaderboardUser;
 }
-
-export interface Leaderboards {
-    cash: LeaderboardData;
-    experience: LeaderboardData;
-    pokemon_count: LeaderboardData;
-} 

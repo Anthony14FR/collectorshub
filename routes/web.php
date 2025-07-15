@@ -1,12 +1,14 @@
 <?php
 
+use App\Http\Controllers\ExpeditionController;
+use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\LevelRewardController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokedexController;
-use App\Http\Controllers\PokemonController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PokemonUpgradeController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SuccessController;
@@ -33,16 +35,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::patch('/avatar', [ProfileController::class, 'updateAvatar'])->name('avatar.update');
+    Route::patch('/background', [ProfileController::class, 'updateBackground'])->name('background.update');
 
     // Routes pour Pokedex
     Route::get('/pokedex/user-pokemons', [PokedexController::class, 'getUserPokemons'])->name('pokedex.user-pokemons');
     Route::post('/pokedex/{id}/add-to-team', [PokedexController::class, 'addToTeam'])->name('pokedex.add-to-team');
     Route::post('/pokedex/{id}/remove-from-team', [PokedexController::class, 'removeFromTeam'])->name('pokedex.remove-from-team');
-
-    // Routes pour Pokemon
-    Route::get('/pokemon', action: [PokemonController::class, 'index'])->name('pokemon.index');
-    Route::get('/pokemon/search', [PokemonController::class, 'search'])->name('pokemon.search');
-    Route::get('/pokemon/{idOrName}', [PokemonController::class, 'show'])->name('pokemon.show');
 
     // Routes pour PromoCode
     Route::get('/promocodes', [PromoCodeController::class, 'index'])->name('promocodes.index');
@@ -74,6 +72,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/success', [SuccessController::class, 'index'])->name('success.index');
     Route::post('/success/{successId}/claim', [SuccessController::class, 'claim'])->name('success.claim');
     Route::post('/success/claim-all', [SuccessController::class, 'claimAll'])->name('success.claim-all');
+
+    // Routes pour LevelRewards
+    Route::post('/level-rewards/claim', [LevelRewardController::class, 'claim'])->name('level-rewards.claim');
+    Route::post('/level-rewards/claim-all', [LevelRewardController::class, 'claimAll'])->name('level-rewards.claim-all');
+
+    // Routes pour Expeditions
+    Route::get('/expeditions', [ExpeditionController::class, 'index'])->name('expeditions.index');
+    Route::get('/expeditions/{expedition}', [ExpeditionController::class, 'show'])->name('expeditions.show');
+
+    // Routes pour Leaderboard
+    Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
 });
 
 require __DIR__ . '/admin.php';

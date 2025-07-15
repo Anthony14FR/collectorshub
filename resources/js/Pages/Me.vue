@@ -16,6 +16,7 @@ import type { Success, UserSuccess } from '@/types/success';
 import type { User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
+import type { LevelReward, LevelRewardPreview } from '@/types/user';
 
 interface Props extends PageProps {
   auth: {
@@ -24,10 +25,11 @@ interface Props extends PageProps {
   inventory?: Inventory[];
   pokedex?: Pokedex[];
   all_pokemons?: Pokemon[];
-  leaderboards?: Leaderboards;
   successes?: Success[];
   unclaimed_successes?: UserSuccess[];
   claimed_successes?: UserSuccess[];
+  level_rewards_to_claim?: LevelReward[];
+  level_rewards_preview?: LevelRewardPreview;
   progress?: {
     total: number;
     unlocked: number;
@@ -46,11 +48,12 @@ const {
   successes = [],
   unclaimed_successes = [],
   claimed_successes = [],
+  level_rewards_to_claim = [],
+  level_rewards_preview,
   progress = { total: 0, unlocked: 0, claimed: 0, unclaimed: 0, percentage: 0 },
 } = defineProps<Props>();
 
 const pokedexModalOpen = ref(false);
-const leaderboardModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 const badgesModalOpen = ref(false);
 const showWelcomeAlert = ref(false);
@@ -79,8 +82,8 @@ const goToMarketplace = () => {
   router.visit('/marketplace');
 };
 
-const openLeaderboardModal = () => {
-  leaderboardModalOpen.value = true;
+const goToLeaderboard = () => {
+  router.visit('/leaderboard');
 };
 
 const openTeamManagementModal = () => {
@@ -94,26 +97,52 @@ const openBadgesModal = () => {
 const dismissWelcomeAlert = () => {
   showWelcomeAlert.value = false;
 }
+
+const goToExpeditions = () => {
+  router.visit('/expeditions');
+}
 </script>
 
 <template>
 
   <Head title="Mon Profil" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="">
 
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-y-auto lg:overflow-hidden">
-      <MobileLayout :user="auth.user" :inventory="inventory" :pokedex="pokedex" :team-pokemons="userTeamPokemons"
-                    :onOpenPokedexModal="() => pokedexModalOpen = true" :onGoToMarketplace="goToMarketplace"
-                    :onGoToLeaderboard="openLeaderboardModal" :onOpenTeamManagementModal="openTeamManagementModal"
-                    :onOpenBadgesModal="openBadgesModal" :has-unclaimed-successes="unclaimed_successes.length > 0" />
+    <div class="relative z-50 h-screen w-screen overflow-x-hidden">
+      <MobileLayout
+        :user="auth.user"
+        :inventory="inventory"
+        :pokedex="pokedex"
+        :level_rewards_to_claim="level_rewards_to_claim"
+        :level_rewards_preview="level_rewards_preview"
+        :team-pokemons="userTeamPokemons"
+        :onOpenPokedexModal="() => pokedexModalOpen = true"
+        :onGoToMarketplace="goToMarketplace"
+        :onGoToLeaderboard="goToLeaderboard"
+        :onOpenTeamManagementModal="openTeamManagementModal"
+        :onOpenBadgesModal="openBadgesModal"
+        :has-unclaimed-successes="unclaimed_successes.length > 0"
+        :onGoToExpeditions="goToExpeditions"
+      />
 
-      <DesktopLayout :user="auth.user" :inventory="inventory" :pokedex="pokedex" :team-pokemons="userTeamPokemons"
-                     :onOpenPokedexModal="() => pokedexModalOpen = true" :onGoToMarketplace="goToMarketplace"
-                     :onGoToLeaderboard="openLeaderboardModal" :onOpenTeamManagementModal="openTeamManagementModal"
-                     :onOpenBadgesModal="openBadgesModal" :has-unclaimed-successes="unclaimed_successes.length > 0" />
+      <DesktopLayout
+        :user="auth.user"
+        :inventory="inventory"
+        :pokedex="pokedex"
+        :level_rewards_to_claim="level_rewards_to_claim"
+        :level_rewards_preview="level_rewards_preview"
+        :team-pokemons="userTeamPokemons"
+        :onOpenPokedexModal="() => pokedexModalOpen = true"
+        :onGoToMarketplace="goToMarketplace"
+        :onGoToLeaderboard="goToLeaderboard"
+        :onOpenTeamManagementModal="openTeamManagementModal"
+        :onOpenBadgesModal="openBadgesModal"
+        :has-unclaimed-successes="unclaimed_successes.length > 0"
+        :onGoToExpeditions="goToExpeditions"
+      />
     </div>
 
     <PokedexModal :show="pokedexModalOpen" :user-pokedex="pokedex" :all-pokemons="all_pokemons"

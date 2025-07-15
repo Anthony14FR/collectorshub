@@ -20,6 +20,7 @@ const props = defineProps<Props>();
 
 const selectedPokemon = ref<DisplayPokemon | null>(null);
 const activeTab = ref<'normal' | 'shiny'>('normal');
+const isMobileFilterDropdownOpen = ref(false);
 
 const searchQuery = ref('');
 const rarityFilter = ref<string>('all');
@@ -123,6 +124,10 @@ const switchTab = (tab: 'normal' | 'shiny') => {
   activeTab.value = tab;
 };
 
+const toggleMobileFilterDropdown = () => {
+  isMobileFilterDropdownOpen.value = !isMobileFilterDropdownOpen.value;
+};
+
 </script>
 
 <template>
@@ -131,19 +136,20 @@ const switchTab = (tab: 'normal' | 'shiny') => {
       <div class="w-full flex flex-col lg:flex-row gap-4 justify-between lg:items-center">
                 
         <div class="flex-shrink-0">
-          <h2 class="text-2xl font-bold">Mon Pokédex</h2>
+          <h2 class="sm:text-2xl text-xl font-bold">Mon Pokédex</h2>
           <div class="flex items-center gap-4 mt-1 text-xs text-base-content/70">
             <span>Normal: <span class="font-bold text-base-content">{{ pokedexProgress.normalOwned }}/{{ pokedexProgress.normalTotal }}</span></span>
             <span class="text-yellow-400">Shiny: <span class="font-bold">{{ pokedexProgress.shinyOwned }}/{{ pokedexProgress.shinyTotal }}</span> ✨</span>
           </div>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-2 items-center mr-12">
-          <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="hidden lg:flex flex-col md:flex-row gap-2 sm:items-center sm:mr-12">
+          <div class="flex sm:items-center gap-2 flex-shrink-0">
             <Button 
               @click="switchTab('normal')" 
               :variant="activeTab === 'normal' ? 'primary' : 'secondary'"
               size="sm"
+              class="w-full"
             >
               Normal
             </Button>
@@ -151,6 +157,7 @@ const switchTab = (tab: 'normal' | 'shiny') => {
               @click="switchTab('shiny')" 
               :variant="activeTab === 'shiny' ? 'primary' : 'secondary'"
               size="sm"
+              class="w-full"
             >
               Shiny
             </Button>
@@ -159,6 +166,40 @@ const switchTab = (tab: 'normal' | 'shiny') => {
             <Input type="text" v-model="searchQuery" placeholder="Rechercher..." id="pokedex_search" size="sm"/>
             <Select v-model="rarityFilter" :options="rarities" id="pokedex_rarity" size="sm"/>
             <Select v-model="ownershipFilter" :options="ownershipOptions" id="pokedex_ownership" size="sm"/>
+          </div>
+        </div>
+
+        <div class="lg:hidden relative w-full flex justify-end">
+          <Button @click="toggleMobileFilterDropdown" variant="secondary" size="sm">
+            Filtres
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </Button>
+          <div v-if="isMobileFilterDropdownOpen" class="absolute top-10 right-0 mt-2 w-72 bg-base-200 shadow-lg rounded-lg p-4 z-10">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center gap-2">
+                <Button 
+                  @click="switchTab('normal')" 
+                  :variant="activeTab === 'normal' ? 'primary' : 'secondary'"
+                  size="sm"
+                  class="w-full"
+                >
+                  Normal
+                </Button>
+                <Button 
+                  @click="switchTab('shiny')" 
+                  :variant="activeTab === 'shiny' ? 'primary' : 'secondary'"
+                  size="sm"
+                  class="w-full"
+                >
+                  Shiny
+                </Button>
+              </div>
+              <Input type="text" v-model="searchQuery" placeholder="Rechercher..." id="pokedex_search_mobile" size="sm"/>
+              <Select v-model="rarityFilter" :options="rarities" id="pokedex_rarity_mobile" size="sm"/>
+              <Select v-model="ownershipFilter" :options="ownershipOptions" id="pokedex_ownership_mobile" size="sm"/>
+            </div>
           </div>
         </div>
 

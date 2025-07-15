@@ -100,7 +100,7 @@ const handleClick = () => {
 
 <template>
   <div
-    class="relative w-32 h-32 mx-auto cursor-pointer transition-all duration-700 ease-in-out hover:scale-110"
+    class="relative sm:w-32 sm:h-32 w-10 h-6 mx-auto cursor-pointer transition-all duration-700 ease-in-out hover:scale-110"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
     @click="handleClick"
@@ -215,28 +215,18 @@ const handleClick = () => {
           <img
             :src="pokemonImageUrl"
             :alt="pokemon.name"
-            class="w-24 h-24 object-contain mx-auto animate-bounceIn"
+            class="w-10 h-24 sm:w-24 object-contain mx-auto animate-bounceIn"
             style="image-rendering: pixelated;"
           />
-
-          <div
-            v-if="pokemon.is_shiny"
-            class="absolute top-0 right-0 text-yellow-400 text-xl animate-sparkleStatic drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]"
-          >
-            ✨
-          </div>
         </div>
 
-        <div class="text-xs font-bold animate-slideUp text-white drop-shadow-lg" :style="{ animationDelay: '0.5s' }">
+        <div class="text-xs font-bold animate-slideUp text-white sm:mt-0 -mt-6 drop-shadow-lg" :style="{ animationDelay: '0.5s' }">
           {{ pokemon.name }}
-        </div>
-        <div class="text-xs text-white/80 animate-slideUp drop-shadow-md" :style="{ animationDelay: '0.6s' }">
-          Niv. {{ pokemon.level }}
         </div>
 
         <RarityBadge
           :rarity="pokemon.rarity"
-          size="xs"
+          size="xxs"
           class="mt-1 inline-block animate-slideUp font-bold"
           :style="{ animationDelay: '0.7s' }"
         />

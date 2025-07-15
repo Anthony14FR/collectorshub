@@ -14,16 +14,23 @@ const props = defineProps({
   userAvatars: {
     type: Array,
     default: () => []
+  },
+  userBackgrounds: {
+    type: Array,
+    default: () => []
   }
 });
 
 const emit = defineEmits(['buy']);
 
 const isAvatar = computed(() => props.item.type === 'avatar');
+const isBackground = computed(() => props.item.type === 'background');
 
 const isUnlocked = computed(() => {
-  if (!isAvatar.value) return false;
-  return props.userAvatars.includes(props.item.image);
+  if (isAvatar.value || isBackground.value) {
+    return props.userAvatars.includes(props.item.image) || props.userBackgrounds.includes(props.item.image);
+  }
+  return false;
 });
 
 const inventoryQuantity = computed(() => {
@@ -57,7 +64,11 @@ const getItemImage = (item) => {
   <div class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group h-full flex flex-col">
     <div class="flex-1 flex flex-col">
       <div class="flex items-start gap-3 mb-3">
-        <div class="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1">
+        <div :class="[
+          'rounded-lg flex items-center justify-center p-1',
+          isBackground ? 'w-32 h-24' : 'bg-gradient-to-br from-primary/20 to-secondary/20',
+          isAvatar ? 'w-16 h-16' : 'w-12 h-12'
+        ]">
           <img :src="getItemImage(item)" :alt="item.name" class="w-full h-full object-contain" :class="{ 'rounded-full': isAvatar }" />
         </div>
         <div class="flex-1">
@@ -75,7 +86,7 @@ const getItemImage = (item) => {
 
       <div class="flex items-center justify-between mb-3">
         <div class="text-xs text-base-content/60">
-          <template v-if="isAvatar">
+          <template v-if="isAvatar || isBackground">
             <span v-if="isUnlocked" class="text-green-500 font-semibold">Débloqué</span>
             <span v-else>Non débloqué</span>
           </template>
@@ -92,7 +103,7 @@ const getItemImage = (item) => {
     </div>
 
     <Button 
-      v-if="!isAvatar || !isUnlocked"
+      v-if="!(isAvatar || isBackground) || !isUnlocked"
       @click="emit('buy', item)" 
       variant="primary" 
       size="sm" 

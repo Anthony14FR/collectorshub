@@ -11,7 +11,7 @@ class PokemonUpgradeService
     public function getUpgradeRequirements(Pokedex $pokedexEntry): array
     {
         $currentStar = $pokedexEntry->star;
-        
+
         if ($currentStar >= 6) {
             throw new \Exception('Ce Pokémon a déjà atteint le niveau maximum (6★)');
         }
@@ -94,7 +94,7 @@ class PokemonUpgradeService
             $query = $user->pokedex()
                 ->with('pokemon')
                 ->where('star', $requirement['star'])
-                ->whereHas('pokemon', function($q) use ($isShiny) {
+                ->whereHas('pokemon', function ($q) use ($isShiny) {
                     $q->where('is_shiny', $isShiny);
                 });
 
@@ -117,7 +117,7 @@ class PokemonUpgradeService
         $query = $user->pokedex()
             ->with('pokemon')
             ->where('star', $requirement['star'])
-            ->whereHas('pokemon', function($q) use ($isShiny) {
+            ->whereHas('pokemon', function ($q) use ($isShiny) {
                 $q->where('is_shiny', $isShiny);
             });
 

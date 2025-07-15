@@ -11,12 +11,17 @@ export type User = {
     last_login: string;
     pokedex?: PokedexEntry[];
     inventory?: InventoryItem[];
+    unlocked_avatars?: string[];
+    unlocked_backgrounds?: string[];
+    background?: string;
+    xp: number;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
     experience_for_current_level: number;
     experience_for_next_level: number;
     experience_percentage: number;
+    claimed_level_rewards?: string[];
 }
 
 export type PokedexEntry = {
@@ -59,4 +64,18 @@ export type InventoryItem = {
     quantity: number;
     created_at: string;
     updated_at: string;
+}
+
+export type LevelReward = {
+    type: string;
+    level: number;
+    cash: number;
+    pokeballs: number;
+    masterballs: number;
+    is_available: boolean;
+}
+
+export type LevelRewardPreview = {
+    previous: LevelReward[];
+    next: LevelReward[];
 }

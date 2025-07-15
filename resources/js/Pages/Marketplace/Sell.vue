@@ -1,13 +1,13 @@
 <template>
   <Head title="Vendre un Pokémon" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden">
-      <div class="flex justify-center pt-4 mb-4">
+    <div class="relative z-10 min-h-screen w-full">
+      <div class="flex justify-center pt-4 mb-4 px-4">
         <div class="text-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
             🏷️ VENDRE
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
@@ -16,134 +16,133 @@
         </div>
       </div>
 
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[400px] z-30">
-        <div v-if="($page.props as any).flash?.success" class="mb-2">
-          <Alert type="success" :message="($page.props as any).flash.success" />
-        </div>
-        <div v-if="($page.props as any).errors?.message" class="mb-2">
-          <Alert type="error" :message="($page.props as any).errors.message" />
-        </div>
+      <div v-if="($page.props as any).flash?.success" class="mb-2 px-4">
+        <Alert type="success" :message="($page.props as any).flash.success" />
+      </div>
+      <div v-if="($page.props as any).errors?.message" class="mb-2 px-4">
+        <Alert type="error" :message="($page.props as any).errors.message" />
       </div>
 
-      <div class="absolute left-4 top-20 w-72">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">➕</span>
-              NOUVELLE ANNONCE
-            </h3>
-          </div>
-
-          <div class="p-3">
-            <div v-if="!selectedPokemon"
-                 @click="showCreateModal = true"
-                 class="bg-base-200/30 backdrop-blur-sm rounded-lg p-8 border-2 border-dashed border-base-300/50 hover:border-primary/50 transition-all duration-200 cursor-pointer group text-center">
-              <div class="text-6xl text-base-content/30 group-hover:text-primary/50 transition-colors duration-200 mb-2">+</div>
-              <p class="text-sm text-base-content/70 group-hover:text-base-content transition-colors duration-200">
-                Cliquer pour ajouter
-              </p>
-            </div>
-
-            <div v-else class="space-y-4">
-              <SelectedPokemonCard
-                :pokemon="selectedPokemon"
-                @close="resetForm"
-              />
-
-              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-warning/20 p-4">
-                <Input
-                  v-model="form.price"
-                  type="number"
-                  label="Prix de vente"
-                  :placeholder="`${formatPrice(priceRange.min)} - ${formatPrice(priceRange.max)}`"
-                  variant="bordered"
-                  size="sm"
-                  :helper-text="`Recommandé : ${formatPrice(priceRange.min)} - ${formatPrice(priceRange.max)}`"
-                />
-              </div>
-
-              <Button
-                @click="listPokemon"
-                :disabled="!canSubmit || processing"
-                variant="primary"
-                size="md"
-                class="w-full bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 border-success/30 shadow-lg shadow-success/20"
-              >
-                {{ processing ? '🔄' : '💰' }} Mettre en vente
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute right-4 top-20 w-72">
-        <MyListingsSection
-          :listings="myListings"
-          :show-cancel-button="true"
-          @cancel-listing="showCancelConfirm"
-        />
-
-        <div class="mt-4">
+      <div class="flex flex-col lg:flex-row gap-4 p-4 lg:p-8">
+        <div class="w-full lg:w-72 order-1 lg:order-1">
           <Button
             @click="router.visit('/marketplace')"
             variant="secondary"
             size="sm"
-            class="w-full"
+            class="w-full mb-4"
           >
             ← Retour marketplace
           </Button>
+          <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
+            <div class="p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
+              <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                <span class="text-lg">➕</span>
+                NOUVELLE ANNONCE
+              </h3>
+            </div>
+
+            <div class="p-3">
+              <div v-if="!selectedPokemon"
+                   @click="showCreateModal = true"
+                   class="bg-base-200/30 backdrop-blur-sm rounded-lg p-8 border-2 border-dashed border-base-300/50 hover:border-primary/50 transition-all duration-200 cursor-pointer group text-center">
+                <div class="text-6xl text-base-content/30 group-hover:text-primary/50 transition-colors duration-200 mb-2">+</div>
+                <p class="text-sm text-base-content/70 group-hover:text-base-content transition-colors duration-200">
+                  Cliquer pour ajouter
+                </p>
+              </div>
+
+              <div v-else class="space-y-4">
+                <SelectedPokemonCard
+                  :pokemon="selectedPokemon"
+                  @close="resetForm"
+                />
+
+                <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-warning/20 p-4">
+                  <Input
+                    v-model="form.price"
+                    type="number"
+                    label="Prix de vente"
+                    :placeholder="`${formatPrice(priceRange.min)} - ${formatPrice(priceRange.max)}`"
+                    variant="bordered"
+                    size="sm"
+                    :helper-text="`Recommandé : ${formatPrice(priceRange.min)} - ${formatPrice(priceRange.max)}`"
+                  />
+                </div>
+
+                <Button
+                  @click="listPokemon"
+                  :disabled="!canSubmit || processing"
+                  variant="primary"
+                  size="md"
+                  class="w-full bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 border-success/30 shadow-lg shadow-success/20"
+                >
+                  {{ processing ? '🔄' : '💰' }} Mettre en vente
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80">
-        <div class="bg-base-100/60 backdrop-blur-lg rounded-2xl border border-warning/30 p-6 shadow-xl">
-          <div class="text-center mb-6">
-            <div class="w-20 h-20 bg-gradient-to-br from-warning/30 to-warning/10 rounded-full flex items-center justify-center mb-3 mx-auto border-2 border-warning/40">
-              <span class="text-4xl">💰</span>
-            </div>
-            <h2 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
-              Centre de Vente
-            </h2>
-          </div>
+        <div class="flex-1 order-2 lg:order-2 flex justify-center">
+          <div class="w-full max-w-80">
+            <div class="bg-base-100/60 backdrop-blur-lg rounded-2xl border border-warning/30 p-6 shadow-xl">
+              <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-gradient-to-br from-warning/30 to-warning/10 rounded-full flex items-center justify-center mb-3 mx-auto border-2 border-warning/40">
+                  <span class="text-4xl">💰</span>
+                </div>
+                <h2 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
+                  Centre de Vente
+                </h2>
+              </div>
 
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-success/10 rounded-xl p-3 text-center border border-success/20">
-              <div class="text-xs text-success/70 uppercase tracking-wide mb-1">Disponibles</div>
-              <div class="text-2xl font-bold text-success">{{ availablePokemons.length }}</div>
-            </div>
-            <div class="bg-warning/10 rounded-xl p-3 text-center border border-warning/20">
-              <div class="text-xs text-warning/70 uppercase tracking-wide mb-1">En vente</div>
-              <div class="text-2xl font-bold text-warning">{{ myListings.length }}</div>
-            </div>
-          </div>
+              <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-success/10 rounded-xl p-3 text-center border border-success/20">
+                  <div class="text-xs text-success/70 uppercase tracking-wide mb-1">Disponibles</div>
+                  <div class="text-2xl font-bold text-success">{{ availablePokemons.length }}</div>
+                </div>
+                <div class="bg-warning/10 rounded-xl p-3 text-center border border-warning/20">
+                  <div class="text-xs text-warning/70 uppercase tracking-wide mb-1">En vente</div>
+                  <div class="text-2xl font-bold text-warning">{{ myListings.length }}</div>
+                </div>
+              </div>
 
-          <div class="bg-base-200/30 rounded-xl p-4 border border-base-300/30">
-            <h3 class="text-sm font-bold text-center mb-3 text-base-content/80">📊 Guide des Prix</h3>
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between items-center">
-                <span class="text-base-content/70">Normal</span>
-                <span class="text-success font-semibold">{{ formatPrice(getPriceRangeForRarity('normal').min) }} - {{ formatPrice(getPriceRangeForRarity('normal').max) }}</span>
+              <div class="bg-base-200/30 rounded-xl p-4 border border-base-300/30">
+                <h3 class="text-sm font-bold text-center mb-3 text-base-content/80">📊 Guide des Prix</h3>
+                <div class="space-y-2 text-xs">
+                  <div class="flex justify-between items-center">
+                    <span class="text-base-content/70">Normal</span>
+                    <span class="text-success font-semibold">{{ formatPrice(getPriceRangeForRarity('normal').min) }} - {{ formatPrice(getPriceRangeForRarity('normal').max) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-blue-400">Rare</span>
+                    <span class="text-info font-semibold">{{ formatPrice(getPriceRangeForRarity('rare').min) }} - {{ formatPrice(getPriceRangeForRarity('rare').max) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-purple-400">Epic</span>
+                    <span class="text-secondary font-semibold">{{ formatPrice(getPriceRangeForRarity('epic').min) }} - {{ formatPrice(getPriceRangeForRarity('epic').max) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-orange-400">Legendary</span>
+                    <span class="text-warning font-semibold">{{ formatPrice(getPriceRangeForRarity('legendary').min) }} - {{ formatPrice(getPriceRangeForRarity('legendary').max) }}</span>
+                  </div>
+                </div>
               </div>
-              <div class="flex justify-between items-center">
-                <span class="text-blue-400">Rare</span>
-                <span class="text-info font-semibold">{{ formatPrice(getPriceRangeForRarity('rare').min) }} - {{ formatPrice(getPriceRangeForRarity('rare').max) }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-purple-400">Epic</span>
-                <span class="text-secondary font-semibold">{{ formatPrice(getPriceRangeForRarity('epic').min) }} - {{ formatPrice(getPriceRangeForRarity('epic').max) }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-orange-400">Legendary</span>
-                <span class="text-warning font-semibold">{{ formatPrice(getPriceRangeForRarity('legendary').min) }} - {{ formatPrice(getPriceRangeForRarity('legendary').max) }}</span>
+
+              <div class="mt-4 text-center">
+                <p class="text-xs text-base-content/60 leading-relaxed">
+                  💡 Les prix sont automatiquement validés selon la rareté
+                </p>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="mt-4 text-center">
-            <p class="text-xs text-base-content/60 leading-relaxed">
-              💡 Les prix sont automatiquement validés selon la rareté
-            </p>
-          </div>
+        <div class="w-full lg:w-72 order-3 lg:order-3 space-y-4">
+          <MyListingsSection
+            :listings="myListings"
+            :show-cancel-button="true"
+            @cancel-listing="showCancelConfirm"
+          />
         </div>
       </div>
 
@@ -184,7 +183,7 @@
 
             <div class="max-h-[500px] overflow-y-auto">
               <div class="p-4">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   <div
                     v-for="pokemon in availablePokemons"
                     :key="pokemon.id"

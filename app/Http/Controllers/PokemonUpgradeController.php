@@ -22,7 +22,7 @@ class PokemonUpgradeController extends Controller
     {
         $user = Auth::user();
         $userPokemons = $user->pokedex()->with('pokemon')->get();
-        
+
         return Inertia::render('PokemonUpgrade/Index', [
             'userPokemons' => $userPokemons
         ]);
@@ -31,7 +31,7 @@ class PokemonUpgradeController extends Controller
     public function getUpgradeRequirements($pokedexId)
     {
         $pokedexEntry = Pokedex::with('pokemon')->findOrFail($pokedexId);
-        
+
         if ($pokedexEntry->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -55,7 +55,7 @@ class PokemonUpgradeController extends Controller
         ]);
 
         $pokedexEntry = Pokedex::with('pokemon')->findOrFail($pokedexId);
-        
+
         if ($pokedexEntry->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -63,8 +63,8 @@ class PokemonUpgradeController extends Controller
         $requirements = $this->upgradeService->getUpgradeRequirements($pokedexEntry);
         $requirementType = $request->input('requirement_type');
         $alreadySelected = $request->input('already_selected', []);
-        
-        $requirement = $requirementType === 'main' 
+
+        $requirement = $requirementType === 'main'
             ? $requirements['main_requirement']
             : $requirements['secondary_requirement'];
 
@@ -87,44 +87,44 @@ class PokemonUpgradeController extends Controller
     {
         $user = Auth::user();
         $userPokemons = $user->pokedex()->with('pokemon')->where('star', '<', 6)->get();
-        
+
         $upgradableIds = [];
         $errors = [];
-        
+
         foreach ($userPokemons as $pokemon) {
             try {
                 if ($pokemon->star >= 6) {
                     $errors[$pokemon->id] = "Déjà au niveau maximum";
                     continue;
                 }
-                
+
                 $requirements = $this->upgradeService->getUpgradeRequirements($pokemon);
-                
+
                 $canUpgrade = true;
                 $availableCounts = [];
-                
+
                 foreach ($requirements as $key => $requirement) {
                     $query = $user->pokedex()
                         ->where('id', '!=', $pokemon->id)
                         ->where('star', $requirement['star'])
-                        ->whereHas('pokemon', function($q) use ($pokemon) {
+                        ->whereHas('pokemon', function ($q) use ($pokemon) {
                             $q->where('is_shiny', $pokemon->pokemon->is_shiny);
                         });
-                    
+
                     if ($requirement['pokemon_id']) {
                         $query->where('pokemon_id', $requirement['pokemon_id']);
                     }
-                    
+
                     $count = $query->count();
                     $availableCounts[$key] = $count;
-                    
+
                     if ($count < $requirement['quantity']) {
                         $canUpgrade = false;
                         $errors[$pokemon->id] = "Pas assez de ressources pour {$requirement['description']} (disponible: $count/{$requirement['quantity']})";
                         break;
                     }
                 }
-                
+
                 if ($canUpgrade) {
                     $upgradableIds[] = $pokemon->id;
                 }
@@ -132,7 +132,7 @@ class PokemonUpgradeController extends Controller
                 $errors[$pokemon->id] = $e->getMessage();
             }
         }
-        
+
         return response()->json([
             'upgradableIds' => $upgradableIds,
             'errors' => $errors,
@@ -148,7 +148,7 @@ class PokemonUpgradeController extends Controller
         ]);
 
         $pokedexEntry = Pokedex::with('pokemon')->findOrFail($request->pokedex_id);
-        
+
         if ($pokedexEntry->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }

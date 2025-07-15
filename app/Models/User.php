@@ -46,6 +46,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'discord_avatar',
         'provider',
         'provider_verified_at',
+        'claimed_level_rewards',
+        'background',
+        'unlocked_backgrounds',
     ];
 
     protected $hidden = [
@@ -70,6 +73,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'experience' => 'integer',
         'unlocked_avatars' => 'array',
         'provider_verified_at' => 'datetime',
+        'claimed_level_rewards' => 'array',
+        'unlocked_backgrounds' => 'array',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
@@ -162,29 +167,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->userSuccesses()->where('is_claimed', false)->count();
     }
 
-    /**
-     * Send the email verification notification.
-     */
     public function sendEmailVerificationNotification()
     {
         $this->notify(new \App\Notifications\VerifyEmailNotification);
     }
 
-    /**
-     * Send the password reset notification.
-     *
-     * @param  string  $token
-     * @return void
-     */
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
-
-    /**
-     * Determine if the user has verified their email address.
-     * OAuth users are considered automatically verified.
-     */
+  
     public function hasVerifiedEmail(): bool
     {
         if ($this->provider) {
@@ -192,5 +184,17 @@ class User extends Authenticatable implements MustVerifyEmail
         }
         
         return !is_null($this->email_verified_at);
+     }
+
+    public function userExpeditions(): HasMany
+    {
+        return $this->hasMany(UserExpedition::class);
+    }
+
+    public function expeditions(): BelongsToMany
+    {
+        return $this->belongsToMany(Expedition::class, 'user_expeditions')
+            ->withPivot('date', 'status', 'started_at', 'ends_at', 'claimed_at')
+            ->withTimestamps();
     }
 }

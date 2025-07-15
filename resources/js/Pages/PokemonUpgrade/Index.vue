@@ -173,14 +173,10 @@ const changePage = (page: number) => {
 const fetchUpgradablePokemons = async () => {
   loading.value = true;
   try {
-    console.log('Récupération des Pokémon upgradables...');
     const response = await fetch(route('upgradable-pokemons'));
     const data = await response.json();
-    console.log('Réponse du serveur:', data);
     upgradableIds.value = data.upgradableIds || [];
     errors.value = data.errors || {};
-    console.log('IDs des Pokémon upgradables:', upgradableIds.value);
-    console.log('Erreurs:', errors.value);
   } catch (error) {
     console.error('Erreur lors de la récupération des Pokémon upgradables:', error);
   } finally {
@@ -192,7 +188,6 @@ onMounted(() => {
   fetchUpgradablePokemons();
   
   if (flash?.success && flash?.upgraded_pokemon) {
-    console.log('Pokémon amélioré détecté dans les données flash:', flash.upgraded_pokemon);
     selectedPokemon.value = flash.upgraded_pokemon;
     showSuccessModal.value = true;
   }
@@ -209,7 +204,7 @@ onMounted(() => {
       <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-16">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 sm:pt-6 mb-4 sm:mb-6">
           <div class="flex items-center gap-2 sm:gap-4">
-            <Button @click="goBack" variant="outline" size="sm" class="shrink-0">
+            <Button @click="goBack" variant="secondary" size="sm" class="shrink-0">
               ← Retour
             </Button>
             <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">

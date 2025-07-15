@@ -8,6 +8,7 @@ interface Props {
 const { rarity, size = 'sm', variant = 'filled' } = defineProps<Props>();
 
 const sizeClasses = {
+  xxs: 'h-3 px-1 text-[8px]',
   xs: 'h-4 px-1.5 text-xs',
   sm: 'h-5 px-2 text-xs',
   md: 'h-6 px-3 text-sm',

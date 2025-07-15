@@ -38,7 +38,16 @@ const getStars = () => {
 
 <template>
   <div class="flex flex-col h-full">
-    <div class="flex gap-4 mb-3">
+    <div class="flex flex-col items-center gap-4 mb-3">
+      <div class="flex w-full justify-between items-center">
+        <CPBadge :cp="listing.pokemon.cp" size="xs" :show-label="false" />
+        <div class="flex items-center gap-2">
+          <StarsBadge :stars="getStars()" size="sm" />
+          <div v-if="pokemon.is_shiny" class="w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
+            <span class="text-yellow-400 text-xs">✨</span>
+          </div>
+        </div>
+      </div>
       <div class="relative flex-shrink-0 flex items-center">
         <img
           :src="getPokemonImageUrl(pokemon)"
@@ -46,31 +55,19 @@ const getStars = () => {
           class="w-32 h-32 object-contain group-hover:scale-110 transition-transform duration-300"
           style="image-rendering: pixelated;"
         />
-        <div v-if="listing.pokemon.cp" class="absolute top-0 left-4">
-          <CPBadge :cp="listing.pokemon.cp" size="xs" :show-label="false" />
-        </div>
-        <div class="absolute -bottom-2 -left-2">
-          <StarsBadge :stars="getStars()" size="sm" />
-        </div>
-        <div v-if="pokemon.is_shiny" class="absolute -bottom-2 left-11 w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-          <span class="text-yellow-400 text-xs">✨</span>
-        </div>
       </div>
 
-      <div class="flex-1 min-w-0 flex flex-col">
-        <div class="flex items-start justify-between mb-2">
+      <div class="flex-1 w-full flex flex-col">
+        <div class="flex justify-between">
           <div>
-            <div class="flex items-center gap-1">
-              <h4 class="font-bold text-base text-base-content">{{ pokemon.name }}</h4>
-            </div>
-            <p class="text-xs text-base-content/70 mb-1">Niveau {{ pokemon.level }}</p>
-            <div v-if="pokemon.rarity" class="mb-2">
-              <RarityBadge :rarity="pokemon.rarity" size="sm" />
+            <div class="flex items-start gap-1">
+              <h4 class="font-bold text-base text-base-content flex items-center gap-1 mt-2">{{ pokemon.name }} <RarityBadge :rarity="pokemon.rarity" size="xs" /></h4>
             </div>
           </div>
-          <div class="text-right">
-            <div class="text-lg font-bold text-warning">{{ formatPrice(listing.price) }}</div>
-          </div>
+        </div>
+
+        <div class="mb-2">
+          <div class="text-lg font-bold text-warning">{{ formatPrice(listing.price) }}</div>
         </div>
 
         <div class="flex flex-wrap gap-1">
@@ -78,7 +75,7 @@ const getStars = () => {
             v-for="(type, index) in parseTypes(pokemon.types)"
             :key="index"
             :type="type"
-            size="xs"
+            size="xxs"
           />
         </div>
       </div>
@@ -86,7 +83,7 @@ const getStars = () => {
 
     <div class="flex items-center justify-between mt-auto pt-2 border-t border-base-300/20">
       <div class="text-xs text-base-content/70">
-        <span>{{ listing.seller.username }}</span>
+        <span>Vendeur : {{ listing.seller.username }}</span>
       </div>
 
       <div>

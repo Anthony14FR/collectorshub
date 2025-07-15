@@ -60,3 +60,7 @@ composer.lock
 
 # Dependances
 /storage/debugbar
+
+# Supervisord
+supervisord.pid
+supervisord.log

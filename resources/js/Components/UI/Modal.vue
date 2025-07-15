@@ -77,7 +77,7 @@ const maxWidthClasses = {
           </div>
 
           <div :class="['flex-1 overflow-y-auto modal-content', maxWidth === 'xs' ? 'p-3' : 'p-6']">
-            <slot>Modal content goes here.</slot>
+            <slot></slot>
           </div>
 
           <div class="absolute top-6 right-16 w-6 h-6 border-2 border-success/20 rounded-full animate-pulse pointer-events-none"></div>
@@ -92,7 +92,7 @@ const maxWidthClasses = {
 <style scoped>
 .modal-mask {
     position: fixed;
-    z-index: 9998;
+    z-index: 9999;
     top: 0;
     left: 0;
     width: 100%;
@@ -184,4 +184,5 @@ const maxWidthClasses = {
 .modal-leave-to .modal-container {
     transform: scale(0.9);
 }
+
 </style>

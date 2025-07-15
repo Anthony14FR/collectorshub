@@ -9,7 +9,7 @@ return new class () extends Migration {
     {
         Schema::create('stat_boosts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pokedex_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pokedex_id')->constrained('pokedex')->onDelete('cascade');
             $table->integer('hp_boost')->default(0);
             $table->integer('attack_boost')->default(0);
             $table->integer('defense_boost')->default(0);

@@ -4,6 +4,8 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, DefineComponent, h } from 'vue';
+import PrimeVue from 'primevue/config';
+import VirtualScroller from 'primevue/virtualscroller';
 
 const appName: string = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -17,6 +19,8 @@ createInertiaApp({
   setup({ el, App, props, plugin }: any) {
     return createApp({ render: () => h(App, props) })
       .use(plugin)
+      .use(PrimeVue)
+      .component('VirtualScroller', VirtualScroller)
       .mount(el);
   },
   progress: {
