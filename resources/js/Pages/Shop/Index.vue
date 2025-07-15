@@ -59,13 +59,13 @@ const handleTabChange = (tab) => {
 <template>
   <Head title="Boutique" />
 
-  <div class="h-screen w-screen overflow-x-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-x-hidden">
+    <div class="relative z-10 min-h-screen w-full overflow-x-hidden">
       <div class="flex justify-center pt-4 mb-4">
         <div class="text-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
             BOUTIQUE
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
@@ -73,52 +73,57 @@ const handleTabChange = (tab) => {
           </p>
         </div>
       </div>
-      <div class="absolute left-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
-            <h3 class="text-sm font-bold tracking-wider">NAVIGATION</h3>
-          </div>
-          <div class="p-3">
-            <Link href="/me">
-              <Button variant="secondary" size="sm" class="w-full">
-                Retour à l'accueil
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
 
-      <div class="absolute right-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="bg-gradient-to-r from-success/10 to-success/5 px-3 py-2 border-b border-success/20">
-            <h4 class="text-xs font-bold tracking-wider">PORTE-MONNAIE</h4>
-          </div>
-          <div class="p-3 text-center">
-            <div class="text-2xl font-bold text-success">
-              {{ formatPrice(user.cash) }}
+      <div class="container mx-auto px-4 max-w-7xl">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-8">
+          <div class="xl:col-span-3 order-1 xl:order-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                  <h3 class="text-sm font-bold tracking-wider">NAVIGATION</h3>
+                </div>
+                <div class="p-3">
+                  <Link href="/me">
+                    <Button variant="secondary" size="sm" class="w-full">
+                      Retour à l'accueil
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="bg-gradient-to-r from-success/10 to-success/5 px-3 py-2 border-b border-success/20">
+                  <h4 class="text-xs font-bold tracking-wider">PORTE-MONNAIE</h4>
+                </div>
+                <div class="p-3 text-center">
+                  <div class="text-xl sm:text-2xl font-bold text-success">
+                    {{ formatPrice(user.cash) }}
+                  </div>
+                  <div class="text-xs text-base-content/70">Votre solde</div>
+                </div>
+              </div>
             </div>
-            <div class="text-xs text-base-content/70">Votre solde</div>
           </div>
-        </div>
-      </div>
 
-      <div class="absolute top-32 left-1/2 -translate-x-1/2 w-[800px] max-h-[700px]">
-        <div v-if="$page.props.flash?.success" class="mb-4">
-          <Alert type="success" :message="$page.props.flash.success" />
-        </div>
-        <div v-if="$page.props.errors?.message" class="mb-4">
-          <Alert type="error" :message="$page.props.errors.message" />
-        </div>
+          <div class="xl:col-span-9 order-2 xl:order-2">
+            <div v-if="$page.props.flash?.success" class="mb-4">
+              <Alert type="success" :message="$page.props.flash.success" />
+            </div>
+            <div v-if="$page.props.errors?.message" class="mb-4">
+              <Alert type="error" :message="$page.props.errors.message" />
+            </div>
 
-        <div class="bg-base-100/60 -mt-12 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
-          <ShopItemsList 
-            :items="items"
-            :inventory="inventory"
-            :userAvatars="user.unlocked_avatars || []"
-            :activeTab="activeTab"
-            @buy="openBuyModal"
-            @changeTab="handleTabChange"
-          />
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[600px] sm:h-[650px] md:h-[700px] xl:h-[700px] flex flex-col">
+              <ShopItemsList 
+                :items="items"
+                :inventory="inventory"
+                :userAvatars="user.unlocked_avatars || []"
+                :activeTab="activeTab"
+                @buy="openBuyModal"
+                @changeTab="handleTabChange"
+              />
+            </div>
+          </div>
         </div>
       </div>
 

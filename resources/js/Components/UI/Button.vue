@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface Props {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'invocation' | 'marketplace' | 'leaderboard';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'invocation' | 'marketplace' | 'leaderboard' | 'success';
   size?: 'sm' | 'md' | 'lg';
   icon?: string;
   disabled?: boolean;
@@ -34,13 +34,14 @@ const variantClasses = {
   outline: 'text-primary border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/5 before:from-primary/0 before:via-primary/10 before:to-primary/0',
   invocation: 'text-accent !border-accent/30 !bg-gradient-to-r !from-accent/10 !to-accent/20 hover:!from-accent/20 hover:!to-accent/30 before:from-accent/0 before:via-accent/10 before:to-accent/0',
   marketplace: 'h-12 w-12 flex-shrink-0 !rounded-full !border-warning/30 !bg-gradient-to-r !from-warning/10 !to-warning/20 !p-0 !text-warning hover:!from-warning/20 hover:!to-warning/30 before:from-warning/0 before:via-warning/10 before:to-warning/0',
-  leaderboard: 'w-full !border-primary/30 !bg-gradient-to-r !from-primary/10 !to-primary/20 !text-primary hover:!from-primary/20 hover:!to-primary/30 before:from-primary/0 before:via-primary/10 before:to-primary/0'
+  leaderboard: 'w-full !border-primary/30 !bg-gradient-to-r !from-primary/10 !to-primary/20 !text-primary hover:!from-primary/20 hover:!to-primary/30 before:from-primary/0 before:via-primary/10 before:to-primary/0',
+  success: 'text-success !border-success/30 !bg-gradient-to-r !from-success/10 !to-success/20 hover:!from-success/20 hover:!to-success/30 before:from-success/0 before:via-success/10 before:to-success/0'
 };
 
 const sizeClasses = {
-  sm: 'px-4 py-2 text-sm rounded-lg',
-  md: 'px-6 py-3 text-sm rounded-xl',
-  lg: 'px-8 py-4 text-base rounded-2xl'
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-3 text-sm',
+  lg: 'px-8 py-4 text-base'
 };
 
 const disabledClasses = 'opacity-50 cursor-not-allowed hover:transform-none hover:shadow-none';

@@ -50,7 +50,7 @@ const getPokemonCP = () => {
 
 <template>
   <div
-    class="relative bg-base-200/60 backdrop-blur-sm rounded-xl p-3 border-2 transition-all duration-300 cursor-pointer group"
+    class="relative bg-base-200/60 mb-16 sm:mb-0 backdrop-blur-sm rounded-xl p-3 border-2 transition-all duration-300 cursor-pointer group"
     :class="{
       'border-base-300/30 hover:border-primary/50 hover:bg-base-200': displayPokemon.owned,
       'border-transparent': !displayPokemon.owned,

@@ -92,7 +92,7 @@ const maxWidthClasses = {
 <style scoped>
 .modal-mask {
     position: fixed;
-    z-index: 9998;
+    z-index: 9999;
     top: 0;
     left: 0;
     width: 100%;
@@ -184,4 +184,5 @@ const maxWidthClasses = {
 .modal-leave-to .modal-container {
     transform: scale(0.9);
 }
+
 </style>

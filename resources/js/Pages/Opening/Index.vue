@@ -226,22 +226,22 @@ const getBallEmoji = (ballType: string) => {
 <template>
   <Head title="Invocation" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="sm:h-screen sm:w-screen bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden">
+    <div class="relative z-10 sm:h-screen  sm:w-screen">
       <div class="flex justify-center pt-4 mb-4">
-        <div class="text-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-1 tracking-wider">
+        <div class="text-center sm:mt-0 mt-14">
+          <h1 class="sm:text-2xl text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-1 tracking-wider">
             ⚡ INVOCATION
           </h1>
-          <p class="text-xs text-base-content/70 uppercase tracking-wider">
+          <p class="sm:text-xs text-[10px] text-base-content/70 uppercase tracking-wider">
             Choisissez votre type de ball et la quantité
           </p>
         </div>
       </div>
 
-      <div class="absolute left-8 top-20">
+      <div class="absolute sm:left-8 left-4 sm:top-20 top-4">
         <Button
           @click="goBack"
           variant="ghost"
@@ -252,8 +252,21 @@ const getBallEmoji = (ballType: string) => {
         </Button>
       </div>
 
-      <div class="flex flex-row justify-center items-start gap-8 mt-24">
-        <div class="w-64">
+      <div class="flex flex-col md:flex-row justify-center items-start gap-8 mt-12 md:mt-24">
+        <div class="flex-1 w-full max-w-md px-4 md:px-0 mt-8 md:mt-0 block sm:hidden mb-16">
+          <div class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
+            <div class="text-7xl mb-4 animate-pulse">🎰</div>
+            <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">Machine à Invocation</h2>
+            <p class="text-base-content/70 text-center mb-2">
+              Tente ta chance et découvre quels Pokémon tu vas obtenir !<br>
+              Plus tu ouvres de balls, plus tu as de chances d'obtenir des Pokémon rares ou shiny.
+            </p>
+            <div class="mt-4 flex flex-col items-center gap-2">
+              <span class="text-xs text-base-content/50">Bonne chance, Dresseur !</span>
+            </div>
+          </div>
+        </div>
+        <div class="w-full md:w-64 px-4 md:px-0">
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
@@ -265,7 +278,7 @@ const getBallEmoji = (ballType: string) => {
               <div class="text-2xl font-bold text-info mb-1">{{ pokeballQuantity }}</div>
               <div class="text-xs text-base-content/70">disponible{{ pokeballQuantity > 1 ? 's' : '' }}</div>
             </div>
-            <div class="p-3 bg-base-100/40">
+            <div class="p-3 m-3 bg-base-100/40">
               <h4 class="text-xs font-bold tracking-wider mb-2 text-center">CHANCES</h4>
               <div class="space-y-1 text-xs">
                 <div class="flex justify-between">
@@ -313,7 +326,7 @@ const getBallEmoji = (ballType: string) => {
           </div>
         </div>
 
-        <div class="flex-1 max-w-md">
+        <div class="flex-1 w-full max-w-md px-4 md:px-0 mt-8 md:mt-0 hidden sm:block">
           <div class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
             <div class="text-7xl mb-4 animate-pulse">🎰</div>
             <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">Machine à Invocation</h2>
@@ -327,7 +340,7 @@ const getBallEmoji = (ballType: string) => {
           </div>
         </div>
 
-        <div class="w-64">
+        <div class="w-full md:w-64 px-4 md:px-0 mt-8 md:mt-0 mb-16">
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
@@ -339,7 +352,7 @@ const getBallEmoji = (ballType: string) => {
               <div class="text-2xl font-bold text-warning mb-1">{{ masterballQuantity }}</div>
               <div class="text-xs text-base-content/70">disponible{{ masterballQuantity > 1 ? 's' : '' }}</div>
             </div>
-            <div class="p-3 bg-base-100/40">
+            <div class="p-3 m-3 bg-base-100/40">
               <h4 class="text-xs font-bold tracking-wider mb-2 text-center">CHANCES</h4>
               <div class="space-y-1 text-xs">
                 <div class="flex justify-between">
@@ -417,11 +430,11 @@ const getBallEmoji = (ballType: string) => {
       />
       <div class="absolute inset-0 bg-black/60"></div>
 
-      <div class="relative text-center max-w-6xl mx-auto px-6">
-        <h2 class="text-3xl font-bold mb-2 text-secondary/80 animate-slideDown">
+      <div class="relative text-center max-w-6xl mx-auto px-6 h-full flex flex-col justify-center">
+        <h2 class="sm:text-3xl text-xl font-bold mb-2 text-secondary/80 animate-slideDown">
           Vos récompenses vous attendent !
         </h2>
-        <p class="text-white/50 mb-20 animate-slideDown" style="animation-delay: 0.2s;">
+        <p class="text-white/50 mb-20 animate-slideDown " style="animation-delay: 0.2s;">
           Survolez les balls pour apercevoir leur rareté, puis cliquez pour révéler !
         </p>
         <div 
@@ -429,7 +442,7 @@ const getBallEmoji = (ballType: string) => {
             'mb-8',
             invocationResults.length === 1
               ? 'flex justify-center'
-              : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-20'
+              : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-x-2 gap-y-24 sm:gap-x-4 sm:gap-y-8 md:gap-x-6 md:gap-y-8 lg:gap-12'
           ]"
         >
           <div
@@ -453,10 +466,10 @@ const getBallEmoji = (ballType: string) => {
             />
           </div>
         </div>
-        <div class="flex gap-4 justify-center mt-20 animate-slideUp" style="animation-delay: 1s;">
+        <div class="flex gap-4 justify-center sm:mt-20 mt-5 animate-slideUp" style="animation-delay: 1s;">
           <Button
             @click="revealAllBalls"
-            variant="ghost"
+            variant="outline"
             size="lg"
             :disabled="allBallsRevealed"
             class="bg-white/10 backdrop-blur-sm hover:bg-white/20"

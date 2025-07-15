@@ -142,18 +142,17 @@ const groupedNext = computed(() =>
 <template>
   <div>
     <div
-      v-if="!responsive"
-      class="absolute left-1/2 -translate-x-1/2 top-8 z-20"
+      class="z-20"
     >
-      <div class="bg-gradient-to-br from-base-100/60 to-base-200/40 backdrop-blur-sm border-2 border-success/20 rounded-3xl px-16 py-6 relative overflow-hidden shadow-2xl shadow-primary/10 min-w-[500px]">
+      <div class="bg-gradient-to-br from-base-100/60 to-base-200/40 backdrop-blur-sm border-2 border-success/20 px-12 py-4 relative overflow-hidden shadow-2xl shadow-primary/10 min-w-[300px] xl:min-w-[500px] sm:min-w-[350px]">
         <div class="absolute top-3 right-3 z-20">
           <Button
             @click="openModal"
             variant="primary"
             size="sm"
-            class="relative group"
+            class="relative group rounded-lg shadow-lg shadow-primary/10"
           >
-            <span class="text-xl">🎁</span>
+            <span class="text-sm">🎁</span>
           </Button>
           <div
             v-if="hasAvailableReward"
@@ -174,7 +173,7 @@ const groupedNext = computed(() =>
         <div class="relative z-10 text-center">
           <Badge
             variant="success"
-            size="lg"
+            size="sm"
             pill
             class="shadow-2xl shadow-primary/20"
           >
@@ -227,76 +226,6 @@ const groupedNext = computed(() =>
         </div>
       </div>
     </div>
-    <div v-else class="w-full max-w-sm mx-auto">
-      <div class="bg-gradient-to-br from-base-100/60 to-base-200/40 backdrop-blur-sm border-2 border-success/20 rounded-2xl px-6 py-4 relative overflow-hidden shadow-xl shadow-primary/10">
-        <div class="text-center mb-3">
-          <Badge
-            variant="success"
-            size="md"
-            pill
-            class="shadow-lg shadow-primary/20"
-          >
-            <div class="w-1.5 h-1.5 bg-success rounded-full animate-pulse"></div>
-            <span class="font-bold tracking-wider text-xs">NIVEAU {{ user.level }}</span>
-            <div class="w-1.5 h-1.5 bg-success rounded-full animate-pulse"></div>
-          </Badge>
-        </div>
-        <div class="mb-3">
-          <div class="h-1.5 bg-base-200/50 rounded-full overflow-hidden relative">
-            <div
-              class="h-full bg-gradient-to-r from-success via-primary to-secondary transition-all duration-1000 ease-out"
-              :style="{ width: experienceProgress + '%' }"
-            ></div>
-          </div>
-        </div>
-        <div class="mb-3 flex justify-center">
-          <Button
-            @click="openModal"
-            :disabled="!hasAvailableReward"
-            variant="warning"
-            size="xs"
-            class="relative"
-            :class="{
-              'opacity-50 cursor-not-allowed':
-                !hasAvailableReward,
-            }"
-          >
-            <div class="flex items-center gap-1">
-              <span class="text-sm">🎁</span>
-              <span class="text-xs font-bold">RÉCOMPENSE</span>
-              <div
-                v-if="hasAvailableReward"
-                class="w-1.5 h-1.5 bg-warning rounded-full animate-pulse"
-              ></div>
-            </div>
-            <div
-              v-if="hasAvailableReward"
-              class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-warning rounded-full animate-ping"
-            ></div>
-          </Button>
-        </div>
-        <div class="text-center text-xs">
-          <div class="mb-1">
-            <span class="font-bold text-success">{{user.experience.toLocaleString()}}</span>
-            <span class="text-base-content/50 mx-1">/</span>
-            <span class="font-bold text-base-content/80">{{user.experience_for_next_level.toLocaleString()}}</span>
-            <span class="text-base-content/50 ml-1">EXP</span>
-          </div>
-          <p
-            class="text-base-content/50 text-xs"
-            v-if="user.level < 100"
-          >
-            {{
-              (user.experience_for_next_level - user.experience).toLocaleString()
-            }}
-            pour niveau {{ user.level + 1 }}
-          </p>
-          <p class="text-base-content/50 text-xs" v-else>
-            Niveau maximum atteint
-          </p>
-        </div>
-      </div>
-    </div>
     <Modal :show="modalOpen" @close="closeModal" max-width="4xl">
       <template #header>
         <div class="flex items-center gap-3">
@@ -304,11 +233,11 @@ const groupedNext = computed(() =>
             <span class="text-lg">🏆</span>
           </div>
           <div class="flex flex-col">
-            <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
+            <h3 class="sm:text-xl text-sm font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
               Récompenses de Niveau
             </h3>
             <div class="mt-1">
-              <span class="text-sm font-semibold text-warning">{{ level_rewards_to_claim.length }} récompenses disponibles</span>
+              <span class="sm:text-sm text-xs font-semibold text-warning">{{ level_rewards_to_claim.length }} récompenses disponibles</span>
             </div>
           </div>
         </div>
@@ -321,7 +250,7 @@ const groupedNext = computed(() =>
               variant="primary" 
               class="w-full max-w-xs"
             >
-              <span class="text-xl mr-2">⚡</span>
+              <span class="text-sm sm:text-xl mr-2">⚡</span>
               Tout réclamer ({{ level_rewards_to_claim.length }})
             </Button>
           </div>
@@ -374,7 +303,7 @@ const groupedNext = computed(() =>
             </div>
           </div>
           <div v-if="level_rewards_preview?.next?.length > 0">
-            <h4 class="text-lg font-semibold mb-4 text-primary">Prochaines Récompenses</h4>
+            <h4 class="sm:text-lg text-sm font-semibold mb-4 text-primary">Prochaines Récompenses</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div 
                 v-for="reward in groupedNext.slice(0, 4)" 
@@ -392,22 +321,22 @@ const groupedNext = computed(() =>
                     <p class="text-xs text-base-content/70 mb-2 capitalize">
                       <span v-for="type in reward.types" :key="type">
                         {{ type.replace('_', ' ').replace('milestone', 'Palier').replace('regular level', 'Niveau standard') }}
-                        <span v-if="idx < reward.types.length - 1"> </span> <!-- espace -->
+                        <span v-if="idx < reward.types.length - 1"> </span>
                       </span>
                     </p>
                     <div class="flex justify-between items-center">
                       <div class="flex gap-2 flex-wrap">
-                        <span class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
+                        <span class="sm:text-xs text-[10px] px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
                           {{ reward.cash.toLocaleString() }} Cash
                         </span>
-                        <span v-if="reward.pokeballs > 0" class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
+                        <span v-if="reward.pokeballs > 0" class="sm:text-xs text-[10px] px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
                           {{ reward.pokeballs }} PB
                         </span>
-                        <span v-if="reward.masterballs > 0" class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
+                        <span v-if="reward.masterballs > 0" class="sm:text-xs text-[10px] px-2 py-0.5 bg-base-content/10 text-base-content/60 rounded-full">
                           {{ reward.masterballs }} MB
                         </span>
                       </div>
-                      <span class="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
+                      <span class="sm:text-xs text-[10px] px-2 py-0.5 bg-primary/10 text-primary rounded-full">
                         Niveau {{ reward.level }}
                       </span>
                     </div>
@@ -417,7 +346,7 @@ const groupedNext = computed(() =>
             </div>
           </div>
           <div class="bg-base-100/50 rounded-xl p-4" v-if="level_rewards_preview?.previous?.length > 0">
-            <h4 class="text-lg font-semibold mb-4 text-success">Récemment Réclamées</h4>
+            <h4 class="sm:text-lg text-sm font-semibold mb-4 text-success">Récemment Réclamées</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div 
                 v-for="reward in groupedPrevious.slice(-4)" 
@@ -440,17 +369,17 @@ const groupedNext = computed(() =>
                     </p>
                     <div class="flex justify-between items-center">
                       <div class="flex gap-2 flex-wrap">
-                        <span class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
+                        <span class="sm:text-xs text-[10px] px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
                           {{ reward.cash.toLocaleString() }} Cash
                         </span>
-                        <span v-if="reward.pokeballs > 0" class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
+                        <span v-if="reward.pokeballs > 0" class="sm:text-xs text-[10px] px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
                           {{ reward.pokeballs }} PB
                         </span>
-                        <span v-if="reward.masterballs > 0" class="text-xs px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
+                        <span v-if="reward.masterballs > 0" class="sm:text-xs text-[10px] px-2 py-0.5 bg-base-content/10 text-base-content rounded-full">
                           {{ reward.masterballs }} MB
                         </span>
                       </div>
-                      <span class="text-xs px-2 py-0.5 bg-success/10 text-success rounded-full">
+                      <span class="sm:text-xs text-[10px] px-2 py-0.5 bg-success/10 text-success rounded-full">
                         Réclamé
                       </span>
                     </div>

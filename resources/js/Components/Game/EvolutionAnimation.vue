@@ -350,7 +350,7 @@ onUnmounted(() => {
         <div class="mb-6 h-32 flex items-center justify-center transition-all duration-1000 ease-out overflow-hidden" :style="{ transitionDelay: isVisible ? '400ms' : '0ms' }">
           <div class="w-full max-w-xl px-4">
             <h2
-              class="text-3xl font-bold transition-opacity duration-200 ease-in-out text-center"
+              class="sm:text-3xl text-xl font-bold transition-opacity duration-200 ease-in-out text-center"
               :class="[
                 { 'opacity-0': !textVisible, 'opacity-100': textVisible },
                 currentMessage === 'L\'évolution a échoué...' ? 'text-red-300/90' : 'text-white/90'
