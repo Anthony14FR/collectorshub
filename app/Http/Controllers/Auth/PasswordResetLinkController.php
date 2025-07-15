@@ -35,7 +35,7 @@ class PasswordResetLinkController extends Controller
         ]);
 
         $login = $request->input('login');
-        
+
         $user = User::where('email', $login)
                    ->orWhere('username', $login)
                    ->first();

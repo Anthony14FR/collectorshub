@@ -21,12 +21,12 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 $user = Auth::guard($guard)->user();
-                
+
                 if ($user && $user->hasVerifiedEmail()) {
                     return redirect('/me');
                 }
 
-                if ($user && !$user->hasVerifiedEmail() && 
+                if ($user && !$user->hasVerifiedEmail() &&
                     ($request->routeIs('login') || $request->routeIs('register'))) {
                     Auth::logout();
                     $request->session()->invalidate();

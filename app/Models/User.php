@@ -169,22 +169,22 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new \App\Notifications\VerifyEmailNotification);
+        $this->notify(new \App\Notifications\VerifyEmailNotification());
     }
 
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
-  
+
     public function hasVerifiedEmail(): bool
     {
         if ($this->provider) {
             return true;
         }
-        
+
         return !is_null($this->email_verified_at);
-     }
+    }
 
     public function userExpeditions(): HasMany
     {

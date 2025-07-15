@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-use Exception;
 
 class SocialAuthController extends Controller
 {
@@ -18,7 +18,7 @@ class SocialAuthController extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         $this->validateProvider($provider);
-        
+
         return Socialite::driver($provider)->redirect();
     }
 
@@ -29,36 +29,36 @@ class SocialAuthController extends Controller
     {
         try {
             $this->validateProvider($provider);
-            
+
             $socialUser = Socialite::driver($provider)->user();
-            
+
             $user = $this->findExistingSocialUser($provider, $socialUser);
-            
+
             if ($user) {
                 $this->updateSocialUserData($user, $provider, $socialUser);
                 Auth::login($user);
                 return $this->redirectAfterLogin($user->fresh());
             }
-            
+
             $existingUser = User::where('email', $socialUser->getEmail())->first();
-            
+
             if ($existingUser) {
                 $this->linkSocialAccount($existingUser, $provider, $socialUser);
                 Auth::login($existingUser);
                 return $this->redirectAfterLogin($existingUser->fresh());
             }
-            
+
             $newUser = $this->createUserFromSocialData($provider, $socialUser);
             Auth::login($newUser);
-            
+
             return $this->redirectAfterLogin($newUser->fresh());
-            
+
         } catch (Exception $e) {
             logger()->error('Social auth error', [
                 'provider' => $provider,
                 'error' => $e->getMessage()
             ]);
-            
+
             return redirect('/login')->with('status', 'Erreur lors de la connexion avec ' . ucfirst($provider) . '. Veuillez réessayer.');
         }
     }
@@ -136,7 +136,7 @@ class SocialAuthController extends Controller
     private function createUserFromSocialData(string $provider, $socialUser): User
     {
         $username = $this->generateUniqueUsername($socialUser, $provider);
-        
+
         $userData = [
             'username' => $username,
             'email' => $socialUser->getEmail(),
@@ -159,7 +159,7 @@ class SocialAuthController extends Controller
 
         $user = User::create($userData);
         $user->assignRole('user');
-        
+
         return $user->fresh();
     }
 
@@ -169,29 +169,29 @@ class SocialAuthController extends Controller
     private function generateUniqueUsername($socialUser, string $provider): string
     {
         $baseUsername = '';
-        
+
         if ($provider === 'discord') {
             $baseUsername = $socialUser->getNickname() ?? $socialUser->getName();
         } else {
             $baseUsername = $socialUser->getName();
         }
-        
+
         $username = Str::slug($baseUsername, '');
         $username = preg_replace('/[^a-zA-Z0-9]/', '', $username);
         $username = substr($username, 0, 20);
-        
+
         if (empty($username)) {
             $username = $provider . 'user';
         }
-        
+
         $originalUsername = $username;
         $counter = 1;
-        
+
         while (User::where('username', $username)->exists()) {
             $username = $originalUsername . $counter;
             $counter++;
         }
-        
+
         return $username;
     }
 
@@ -203,7 +203,7 @@ class SocialAuthController extends Controller
         if (!$user->hasVerifiedEmail() && !$user->provider) {
             return redirect()->route('verification.notice');
         }
-        
+
         return redirect()->intended(route('me', absolute: false));
     }
 }

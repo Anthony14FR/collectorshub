@@ -17,7 +17,7 @@ class ResetPasswordNotification extends ResetPassword
     {
         $url = $this->resetUrl($notifiable);
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('Réinitialisation de votre mot de passe CollectorsHub')
             ->view('emails.reset-password', [
                 'actionUrl' => $url,
@@ -42,4 +42,4 @@ class ResetPasswordNotification extends ResetPassword
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
     }
-} 
+}
