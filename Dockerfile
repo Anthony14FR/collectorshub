@@ -29,6 +29,9 @@ RUN apk add --no-cache \
     postgresql-dev \
     sqlite \
     sqlite-dev \
+    autoconf \
+    g++ \
+    make \
     && docker-php-ext-install \
     pdo \
     pdo_mysql \
@@ -38,6 +41,8 @@ RUN apk add --no-cache \
     xml \
     bcmath \
     opcache
+
+RUN pecl install redis && docker-php-ext-enable redis
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
