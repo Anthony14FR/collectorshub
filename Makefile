@@ -1,4 +1,4 @@
-.PHONY: help install setup start clear-cache refresh log main main-rebuild docker-up-dev docker-restart docker-dev docker-up-prod docker-down docker-stop docker-rebuild docker-logs docker-shell
+.PHONY: help install setup start clear-cache refresh log main main-rebuild
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -119,6 +119,13 @@ docker-prod-seed:
 
 docker-prod-refresh:
 	docker compose -f docker-compose.prod.yml exec app php artisan migrate:fresh --seed
+
+docker-prod-migrate:
+	docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
+
+docker-prod-restart:
+	docker compose -f docker-compose.prod.yml down
+	docker compose -f docker-compose.prod.yml up -d
 
 docker-down:
 	@echo "🛑 Arrêt et suppression des services Docker..."
