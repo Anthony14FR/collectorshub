@@ -44,6 +44,8 @@ class RegisteredUserController extends Controller
             'last_login' => now(),
             'avatar' => $request->avatar,
             'unlocked_avatars' => json_encode(["/images/trainer/1.png", "/images/trainer/2.png"]),
+            'background' => '/images/section-me-background.jpg',
+            'unlocked_backgrounds' => json_encode(['/images/section-me-background.jpg']),
         ]);
 
         $user->assignRole('user');

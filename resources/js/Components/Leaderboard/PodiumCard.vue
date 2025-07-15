@@ -65,11 +65,29 @@ const avatarSize = computed(() => {
   <div class="flex flex-col items-center">
     <div class="mb-4 flex flex-col items-center">
       <div class="relative mb-3">
-        <div :class="['relative overflow-hidden rounded-full', avatarSize]">
+        <div :class="['relative overflow-hidden rounded-full border-2 border-base-300/50 shadow-lg', avatarSize]">
+          <div 
+            v-if="user.background"
+            class="absolute inset-0 w-full h-full rounded-full overflow-hidden"
+            :style="{
+              backgroundImage: `url(${user.background})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }"
+          >
+            <div class="absolute inset-0 bg-black/40 rounded-full"></div>
+          </div>
+          
+          <div 
+            v-else
+            class="absolute inset-0 w-full h-full rounded-full bg-gradient-to-br from-primary/20 to-secondary/20"
+          ></div>
+          
           <img 
             :src="user.avatar || `/images/trainer/${(user.id % 10) + 1}.png`"
             :alt="user.username"
-            class="w-full h-full object-cover"
+            class="relative z-10 w-full h-full object-cover rounded-full"
             style="image-rendering: pixelated;"
           />
         </div>

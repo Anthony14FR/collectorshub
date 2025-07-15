@@ -48,17 +48,13 @@ const typeConfig: Record<string, { color: string; bg: string; fileName: string; 
   fairy: { color: '#EC4899', bg: 'rgba(236, 72, 153, 0.2)', borderColor: 'rgba(236, 72, 153, 0.3)', fileName: 'Fée' },
 };
 
-console.log('Type reçu:', type);
 
 const normalizedType = type.toLowerCase();
 const englishType = frenchToEnglish[normalizedType] || normalizedType;
 
-console.log('Type normalisé:', normalizedType);
-console.log('Type anglais:', englishType);
 
 const config = typeConfig[englishType] || typeConfig.normal;
 
-console.log('Config trouvée:', config);
 
 const sizeClasses = {
   xxs: 'px-1 py-0.5 text-[8px] gap-1',

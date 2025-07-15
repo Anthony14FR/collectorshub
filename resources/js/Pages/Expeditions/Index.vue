@@ -8,7 +8,6 @@ import ExpeditionCountdown from '@/Components/Expeditions/ExpeditionCountdown.vu
 import RewardsModal from '@/Components/Expeditions/RewardsModal.vue'
 
 const page = usePage()
-console.log(page.props)
 const activeTab = ref('disponibles')
 const showSelectionModal = ref(false)
 const selectedExpedition = ref(null)

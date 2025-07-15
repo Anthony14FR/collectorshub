@@ -145,7 +145,7 @@ const goToPokemonUpgrade = () => {
             </span>
           </div>
           <div class="relative z-10">
-            <h3 class="mb-1 bg-gradient-to-r from-info to-info/80 bg-clip-text text-base font-bold text-transparent">
+            <h3 class="mb-1  font-bold">
               Badges
             </h3>
             <p class="text-xs text-base-content/70">
@@ -221,7 +221,7 @@ const goToPokemonUpgrade = () => {
               </div>
             </div>
           </div>
-          <p>Augmentez le niveau d'étoiles de vos Pokémon</p>
+          <p class="text-white">Augmentez le niveau d'étoiles de vos Pokémon</p>
           
           <div class="flex">
             <Button
