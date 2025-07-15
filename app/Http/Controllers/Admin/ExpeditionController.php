@@ -37,7 +37,7 @@ class ExpeditionController extends Controller
     {
         return Inertia::render('Admin/Expeditions/Create', [
             'rarities' => $this->adminExpeditionService->getAvailableRarities(),
-            'types' => $this->adminExpeditionService->getAvailableTypes(),
+            'availableTypes' => $this->adminExpeditionService->getAvailableTypes(),
             'items' => $this->adminExpeditionService->getAvailableItems(),
             'rewardTypes' => $this->adminExpeditionService->getRewardTypes(),
             'requirementTypes' => $this->adminExpeditionService->getRequirementTypes()
@@ -75,7 +75,7 @@ class ExpeditionController extends Controller
         return Inertia::render('Admin/Expeditions/Edit', [
             'expedition' => $expedition,
             'rarities' => $this->adminExpeditionService->getAvailableRarities(),
-            'types' => $this->adminExpeditionService->getAvailableTypes(),
+            'availableTypes' => $this->adminExpeditionService->getAvailableTypes(),
             'items' => $this->adminExpeditionService->getAvailableItems(),
             'rewardTypes' => $this->adminExpeditionService->getRewardTypes(),
             'requirementTypes' => $this->adminExpeditionService->getRequirementTypes()

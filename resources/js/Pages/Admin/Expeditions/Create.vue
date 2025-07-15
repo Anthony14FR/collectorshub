@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import { getRarityLabel, getRarityDotColor, getRewardLabel, getRequirementLabel } from '@/utils/expedition';
@@ -190,6 +190,14 @@ const availableRequirementValues = computed(() => {
     return props.rarities.map(r => ({ value: r, label: getRarityLabel(r) }));
   } else {
     return props.availableTypes.map(t => ({ value: t, label: t }));
+  }
+});
+
+watch(() => newRequirement.value.type, (newType) => {
+  if (newType === 'rarity') {
+    newRequirement.value.value = 'normal';
+  } else {
+    newRequirement.value.value = props.availableTypes[0] || 'Normal';
   }
 });
 </script>

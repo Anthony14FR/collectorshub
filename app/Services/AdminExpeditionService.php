@@ -131,10 +131,20 @@ class AdminExpeditionService
 
     public function getAvailableTypes(): array
     {
-        return [
-            'Normal', 'Feu', 'Eau', 'Electrik', 'Plante', 'Glace', 'Combat', 'Poison',
-            'Sol', 'Vol', 'Psy', 'Insecte', 'Roche', 'Spectre', 'Dragon', 'Acier', 'Fee'
-        ];
+        return DB::table('pokemon')
+            ->select('types')
+            ->distinct()
+            ->get()
+            ->flatMap(function ($pokemon) {
+                $types = json_decode($pokemon->types, true);
+                return collect($types)->map(function ($type) {
+                    return is_array($type) ? $type['name'] : $type;
+                });
+            })
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
     }
 
     public function getAvailableRarities(): array
