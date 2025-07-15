@@ -5,6 +5,7 @@ use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LevelRewardController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokedexController;
 use App\Http\Controllers\PokemonUpgradeController;
@@ -82,6 +83,13 @@ Route::middleware('auth')->group(function () {
 
     // Routes pour Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+
+    // Routes pour Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
 });
 
 require __DIR__ . '/admin.php';

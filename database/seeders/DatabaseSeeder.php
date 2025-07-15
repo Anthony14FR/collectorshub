@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             InventorySeeder::class,
             MarketplaceSeeder::class,
             ExpeditionSeeder::class,
+            NotificationSeeder::class,
         ]);
     }
 }

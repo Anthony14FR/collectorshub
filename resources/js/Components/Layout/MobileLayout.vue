@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import LevelDisplay from '@/Components/Profile/LevelDisplay.vue';
 import GameInventory from '@/Components/Game/GameInventory.vue';
-import UserMenu from '@/Components/Profile/UserMenu.vue';
+import LevelDisplay from '@/Components/Profile/LevelDisplay.vue';
 import TrainerProfile from '@/Components/Profile/TrainerProfile.vue';
+import UserMenu from '@/Components/Profile/UserMenu.vue';
 import Button from '@/Components/UI/Button.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
-import { router } from '@inertiajs/vue3';
-import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
-import type { LevelReward, LevelRewardPreview } from "@/types/user";
+import type { LevelReward, LevelRewardPreview, User } from '@/types/user';
+import { router } from '@inertiajs/vue3';
 
 interface Props {
   user: User;
@@ -25,15 +24,18 @@ interface Props {
   level_rewards_to_claim?: LevelReward[];
   level_rewards_preview?: LevelRewardPreview;
   onGoToExpeditions?: () => void;
+  announcements?: any[];
+  marketplaceHistory?: any[];
+  unreadNotificationsCount?: number;
 }
 
-const { 
-  user, 
-  inventory, 
-  pokedex, 
-  onOpenPokedexModal, 
-  onGoToMarketplace, 
-  onGoToLeaderboard, 
+const {
+  user,
+  inventory,
+  pokedex,
+  onOpenPokedexModal,
+  onGoToMarketplace,
+  onGoToLeaderboard,
   onOpenTeamManagementModal,
   onOpenBadgesModal,
   hasUnclaimedSuccesses,
@@ -41,6 +43,7 @@ const {
   level_rewards_to_claim = [],
   level_rewards_preview,
   onGoToExpeditions,
+  unreadNotificationsCount = 0,
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -59,7 +62,8 @@ const goToPokemonUpgrade = () => {
 <template>
   <div class="lg:hidden min-h-screen pb-safe">
     <div class="z-50 px-3 py-2">
-      <LevelDisplay :user="user" :responsive="true" :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview" />
+      <LevelDisplay :user="user" :responsive="true" :level_rewards_to_claim="level_rewards_to_claim"
+                    :level_rewards_preview="level_rewards_preview" />
     </div>
 
     <div class="space-y-3">
@@ -76,13 +80,16 @@ const goToPokemonUpgrade = () => {
 
       <div class="flex justify-center bg-base-100/60 backdrop-blur-sm rounded-2xl border border-base-300/20 p-4">
         <div class="scale-90 -my-2">
-          <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal" :team-pokemons="teamPokemons" />
+          <TrainerProfile :user="user" :trainer-image-id="2" :on-open-pokedex-modal="onOpenTeamManagementModal"
+                          :team-pokemons="teamPokemons" />
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-2">
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-600/30 border border-green-400/30">
-          <div class="absolute inset-0 bg-[url('/images/background/invocation.gif')] bg-cover bg-center opacity-30"></div>
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-600/30 border border-green-400/30">
+          <div class="absolute inset-0 bg-[url('/images/background/invocation.gif')] bg-cover bg-center opacity-30">
+          </div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
               <img src="/images/items/pokeball.png" alt="pokeball" class="w-5 h-5 mr-2">
@@ -95,7 +102,8 @@ const goToPokemonUpgrade = () => {
           </div>
         </div>
 
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-warning/20 to-orange-500/30 border border-warning/30">
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-warning/20 to-orange-500/30 border border-warning/30">
           <div class="absolute inset-0 bg-[url('/images/marketplace.jpg')] bg-cover bg-center opacity-40"></div>
           <div class="absolute inset-0 bg-black/40"></div>
           <div class="relative p-4 flex flex-col h-32">
@@ -104,7 +112,8 @@ const goToPokemonUpgrade = () => {
               <h3 class="text-sm font-bold text-warning">Market</h3>
             </div>
             <p class="text-xs text-white/80 mb-auto">Acheter & vendre</p>
-            <Button v-if="onGoToMarketplace" @click="onGoToMarketplace" variant="invocation" size="sm" class="w-full text-xs py-1.5">
+            <Button v-if="onGoToMarketplace" @click="onGoToMarketplace" variant="invocation" size="sm"
+                    class="w-full text-xs py-1.5">
               Explorer
             </Button>
           </div>
@@ -112,7 +121,8 @@ const goToPokemonUpgrade = () => {
       </div>
 
       <div class="grid grid-cols-2 gap-2">
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-info/20 to-blue-500/30 border border-info/30">
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-info/20 to-blue-500/30 border border-info/30">
           <div class="absolute inset-0 bg-[url('/images/badge.jpg')] bg-cover bg-center opacity-30"></div>
           <div v-if="hasUnclaimedSuccesses" class="absolute top-2 right-2 z-20">
             <span class="relative flex h-2 w-2">
@@ -126,13 +136,15 @@ const goToPokemonUpgrade = () => {
               <h3 class="text-sm font-bold text-info">Badges</h3>
             </div>
             <p class="text-xs text-white/80 mb-auto">Vos succès</p>
-            <Button v-if="onOpenBadgesModal" @click="onOpenBadgesModal" variant="secondary" size="sm" class="w-full text-xs py-1.5">
+            <Button v-if="onOpenBadgesModal" @click="onOpenBadgesModal" variant="secondary" size="sm"
+                    class="w-full text-xs py-1.5">
               Voir
             </Button>
           </div>
         </div>
 
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-warning/30 to-amber-500/40 border border-warning/40">
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-warning/30 to-amber-500/40 border border-warning/40">
           <div class="absolute inset-0 bg-[url('/images/background/upgrade.gif')] bg-cover bg-center opacity-40"></div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
@@ -150,49 +162,80 @@ const goToPokemonUpgrade = () => {
       <div class="bg-gradient-to-r from-secondary/10 to-accent/20 rounded-xl border border-secondary/20 p-4">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 bg-gradient-to-br from-secondary/30 to-accent/30 rounded-lg flex items-center justify-center text-sm">📚</div>
-            <h3 class="font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">Mon Pokédex</h3>
+            <div
+              class="w-6 h-6 bg-gradient-to-br from-secondary/30 to-accent/30 rounded-lg flex items-center justify-center text-sm">
+              📚</div>
+            <h3 class="font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">Mon Pokédex
+            </h3>
           </div>
           <span class="text-sm font-medium text-secondary">{{ pokedex.length }}</span>
         </div>
-        <Button variant="secondary" size="sm" @click="onOpenPokedexModal" class="w-full bg-gradient-to-r from-secondary/10 to-accent/20 border-secondary/30 text-secondary hover:from-secondary/20 hover:to-accent/30">
+        <Button variant="secondary" size="sm" @click="onOpenPokedexModal"
+                class="w-full bg-gradient-to-r from-secondary/10 to-accent/20 border-secondary/30 text-secondary hover:from-secondary/20 hover:to-accent/30">
           Voir mes Pokémon
         </Button>
       </div>
 
       <div class="grid grid-cols-2 gap-2">
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/20 to-blue-600/30 border border-primary/30">
-          <div class="absolute inset-0 bg-[url('/images/background/leaderboard.jpg')] bg-cover bg-center opacity-30"></div>
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/20 to-blue-600/30 border border-primary/30">
+          <div class="absolute inset-0 bg-[url('/images/background/leaderboard.jpg')] bg-cover bg-center opacity-30">
+          </div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
               <img src="/images/icons/classement.png" alt="Classement" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-primary">Ranking</h3>
             </div>
             <p class="text-xs text-white/80 mb-auto">Top 100</p>
-            <Button v-if="onGoToLeaderboard" @click="onGoToLeaderboard" variant="leaderboard" size="sm" class="w-full text-xs py-1.5">
+            <Button v-if="onGoToLeaderboard" @click="onGoToLeaderboard" variant="leaderboard" size="sm"
+                    class="w-full text-xs py-1.5">
               Voir
             </Button>
           </div>
         </div>
 
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-success/20 to-emerald-600/30 border border-success/30">
-          <div class="absolute inset-0 bg-[url('/images/background/expeditions.gif')] bg-cover bg-center opacity-30"></div>
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-success/20 to-emerald-600/30 border border-success/30">
+          <div class="absolute inset-0 bg-[url('/images/background/expeditions.gif')] bg-cover bg-center opacity-30">
+          </div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
               <img src="/images/icons/treasure-map.webp" alt="Expedition" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-success">Expéditions</h3>
             </div>
             <p class="text-xs text-white/80 mb-auto">Aventures</p>
-            <Button v-if="onGoToExpeditions" @click="onGoToExpeditions" variant="secondary" size="sm" class="w-full text-xs py-1.5">
+            <Button v-if="onGoToExpeditions" @click="onGoToExpeditions" variant="secondary" size="sm"
+                    class="w-full text-xs py-1.5">
               Partir
             </Button>
           </div>
         </div>
       </div>
 
+      <!-- Boîte de réception -->
+      <div class="bg-gradient-to-r from-info/10 to-primary/20 rounded-xl border border-info/20 p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div
+              class="w-6 h-6 bg-gradient-to-br from-info/30 to-primary/30 rounded-lg flex items-center justify-center text-sm">
+              📬</div>
+            <h3 class="font-bold bg-gradient-to-r from-info to-primary bg-clip-text text-transparent">Boîte de réception
+            </h3>
+            <span v-if="unreadNotificationsCount > 0"
+                  class="bg-error text-error-content text-xs px-2 py-1 rounded-full font-bold">
+              {{ unreadNotificationsCount }}
+            </span>
+          </div>
+        </div>
+        <Button variant="secondary" size="sm" @click="router.visit('/notifications')"
+                class="w-full bg-gradient-to-r from-info/10 to-primary/20 border-info/30 text-info hover:from-info/20 hover:to-primary/30">
+          Voir ses messages
+        </Button>
+      </div>
+
       <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/20 p-4">
         <Button variant="outline" size="md" class="w-full" @click="goToShop">
-          <img src="/images/icons/shop.webp" alt="Boutique" class="w-5 h-5 mr-2" /> 
+          <img src="/images/icons/shop.webp" alt="Boutique" class="w-5 h-5 mr-2" />
           Boutique
         </Button>
       </div>
