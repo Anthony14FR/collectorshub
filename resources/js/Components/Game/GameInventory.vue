@@ -32,7 +32,7 @@ const formatPrice = (price: number) => {
       <img src="/images/icons/bag.webp" alt="Sac" class="w-6 h-6 mr-2" /> SAC
     </Button>
 
-    <Modal :show="isModalOpen" @close="isModalOpen = false" max-width="4xl">
+    <Modal :show="isModalOpen" @close="isModalOpen = false" max-width="4xl" fixed-height>
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-gradient-to-br from-success/20 to-primary/20 rounded-lg flex items-center justify-center">

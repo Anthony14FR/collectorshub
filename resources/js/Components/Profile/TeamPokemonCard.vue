@@ -37,7 +37,7 @@ const rarityBorderClass = computed(() => {
 
 <template>
   <div
-    class="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20
+    class="relative w-20 h-20
            bg-base-200/60 backdrop-blur-sm rounded-md flex items-center justify-center p-0.5
            transition-all duration-300 group overflow-hidden"
     :class="rarityBorderClass"

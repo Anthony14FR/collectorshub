@@ -16,6 +16,7 @@ import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
 import type { Leaderboards } from '@/types/leaderboard';
 import type { Success, UserSuccess } from '@/types/success';
+import type { LevelReward, LevelRewardPreview } from '@/types/user';
 
 interface Props extends PageProps {
   auth: {
@@ -80,16 +81,20 @@ const openTeamManagementModal = () => {
 const openBadgesModal = () => {
   badgesModalOpen.value = true;
 }
+
+const goToExpeditions = () => {
+  router.visit('/expeditions');
+}
 </script>
 
 <template>
   <Head title="Mon Profil" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="h-screen w-screen bg-gradient-to-br from-base-200 to-base-300 relative">
 
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-y-auto lg:overflow-hidden">
+    <div class="relative z-10 h-screen w-screen overflow-x-hidden">
       <MobileLayout
         :user="auth.user"
         :inventory="inventory"
@@ -103,6 +108,7 @@ const openBadgesModal = () => {
         :onOpenTeamManagementModal="openTeamManagementModal"
         :onOpenBadgesModal="openBadgesModal"
         :has-unclaimed-successes="unclaimed_successes.length > 0"
+        :onGoToExpeditions="goToExpeditions"
       />
 
       <DesktopLayout
@@ -118,6 +124,7 @@ const openBadgesModal = () => {
         :onOpenTeamManagementModal="openTeamManagementModal"
         :onOpenBadgesModal="openBadgesModal"
         :has-unclaimed-successes="unclaimed_successes.length > 0"
+        :onGoToExpeditions="goToExpeditions"
       />
     </div>
 
