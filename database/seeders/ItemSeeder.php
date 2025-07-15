@@ -12,33 +12,6 @@ class ItemSeeder extends Seeder
     {
         $items = [
             [
-                'name' => 'Potion',
-                'description' => 'Un item qui restaure 20 PV d\'un Pokémon.',
-                'type' => 'heal',
-                'image' => "images/items/potion.png",
-                'effect' => ['amount' => 20],
-                'price' => 300,
-                'rarity' => 'normal',
-            ],
-            [
-                'name' => 'Super Potion',
-                'description' => 'Un item qui restaure 50 PV d\'un Pokémon.',
-                'type' => 'heal',
-                'image' => "images/items/super_potion.png",
-                'effect' => ['amount' => 50],
-                'price' => 700,
-                'rarity' => 'rare',
-            ],
-            [
-                'name' => 'Hyper Potion',
-                'description' => 'Un item qui restaure 200 PV d\'un Pokémon.',
-                'type' => 'heal',
-                'image' => "images/items/hyper_potion.png",
-                'effect' => ['amount' => 200],
-                'price' => 1500,
-                'rarity' => 'rare',
-            ],
-            [
                 'name' => 'Pokeball',
                 'description' => 'Boh c\'est une pokeball quoi',
                 'type' => 'ball',
@@ -81,5 +54,56 @@ class ItemSeeder extends Seeder
                 'rarity' => 'normal',
             ]);
         });
+
+        $backgrounds = [
+            [
+                'name' => 'Bots City',
+                'description' => 'Une ville stylée',
+                'image' => '/images/background/1.gif',
+                'price' => 5000
+            ],
+            [
+                'name' => 'Sunset Love',
+                'description' => 'Un coucher de soleil romantique à l\'horizon',
+                'image' => '/images/background/2.gif',
+                'price' => 7500
+            ],
+            [
+                'name' => 'Ocean Stream',
+                'description' => 'Horizon de l\'océan',
+                'image' => '/images/background/3.gif',
+                'price' => 10000
+            ],
+            [
+                'name' => 'Simple Dark Room',
+                'description' => 'Une chambre la nuit',
+                'image' => '/images/background/4.gif',
+                'price' => 12500
+            ],
+            [
+                'name' => 'Pokemon Party',
+                'description' => 'Une chambre avec des pokémon',
+                'image' => '/images/background/5.gif',
+                'price' => 15000
+            ],
+            [
+                'name' => 'Witch Room',
+                'description' => 'La chambre mystérieuse d\'une sorcière',
+                'image' => '/images/background/6.gif',
+                'price' => 17500
+            ],
+        ];
+
+        foreach ($backgrounds as $background) {
+            Item::create([
+                'name' => $background['name'],
+                'description' => $background['description'],
+                'type' => 'background',
+                'image' => $background['image'],
+                'effect' => [],
+                'price' => $background['price'],
+                'rarity' => 'normal',
+            ]);
+        }
     }
 }

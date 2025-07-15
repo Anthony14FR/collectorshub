@@ -26,6 +26,8 @@ const emit = defineEmits(['close', 'confirm']);
 
 const quantity = ref(1);
 const isAvatar = computed(() => props.item && props.item.type === 'avatar');
+const isBackground = computed(() => props.item && props.item.type === 'background');
+const isUnlockable = computed(() => isAvatar.value || isBackground.value);
 
 const totalCost = computed(() => {
   if (!props.item) return 0;
@@ -43,7 +45,7 @@ const remainingCash = computed(() => {
 const confirmPurchase = () => {
   emit('confirm', {
     item_id: props.item.id,
-    quantity: isAvatar.value ? 1 : quantity.value
+    quantity: isUnlockable.value ? 1 : quantity.value
   });
 };
 
@@ -65,7 +67,7 @@ const getItemImage = (item) => {
     <template #header>
       <div v-if="item" class="flex items-center gap-3">
         <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center p-1">
-          <img :src="getItemImage(item)" :alt="item?.name" class="w-full h-full object-contain" :class="{ 'rounded-full': isAvatar }" />
+          <img :src="getItemImage(item)" :alt="item?.name" class="w-full h-full object-contain" :class="{ 'rounded-full': isAvatar || isBackground }" />
         </div>
         <div class="flex flex-col">
           <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -89,7 +91,7 @@ const getItemImage = (item) => {
             </p>
           </div>
                     
-          <div v-if="!isAvatar" class="bg-base-200/30 rounded-xl p-4">
+          <div v-if="!isUnlockable" class="bg-base-200/30 rounded-xl p-4">
             <div class="flex items-center justify-between">
               <span>Quantité :</span>
               <div class="flex items-center gap-2">

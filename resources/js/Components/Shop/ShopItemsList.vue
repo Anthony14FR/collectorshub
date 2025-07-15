@@ -16,9 +16,13 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  userBackgrounds: {
+    type: Array,
+    default: () => []
+  },
   activeTab: {
     type: String,
-    default: 'items'
+    default: 'balls'
   }
 });
 
@@ -34,12 +38,12 @@ watch(() => props.activeTab, () => {
 const filteredItems = computed(() => {
   let result = props.items;
     
-  if (props.activeTab === 'items') {
-    result = result.filter(item => item.type !== 'avatar' && item.type !== 'ball');
-  } else if (props.activeTab === 'balls') {
+  if (props.activeTab === 'balls') {
     result = result.filter(item => item.type === 'ball');
   } else if (props.activeTab === 'avatars') {
     result = result.filter(item => item.type === 'avatar');
+  } else if (props.activeTab === 'backgrounds') {
+    result = result.filter(item => item.type === 'background');
   }
     
   return result;
@@ -121,17 +125,6 @@ const paginationItems = computed(() => {
     <div class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
       <div class="flex flex-wrap gap-2 sm:gap-4 justify-center sm:justify-start">
         <button
-          @click="emit('changeTab', 'items')"
-          :class="[
-            'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
-            activeTab === 'items' 
-              ? 'bg-warning text-warning-content shadow-md' 
-              : 'text-base-content/70 hover:text-base-content hover:bg-base-200/50'
-          ]"
-        >
-          Objets
-        </button>
-        <button
           @click="emit('changeTab', 'balls')"
           :class="[
             'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
@@ -153,6 +146,17 @@ const paginationItems = computed(() => {
         >
           Avatars
         </button>
+        <button
+          @click="emit('changeTab', 'backgrounds')"
+          :class="[
+            'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
+            activeTab === 'backgrounds' 
+              ? 'bg-warning text-warning-content shadow-md' 
+              : 'text-base-content/70 hover:text-base-content hover:bg-base-200/50'
+          ]"
+        >
+          Backgrounds
+        </button>
       </div>
     </div>
 
@@ -164,6 +168,7 @@ const paginationItems = computed(() => {
             :item="item"
             :userInventory="inventory"
             :userAvatars="userAvatars"
+            :userBackgrounds="userBackgrounds"
             @buy="emit('buy', $event)"
           />
           <div v-else class="bg-base-200/30 rounded-xl border border-base-300/20 h-full min-h-[180px] sm:min-h-[200px]"></div>

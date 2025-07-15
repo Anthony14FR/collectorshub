@@ -11,6 +11,10 @@ export type User = {
     last_login: string;
     pokedex?: PokedexEntry[];
     inventory?: InventoryItem[];
+    unlocked_avatars?: string[];
+    unlocked_backgrounds?: string[];
+    background?: string;
+    xp: number;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
