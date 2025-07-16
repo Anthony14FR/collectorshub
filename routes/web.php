@@ -26,9 +26,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Route pour Me
-    Route::get('/me', [MeController::class, 'index'])->middleware(['verified'])->name('me');
+    Route::get('/me', [MeController::class, 'index'])->name('me');
 
     // Routes pour Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

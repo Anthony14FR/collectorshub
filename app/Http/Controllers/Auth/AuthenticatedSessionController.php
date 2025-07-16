@@ -36,6 +36,10 @@ class AuthenticatedSessionController extends Controller
 
         User::where('id', Auth::id())->update(['last_login' => now()]);
 
+        if (!Auth::user()->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice');
+        }
+
         return redirect()->intended(route('me', absolute: false));
     }
 
