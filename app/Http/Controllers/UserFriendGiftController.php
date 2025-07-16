@@ -22,14 +22,14 @@ class UserFriendGiftController extends Controller
         $user = Auth::user();
         $receiver = User::findOrFail($request->input('receiver_id'));
         $ok = $this->giftService->sendGift($user, $receiver);
-        return redirect()->back()->with($ok ? 'success' : 'error', $ok ? 'Cadeau envoyé !' : 'Impossible d\'envoyer le cadeau.');
+        return redirect()->route('me')->with($ok ? 'success' : 'error', $ok ? 'Cadeau envoyé !' : 'Impossible d\'envoyer le cadeau.');
     }
 
     public function sendToAll()
     {
         $user = Auth::user();
         $count = $this->giftService->sendToAllFriends($user);
-        return redirect()->back()->with('success', "$count cadeaux envoyés à vos amis !");
+        return redirect()->route('me')->with('success', "$count cadeaux envoyés à vos amis !");
     }
 
     public function claim(Request $request)
@@ -37,7 +37,7 @@ class UserFriendGiftController extends Controller
         $user = Auth::user();
         $gift = UserFriendGift::findOrFail($request->input('gift_id'));
         $ok = $this->giftService->claimGift($user, $gift);
-        return redirect()->back()->with($ok ? 'success' : 'error', $ok ? 'Cadeau récupéré !' : 'Impossible de récupérer ce cadeau.');
+        return redirect()->route('me')->with($ok ? 'success' : 'error', $ok ? 'Cadeau récupéré !' : 'Impossible de récupérer ce cadeau.');
     }
 
     public function toClaim()

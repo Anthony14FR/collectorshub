@@ -68,7 +68,7 @@ class FriendController extends Controller
         $user = Auth::user();
         $target = User::findOrFail($request->input('target_id'));
         $ok = $this->friendService->sendFriendRequest($user, $target);
-        return redirect()->back()->with($ok ? 'success' : 'error', $ok ? 'Demande envoyée !' : 'Impossible d\'envoyer la demande.');
+        return redirect()->route('me')->with($ok ? 'success' : 'error', $ok ? 'Demande envoyée !' : 'Impossible d\'envoyer la demande.');
     }
 
     /**
@@ -79,7 +79,7 @@ class FriendController extends Controller
         $user = Auth::user();
         $requester = User::findOrFail($request->input('requester_id'));
         $ok = $this->friendService->acceptFriendRequest($user, $requester);
-        return redirect()->back()->with($ok ? 'success' : 'error', $ok ? 'Ami ajouté !' : 'Impossible d\'accepter la demande.');
+        return redirect()->route('me')->with($ok ? 'success' : 'error', $ok ? 'Ami ajouté !' : 'Impossible d\'accepter la demande.');
     }
 
     /**
@@ -90,7 +90,7 @@ class FriendController extends Controller
         $user = Auth::user();
         $target = User::findOrFail($request->input('target_id'));
         $ok = $this->friendService->removeFriend($user, $target);
-        return redirect()->back()->with($ok ? 'success' : 'error', $ok ? 'Ami supprimé.' : 'Erreur lors de la suppression.');
+        return redirect()->route('me')->with($ok ? 'success' : 'error', $ok ? 'Ami supprimé.' : 'Erreur lors de la suppression.');
     }
 
     /**
@@ -101,5 +101,15 @@ class FriendController extends Controller
         $query = $request->input('query');
         $results = $this->friendService->searchUser($query);
         return response()->json(['results' => $results]);
+    }
+
+    /**
+     * Suggestions d'amis (API JSON)
+     */
+    public function suggestions()
+    {
+        $user = Auth::user();
+        $suggestions = $this->friendService->getFriendSuggestions($user);
+        return response()->json(['suggestions' => $suggestions]);
     }
 }

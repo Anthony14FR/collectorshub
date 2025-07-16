@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { router } from '@inertiajs/vue3';
+import { ref, watch } from "vue";
+import axios from "axios";
+import { router } from "@inertiajs/vue3";
 import FriendsCard from "./FriendsCard.vue";
 import Modal from "@/Components/UI/Modal.vue";
 import Button from "@/Components/UI/Button.vue";
 import Input from "@/Components/UI/Input.vue";
-import type { UserFriend, FriendRequest } from '@/types/friend';
-import type { User } from '@/types/user';
+import type { UserFriend, FriendRequest } from "@/types/friend";
+import type { User } from "@/types/user";
 
 const props = defineProps<{
   show: boolean;
@@ -16,34 +17,21 @@ const props = defineProps<{
   suggestions: User[];
 }>();
 
-const emit = defineEmits(["close", "refresh"]);
-
 const searchQuery = ref("");
 const searchResults = ref<User[]>([]);
 const loadingSearch = ref(false);
-const suggestions = ref(props.suggestions || []);
 const refreshingSuggestions = ref(false);
-let suggestionInterval: any = null;
 
-const friends = ref<UserFriend[]>(props.friends || []);
-const friendRequests = ref<FriendRequest[]>(props.friend_requests ?? []);
+const suggestions = ref<User[]>([...props.suggestions]);
 
-const refreshFriends = async () => {
-  const { data } = await axios.get("/friends");
-  friends.value = data.friends;
-  friendRequests.value = data.friend_requests ?? [];
-  suggestions.value = data.suggestions;
-};
-
-const refreshSuggestions = async () => {
-  refreshingSuggestions.value = true;
-  try {
-    const { data } = await axios.get("/friends");
-    suggestions.value = data.suggestions;
-  } finally {
-    refreshingSuggestions.value = false;
+watch(
+  () => props.show,
+  (val) => {
+    if (val) {
+      suggestions.value = [...props.suggestions];
+    }
   }
-};
+);
 
 const handleSearch = async () => {
   if (!searchQuery.value) return;
@@ -58,48 +46,72 @@ const handleSearch = async () => {
   }
 };
 
+const refreshSuggestions = async () => {
+  refreshingSuggestions.value = true;
+  try {
+    const { data } = await axios.get("/api/friends/suggestions");
+    suggestions.value = data.suggestions;
+    if (searchQuery.value) {
+      await handleSearch();
+    }
+  } finally {
+    refreshingSuggestions.value = false;
+  }
+};
+
 const handleClose = () => {
-  emit("close");
+  props.onClose();
 };
 
-const acceptRequest = async (requesterId) => {
-  router.post("/friends/accept-request", { requester_id: requesterId }, {
-    preserveScroll: true,
-    onFinish: () => { /* optionnel */ }
-  });
+const acceptRequest = (requesterId) => {
+  router.post(
+    "/friends/accept-request",
+    { requester_id: requesterId },
+    { preserveScroll: true }
+  );
 };
 
-const refuseRequest = async (targetId) => {
-  router.post("/friends/remove", { target_id: targetId }, {
-    preserveScroll: true,
-    onFinish: () => { /* optionnel */ }
-  });
+const refuseRequest = (targetId) => {
+  router.post(
+    "/friends/remove",
+    { target_id: targetId },
+    { preserveScroll: true }
+  );
 };
 
-const sendFriendRequest = async (targetId) => {
-  router.post("/friends/send-request", { target_id: targetId }, {
-    preserveScroll: true,
-    onFinish: () => { /* optionnel */ }
-  });
+const sendFriendRequest = (targetId) => {
+  searchResults.value = searchResults.value.filter(
+    (user) => user.id !== targetId
+  );
+  suggestions.value = suggestions.value.filter(
+    (user) => user.id !== targetId
+  );
+  router.post(
+    "/friends/send-request",
+    { target_id: targetId },
+    { preserveScroll: true }
+  );
 };
 
-const sendGift = async (friendId) => {
-  router.post("/friend-gifts/send", { receiver_id: friendId }, {
-    preserveScroll: true,
-    onFinish: () => { /* optionnel */ }
-  });
+const sendGift = (friendId) => {
+  router.post(
+    "/friend-gifts/send",
+    { receiver_id: friendId },
+    { preserveScroll: true }
+  );
 };
 
-const claimGift = async (giftId) => {
-  router.post("/friend-gifts/claim", { gift_id: giftId }, {
-    preserveScroll: true,
-    onFinish: () => { /* optionnel */ }
-  });
+const claimGift = (giftId) => {
+  router.post(
+    "/friend-gifts/claim",
+    { gift_id: giftId },
+    { preserveScroll: true }
+  );
 };
 </script>
 
 <template>
-  <Modal :show="show" @close="handleClose" max-width="2xl">
+  <Modal :show="props.show" @close="handleClose" max-width="2xl">
     <template #header>
       <div class="flex items-center gap-2">
         <span class="font-bold text-lg">Mes amis</span>
@@ -202,7 +214,7 @@ const claimGift = async (giftId) => {
           <div class="font-semibold mb-2">Mes amis</div>
           <div class="flex flex-col gap-2">
             <FriendsCard
-              v-for="friend in friends"
+              v-for="friend in props.friends"
               :key="friend.id"
               :friend="friend"
               @send-gift="sendGift"

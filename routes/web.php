@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/friends/accept-request', [\App\Http\Controllers\FriendController::class, 'acceptRequest'])->name('friends.acceptRequest');
     Route::post('/friends/remove', [\App\Http\Controllers\FriendController::class, 'remove'])->name('friends.remove');
     Route::get('/friends/search', [\App\Http\Controllers\FriendController::class, 'search'])->name('friends.search');
+    Route::get('/api/friends/suggestions', [\App\Http\Controllers\FriendController::class, 'suggestions'])->middleware(['auth']);
 
     // Gestion des cadeaux d'amis
     Route::post('/friend-gifts/send', [\App\Http\Controllers\UserFriendGiftController::class, 'send'])->name('friendGifts.send');
