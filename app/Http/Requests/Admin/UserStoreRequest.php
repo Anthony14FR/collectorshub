@@ -8,11 +8,6 @@ use Illuminate\Validation\Rule;
 
 class UserStoreRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return auth()->check() && auth()->user()->role === 'admin';
-    }
-
     public function rules(): array
     {
         return [
