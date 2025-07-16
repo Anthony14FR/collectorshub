@@ -8,6 +8,11 @@ use App\Models\User;
 
 class XpService
 {
+    public function __construct(
+        private GameConfigurationService $configService
+    ) {
+    }
+
     public function addXp(User $user, int $xp): void
     {
         $user->experience += $xp;
@@ -28,32 +33,14 @@ class XpService
 
         $isShiny = isset($pokemon->is_shiny) && $pokemon->is_shiny;
         $rarity = $pokemon->rarity;
-        $xp = 0;
-        if (!$isShiny) {
-            $xp = match ($rarity) {
-                'legendary' => 35,
-                'epic' => 10,
-                'rare' => 5,
-                default => 1,
-            };
-        } else {
-            $xp = match ($rarity) {
-                'legendary' => 70,
-                'epic' => 20,
-                'rare' => 10,
-                default => 5,
-            };
-        }
+        $xpRewards = $this->configService->getXpRewards();
+        $rarityConfig = $xpRewards['rarity_bonuses'][$rarity] ?? $xpRewards['rarity_bonuses']['normal'];
+
+        $xp = $isShiny ? $rarityConfig['shiny'] : $rarityConfig['base'];
 
         $alreadyOwned = $user->pokedex()->where('pokemon_id', $pokemon->id)->count() > 1;
         if (!$alreadyOwned) {
-            $bonus = match ($rarity) {
-                'legendary' => 15,
-                'epic' => 10,
-                'rare' => 5,
-                default => 1,
-            };
-            $xp += $bonus;
+            $xp += $rarityConfig['first_catch_bonus'];
         }
 
         $this->addXp($user, $xp);

@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class LevelRewardService
 {
+    public function __construct(
+        private GameConfigurationService $configService
+    ) {
+    }
+
     public function checkAndDistributeRewards(User $user, int $newLevel): array
     {
         $rewards = [];
@@ -42,49 +47,51 @@ class LevelRewardService
     public function getMilestonesForLevel(int $level): array
     {
         $milestones = [];
+        $levelRewards = $this->configService->getLevelRewards();
+
         if ($level % 5 === 0) {
             $milestones[] = [
                 'type' => 'milestone_5',
                 'level' => $level,
-                'cash' => 1500,
-                'pokeballs' => 10,
-                'masterballs' => 0
+                'cash' => $levelRewards['milestone_5']['cash'],
+                'pokeballs' => $levelRewards['milestone_5']['pokeballs'],
+                'masterballs' => $levelRewards['milestone_5']['masterballs']
             ];
         }
         if ($level % 10 === 0) {
             $milestones[] = [
                 'type' => 'milestone_10',
                 'level' => $level,
-                'cash' => 3000,
-                'pokeballs' => 0,
-                'masterballs' => 5
+                'cash' => $levelRewards['milestone_10']['cash'],
+                'pokeballs' => $levelRewards['milestone_10']['pokeballs'],
+                'masterballs' => $levelRewards['milestone_10']['masterballs']
             ];
         }
         if ($level % 25 === 0) {
             $milestones[] = [
                 'type' => 'milestone_25',
                 'level' => $level,
-                'cash' => 5000,
-                'pokeballs' => 10,
-                'masterballs' => 5
+                'cash' => $levelRewards['milestone_25']['cash'],
+                'pokeballs' => $levelRewards['milestone_25']['pokeballs'],
+                'masterballs' => $levelRewards['milestone_25']['masterballs']
             ];
         }
         if ($level % 50 === 0) {
             $milestones[] = [
                 'type' => 'milestone_50',
                 'level' => $level,
-                'cash' => 10000,
-                'pokeballs' => 20,
-                'masterballs' => 15
+                'cash' => $levelRewards['milestone_50']['cash'],
+                'pokeballs' => $levelRewards['milestone_50']['pokeballs'],
+                'masterballs' => $levelRewards['milestone_50']['masterballs']
             ];
         }
         if ($level % 5 !== 0 && $level % 10 !== 0 && $level % 25 !== 0 && $level % 50 !== 0) {
             $milestones[] = [
                 'type' => 'regular_level',
                 'level' => $level,
-                'cash' => 2500,
-                'pokeballs' => 2,
-                'masterballs' => 0
+                'cash' => $levelRewards['regular_level']['cash'],
+                'pokeballs' => $levelRewards['regular_level']['pokeballs'],
+                'masterballs' => $levelRewards['regular_level']['masterballs']
             ];
         }
         return $milestones;

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Pokedex;
 use App\Observers\PokedexObserver;
+use App\Services\GameConfigurationService;
 use App\Services\SuccessService;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Vite;
@@ -19,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(SuccessService::class);
+        $this->app->singleton(GameConfigurationService::class);
     }
 
     /**
