@@ -16,7 +16,7 @@ class UserFriendGiftService
         if (!$sender->friends()->where('users.id', $receiver->id)->exists()) {
             return false;
         }
-        if ($this->hasSentToday($sender, $receiver)) {
+        if ($this->getLastSentGift($sender, $receiver)) {
             return false;
         }
 
@@ -30,13 +30,21 @@ class UserFriendGiftService
         return true;
     }
 
-    public function hasSentToday(User $sender, User $receiver): bool
+    public function getSentGiftToday(User $sender, User $receiver): ?UserFriendGift
     {
         $today = now()->startOfDay();
         return UserFriendGift::where('sender_id', $sender->id)
             ->where('receiver_id', $receiver->id)
             ->where('sent_at', '>=', $today)
-            ->exists();
+            ->first();
+    }
+
+    public function getLastSentGift(User $sender, User $receiver): ?UserFriendGift
+    {
+        return UserFriendGift::where('sender_id', $sender->id)
+            ->where('receiver_id', $receiver->id)
+            ->orderByDesc('sent_at')
+            ->first();
     }
 
     public function claimGift(User $receiver, UserFriendGift $gift): bool
@@ -63,7 +71,7 @@ class UserFriendGiftService
     {
         $count = 0;
         foreach ($sender->friends as $friend) {
-            if (!$this->hasSentToday($sender, $friend)) {
+            if (!$this->getLastSentGift($sender, $friend)) {
                 $this->sendGift($sender, $friend, $amount);
                 $count++;
             }

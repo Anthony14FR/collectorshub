@@ -5,6 +5,7 @@ import Avatar from "@/Components/UI/Avatar.vue";
 import Badge from "@/Components/UI/Badge.vue";
 import { Link } from "@inertiajs/vue3";
 import type { UserFriend } from '@/types/friend';
+import FriendGiftCountdown from "@/Components/friends/FriendGiftCountdown.vue";
 
 const props = defineProps<{
   friend: UserFriend;
@@ -12,8 +13,12 @@ const props = defineProps<{
 
 const emit = defineEmits(["send-gift", "claim-gift", "remove-friend"]);
 
-const canSendGift = computed(() => !props.friend.hasSentGiftToday);
 const canClaimGift = computed(() => props.friend.hasGiftToClaim);
+
+const handleCountdownExpired = () => {
+  props.friend.isOnCooldown = false;
+  props.friend.nextGiftAvailableAt = null;
+};
 
 const getAvatarSrc = (friend: UserFriend) => {
   return friend.avatar || `/images/trainer/${(friend.id % 10) + 1}.png`;
@@ -26,7 +31,7 @@ const getAvatarSrc = (friend: UserFriend) => {
       <span class="text-white text-xs font-bold">!</span>
     </div>
 
-    <div v-if="!canSendGift" class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-warning/80 to-warning rounded-full flex items-center justify-center shadow-lg">
+    <div v-if="props.friend.isOnCooldown && props.friend.nextGiftAvailableAt" class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-warning/80 to-warning rounded-full flex items-center justify-center shadow-lg">
       <span class="text-white text-xs">✓</span>
     </div>
 
@@ -61,11 +66,6 @@ const getAvatarSrc = (friend: UserFriend) => {
             <span class="text-info">⭐</span>
             <span>Niveau {{ friend.level }}</span>
           </div>
-          
-          <div v-if="!canSendGift" class="flex items-center gap-1">
-            <span class="text-warning">✉️</span>
-            <span class="text-xs">Envoyé</span>
-          </div>
         </div>
       </div>
 
@@ -84,7 +84,7 @@ const getAvatarSrc = (friend: UserFriend) => {
         </Button>
         
         <Button
-          v-if="canSendGift"
+          v-else-if="!props.friend.isOnCooldown"
           size="sm"
           variant="primary"
           @click="emit('send-gift', friend.id)"
@@ -96,22 +96,16 @@ const getAvatarSrc = (friend: UserFriend) => {
           </span>
         </Button>
         
-        <Button
-          v-if="!canSendGift && !canClaimGift"
-          size="sm"
-          variant="secondary"
-          disabled
-          class="w-full sm:w-auto"
+        <div
+          v-else
+          class="w-full sm:w-auto flex flex-col items-center justify-center p-2 rounded-lg bg-base-200"
         >
-          <span class="flex items-center gap-1">
-            <span>⏰</span>
-            Demain
-          </span>
-        </Button>
+          <FriendGiftCountdown :next-gift-available-at="props.friend.nextGiftAvailableAt" @expired="handleCountdownExpired" />
+        </div>
         
         <Button
-          size="xs"
-          variant="error"
+          size="sm"
+          variant="secondary"
           @click="emit('remove-friend', friend.id)"
           class="mt-1 w-full sm:w-auto"
         >

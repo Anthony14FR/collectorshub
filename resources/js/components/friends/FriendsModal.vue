@@ -92,6 +92,7 @@ const handleSearch = async () => {
   }
 };
 
+const REFRESH_COOLDOWN = 15;
 const refreshSuggestions = async () => {
   if (!canRefresh.value || refreshingSuggestions.value) return;
   
@@ -113,7 +114,7 @@ const refreshSuggestions = async () => {
         suggestions: data.suggestions
       });
       
-      refreshCountdown.value = 5;
+      refreshCountdown.value = REFRESH_COOLDOWN;
       startCountdown();
       
       if (searchQuery.value.trim()) {
@@ -122,11 +123,11 @@ const refreshSuggestions = async () => {
     }
   } catch (error) {
     if (error.response?.status === 429) {
-      const remainingTime = error.response.data.remaining_time || 5;
+      const remainingTime = error.response.data.remaining_time || REFRESH_COOLDOWN;
       refreshCountdown.value = Math.ceil(remainingTime);
       startCountdown();
     } else {
-      refreshCountdown.value = 5;
+      refreshCountdown.value = REFRESH_COOLDOWN;
       startCountdown();
     }
   } finally {
@@ -269,7 +270,13 @@ const sendGift = (friendId) => {
       onSuccess: () => {
         const friendIndex = localFriends.value.findIndex(f => f.id === friendId);
         if (friendIndex !== -1) {
-          localFriends.value[friendIndex].hasSentGiftToday = true;
+          const now = new Date();
+          const nextAvailableTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+          localFriends.value[friendIndex] = {
+            ...localFriends.value[friendIndex],
+            isOnCooldown: true,
+            nextGiftAvailableAt: nextAvailableTime.toISOString(),
+          };
         }
       }
     }
@@ -318,9 +325,17 @@ const sendGiftToAll = () => {
     { 
       preserveScroll: true,
       onSuccess: () => {
-        localFriends.value.forEach(friend => {
-          if (!friend.hasSentGiftToday) {
-            friend.hasSentGiftToday = true;
+        const now = new Date();
+        localFriends.value = localFriends.value.map(friend => {
+          if (!friend.isOnCooldown) {
+            const nextAvailableTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            return {
+              ...friend,
+              isOnCooldown: true,
+              nextGiftAvailableAt: nextAvailableTime.toISOString(),
+            };
+          } else {
+            return friend;
           }
         });
       }
@@ -362,6 +377,7 @@ const getAvatarSrc = (user: User) => {
           </p>
         </div>
         <Button
+          v-if="activeTab === 'search'"
           @click="refreshSuggestions"
           :loading="refreshingSuggestions"
           :disabled="!canRefresh"

@@ -47,41 +47,9 @@ class MeController extends Controller
 
         $friendsGiftsToClaim = $user->friendGiftsToClaim()->get();
 
-        $userFriendGiftService = $this->userFriendGiftService;
-
-        $friends = $user->friends()->get()->map(function ($friend) use ($user, $userFriendGiftService) {
-            $hasSentGiftToday = $userFriendGiftService->hasSentToday($user, $friend);
-            $gift = $friend->userFriendGiftsSent()
-                ->where('receiver_id', $user->id)
-                ->where('is_claimed', false)
-                ->first();
-            $hasGiftToClaim = $gift !== null;
-            $giftId = $gift ? $gift->id : null;
-            return [
-                'id' => $friend->id,
-                'username' => $friend->username,
-                'level' => $friend->level,
-                'avatar' => $friend->avatar ?: "/images/trainer/" . (($friend->id % 10) + 1) . ".png",
-                'hasSentGiftToday' => $hasSentGiftToday,
-                'hasGiftToClaim' => $hasGiftToClaim,
-                'giftId' => $giftId,
-            ];
-        });
-
-        $friendRequests = $user->friendRequests()->with('user')->get()->map(function ($req) {
-            return [
-                'id' => $req->id,
-                'user' => [
-                    'id' => $req->user->id,
-                    'username' => $req->user->username,
-                    'email' => $req->user->email,
-                    'level' => $req->user->level,
-                    'avatar' => $req->user->avatar ?: "/images/trainer/" . (($req->user->id % 10) + 1) . ".png",
-                ],
-            ];
-        });
-
-        $suggestions = $this->friendService->getFriendSuggestions($user);
+        $friends = $this->friendService->getFormattedFriends($user, $this->userFriendGiftService);
+        $friendRequests = $this->friendService->getFormattedFriendRequests($user);
+        $suggestions = $this->friendService->getFormattedFriendSuggestions($user);
 
         return Inertia::render('Me', [
             'user' => $user,

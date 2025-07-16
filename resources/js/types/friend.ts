@@ -3,7 +3,8 @@ export interface UserFriend {
     username: string;
     level: number;
     avatar?: string;
-    hasSentGiftToday: boolean;
+    isOnCooldown: boolean;
+    nextGiftAvailableAt?: string | null;
     hasGiftToClaim: boolean;
     giftId?: number;
   }

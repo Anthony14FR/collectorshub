@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class FriendService
 {
-    /**
-     * Envoie une demande d'ami
-     */
     public function sendFriendRequest(User $user, User $target): bool
     {
         if ($user->id === $target->id) {
@@ -37,9 +34,6 @@ class FriendService
         return true;
     }
 
-    /**
-     * Accepte une demande d'ami
-     */
     public function acceptFriendRequest(User $user, User $requester): bool
     {
         $request = UserFriend::where('user_id', $requester->id)
@@ -58,7 +52,6 @@ class FriendService
 
         DB::transaction(function () use ($request, $user, $requester) {
             $request->update(['status' => 'accepted']);
-            // On crée la relation réciproque
             UserFriend::updateOrCreate([
                 'user_id' => $user->id,
                 'friend_id' => $requester->id,
@@ -69,9 +62,6 @@ class FriendService
         return true;
     }
 
-    /**
-     * Refuse ou supprime une demande d'ami
-     */
     public function removeFriend(User $user, User $target): bool
     {
         UserFriend::where(function ($q) use ($user, $target) {
@@ -82,9 +72,6 @@ class FriendService
         return true;
     }
 
-    /**
-     * Vérifie si deux utilisateurs sont amis
-     */
     public function areFriends(User $user, User $target): bool
     {
         return UserFriend::where('user_id', $user->id)
@@ -93,9 +80,6 @@ class FriendService
             ->exists();
     }
 
-    /**
-     * Vérifie s'il y a une demande en attente
-     */
     public function hasPendingRequest(User $user, User $target): bool
     {
         return UserFriend::where('user_id', $user->id)
@@ -104,31 +88,97 @@ class FriendService
             ->exists();
     }
 
-    /**
-     * Suggestions d'amis (5 utilisateurs aléatoires non amis)
-     */
     public function getFriendSuggestions(User $user, int $limit = 5)
     {
         $friendIds = $user->friends()->pluck('users.id')->toArray();
         $friendIds[] = $user->id;
-        return User::whereNotIn('id', $friendIds)
+
+        $pendingRequestIds = \App\Models\UserFriend::where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)->orWhere('friend_id', $user->id);
+        })->where('status', 'pending')->get()->flatMap(function ($request) use ($user) {
+            return [$request->user_id, $request->friend_id];
+        })->unique()->toArray();
+
+        $excludeIds = array_unique(array_merge($friendIds, $pendingRequestIds));
+
+        return User::whereNotIn('id', $excludeIds)
             ->inRandomOrder()
             ->limit($limit)
             ->get();
     }
 
-    /**
-     * Recherche d'utilisateur par username ou email
-     */
     public function searchUser(string $query, ?int $excludeUserId = null)
     {
-        $searchQuery = User::where('username', 'like', "%$query%")
-            ->orWhere('email', 'like', "%$query%");
+        $searchQuery = User::where('username', 'like', "%{$query}%")
+            ->orWhere('email', 'like', "%{$query}%");
 
         if ($excludeUserId) {
             $searchQuery->where('id', '!=', $excludeUserId);
         }
 
         return $searchQuery->get();
+    }
+
+    public function getFormattedFriends($user, UserFriendGiftService $userFriendGiftService)
+    {
+        return $user->friends()->get()->map(function ($friend) use ($user, $userFriendGiftService) {
+            $lastSentGift = $userFriendGiftService->getLastSentGift($user, $friend);
+
+            $nextGiftAvailableAt = null;
+            $isOnCooldown = false;
+
+            if ($lastSentGift) {
+                $availableAt = $lastSentGift->sent_at->addHours(24);
+                if (now()->lessThan($availableAt)) {
+                    $isOnCooldown = true;
+                    $nextGiftAvailableAt = $availableAt->toIso8601String();
+                }
+            }
+
+            $gift = $friend->userFriendGiftsSent()
+                ->where('receiver_id', $user->id)
+                ->where('is_claimed', false)
+                ->first();
+            $hasGiftToClaim = $gift !== null;
+            $giftId = $gift ? $gift->id : null;
+            return [
+                'id' => $friend->id,
+                'username' => $friend->username,
+                'level' => $friend->level,
+                'avatar' => $friend->avatar ?: "/images/trainer/" . (($friend->id % 10) + 1) . ".png",
+                'isOnCooldown' => $isOnCooldown,
+                'nextGiftAvailableAt' => $nextGiftAvailableAt,
+                'hasGiftToClaim' => $hasGiftToClaim,
+                'giftId' => $giftId,
+            ];
+        });
+    }
+
+    public function getFormattedFriendRequests($user)
+    {
+        return $user->friendRequests()->with('user')->get()->map(function ($req) {
+            return [
+                'id' => $req->id,
+                'user' => [
+                    'id' => $req->user->id,
+                    'username' => $req->user->username,
+                    'email' => $req->user->email,
+                    'level' => $req->user->level,
+                    'avatar' => $req->user->avatar ?: "/images/trainer/" . (($req->user->id % 10) + 1) . ".png",
+                ],
+            ];
+        });
+    }
+
+    public function getFormattedFriendSuggestions($user)
+    {
+        return $this->getFriendSuggestions($user)->map(function ($suggestion) {
+            return [
+                'id' => $suggestion->id,
+                'username' => $suggestion->username,
+                'level' => $suggestion->level,
+                'avatar' => $suggestion->avatar ?: "/images/trainer/" . (($suggestion->id % 10) + 1) . ".png",
+            ];
+        });
     }
 }

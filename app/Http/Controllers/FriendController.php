@@ -19,15 +19,12 @@ class FriendController extends Controller
         $this->friendService = $friendService;
     }
 
-    /**
-     * Affiche la liste des amis, suggestions et demandes
-     */
     public function index()
     {
         $user = Auth::user();
         $userFriendGiftService = app(\App\Services\UserFriendGiftService::class);
         $friends = $user->friends()->get()->map(function ($friend) use ($user, $userFriendGiftService) {
-            $hasSentGiftToday = $userFriendGiftService->hasSentToday($user, $friend);
+            $hasSentGiftToday = $userFriendGiftService->getSentGiftToday($user, $friend) !== null;
             $gift = $friend->userFriendGiftsSent()
                 ->where('receiver_id', $user->id)
                 ->where('is_claimed', false)
@@ -62,9 +59,6 @@ class FriendController extends Controller
         ]);
     }
 
-    /**
-     * Envoie une demande d'ami
-     */
     public function sendRequest(Request $request)
     {
         $user = Auth::user();
@@ -73,9 +67,6 @@ class FriendController extends Controller
         return redirect()->route('me')->with($ok ? 'success' : 'error', $ok ? 'Demande envoyée !' : 'Impossible d\'envoyer la demande.');
     }
 
-    /**
-     * Accepte une demande d'ami
-     */
     public function acceptRequest(Request $request)
     {
         $user = Auth::user();
@@ -84,9 +75,6 @@ class FriendController extends Controller
         return redirect()->route('me')->with($ok ? 'success' : 'error', $ok ? 'Ami ajouté !' : 'Impossible d\'accepter la demande.');
     }
 
-    /**
-     * Supprime un ami ou refuse une demande
-     */
     public function remove(Request $request)
     {
         $user = Auth::user();
@@ -95,9 +83,6 @@ class FriendController extends Controller
         return redirect()->route('me')->with($ok ? 'success' : 'error', $ok ? 'Ami supprimé.' : 'Erreur lors de la suppression.');
     }
 
-    /**
-     * Recherche d'utilisateur (username ou email)
-     */
     public function search(Request $request)
     {
         $query = $request->input('query');
@@ -115,8 +100,8 @@ class FriendController extends Controller
         $excludeIds = array_merge($friendIds, $pendingRequestIds);
 
         $results = User::where(function ($q) use ($query) {
-            $q->where('username', 'like', "%$query%")
-              ->orWhere('email', 'like', "%$query%");
+            $q->where('username', 'like', "%{$query}%")
+              ->orWhere('email', 'like', "%{$query}%");
         })
         ->whereNotIn('id', $excludeIds)
         ->get();
@@ -124,9 +109,6 @@ class FriendController extends Controller
         return response()->json(['results' => $results]);
     }
 
-    /**
-     * Suggestions d'amis (API JSON)
-     */
     public function suggestions()
     {
         $user = Auth::user();
@@ -170,8 +152,8 @@ class FriendController extends Controller
 
         if ($lastRefresh) {
             $secondsElapsed = now()->diffInSeconds($lastRefresh);
-            if ($secondsElapsed < 5) {
-                $remainingTime = 5 - $secondsElapsed;
+            if ($secondsElapsed < 15) {
+                $remainingTime = 15 - $secondsElapsed;
                 return response()->json([
                     'error' => 'Throttle actif',
                     'remaining_time' => $remainingTime,
@@ -180,13 +162,24 @@ class FriendController extends Controller
             }
         }
 
-        Cache::put($cacheKey, now(), 5);
+        Cache::put($cacheKey, now(), 15);
 
         try {
             $userFriendGiftService = app(\App\Services\UserFriendGiftService::class);
 
             $friends = $user->friends()->get()->map(function ($friend) use ($user, $userFriendGiftService) {
-                $hasSentGiftToday = $userFriendGiftService->hasSentToday($user, $friend);
+                $lastSentGift = $userFriendGiftService->getLastSentGift($user, $friend);
+
+                $nextGiftAvailableAt = null;
+                $isOnCooldown = false;
+
+                if ($lastSentGift) {
+                    $availableAt = $lastSentGift->sent_at->addHours(24);
+                    if (now()->lessThan($availableAt)) {
+                        $isOnCooldown = true;
+                        $nextGiftAvailableAt = $availableAt->toIso8601String();
+                    }
+                }
                 $gift = $friend->userFriendGiftsSent()
                     ->where('receiver_id', $user->id)
                     ->where('is_claimed', false)
@@ -199,7 +192,8 @@ class FriendController extends Controller
                     'username' => $friend->username,
                     'level' => $friend->level,
                     'avatar' => $friend->avatar ?: "/images/trainer/" . (($friend->id % 10) + 1) . ".png",
-                    'hasSentGiftToday' => $hasSentGiftToday,
+                    'isOnCooldown' => $isOnCooldown,
+                    'nextGiftAvailableAt' => $nextGiftAvailableAt,
                     'hasGiftToClaim' => $hasGiftToClaim,
                     'giftId' => $giftId,
                 ];
