@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,14 +43,18 @@ class RegisteredUserController extends Controller
             'last_login' => now(),
             'avatar' => $request->avatar,
             'unlocked_avatars' => json_encode(["/images/trainer/1.png", "/images/trainer/2.png"]),
+            'background' => '/images/section-me-background.jpg',
+            'unlocked_backgrounds' => json_encode(['/images/section-me-background.jpg']),
         ]);
+
+        $user = $user->fresh();
 
         $user->assignRole('user');
 
-        event(new Registered($user));
+        $user->sendEmailVerificationNotification();
 
         Auth::login($user);
 
-        return redirect(route('me', absolute: false));
+        return redirect(route('verification.notice', absolute: false));
     }
 }

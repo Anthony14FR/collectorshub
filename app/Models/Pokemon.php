@@ -11,6 +11,29 @@ class Pokemon extends Model
     public $incrementing = false;
     protected $keyType = 'integer';
 
+    public const RARITIES = ['normal', 'rare', 'epic', 'legendary'];
+    public const RARITY_LABELS = [
+        'normal' => 'Normal',
+        'rare' => 'Rare',
+        'epic' => 'Épique',
+        'legendary' => 'Légendaire'
+    ];
+
+    public const TYPES = [
+        'Normal', 'Feu', 'Eau', 'Électrik', 'Plante', 'Glace', 'Combat', 'Poison',
+        'Sol', 'Vol', 'Psy', 'Insecte', 'Roche', 'Spectre', 'Dragon', 'Ténèbres', 'Acier', 'Fée'
+    ];
+
+    public const DAMAGE_RELATIONS = ['neutral', 'resistant', 'vulnerable', 'twice_resistant'];
+    public const DAMAGE_RELATION_LABELS = [
+        'neutral' => 'Neutre',
+        'resistant' => 'Résistant',
+        'vulnerable' => 'Vulnérable',
+        'twice_resistant' => 'Double Résistant'
+    ];
+
+    public const GENERATIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
     protected $fillable = [
         'id',
         'pokedex_id',
@@ -120,5 +143,20 @@ class Pokemon extends Model
     public function preEvolution(): HasOne
     {
         return $this->hasOne(Pokemon::class, 'id', 'pre_evolution_id');
+    }
+
+    public function getRarityLabel(): string
+    {
+        return self::RARITY_LABELS[$this->rarity] ?? $this->rarity;
+    }
+
+    public function getTotalStats(): int
+    {
+        return $this->hp + $this->attack + $this->defense + $this->speed + $this->special_attack + $this->special_defense;
+    }
+
+    public static function getTypeImage(string $type): string
+    {
+        return "/images/types/{$type}.png";
     }
 }

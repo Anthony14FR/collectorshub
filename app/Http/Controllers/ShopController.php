@@ -35,36 +35,59 @@ class ShopController extends Controller
         $quantity = $validated['quantity'];
         $totalCost = $item->price * $quantity;
 
-        if ($item->type === 'avatar') {
-            $unlocked = $user->unlocked_avatars;
-            if (is_string($unlocked)) {
-                $unlocked = json_decode($unlocked, true);
-            }
-            $unlocked = $unlocked ?? [];
-            if (in_array($item->image, $unlocked)) {
-                return back()->withErrors([
-                    'message' => 'Avatar déjà débloqué'
-                ]);
-            }
-            if ($user->cash < $item->price) {
-                return back()->withErrors([
-                    'message' => 'Vous n\'avez pas assez d\'argent pour acheter cet avatar'
-                ]);
-            }
-            $unlocked[] = $item->image;
-            $user->unlocked_avatars = $unlocked;
-            $user->cash -= $item->price;
-            $user->save();
-            return redirect()->route('shop.index')->with('success', "Avatar débloqué !");
-        }
-
-        if ($user->cash < $totalCost) {
-            return back()->withErrors([
-                'message' => 'Vous n\'avez pas assez d\'argent pour acheter cet item'
-            ]);
-        }
-
         try {
+            if ($item->type === 'avatar') {
+                $unlocked = $user->unlocked_avatars;
+                if (is_string($unlocked)) {
+                    $unlocked = json_decode($unlocked, true);
+                }
+                $unlocked = $unlocked ?? [];
+                if (in_array($item->image, $unlocked)) {
+                    return back()->withErrors([
+                        'message' => 'Avatar déjà débloqué'
+                    ]);
+                }
+                if ($user->cash < $item->price) {
+                    return back()->withErrors([
+                        'message' => 'Vous n\'avez pas assez d\'argent pour acheter cet avatar'
+                    ]);
+                }
+                $unlocked[] = $item->image;
+                $user->unlocked_avatars = $unlocked;
+                $user->cash -= $item->price;
+                $user->save();
+                return redirect()->route('shop.index')->with('success', "Avatar débloqué !");
+            }
+
+            if ($item->type === 'background') {
+                $unlocked = $user->unlocked_backgrounds;
+                if (is_string($unlocked)) {
+                    $unlocked = json_decode($unlocked, true);
+                }
+                $unlocked = $unlocked ?? [];
+                if (in_array($item->image, $unlocked)) {
+                    return back()->withErrors([
+                        'message' => 'Background déjà débloqué'
+                    ]);
+                }
+                if ($user->cash < $item->price) {
+                    return back()->withErrors([
+                        'message' => 'Vous n\'avez pas assez d\'argent pour acheter ce background'
+                    ]);
+                }
+                $unlocked[] = $item->image;
+                $user->unlocked_backgrounds = $unlocked;
+                $user->cash -= $item->price;
+                $user->save();
+                return redirect()->route('shop.index')->with('success', "Background débloqué !");
+            }
+
+            if ($user->cash < $totalCost) {
+                return back()->withErrors([
+                    'message' => 'Vous n\'avez pas assez d\'argent pour acheter cet item'
+                ]);
+            }
+
             $inventoryItem = Inventory::firstOrNew([
                 'user_id' => $user->id,
                 'item_id' => $item->id

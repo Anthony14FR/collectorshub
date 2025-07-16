@@ -12,7 +12,8 @@ return (new PhpCsFixer\Config())
             ->in([
                 __DIR__ . '/app',
                 __DIR__ . '/config',
+                __DIR__ . '/bootstrap',
                 __DIR__ . '/database',
                 __DIR__ . '/routes',
             ])
-    ); 
+    );

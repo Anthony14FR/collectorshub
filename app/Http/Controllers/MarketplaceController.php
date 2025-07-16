@@ -163,13 +163,13 @@ class MarketplaceController extends Controller
                 $listing->buyer_id = $user->id;
                 $listing->save();
             });
+
+            return redirect()->route('marketplace.index')->with('success', 'Pokemon acheté avec succès');
         } catch (\Throwable $e) {
             return back()->withErrors([
                 'message' => 'Erreur lors de l\'achat : ' . $e->getMessage()
             ]);
         }
-
-        return redirect()->route('marketplace.index')->with('success', 'Achat réussi');
     }
 
     public function getListings(Request $request)

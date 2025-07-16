@@ -25,6 +25,19 @@ const unlockedAvatars = Array.isArray(props.auth.user.unlocked_avatars)
     ? JSON.parse(props.auth.user.unlocked_avatars)
     : [];
 
+const unlockedBackgrounds = Array.isArray(props.auth.user.unlocked_backgrounds)
+  ? props.auth.user.unlocked_backgrounds
+  : props.auth.user.unlocked_backgrounds 
+    ? JSON.parse(props.auth.user.unlocked_backgrounds)
+    : [];
+
+const allAvailableBackgrounds = computed(() => {
+  const defaultBg = '/images/section-me-background.jpg';
+  const otherBackgrounds = unlockedBackgrounds.filter((bg: string) => bg !== defaultBg);
+  const result = [defaultBg, ...otherBackgrounds];
+  return result;
+});
+
 const profileForm = reactive({
   username: props.auth.user.username,
   email: props.auth.user.email,
@@ -46,10 +59,17 @@ const avatarForm = reactive({
   errors: {} as Record<string, string>,
 });
 
+const backgroundForm = reactive({
+  background: props.auth.user.background,
+  processing: false,
+  errors: {} as Record<string, string>,
+});
+
 
 const showProfileModal = ref(false);
 const showPasswordModal = ref(false);
 const showAvatarModal = ref(false);
+const showBackgroundModal = ref(false);
 const showAlert = ref(false);
 const alertType = ref<'success' | 'error'>('success');
 const alertMessage = ref('');
@@ -124,6 +144,29 @@ const updateAvatar = () => {
       avatarForm.errors = errors;
     },
   });
+};
+
+const updateBackground = () => {
+  backgroundForm.processing = true;
+  backgroundForm.errors = {};
+  
+  router.patch("/background", { 
+    background: backgroundForm.background 
+  }, {
+    onSuccess: () => {
+      backgroundForm.processing = false;
+      showBackgroundModal.value = false;
+      showSuccessAlert("Background mis à jour avec succès !");
+    },
+    onError: (errors: Record<string, string>) => {
+      backgroundForm.processing = false;
+      backgroundForm.errors = errors;
+    },
+  });
+};
+
+const selectBackground = (backgroundPath: string) => {
+  backgroundForm.background = backgroundPath;
 };
 
 const cancelProfileEdit = () => {
@@ -226,6 +269,12 @@ const goToProfile = () => {
                     </span>
                   </div>
                 </div>
+                <Button 
+                  @click="showBackgroundModal = true"
+                  variant="secondary"
+                >
+                  🎨 Changer le fond
+                </Button>
               </div>
             </div>
 
@@ -298,8 +347,8 @@ const goToProfile = () => {
           </div>
 
           <div class="text-center">
-            <Button @click="goToProfile" variant="outline" size="lg" class="min-w-48">
-              ← Retour au profil
+            <Button @click="goToProfile" variant="secondary" size="lg" class="min-w-48">
+              ← Retour à la page d'accueil
             </Button>
           </div>
         </div>
@@ -441,6 +490,58 @@ const goToProfile = () => {
             </Button>
             <Button @click="updateAvatar" :disabled="avatarForm.processing">
               {{ avatarForm.processing ? 'Mise à jour...' : 'Confirmer' }}
+            </Button>
+          </div>
+        </div>
+      </template>
+    </Modal>
+
+    <Modal :show="showBackgroundModal" @close="showBackgroundModal = false" max-width="4xl">
+      <template #header>
+        <h3 class="text-lg font-bold">Choisir un Background</h3>
+      </template>
+      <template #default>
+        <div class="p-4">
+          <div v-if="allAvailableBackgrounds.length === 0" class="text-center py-8">
+            <p class="text-xl mb-2">🎨</p>
+            <p class="text-sm mb-4">Aucun background disponible</p>
+            <Button @click="() => { showBackgroundModal = false; router.visit('/shop'); }" variant="primary">
+              Aller au Shop
+            </Button>
+          </div>
+          <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div
+              v-for="background in allAvailableBackgrounds"
+              :key="background"
+              @click="selectBackground(background)"
+              class="relative cursor-pointer rounded-lg overflow-hidden transition-all duration-200 border-2 aspect-video"
+              :class="[
+                backgroundForm.background === background 
+                  ? 'border-secondary shadow-lg shadow-secondary/30 scale-105' 
+                  : 'border-base-300/30 hover:border-secondary/50 hover:scale-105'
+              ]"
+            >
+              <img
+                :src="background"
+                alt="Background"
+                class="w-full h-full object-cover"
+              />
+              <div
+                v-if="backgroundForm.background === background"
+                class="absolute inset-0 bg-secondary/20 flex items-center justify-center"
+              >
+                <svg class="w-8 h-8 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-3 justify-end mt-6">
+            <Button @click="showBackgroundModal = false" variant="outline" type="button">
+              Annuler
+            </Button>
+            <Button @click="updateBackground" :disabled="backgroundForm.processing">
+              {{ backgroundForm.processing ? 'Mise à jour...' : 'Confirmer' }}
             </Button>
           </div>
         </div>

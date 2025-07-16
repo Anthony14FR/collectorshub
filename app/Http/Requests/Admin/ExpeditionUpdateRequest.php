@@ -7,11 +7,6 @@ use Illuminate\Validation\Rule;
 
 class ExpeditionUpdateRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return is_admin();
-    }
-
     public function rules(): array
     {
         return [

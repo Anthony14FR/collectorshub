@@ -72,6 +72,15 @@ class UserService
     public function canDeleteUser(User $user): bool
     {
         $authUser = Auth::user();
-        return $authUser ? $user->id !== $authUser->id : true;
+
+        if (!$authUser) {
+            return false;
+        }
+
+        if (is_admin()) {
+            return $user->id !== $authUser->id;
+        }
+
+        return false;
     }
 }

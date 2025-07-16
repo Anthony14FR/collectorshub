@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Pokemon;
+use App\Services\GameConfigurationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,11 @@ use Inertia\Inertia;
 
 class OpeningController extends Controller
 {
+    public function __construct(
+        private GameConfigurationService $configService
+    ) {
+    }
+
     public function index()
     {
         $inventory = Auth::user()->inventory()->with('item')->get();
@@ -70,29 +76,11 @@ class OpeningController extends Controller
 
     private function drawRandomPokemon($ballType)
     {
-        $rarityChances = [];
+        $rarityProbabilities = $this->configService->getRarityProbabilities();
+        $rarityChances = $rarityProbabilities['ball_types'][$ballType] ?? null;
 
-        switch ($ballType) {
-            case 'Pokeball':
-                $rarityChances = [
-                    'normal' => 70,
-                    'rare' => 27,
-                    'epic' => 2.7,
-                    'legendary' => 0.3
-                ];
-                break;
-
-            case 'Masterball':
-                $rarityChances = [
-                    'normal' => 34,
-                    'rare' => 60,
-                    'epic' => 5,
-                    'legendary' => 1
-                ];
-                break;
-
-            default:
-                throw new \Exception('Type de ball non pris en charge: ' . $ballType);
+        if (!$rarityChances) {
+            throw new \Exception('Type de ball non pris en charge: ' . $ballType);
         }
 
         $rand = rand(1, 100);

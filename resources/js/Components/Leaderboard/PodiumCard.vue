@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import CPBadge from '@/Components/UI/CPBadge.vue';
 import TeamPokemonCard from '@/Components/Profile/TeamPokemonCard.vue';
 import type { LeaderboardUser } from '@/types/leaderboard';
+import { Link } from '@inertiajs/vue3';
 
 interface Props {
   user: LeaderboardUser;
@@ -65,11 +66,29 @@ const avatarSize = computed(() => {
   <div class="flex flex-col items-center">
     <div class="mb-4 flex flex-col items-center">
       <div class="relative mb-3">
-        <div :class="['relative overflow-hidden rounded-full', avatarSize]">
+        <div :class="['relative overflow-hidden rounded-full border-2 border-base-300/50 shadow-lg', avatarSize]">
+          <div 
+            v-if="user.background"
+            class="absolute inset-0 w-full h-full rounded-full overflow-hidden"
+            :style="{
+              backgroundImage: `url(${user.background})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }"
+          >
+            <div class="absolute inset-0 bg-black/40 rounded-full"></div>
+          </div>
+          
+          <div 
+            v-else
+            class="absolute inset-0 w-full h-full rounded-full bg-gradient-to-br from-primary/20 to-secondary/20"
+          ></div>
+          
           <img 
             :src="user.avatar || `/images/trainer/${(user.id % 10) + 1}.png`"
             :alt="user.username"
-            class="w-full h-full object-cover"
+            class="relative z-10 w-full h-full object-cover rounded-full"
             style="image-rendering: pixelated;"
           />
         </div>
@@ -84,7 +103,9 @@ const avatarSize = computed(() => {
       
       <div :class="['text-center', position === 1 ? 'sm:mb-8 mb-0' : '']">
         <div :class="['font-bold text-base-content mb-1', position === 1 ? 'text-base sm:text-lg' : 'text-sm sm:text-base']">
-          {{ user.username }}
+          <Link :href="`/profile/${user.username}`" class="text-primary hover:underline">
+            {{ user.username }}
+          </Link>
         </div>
         <div class="text-xs text-base-content/70 mb-2">
           {{ getValueLabel }} {{ getValue }}
