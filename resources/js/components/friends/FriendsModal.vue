@@ -342,18 +342,18 @@ const removeFriend = (friendId) => {
 };
 
 const getAvatarSrc = (user: User) => {
-  return user.avatar || `/images/trainer/${user.id % 10 + 1}.png`;
+  return user.avatar || `/images/trainer/${(user.id % 10) + 1}.png`;
 };
 </script>
 
 <template>
   <Modal :show="props.show" @close="handleClose" max-width="4xl">
     <template #header>
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center">
+      <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center mb-2 sm:mb-0">
           <span class="text-2xl">👥</span>
         </div>
-        <div class="flex-1">
+        <div class="flex-1 text-center sm:text-left">
           <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Mes Amis
           </h3>
@@ -367,6 +367,7 @@ const getAvatarSrc = (user: User) => {
           :disabled="!canRefresh"
           size="sm"
           variant="secondary"
+          class="mt-2 sm:mt-0 sm:mr-10 w-full sm:w-auto"
         >
           <span v-if="refreshCountdown > 0">
             🔄 Attendre {{ refreshCountdown }}s
@@ -379,10 +380,10 @@ const getAvatarSrc = (user: User) => {
     </template>
 
     <template #tabs>
-      <div class="flex">
+      <div class="flex flex-wrap justify-center sm:justify-start">
         <button 
           @click="activeTab = 'friends'" 
-          class="px-4 py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+          class="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           :class="activeTab === 'friends' ? 'text-primary border-b-2 border-primary' : 'text-base-content/70 hover:text-base-content'"
         >
           <span>👥</span>
@@ -391,7 +392,7 @@ const getAvatarSrc = (user: User) => {
         
         <button 
           @click="activeTab = 'requests'" 
-          class="px-4 py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+          class="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           :class="activeTab === 'requests' ? 'text-warning border-b-2 border-warning' : 'text-base-content/70 hover:text-base-content'"
         >
           <span>📨</span>
@@ -401,7 +402,7 @@ const getAvatarSrc = (user: User) => {
         
         <button 
           @click="activeTab = 'pending'" 
-          class="px-4 py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+          class="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           :class="activeTab === 'pending' ? 'text-info border-b-2 border-info' : 'text-base-content/70 hover:text-base-content'"
         >
           <span>⏳</span>
@@ -411,7 +412,7 @@ const getAvatarSrc = (user: User) => {
         
         <button 
           @click="activeTab = 'search'" 
-          class="px-4 py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+          class="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           :class="activeTab === 'search' ? 'text-success border-b-2 border-success' : 'text-base-content/70 hover:text-base-content'"
         >
           <span>🔍</span>
@@ -421,12 +422,12 @@ const getAvatarSrc = (user: User) => {
     </template>
 
     <template #default>
-      <div class="space-y-6">
+      <div class="space-y-6 px-2 sm:px-0">
         <div v-if="activeTab === 'friends'">
           <div v-if="localFriends.length > 0" class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h4 class="text-lg font-semibold text-base-content">Mes amis</h4>
-              <div class="flex items-center gap-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <h4 class="text-lg font-semibold text-base-content text-center sm:text-left">Mes amis</h4>
+              <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
                 <div class="flex items-center gap-4 text-sm text-base-content/70">
                   <div class="flex items-center gap-1">
                     <span class="text-success">🎁</span>
@@ -438,12 +439,13 @@ const getAvatarSrc = (user: User) => {
                   </div>
                 </div>
                 
-                <div class="flex gap-2">
+                <div class="flex gap-2 w-full sm:w-auto">
                   <Button
                     v-if="localFriends.filter(f => f.hasGiftToClaim).length > 0"
                     @click="claimAllGifts"
                     variant="success"
                     size="sm"
+                    class="w-full sm:w-auto"
                   >
                     🎁 Tout récupérer
                   </Button>
@@ -453,6 +455,7 @@ const getAvatarSrc = (user: User) => {
                     @click="sendGiftToAll"
                     variant="primary"
                     size="sm"
+                    class="w-full sm:w-auto"
                   >
                     💝 Envoyer à tous
                   </Button>
@@ -460,7 +463,7 @@ const getAvatarSrc = (user: User) => {
               </div>
             </div>
             
-            <div class="grid gap-3">
+            <div class="grid gap-3 grid-cols-1">
               <FriendsCard
                 v-for="friend in localFriends"
                 :key="friend.id"
@@ -472,13 +475,13 @@ const getAvatarSrc = (user: User) => {
             </div>
           </div>
           
-          <div v-else class="flex flex-col items-center justify-center py-16 text-center">
-            <div class="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mb-4">
-              <span class="text-4xl">👥</span>
+          <div v-else class="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mb-4">
+              <span class="text-3xl sm:text-4xl">👥</span>
             </div>
-            <h3 class="text-xl font-bold text-base-content mb-2">Aucun ami pour le moment</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-base-content mb-2">Aucun ami pour le moment</h3>
             <p class="text-base-content/70 mb-4">Commencez à ajouter des amis pour partager des cadeaux !</p>
-            <Button @click="activeTab = 'search'" variant="primary">
+            <Button @click="activeTab = 'search'" variant="primary" class="w-full sm:w-auto">
               Rechercher des amis
             </Button>
           </div>
@@ -492,9 +495,9 @@ const getAvatarSrc = (user: User) => {
               <div
                 v-for="req in localFriendRequests"
                 :key="req.id"
-                class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-warning/30 hover:border-warning/50 transition-all duration-300 shadow-lg"
+                class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-3 sm:p-4 border border-warning/30 hover:border-warning/50 transition-all duration-300 shadow-lg"
               >
-                <div class="flex items-center gap-4">
+                <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
                   <Avatar 
                     :src="getAvatarSrc(req.user)"
                     :alt="req.user.username"
@@ -502,19 +505,20 @@ const getAvatarSrc = (user: User) => {
                     gradient
                   />
                   
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
+                  <div class="flex-1 text-center sm:text-left">
+                    <div class="flex items-center gap-2 mb-1 justify-center sm:justify-start">
                       <h3 class="font-bold text-base-content">{{ req.user.username }}</h3>
                       <Badge variant="warning" size="xs">Demande</Badge>
                     </div>
                     <p class="text-sm text-base-content/70">Niveau {{ req.user.level }}</p>
                   </div>
                   
-                  <div class="flex gap-2">
+                  <div class="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
                     <Button
                       size="sm"
                       variant="success"
                       @click="acceptRequest(req.user.id)"
+                      class="w-1/2 sm:w-auto"
                     >
                       ✅ Accepter
                     </Button>
@@ -522,6 +526,7 @@ const getAvatarSrc = (user: User) => {
                       size="sm"
                       variant="error"
                       @click="refuseRequest(req.user.id)"
+                      class="w-1/2 sm:w-auto"
                     >
                       ❌ Refuser
                     </Button>
@@ -531,11 +536,11 @@ const getAvatarSrc = (user: User) => {
             </div>
           </div>
           
-          <div v-else class="flex flex-col items-center justify-center py-16 text-center">
-            <div class="w-24 h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
-              <span class="text-4xl">📨</span>
+          <div v-else class="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
+              <span class="text-3xl sm:text-4xl">📨</span>
             </div>
-            <h3 class="text-xl font-bold text-base-content mb-2">Aucune demande</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-base-content mb-2">Aucune demande</h3>
             <p class="text-base-content/70">Vous n'avez pas de demande d'ami en attente.</p>
           </div>
         </div>
@@ -555,9 +560,9 @@ const getAvatarSrc = (user: User) => {
               <div
                 v-for="req in pendingRequests"
                 :key="req.id"
-                class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-info/30 hover:border-info/50 transition-all duration-300 shadow-lg"
+                class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-3 sm:p-4 border border-info/30 hover:border-info/50 transition-all duration-300 shadow-lg"
               >
-                <div class="flex items-center gap-4">
+                <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
                   <Avatar 
                     :src="getAvatarSrc(req.user)"
                     :alt="req.user.username"
@@ -565,19 +570,20 @@ const getAvatarSrc = (user: User) => {
                     gradient
                   />
                   
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
+                  <div class="flex-1 text-center sm:text-left">
+                    <div class="flex items-center gap-2 mb-1 justify-center sm:justify-start">
                       <h3 class="font-bold text-base-content">{{ req.user.username }}</h3>
                       <Badge variant="info" size="xs">En attente</Badge>
                     </div>
                     <p class="text-sm text-base-content/70">Niveau {{ req.user.level }}</p>
                   </div>
                   
-                  <div class="flex gap-2">
+                  <div class="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
                     <Button
                       size="sm"
                       variant="error"
                       @click="cancelPendingRequest(req.user.id)"
+                      class="w-full sm:w-auto"
                     >
                       ❌ Annuler
                     </Button>
@@ -587,19 +593,19 @@ const getAvatarSrc = (user: User) => {
             </div>
           </div>
           
-          <div v-else class="flex flex-col items-center justify-center py-16 text-center">
-            <div class="w-24 h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
-              <span class="text-4xl">⏳</span>
+          <div v-else class="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
+              <span class="text-3xl sm:text-4xl">⏳</span>
             </div>
-            <h3 class="text-xl font-bold text-base-content mb-2">Aucune demande en attente</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-base-content mb-2">Aucune demande en attente</h3>
             <p class="text-base-content/70">Vous n'avez envoyé aucune demande d'ami en attente.</p>
           </div>
         </div>
 
         <div v-if="activeTab === 'search'">
           <div class="space-y-6">
-            <div class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-info/30">
-              <div class="flex gap-3">
+            <div class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-3 sm:p-4 border border-info/30">
+              <div class="flex flex-col sm:flex-row gap-3">
                 <Input
                   v-model="searchQuery"
                   placeholder="Rechercher par pseudo..."
@@ -610,6 +616,7 @@ const getAvatarSrc = (user: User) => {
                   @click="handleSearch"
                   :loading="loadingSearch"
                   variant="info"
+                  class="w-full sm:w-auto"
                 >
                   🔍 Rechercher
                 </Button>
@@ -622,9 +629,9 @@ const getAvatarSrc = (user: User) => {
                 <div
                   v-for="user in searchResults"
                   :key="user.id"
-                  class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-base-300/30 hover:border-primary/50 transition-all duration-300 shadow-lg"
+                  class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-3 sm:p-4 border border-base-300/30 hover:border-primary/50 transition-all duration-300 shadow-lg"
                 >
-                  <div class="flex items-center gap-4">
+                  <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
                     <Avatar 
                       :src="getAvatarSrc(user)"
                       :alt="user.username"
@@ -632,7 +639,7 @@ const getAvatarSrc = (user: User) => {
                       gradient
                     />
                     
-                    <div class="flex-1">
+                    <div class="flex-1 text-center sm:text-left">
                       <h3 class="font-bold text-base-content">{{ user.username }}</h3>
                       <p class="text-sm text-base-content/70">Niveau {{ user.level }}</p>
                     </div>
@@ -641,6 +648,7 @@ const getAvatarSrc = (user: User) => {
                       size="sm"
                       variant="primary"
                       @click="sendFriendRequest(user.id)"
+                      class="w-full sm:w-auto"
                     >
                       ➕ Ajouter
                     </Button>
@@ -650,11 +658,11 @@ const getAvatarSrc = (user: User) => {
             </div>
 
             <div v-else-if="hasSearched && !loadingSearch && searchResults.length === 0" class="space-y-4">
-              <div class="flex flex-col items-center justify-center py-12 text-center">
-                <div class="w-20 h-20 bg-gradient-to-br from-error/20 to-error/30 rounded-full flex items-center justify-center mb-4">
-                  <span class="text-4xl">🔍</span>
+              <div class="flex flex-col items-center justify-center py-10 sm:py-12 text-center">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-error/20 to-error/30 rounded-full flex items-center justify-center mb-4">
+                  <span class="text-3xl sm:text-4xl">🔍</span>
                 </div>
-                <h3 class="text-lg font-bold text-base-content mb-2">Aucun utilisateur trouvé</h3>
+                <h3 class="text-base sm:text-lg font-bold text-base-content mb-2">Aucun utilisateur trouvé</h3>
                 <p class="text-base-content/70 mb-4">
                   Aucun utilisateur ne correspond à "{{ searchQuery }}"
                 </p>
@@ -662,6 +670,7 @@ const getAvatarSrc = (user: User) => {
                   @click="searchQuery = ''; hasSearched = false;"
                   variant="secondary"
                   size="sm"
+                  class="w-full sm:w-auto"
                 >
                   Effacer la recherche
                 </Button>
@@ -674,7 +683,7 @@ const getAvatarSrc = (user: User) => {
                 <div
                   v-for="user in localSuggestions"
                   :key="user.id"
-                  class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-base-300/30 hover:border-primary/50 transition-all duration-300 shadow-lg group"
+                  class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-3 sm:p-4 border border-base-300/30 hover:border-primary/50 transition-all duration-300 shadow-lg group"
                 >
                   <div class="flex flex-col items-center text-center gap-3">
                     <Avatar 
@@ -702,11 +711,11 @@ const getAvatarSrc = (user: User) => {
               </div>
             </div>
             
-            <div v-else-if="!loadingSearch && !searchResults.length" class="flex flex-col items-center justify-center py-16 text-center">
-              <div class="w-24 h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
-                <span class="text-4xl">🔍</span>
+            <div v-else-if="!loadingSearch && !searchResults.length" class="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
+                <span class="text-3xl sm:text-4xl">🔍</span>
               </div>
-              <h3 class="text-xl font-bold text-base-content mb-2">Recherchez des amis</h3>
+              <h3 class="text-lg sm:text-xl font-bold text-base-content mb-2">Recherchez des amis</h3>
               <p class="text-base-content/70">Utilisez la barre de recherche pour trouver d'autres joueurs !</p>
             </div>
           </div>

@@ -3,6 +3,7 @@ import { computed } from "vue";
 import Button from "@/Components/UI/Button.vue";
 import Avatar from "@/Components/UI/Avatar.vue";
 import Badge from "@/Components/UI/Badge.vue";
+import { Link } from "@inertiajs/vue3";
 import type { UserFriend } from '@/types/friend';
 
 const props = defineProps<{
@@ -15,7 +16,7 @@ const canSendGift = computed(() => !props.friend.hasSentGiftToday);
 const canClaimGift = computed(() => props.friend.hasGiftToClaim);
 
 const getAvatarSrc = (friend: UserFriend) => {
-  return friend.avatar || `/images/trainer/${friend.id % 10 + 1}.png`;
+  return friend.avatar || `/images/trainer/${(friend.id % 10) + 1}.png`;
 };
 </script>
 
@@ -29,8 +30,8 @@ const getAvatarSrc = (friend: UserFriend) => {
       <span class="text-white text-xs">✓</span>
     </div>
 
-    <div class="flex items-center gap-4">
-      <div class="relative">
+    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-4 text-center sm:text-left">
+      <div class="relative flex-shrink-0 mb-2 sm:mb-0">
         <Avatar 
           :src="getAvatarSrc(friend)"
           :alt="friend.username"
@@ -45,15 +46,17 @@ const getAvatarSrc = (friend: UserFriend) => {
         </div>
       </div>
 
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2 mb-1">
-          <h3 class="font-bold text-base-content truncate">{{ friend.username }}</h3>
+      <div class="flex-1 min-w-0 mb-2 sm:mb-0">
+        <div class="flex items-center gap-2 mb-1 justify-center sm:justify-start">
+          <Link :href="`/profile/${friend.username}`" class="font-bold text-base-content truncate text-primary hover:underline">
+            {{ friend.username }}
+          </Link>
           <Badge v-if="canClaimGift" variant="success" size="xs" pulse>
             Cadeau
           </Badge>
         </div>
         
-        <div class="flex items-center gap-2 text-sm text-base-content/70">
+        <div class="flex items-center gap-2 text-sm text-base-content/70 justify-center sm:justify-start">
           <div class="flex items-center gap-1">
             <span class="text-info">⭐</span>
             <span>Niveau {{ friend.level }}</span>
@@ -66,13 +69,13 @@ const getAvatarSrc = (friend: UserFriend) => {
         </div>
       </div>
 
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto justify-center sm:justify-end">
         <Button
           v-if="canClaimGift"
           size="sm"
           variant="success"
           @click="emit('claim-gift', friend.giftId)"
-          class="animate-pulse"
+          class="animate-pulse w-full sm:w-auto"
         >
           <span class="flex items-center gap-1">
             <span>🎁</span>
@@ -85,6 +88,7 @@ const getAvatarSrc = (friend: UserFriend) => {
           size="sm"
           variant="primary"
           @click="emit('send-gift', friend.id)"
+          class="w-full sm:w-auto"
         >
           <span class="flex items-center gap-1">
             <span>💝</span>
@@ -97,6 +101,7 @@ const getAvatarSrc = (friend: UserFriend) => {
           size="sm"
           variant="secondary"
           disabled
+          class="w-full sm:w-auto"
         >
           <span class="flex items-center gap-1">
             <span>⏰</span>
@@ -108,7 +113,7 @@ const getAvatarSrc = (friend: UserFriend) => {
           size="xs"
           variant="error"
           @click="emit('remove-friend', friend.id)"
-          class="mt-1"
+          class="mt-1 w-full sm:w-auto"
         >
           <span class="flex items-center gap-1">
             <span>🗑️</span>

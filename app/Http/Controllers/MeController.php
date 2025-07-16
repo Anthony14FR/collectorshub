@@ -61,6 +61,7 @@ class MeController extends Controller
                 'id' => $friend->id,
                 'username' => $friend->username,
                 'level' => $friend->level,
+                'avatar' => $friend->avatar ?: "/images/trainer/" . (($friend->id % 10) + 1) . ".png",
                 'hasSentGiftToday' => $hasSentGiftToday,
                 'hasGiftToClaim' => $hasGiftToClaim,
                 'giftId' => $giftId,
@@ -75,6 +76,7 @@ class MeController extends Controller
                     'username' => $req->user->username,
                     'email' => $req->user->email,
                     'level' => $req->user->level,
+                    'avatar' => $req->user->avatar ?: "/images/trainer/" . (($req->user->id % 10) + 1) . ".png",
                 ],
             ];
         });

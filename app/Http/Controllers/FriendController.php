@@ -114,10 +114,12 @@ class FriendController extends Controller
 
         $excludeIds = array_merge($friendIds, $pendingRequestIds);
 
-        $results = User::where('username', 'like', "%$query%")
-            ->orWhere('email', 'like', "%$query%")
-            ->whereNotIn('id', $excludeIds)
-            ->get();
+        $results = User::where(function ($q) use ($query) {
+            $q->where('username', 'like', "%$query%")
+              ->orWhere('email', 'like', "%$query%");
+        })
+        ->whereNotIn('id', $excludeIds)
+        ->get();
 
         return response()->json(['results' => $results]);
     }
@@ -196,7 +198,7 @@ class FriendController extends Controller
                     'id' => $friend->id,
                     'username' => $friend->username,
                     'level' => $friend->level,
-                    'avatar' => $friend->avatar,
+                    'avatar' => $friend->avatar ?: "/images/trainer/" . (($friend->id % 10) + 1) . ".png",
                     'hasSentGiftToday' => $hasSentGiftToday,
                     'hasGiftToClaim' => $hasGiftToClaim,
                     'giftId' => $giftId,
@@ -210,7 +212,7 @@ class FriendController extends Controller
                         'id' => $req->user->id,
                         'username' => $req->user->username,
                         'level' => $req->user->level,
-                        'avatar' => $req->user->avatar,
+                        'avatar' => $req->user->avatar ?: "/images/trainer/" . (($req->user->id % 10) + 1) . ".png",
                     ],
                 ];
             });
@@ -228,7 +230,7 @@ class FriendController extends Controller
                             'id' => $request->friend->id,
                             'username' => $request->friend->username,
                             'level' => $request->friend->level,
-                            'avatar' => $request->friend->avatar,
+                            'avatar' => $request->friend->avatar ?: "/images/trainer/" . (($request->friend->id % 10) + 1) . ".png",
                         ],
                     ];
                 });
