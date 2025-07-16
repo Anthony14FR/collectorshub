@@ -12,6 +12,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (!is_admin()) {
+            abort(403, 'Accès non autorisé');
+        }
+
         $stats = [
             'totalUsers' => User::count(),
             'activeUsers' => User::where('status', 'active')->count(),
@@ -36,6 +40,13 @@ class DashboardController extends Controller
 
     public function clearCache(Request $request)
     {
+        if (!is_admin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès non autorisé'
+            ], 403);
+        }
+
         try {
             Artisan::call('cache:clear');
             Artisan::call('config:clear');
