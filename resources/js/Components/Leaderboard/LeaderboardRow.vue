@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import CPBadge from '@/Components/UI/CPBadge.vue';
 import TeamPokemonCard from '@/Components/Profile/TeamPokemonCard.vue';
 import type { LeaderboardUser } from '@/types/leaderboard';
@@ -80,7 +81,9 @@ const getRankColor = computed(() => {
       
       <div class="flex-1 min-w-0">
         <div class="font-bold text-base-content truncate">
-          {{ user.username }}
+          <Link :href="`/profile/${user.username}`" class="text-primary hover:underline">
+            {{ user.username }}
+          </Link>
           <span v-if="isCurrentUser" class="text-xs text-primary ml-2">(Vous)</span>
         </div>
         <div class="text-sm text-base-content/70">
