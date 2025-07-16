@@ -39,10 +39,10 @@ log: ## Affiche les 200 dernières lignes des logs Laravel et suit les nouvelles
 main: ## Checkout main et pull
 	git checkout main && git pull
 
-main-rebuild: ## Checkout main, pull, et rebuild + start
+main-rebuild: ## Checkout main, pull, et rebuild + refresh
 	make main
 	make install
-	make start
+	make refresh
 
 # Commandes Docker
 
