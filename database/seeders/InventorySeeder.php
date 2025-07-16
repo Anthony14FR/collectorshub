@@ -13,8 +13,13 @@ class InventorySeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('role', 'admin')->first();
-        $users = User::where('role', 'user')->get();
+        $admin = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->first();
+
+        $users = User::whereHas('roles', function ($query) {
+            $query->where('name', 'user');
+        })->get();
 
         if (!$admin || $users->isEmpty()) {
             $this->command->error('Utilisateurs admin ou user non trouvés. Exécutez d\'abord UserSeeder.');
