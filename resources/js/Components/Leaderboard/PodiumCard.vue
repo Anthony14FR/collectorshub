@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import CPBadge from '@/Components/UI/CPBadge.vue';
 import TeamPokemonCard from '@/Components/Profile/TeamPokemonCard.vue';
 import type { LeaderboardUser } from '@/types/leaderboard';
+import { Link } from '@inertiajs/vue3';
 
 interface Props {
   user: LeaderboardUser;
@@ -102,7 +103,9 @@ const avatarSize = computed(() => {
       
       <div :class="['text-center', position === 1 ? 'sm:mb-8 mb-0' : '']">
         <div :class="['font-bold text-base-content mb-1', position === 1 ? 'text-base sm:text-lg' : 'text-sm sm:text-base']">
-          {{ user.username }}
+          <Link :href="`/profile/${user.username}`" class="text-primary hover:underline">
+            {{ user.username }}
+          </Link>
         </div>
         <div class="text-xs text-base-content/70 mb-2">
           {{ getValueLabel }} {{ getValue }}
