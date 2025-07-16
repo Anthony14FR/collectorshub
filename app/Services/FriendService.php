@@ -120,10 +120,15 @@ class FriendService
     /**
      * Recherche d'utilisateur par username ou email
      */
-    public function searchUser(string $query)
+    public function searchUser(string $query, ?int $excludeUserId = null)
     {
-        return User::where('username', 'like', "%$query%")
-            ->orWhere('email', 'like', "%$query%")
-            ->get();
+        $searchQuery = User::where('username', 'like', "%$query%")
+            ->orWhere('email', 'like', "%$query%");
+
+        if ($excludeUserId) {
+            $searchQuery->where('id', '!=', $excludeUserId);
+        }
+
+        return $searchQuery->get();
     }
 }

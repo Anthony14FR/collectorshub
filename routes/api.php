@@ -14,4 +14,8 @@ Route::middleware('auth')->prefix('api')->group(function () {
 
     Route::post('/expeditions/{expedition}/start', [ExpeditionController::class, 'start'])->name('api.expeditions.start');
     Route::post('/expeditions/claim', [ExpeditionController::class, 'claim'])->name('api.expeditions.claim');
+
+    Route::get('/friends/suggestions', [\App\Http\Controllers\FriendController::class, 'suggestions']);
+    Route::get('/friends/pending-requests', [\App\Http\Controllers\FriendController::class, 'getPendingRequests']);
+    Route::post('/friends/refresh', [\App\Http\Controllers\FriendController::class, 'refresh']);
 });

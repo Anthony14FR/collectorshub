@@ -4,20 +4,18 @@ import { Head, router } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
 import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
-import Modal from '@/Components/UI/Modal.vue';
 import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
 import TeamManagementModal from '@/Components/Game/TeamManagementModal.vue';
 import BadgesModal from '@/Components/Profile/BadgesModal.vue';
-import FriendsModal from '@/components/friends/FriendsModal.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
-import type { Leaderboards } from '@/types/leaderboard';
 import type { Success, UserSuccess } from '@/types/success';
 import type { LevelReward, LevelRewardPreview } from '@/types/user';
 import type { UserFriend, UserFriendGift, FriendRequest } from '@/types/friend';
+import FriendsModal from '@/Components/Friends/FriendsModal.vue';
 
 interface Props extends PageProps {
   auth: {
@@ -65,6 +63,34 @@ const pokedexModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 const badgesModalOpen = ref(false);
 const friendsModalOpen = ref(false);
+const friendsData = ref([...friends]);
+const friendRequestsData = ref([...friend_requests]);
+const suggestionsData = ref([...suggestions]);
+
+
+const sendGift = (friendId) => {
+  router.post(
+    "/friend-gifts/send",
+    { receiver_id: friendId },
+    { preserveScroll: true }
+  );
+};
+
+const claimGift = (giftId) => {
+  router.post(
+    "/friend-gifts/claim",
+    { gift_id: giftId },
+    { preserveScroll: true }
+  );
+};
+
+const removeFriend = (friendId) => {
+  router.post(
+    "/friends/remove",
+    { target_id: friendId },
+    { preserveScroll: true }
+  );
+};
 
 const userTeamPokemons = computed(() => {
   return pokedex
@@ -75,7 +101,22 @@ const userTeamPokemons = computed(() => {
 
 const refreshInventory = async () => {
   const { data } = await axios.get('/me/inventory');
-  // Met à jour la variable d'inventaire locale (ex: inventory.value = data.inventory)
+};
+
+const handleDataRefreshed = (newData) => {
+  if (newData.friends) {
+    friendsData.value = newData.friends;
+  }
+  if (newData.friend_requests) {
+    friendRequestsData.value = newData.friend_requests;
+  }
+  if (newData.suggestions) {
+    suggestionsData.value = newData.suggestions;
+  }
+  
+  friendsData.value = [...friendsData.value];
+  friendRequestsData.value = [...friendRequestsData.value];
+  suggestionsData.value = [...suggestionsData.value];
 };
 
 const goToMarketplace = () => {
@@ -172,11 +213,15 @@ const goToExpeditions = () => {
 
     <FriendsModal
       :show="friendsModalOpen"
-      @close="friendsModalOpen = false"
-      :friends="friends"
-      :friend_requests="friend_requests || []"
-      :suggestions="suggestions ||[]"
-      @refresh-inventory="refreshInventory"
+      :onClose="() => friendsModalOpen = false"
+      :friends="friendsData"
+      :friend_requests="friendRequestsData"
+      :suggestions="suggestionsData"
+      :currentUserId="auth.user.id"
+      @send-gift="sendGift"
+      @claim-gift="claimGift"
+      @remove-friend="removeFriend"
+      @dataRefreshed="handleDataRefreshed"
     />
   </div>
 </template>

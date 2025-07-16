@@ -89,13 +89,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/friends/accept-request', [\App\Http\Controllers\FriendController::class, 'acceptRequest'])->name('friends.acceptRequest');
     Route::post('/friends/remove', [\App\Http\Controllers\FriendController::class, 'remove'])->name('friends.remove');
     Route::get('/friends/search', [\App\Http\Controllers\FriendController::class, 'search'])->name('friends.search');
-    Route::get('/api/friends/suggestions', [\App\Http\Controllers\FriendController::class, 'suggestions'])->middleware(['auth']);
 
     // Gestion des cadeaux d'amis
-    Route::post('/friend-gifts/send', [\App\Http\Controllers\UserFriendGiftController::class, 'send'])->name('friendGifts.send');
-    Route::post('/friend-gifts/send-to-all', [\App\Http\Controllers\UserFriendGiftController::class, 'sendToAll'])->name('friendGifts.sendToAll');
-    Route::post('/friend-gifts/claim', [\App\Http\Controllers\UserFriendGiftController::class, 'claim'])->name('friendGifts.claim');
-    Route::get('/friend-gifts/to-claim', [\App\Http\Controllers\UserFriendGiftController::class, 'toClaim'])->name('friendGifts.toClaim');
+    Route::post('/friend-gifts/send', [\App\Http\Controllers\UserFriendGiftController::class, 'send'])->name('friend-gifts.send');
+    Route::post('/friend-gifts/claim', [\App\Http\Controllers\UserFriendGiftController::class, 'claim'])->name('friend-gifts.claim');
+    Route::post('/friend-gifts/claim-all', [\App\Http\Controllers\UserFriendGiftController::class, 'claimAll'])->name('friend-gifts.claim-all');
+    Route::post('/friend-gifts/send-all', [\App\Http\Controllers\UserFriendGiftController::class, 'sendToAll'])->name('friend-gifts.send-all');
 });
 
 require __DIR__ . '/admin.php';
