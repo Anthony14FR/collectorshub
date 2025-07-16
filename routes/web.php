@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExpeditionController;
+use App\Http\Controllers\InfernalTowerController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LevelRewardController;
 use App\Http\Controllers\MarketplaceController;
@@ -87,6 +88,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Routes pour Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+
+    // Route pour la Tour Infernale
+    Route::get('/tower', [InfernalTowerController::class, 'index'])->name('tower.index');
 });
 
 require __DIR__ . '/admin.php';

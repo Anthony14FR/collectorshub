@@ -49,6 +49,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'claimed_level_rewards',
         'background',
         'unlocked_backgrounds',
+        'infernal_tower_current_level',
+        'infernal_tower_daily_defeats',
+        'infernal_tower_last_reset',
     ];
 
     protected $hidden = [
@@ -62,6 +65,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'cash' => 0,
         'role' => 'user',
         'status' => 'active',
+        'infernal_tower_current_level' => 1,
+        'infernal_tower_daily_defeats' => 10,
     ];
 
     protected $casts = [
@@ -75,6 +80,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'provider_verified_at' => 'datetime',
         'claimed_level_rewards' => 'array',
         'unlocked_backgrounds' => 'array',
+        'infernal_tower_current_level' => 'integer',
+        'infernal_tower_daily_defeats' => 'integer',
+        'infernal_tower_last_reset' => 'datetime',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
@@ -164,7 +172,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getUnclaimedCount(): int
     {
-        return $this->userSuccesses()->where('is_claimed', false)->count();
+        return $this->unclaimedSuccesses()->count();
     }
 
     public function sendEmailVerificationNotification()
@@ -196,5 +204,21 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Expedition::class, 'user_expeditions')
             ->withPivot('date', 'status', 'started_at', 'ends_at', 'claimed_at')
             ->withTimestamps();
+    }
+
+    public function resetInfernalTowerDailyDefeats(): void
+    {
+        $now = now();
+
+        if (is_null($this->infernal_tower_last_reset) || $this->infernal_tower_last_reset->isToday() === false) {
+            $this->infernal_tower_daily_defeats = 10;
+            $this->infernal_tower_last_reset = $now;
+            $this->save();
+        }
+    }
+
+    public function getRawDailyDefeats(): int
+    {
+        return $this->attributes['infernal_tower_daily_defeats'] ?? 0;
     }
 }

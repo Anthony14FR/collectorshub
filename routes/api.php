@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExpeditionController;
+use App\Http\Controllers\InfernalTowerController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokemonUpgradeController;
 use Illuminate\Support\Facades\Route;
@@ -14,4 +15,6 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
 
     Route::post('/expeditions/{expedition}/start', [ExpeditionController::class, 'start'])->name('api.expeditions.start');
     Route::post('/expeditions/claim', [ExpeditionController::class, 'claim'])->name('api.expeditions.claim');
+
+    Route::post('/tower/attempt', [InfernalTowerController::class, 'attempt'])->name('api.tower.attempt');
 });
