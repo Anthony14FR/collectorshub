@@ -221,4 +221,35 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->attributes['infernal_tower_daily_defeats'] ?? 0;
     }
+  
+    public function userFriends()
+    {
+        return $this->hasMany(UserFriend::class, 'user_id');
+    }
+
+    public function friends()
+    {
+        return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_id')
+            ->wherePivot('status', 'accepted');
+    }
+
+    public function friendRequests()
+    {
+        return $this->hasMany(UserFriend::class, 'friend_id')->where('status', 'pending');
+    }
+
+    public function userFriendGiftsSent()
+    {
+        return $this->hasMany(UserFriendGift::class, 'sender_id');
+    }
+
+    public function userFriendGiftsReceived()
+    {
+        return $this->hasMany(UserFriendGift::class, 'receiver_id');
+    }
+
+    public function friendGiftsToClaim()
+    {
+        return $this->userFriendGiftsReceived()->where('is_claimed', false);
+    }
 }

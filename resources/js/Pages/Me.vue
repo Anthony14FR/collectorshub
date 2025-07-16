@@ -17,6 +17,8 @@ import type { User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
 import type { LevelReward, LevelRewardPreview } from '@/types/user';
+import type { UserFriend, UserFriendGift, FriendRequest } from '@/types/friend';
+import FriendsModal from '@/Components/Friends/FriendsModal.vue';
 
 interface Props extends PageProps {
   auth: {
@@ -37,6 +39,10 @@ interface Props extends PageProps {
     unclaimed: number;
     percentage: number;
   };
+  friend_gifts_to_claim: UserFriendGift[];
+  friend_requests: FriendRequest[];
+  friends: UserFriend[];
+  suggestions: User[];
 }
 
 const {
@@ -51,11 +57,46 @@ const {
   level_rewards_to_claim = [],
   level_rewards_preview,
   progress = { total: 0, unlocked: 0, claimed: 0, unclaimed: 0, percentage: 0 },
+  friend_gifts_to_claim = [],
+  friend_requests = [],
+  friends = [],
+  suggestions = [],
 } = defineProps<Props>();
 
 const pokedexModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 const badgesModalOpen = ref(false);
+
+const friendsModalOpen = ref(false);
+const friendsData = ref([...friends]);
+const friendRequestsData = ref([...friend_requests]);
+const suggestionsData = ref([...suggestions]);
+
+
+const sendGift = (friendId) => {
+  router.post(
+    "/friend-gifts/send",
+    { receiver_id: friendId },
+    { preserveScroll: true }
+  );
+};
+
+const claimGift = (giftId) => {
+  router.post(
+    "/friend-gifts/claim",
+    { gift_id: giftId },
+    { preserveScroll: true }
+  );
+};
+
+const removeFriend = (friendId) => {
+  router.post(
+    "/friends/remove",
+    { target_id: friendId },
+    { preserveScroll: true }
+  );
+};
+
 const showWelcomeAlert = ref(false);
 
 onMounted(() => {
@@ -78,6 +119,26 @@ const userTeamPokemons = computed(() => {
     .slice(0, 6);
 });
 
+const refreshInventory = async () => {
+  const { data } = await axios.get('/me/inventory');
+};
+
+const handleDataRefreshed = (newData) => {
+  if (newData.friends) {
+    friendsData.value = newData.friends;
+  }
+  if (newData.friend_requests) {
+    friendRequestsData.value = newData.friend_requests;
+  }
+  if (newData.suggestions) {
+    suggestionsData.value = newData.suggestions;
+  }
+  
+  friendsData.value = [...friendsData.value];
+  friendRequestsData.value = [...friendRequestsData.value];
+  suggestionsData.value = [...suggestionsData.value];
+};
+
 const goToMarketplace = () => {
   router.visit('/marketplace');
 };
@@ -92,6 +153,10 @@ const openTeamManagementModal = () => {
 
 const openBadgesModal = () => {
   badgesModalOpen.value = true;
+}
+
+const openFriendsModal = () => {
+  friendsModalOpen.value = true;
 }
 
 const dismissWelcomeAlert = () => {
@@ -126,6 +191,8 @@ const goToExpeditions = () => {
         :onOpenBadgesModal="openBadgesModal"
         :has-unclaimed-successes="unclaimed_successes.length > 0"
         :onGoToExpeditions="goToExpeditions"
+        :onOpenFriendsModal="openFriendsModal"
+        :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
       />
 
       <DesktopLayout
@@ -142,6 +209,8 @@ const goToExpeditions = () => {
         :onOpenBadgesModal="openBadgesModal"
         :has-unclaimed-successes="unclaimed_successes.length > 0"
         :onGoToExpeditions="goToExpeditions"
+        :onOpenFriendsModal="openFriendsModal"
+        :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
       />
     </div>
 
@@ -181,5 +250,17 @@ const goToExpeditions = () => {
              :message="`🎉 Bienvenue ${auth.user.username} ! Votre email a été vérifié avec succès. Votre aventure Pokémon peut commencer !`"
              dismissible @dismiss="dismissWelcomeAlert" />
     </div>
+    <FriendsModal
+      :show="friendsModalOpen"
+      :onClose="() => friendsModalOpen = false"
+      :friends="friendsData"
+      :friend_requests="friendRequestsData"
+      :suggestions="suggestionsData"
+      :currentUserId="auth.user.id"
+      @send-gift="sendGift"
+      @claim-gift="claimGift"
+      @remove-friend="removeFriend"
+      @dataRefreshed="handleDataRefreshed"
+    />
   </div>
 </template>
