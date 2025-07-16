@@ -12,7 +12,7 @@ return new class () extends Migration {
             $table->string('name', 100);
             $table->text('description')->nullable();
             $table->enum('rarity', ['normal', 'rare', 'epic', 'legendary'])->default('normal');
-            $table->integer('duration_minutes');
+            $table->float('duration_minutes');
             $table->json('rewards');
             $table->boolean('is_active')->default(true);
             $table->timestamps();

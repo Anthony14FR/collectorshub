@@ -35,7 +35,11 @@ if (!function_exists('is_admin')) {
             return false;
         }
 
-        return auth()->user()->hasRole('admin');
+        try {
+            return auth()->user()->hasRole('admin');
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
 

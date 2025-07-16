@@ -1,4 +1,4 @@
-.PHONY: help install setup start clear-cache refresh log main main-rebuild docker-up-dev docker-restart docker-dev docker-up-prod docker-down docker-stop docker-rebuild docker-logs docker-shell
+.PHONY: help install setup start clear-cache refresh log main main-rebuild
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -39,10 +39,10 @@ log: ## Affiche les 200 dernières lignes des logs Laravel et suit les nouvelles
 main: ## Checkout main et pull
 	git checkout main && git pull
 
-main-rebuild: ## Checkout main, pull, et rebuild + start
+main-rebuild: ## Checkout main, pull, et rebuild + refresh
 	make main
 	make install
-	make start
+	make refresh
 
 # Commandes Docker
 
@@ -107,19 +107,25 @@ docker-dev:
 
 docker-up-prod:
 	@echo "🏭 Démarrage de l'environnement de production..."
-	@if [ ! -f .env.production ]; then \
-		echo "❌ Fichier .env.production manquant !"; \
-		echo "📝 Créez le fichier: cp env.production.example .env.production"; \
-		echo "✏️  Puis éditez-le avec vos vraies valeurs"; \
-		exit 1; \
-	fi
-	docker compose -f docker-compose.prod.yml --env-file .env.production build
-	docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+	docker compose -f docker-compose.prod.yml build
+	docker compose -f docker-compose.prod.yml up -d
 	@echo "⏳ Attente que les services soient prêts..."
 	sleep 15
 	docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
-	docker compose -f docker-compose.prod.yml exec app php artisan db:seed --force
 	@echo "✅ Environnement de production démarré !"
+
+docker-prod-seed:
+	docker compose -f docker-compose.prod.yml exec app php artisan db:seed --force
+
+docker-prod-refresh:
+	docker compose -f docker-compose.prod.yml exec app php artisan migrate:fresh --seed
+
+docker-prod-migrate:
+	docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
+
+docker-prod-restart:
+	docker compose -f docker-compose.prod.yml down
+	docker compose -f docker-compose.prod.yml up -d
 
 docker-down:
 	@echo "🛑 Arrêt et suppression des services Docker..."

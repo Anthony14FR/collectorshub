@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SuccessController;
+use App\Http\Controllers\UserProfileController;
 use App\Models\Pokedex;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -26,15 +27,19 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Route pour Me
-    Route::get('/me', [MeController::class, 'index'])->middleware(['verified'])->name('me');
+    Route::get('/me', [MeController::class, 'index'])->name('me');
+
+    // Route pour voir le profil d'un utilisateur
+    Route::get('/profile/{user:username}', [UserProfileController::class, 'show'])->middleware(['verified'])->name('user.profile.show');
 
     // Routes pour Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::patch('/avatar', [ProfileController::class, 'updateAvatar'])->name('avatar.update');
+    Route::patch('/background', [ProfileController::class, 'updateBackground'])->name('background.update');
 
     // Routes pour Pokedex
     Route::get('/pokedex/user-pokemons', [PokedexController::class, 'getUserPokemons'])->name('pokedex.user-pokemons');

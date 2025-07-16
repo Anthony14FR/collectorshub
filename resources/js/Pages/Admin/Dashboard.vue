@@ -90,6 +90,15 @@ const adminSections = ref([
     color: 'accent',
     stat: props.stats?.active_users || 0,
     statLabel: 'Actifs'
+  },
+  {
+    title: 'Configuration',
+    description: 'Paramètres de récompenses et probabilités',
+    icon: '🎮',
+    route: '/admin/game-configuration',
+    color: 'success',
+    stat: 3,
+    statLabel: 'Catégories'
   }
 ]);
 

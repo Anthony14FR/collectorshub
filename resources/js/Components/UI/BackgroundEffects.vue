@@ -1,26 +1,68 @@
-<script setup lang="ts">
-interface Props {
-  backgroundImage?: string;
-}
+<script setup>
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
-const { backgroundImage = '/images/section-me-background.jpg' } = defineProps<Props>();
+const page = usePage();
+const userBackground = computed(() => page.props.auth?.user?.background);
 </script>
 
 <template>
-  <div class="absolute inset-0">
-    <div class="absolute inset-0 opacity-30">
-      <img
-        :src="backgroundImage"
-        alt="Background"
-        class="w-full h-full object-cover"
-      />
-    </div>
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-20 left-20 w-2 h-2 bg-primary/30 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
-      <div class="absolute top-40 right-32 w-3 h-3 bg-secondary/20 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
-      <div class="absolute bottom-32 left-16 w-2 h-2 bg-accent/25 rounded-full animate-bounce" style="animation-delay: 2s;"></div>
-      <div class="absolute bottom-20 right-20 w-3 h-3 bg-success/20 rounded-full animate-pulse" style="animation-delay: 3s;"></div>
+  <div v-if="userBackground" class="fixed inset-0 z-0">
+    <img 
+      :src="userBackground" 
+      alt="Background" 
+      class="w-full h-full object-cover"
+    />
+    <div class="absolute inset-0 bg-black/50"></div>
+  </div>
+  <div v-else class="fixed inset-0 z-0 bg-gradient-to-br from-primary/10 via-base-100 to-secondary/10">
+    <div class="absolute inset-0 overflow-hidden">
+      <div
+        class="absolute w-96 h-96 rounded-full bg-primary/5 blur-3xl animate-float"
+        style="top: -10%; left: -10%; animation-delay: 0s"
+      ></div>
+      <div
+        class="absolute w-96 h-96 rounded-full bg-secondary/5 blur-3xl animate-float-reverse"
+        style="bottom: -10%; right: -10%; animation-delay: 2s"
+      ></div>
+      <div
+        class="absolute w-64 h-64 rounded-full bg-accent/5 blur-3xl animate-float"
+        style="top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 4s"
+      ></div>
     </div>
   </div>
 </template>
+
+<style scoped>
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  33% {
+    transform: translateY(-30px) translateX(20px) scale(1.05);
+  }
+  66% {
+    transform: translateY(20px) translateX(-20px) scale(0.95);
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  33% {
+    transform: translateY(30px) translateX(-20px) scale(0.95);
+  }
+  66% {
+    transform: translateY(-20px) translateX(20px) scale(1.05);
+  }
+}
+
+.animate-float {
+  animation: float 20s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: float-reverse 25s ease-in-out infinite;
+}
+</style>

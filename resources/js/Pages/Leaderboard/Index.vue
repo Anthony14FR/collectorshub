@@ -71,7 +71,7 @@ const changePage = (page: number) => {
     <BackgroundEffects />
 
     <div class="relative z-10 min-h-screen w-full">
-      <div class="flex justify-center pt-8 px-4">
+      <div class="flex justify-center pt-8 px-4 mb-10">
         <div class="text-center">
           <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
             🏆 CLASSEMENTS

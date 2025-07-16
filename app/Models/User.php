@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\XpService;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
     use HasFactory;
@@ -38,7 +39,16 @@ class User extends Authenticatable
         'status',
         'avatar',
         'unlocked_avatars',
+        'google_id',
+        'google_avatar',
+        'discord_id',
+        'discord_username',
+        'discord_avatar',
+        'provider',
+        'provider_verified_at',
         'claimed_level_rewards',
+        'background',
+        'unlocked_backgrounds',
     ];
 
     protected $hidden = [
@@ -62,7 +72,9 @@ class User extends Authenticatable
         'level' => 'integer',
         'experience' => 'integer',
         'unlocked_avatars' => 'array',
+        'provider_verified_at' => 'datetime',
         'claimed_level_rewards' => 'array',
+        'unlocked_backgrounds' => 'array',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
@@ -153,6 +165,25 @@ class User extends Authenticatable
     public function getUnclaimedCount(): int
     {
         return $this->userSuccesses()->where('is_claimed', false)->count();
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new \App\Notifications\VerifyEmailNotification());
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
+
+    public function hasVerifiedEmail(): bool
+    {
+        if ($this->provider) {
+            return true;
+        }
+
+        return !is_null($this->email_verified_at);
     }
 
     public function userExpeditions(): HasMany

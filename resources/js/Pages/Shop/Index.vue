@@ -18,7 +18,7 @@ const props = defineProps({
 const selectedItem = ref(null);
 const showBuyModal = ref(false);
 const showInventoryModal = ref(false);
-const activeTab = ref("items");
+const activeTab = ref("balls");
 const processing = ref(false);
 
 const form = useForm({
@@ -119,6 +119,7 @@ const handleTabChange = (tab) => {
                 :inventory="inventory"
                 :userAvatars="user.unlocked_avatars || []"
                 :activeTab="activeTab"
+                :userBackgrounds="user.unlocked_backgrounds || []"
                 @buy="openBuyModal"
                 @changeTab="handleTabChange"
               />
