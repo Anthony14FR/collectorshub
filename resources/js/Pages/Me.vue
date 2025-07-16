@@ -157,6 +157,7 @@ const openBadgesModal = () => {
 
 const openFriendsModal = () => {
   friendsModalOpen.value = true;
+}
 
 const dismissWelcomeAlert = () => {
   showWelcomeAlert.value = false;
