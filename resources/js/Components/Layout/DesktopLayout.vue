@@ -28,6 +28,7 @@ interface Props {
   level_rewards_to_claim?: LevelReward[];
   level_rewards_preview?: LevelRewardPreview;
   onGoToExpeditions?: () => void;
+  onOpenFriendsModal?: () => void;
 }
 
 const { 
@@ -44,6 +45,7 @@ const {
   level_rewards_to_claim = [],
   level_rewards_preview,
   onGoToExpeditions,
+  onOpenFriendsModal
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -188,6 +190,30 @@ const goToPokemonUpgrade = () => {
               Voir le classement
             </Button>
           </div>
+        </div>
+
+        <div
+          class="flex flex-row items-center justify-between overflow-hidden p-4 backdrop-blur-sm relative"
+          style="background-image: url('/images/friends.jpg'); background-size: cover; background-position: center;"
+        >
+          <div class="absolute inset-0 bg-black/70" />
+          <div class="relative z-10">
+            <h3 class="mb-1 bg-gradient-to-r from-secondary to-secondary/80 bg-clip-text text-base font-bold text-transparent">
+              Amis
+            </h3>
+            <p class="text-xs text-base-content/70">
+              Gérer mes amis & cadeaux
+            </p>
+          </div>
+          <Button
+            v-if="onOpenFriendsModal"
+            @click="onOpenFriendsModal"
+            variant="secondary"
+            size="sm"
+            class="relative z-10"
+          >
+            <img src="/images/icons/friends.png" alt="Amis" class="w-10 h-10" />
+          </Button>
         </div>
       </div>
     </SideSection>

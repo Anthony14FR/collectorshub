@@ -197,4 +197,36 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withPivot('date', 'status', 'started_at', 'ends_at', 'claimed_at')
             ->withTimestamps();
     }
+
+    public function userFriends()
+    {
+        return $this->hasMany(UserFriend::class, 'user_id');
+    }
+
+    public function friends()
+    {
+        return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_id')
+            ->wherePivot('status', 'accepted');
+    }
+
+    public function friendRequests()
+    {
+        return $this->hasMany(UserFriend::class, 'friend_id')->where('status', 'pending');
+    }
+
+    // --- Relations pour les cadeaux d'amis ---
+    public function userFriendGiftsSent()
+    {
+        return $this->hasMany(UserFriendGift::class, 'sender_id');
+    }
+
+    public function userFriendGiftsReceived()
+    {
+        return $this->hasMany(UserFriendGift::class, 'receiver_id');
+    }
+
+    public function friendGiftsToClaim()
+    {
+        return $this->userFriendGiftsReceived()->where('is_claimed', false);
+    }
 }
