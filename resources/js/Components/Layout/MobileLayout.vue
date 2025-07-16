@@ -7,7 +7,7 @@ import Button from '@/Components/UI/Button.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
-import type { LevelReward, LevelRewardPreview, User } from '@/types/user';
+import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
 import { router } from '@inertiajs/vue3';
 
 interface Props {
@@ -21,7 +21,7 @@ interface Props {
   onOpenBadgesModal?: () => void;
   hasUnclaimedSuccesses?: boolean;
   teamPokemons?: Pokedex[];
-  level_rewards_to_claim?: LevelReward[];
+  level_rewards_to_claim?: AvailableLevelReward[];
   level_rewards_preview?: LevelRewardPreview;
   onGoToExpeditions?: () => void;
   announcements?: any[];
@@ -63,7 +63,7 @@ const goToPokemonUpgrade = () => {
   <div class="lg:hidden min-h-screen pb-safe">
     <div class="z-50 px-3 py-2">
       <LevelDisplay :user="user" :responsive="true" :level_rewards_to_claim="level_rewards_to_claim"
-                    :level_rewards_preview="level_rewards_preview" />
+                    :level_rewards_preview="level_rewards_preview" :unreadNotificationsCount="unreadNotificationsCount" />
     </div>
 
     <div class="space-y-3">
@@ -210,27 +210,6 @@ const goToPokemonUpgrade = () => {
             </Button>
           </div>
         </div>
-      </div>
-
-      <!-- Boîte de réception -->
-      <div class="bg-gradient-to-r from-info/10 to-primary/20 rounded-xl border border-info/20 p-4">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <div
-              class="w-6 h-6 bg-gradient-to-br from-info/30 to-primary/30 rounded-lg flex items-center justify-center text-sm">
-              📬</div>
-            <h3 class="font-bold bg-gradient-to-r from-info to-primary bg-clip-text text-transparent">Boîte de réception
-            </h3>
-            <span v-if="unreadNotificationsCount > 0"
-                  class="bg-error text-error-content text-xs px-2 py-1 rounded-full font-bold">
-              {{ unreadNotificationsCount }}
-            </span>
-          </div>
-        </div>
-        <Button variant="secondary" size="sm" @click="router.visit('/notifications')"
-                class="w-full bg-gradient-to-r from-info/10 to-primary/20 border-info/30 text-info hover:from-info/20 hover:to-primary/30">
-          Voir ses messages
-        </Button>
       </div>
 
       <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/20 p-4">

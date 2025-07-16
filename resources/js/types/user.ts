@@ -62,8 +62,8 @@ export type InventoryItem = {
     updated_at: string;
 }
 
-export type LevelReward = {
-    type: string;
+export type AvailableLevelReward = {
+    types: string[];
     level: number;
     cash: number;
     pokeballs: number;
@@ -71,7 +71,27 @@ export type LevelReward = {
     is_available: boolean;
 }
 
-export type LevelRewardPreview = {
-    previous: LevelReward[];
-    next: LevelReward[];
+export type PreviewLevelReward = {
+    type: string;
+    level: number;
+    cash: number;
+    pokeballs: number;
+    masterballs: number;
+    is_claimed: boolean;
 }
+
+export type GroupedReward = {
+    level: number;
+    types: string[];
+    cash: number;
+    pokeballs: number;
+    masterballs: number;
+    is_claimed: boolean;
+}
+
+export type LevelRewardPreview = {
+    previous: PreviewLevelReward[];
+    next: PreviewLevelReward[];
+}
+
+export type LevelReward = AvailableLevelReward;

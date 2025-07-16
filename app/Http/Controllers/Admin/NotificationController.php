@@ -15,7 +15,9 @@ class NotificationController extends Controller
      */
     public function create()
     {
-        $users = User::select(['id', 'name', 'email'])->orderBy('name')->get();
+        $users = User::select(['id', 'name', 'username', 'email', 'level', 'role'])
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('Admin/Notifications/Create', [
             'users' => $users

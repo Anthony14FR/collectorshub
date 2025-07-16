@@ -10,7 +10,7 @@ import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
 import type { Success, UserSuccess } from '@/types/success';
-import type { LevelReward, LevelRewardPreview, User } from '@/types/user';
+import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
@@ -24,7 +24,7 @@ interface Props extends PageProps {
   successes?: Success[];
   unclaimed_successes?: UserSuccess[];
   claimed_successes?: UserSuccess[];
-  level_rewards_to_claim?: LevelReward[];
+  level_rewards_to_claim?: AvailableLevelReward[];
   level_rewards_preview?: LevelRewardPreview;
   announcements?: any[];
   marketplace_history?: any[];

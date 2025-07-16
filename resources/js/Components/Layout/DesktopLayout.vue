@@ -11,7 +11,7 @@ import { router } from '@inertiajs/vue3';
 
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
-import type { LevelReward, LevelRewardPreview, User } from '@/types/user';
+import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
 
 interface Props {
   user: User;
@@ -24,7 +24,7 @@ interface Props {
   onOpenBadgesModal?: () => void;
   hasUnclaimedSuccesses?: boolean;
   teamPokemons?: Pokedex[];
-  level_rewards_to_claim?: LevelReward[];
+  level_rewards_to_claim?: AvailableLevelReward[];
   level_rewards_preview?: LevelRewardPreview;
   onGoToExpeditions?: () => void;
   announcements?: any[];
@@ -67,7 +67,7 @@ const goToPokemonUpgrade = () => {
     <div class="flex flex-col space-y-1 w-72 mx-auto">
       <div class="flex justify-center mt-4">
         <LevelDisplay :user="user" :level_rewards_to_claim="level_rewards_to_claim"
-                      :level_rewards_preview="level_rewards_preview" />
+                      :level_rewards_preview="level_rewards_preview" :unreadNotificationsCount="unreadNotificationsCount" />
       </div>
 
       <div class="z-20 mb-14">
@@ -166,36 +166,6 @@ const goToPokemonUpgrade = () => {
             </Button>
           </div>
         </div>
-
-        <div class="bg-gradient-to-r from-primary/20 to-primary/40"
-             style="background-image: url('/images/background/leaderboard.jpg'); background-size: cover; background-position: center;">
-          <div class="flex h-full flex-col bg-base-100/70 p-4">
-            <div class="flex-grow">
-              <div class="flex items-center">
-                <img src="/images/icons/inbox.png" alt="Boîte de réception" class="w-10 h-10" />
-                <div class="ml-3">
-                  <div class="flex items-center gap-2">
-                    <h3
-                      class="mb-1 bg-gradient-to-r from-info to-primary/80 bg-clip-text text-base font-bold text-transparent">
-                      Boîte de réception
-                    </h3>
-                    <span v-if="unreadNotificationsCount > 0"
-                          class="bg-error text-error-content text-xs px-2 py-1 rounded-full font-bold">
-                      {{ unreadNotificationsCount }}
-                    </span>
-                  </div>
-                  <p class="text-xs text-base-content/70">
-                    Vos notifications
-                  </p>
-                </div>
-              </div>
-            </div>
-            <Button @click="router.visit('/notifications')" variant="leaderboard" size="sm" class="mt-3">
-              Voir ses messages
-            </Button>
-          </div>
-        </div>
-
 
       </div>
     </SideSection>
