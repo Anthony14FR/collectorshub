@@ -82,6 +82,19 @@ Route::middleware('auth')->group(function () {
 
     // Routes pour Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+
+    // Gestion des amis
+    Route::get('/friends', [\App\Http\Controllers\FriendController::class, 'index'])->name('friends.index');
+    Route::post('/friends/send-request', [\App\Http\Controllers\FriendController::class, 'sendRequest'])->name('friends.sendRequest');
+    Route::post('/friends/accept-request', [\App\Http\Controllers\FriendController::class, 'acceptRequest'])->name('friends.acceptRequest');
+    Route::post('/friends/remove', [\App\Http\Controllers\FriendController::class, 'remove'])->name('friends.remove');
+    Route::get('/friends/search', [\App\Http\Controllers\FriendController::class, 'search'])->name('friends.search');
+
+    // Gestion des cadeaux d'amis
+    Route::post('/friend-gifts/send', [\App\Http\Controllers\UserFriendGiftController::class, 'send'])->name('friendGifts.send');
+    Route::post('/friend-gifts/send-to-all', [\App\Http\Controllers\UserFriendGiftController::class, 'sendToAll'])->name('friendGifts.sendToAll');
+    Route::post('/friend-gifts/claim', [\App\Http\Controllers\UserFriendGiftController::class, 'claim'])->name('friendGifts.claim');
+    Route::get('/friend-gifts/to-claim', [\App\Http\Controllers\UserFriendGiftController::class, 'toClaim'])->name('friendGifts.toClaim');
 });
 
 require __DIR__ . '/admin.php';

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Pokemon;
 use App\Models\Success;
+use App\Services\FriendService;
 use App\Services\LeaderboardService;
 use App\Services\LevelRewardService;
 use App\Services\SuccessService;
+use App\Services\UserFriendGiftService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -15,12 +17,16 @@ class MeController extends Controller
     protected LeaderboardService $leaderboardService;
     protected SuccessService $successService;
     protected LevelRewardService $levelRewardService;
+    protected FriendService $friendService;
+    protected UserFriendGiftService $userFriendGiftService;
 
-    public function __construct(LeaderboardService $leaderboardService, SuccessService $successService, LevelRewardService $levelRewardService)
+    public function __construct(LeaderboardService $leaderboardService, SuccessService $successService, LevelRewardService $levelRewardService, FriendService $friendService, UserFriendGiftService $userFriendGiftService)
     {
         $this->leaderboardService = $leaderboardService;
         $this->successService = $successService;
         $this->levelRewardService = $levelRewardService;
+        $this->friendService = $friendService;
+        $this->userFriendGiftService = $userFriendGiftService;
     }
 
     public function index()
@@ -39,6 +45,42 @@ class MeController extends Controller
         $levelRewardsToClaim = $this->levelRewardService->getAvailableRewards($user);
         $levelRewardsPreview = $this->levelRewardService->getPreviewRewards($user);
 
+        $friendsGiftsToClaim = $user->friendGiftsToClaim()->get();
+
+        $userFriendGiftService = $this->userFriendGiftService;
+
+        $friends = $user->friends()->get()->map(function ($friend) use ($user, $userFriendGiftService) {
+            $hasSentGiftToday = $userFriendGiftService->hasSentToday($user, $friend);
+            $gift = $friend->userFriendGiftsSent()
+                ->where('receiver_id', $user->id)
+                ->where('is_claimed', false)
+                ->first();
+            $hasGiftToClaim = $gift !== null;
+            $giftId = $gift ? $gift->id : null;
+            return [
+                'id' => $friend->id,
+                'username' => $friend->username,
+                'level' => $friend->level,
+                'hasSentGiftToday' => $hasSentGiftToday,
+                'hasGiftToClaim' => $hasGiftToClaim,
+                'giftId' => $giftId,
+            ];
+        });
+
+        $friendRequests = $user->friendRequests()->with('user')->get()->map(function ($req) {
+            return [
+                'id' => $req->id,
+                'user' => [
+                    'id' => $req->user->id,
+                    'username' => $req->user->username,
+                    'email' => $req->user->email,
+                    'level' => $req->user->level,
+                ],
+            ];
+        });
+
+        $suggestions = $this->friendService->getFriendSuggestions($user);
+
         return Inertia::render('Me', [
             'user' => $user,
             'pokedex' => $pokedex,
@@ -51,6 +93,10 @@ class MeController extends Controller
             'progress' => $progress,
             'level_rewards_to_claim' => $levelRewardsToClaim,
             'level_rewards_preview' => $levelRewardsPreview,
+            'friend_gifts_to_claim' => $friendsGiftsToClaim,
+            'friend_requests' => $friendRequests,
+            'friends' => $friends,
+            'suggestions' => $suggestions
         ]);
     }
 }
