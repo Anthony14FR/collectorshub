@@ -6,6 +6,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, DefineComponent, h } from 'vue';
 import PrimeVue from 'primevue/config';
 import VirtualScroller from 'primevue/virtualscroller';
+import musicPlayerPlugin from './plugins/musicPlayer';
 
 const appName: string = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -20,6 +21,7 @@ createInertiaApp({
     return createApp({ render: () => h(App, props) })
       .use(plugin)
       .use(PrimeVue)
+      .use(musicPlayerPlugin)
       .component('VirtualScroller', VirtualScroller)
       .mount(el);
   },
