@@ -25,20 +25,26 @@ class GameConfigurationService
     public function getRarityProbabilities(): array
     {
         return Cache::remember('game_config.rarity_probabilities', self::CACHE_TTL, function () {
-            return GameConfiguration::getValue('rarity_probabilities', 'ball_types', [
-                'Pokeball' => [
-                    'normal' => 70,
-                    'rare' => 27,
-                    'epic' => 2.7,
-                    'legendary' => 0.3
-                ],
-                'Masterball' => [
-                    'normal' => 34,
-                    'rare' => 60,
-                    'epic' => 5,
-                    'legendary' => 1
+            $value = GameConfiguration::getValue('rarity_probabilities', 'ball_types', null);
+            if (is_array($value) && isset($value['Pokeball']) && isset($value['Masterball'])) {
+                return ['ball_types' => $value];
+            }
+            return [
+                'ball_types' => [
+                    'Pokeball' => [
+                        'normal' => 70,
+                        'rare' => 27,
+                        'epic' => 2.7,
+                        'legendary' => 0.3
+                    ],
+                    'Masterball' => [
+                        'normal' => 34,
+                        'rare' => 60,
+                        'epic' => 5,
+                        'legendary' => 1
+                    ]
                 ]
-            ]);
+            ];
         });
     }
 
@@ -80,10 +86,18 @@ class GameConfigurationService
         });
     }
 
+    public function getShinyRate(): int
+    {
+        return Cache::remember('game_config.shiny_rate', self::CACHE_TTL, function () {
+            return GameConfiguration::getValue('shiny_rate', 'chance', 1);
+        });
+    }
+
     public function clearCache(): void
     {
         Cache::forget('game_config.level_rewards');
         Cache::forget('game_config.rarity_probabilities');
         Cache::forget('game_config.xp_rewards');
+        Cache::forget('game_config.shiny_rate');
     }
 }
