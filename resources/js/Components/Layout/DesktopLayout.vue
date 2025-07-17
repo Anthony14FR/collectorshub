@@ -28,6 +28,7 @@ interface Props {
   level_rewards_to_claim?: LevelReward[];
   level_rewards_preview?: LevelRewardPreview;
   onGoToExpeditions?: () => void;
+  onGoToTower?: () => void;
   onOpenFriendsModal?: () => void;
 }
 
@@ -45,6 +46,7 @@ const {
   level_rewards_to_claim = [],
   level_rewards_preview,
   onGoToExpeditions,
+  onGoToTower,
   onOpenFriendsModal
 } = defineProps<Props>();
 
@@ -286,6 +288,32 @@ const goToPokemonUpgrade = () => {
             class="w-full"
           >
             Commencer une expédition
+          </Button>
+        </div>
+      </div>
+    </SideSection>
+    <SideSection position="right" :top="false" class="top-[655px]">
+      <div
+        class="relative h-40 overflow-hidden border-2 border-error bg-base-100/60 p-4 flex flex-col justify-end"
+        style="background-image: url('/images/background/tower.jpg'); background-size: cover; background-position: center;"
+      >
+        <div class="absolute inset-0 bg-gradient-to-t from-error/70 to-transparent" />
+        <div class="relative z-10">
+          <h3 class="mb-1 text-lg font-bold text-white flex items-center">
+            <span class="text-xl mr-2">🔥</span>
+            Tour Infernale
+          </h3>
+          <p class="mb-3 text-xs text-white/80">
+            Défiez les dresseurs les plus puissants
+          </p>
+          <Button
+            v-if="onGoToTower"
+            @click="onGoToTower"
+            variant="secondary"
+            size="sm"
+            class="w-full"
+          >
+            Entrer dans la tour
           </Button>
         </div>
       </div>

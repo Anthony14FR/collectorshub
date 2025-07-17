@@ -7,7 +7,7 @@ export interface Track {
 }
 
 const isPlaying = ref(false)
-const isVisible = ref(true)
+const isVisible = ref(false)
 const currentTrackIndex = ref(0)
 const currentTime = ref(0)
 const duration = ref(0)

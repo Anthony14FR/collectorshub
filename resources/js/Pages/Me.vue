@@ -166,6 +166,10 @@ const dismissWelcomeAlert = () => {
 const goToExpeditions = () => {
   router.visit('/expeditions');
 }
+
+const goToTower = () => {
+  router.visit('/tower');
+}
 </script>
 
 <template>
@@ -191,6 +195,7 @@ const goToExpeditions = () => {
         :onOpenBadgesModal="openBadgesModal"
         :has-unclaimed-successes="unclaimed_successes.length > 0"
         :onGoToExpeditions="goToExpeditions"
+        :onGoToTower="goToTower"
         :onOpenFriendsModal="openFriendsModal"
         :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
       />
@@ -209,6 +214,7 @@ const goToExpeditions = () => {
         :onOpenBadgesModal="openBadgesModal"
         :has-unclaimed-successes="unclaimed_successes.length > 0"
         :onGoToExpeditions="goToExpeditions"
+        :onGoToTower="goToTower"
         :onOpenFriendsModal="openFriendsModal"
         :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
       />

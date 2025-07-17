@@ -25,6 +25,7 @@ interface Props {
   level_rewards_to_claim?: LevelReward[];
   level_rewards_preview?: LevelRewardPreview;
   onGoToExpeditions?: () => void;
+  onGoToTower?: () => void;
   onOpenFriendsModal?: () => void;
 }
 
@@ -42,6 +43,7 @@ const {
   level_rewards_to_claim = [],
   level_rewards_preview,
   onGoToExpeditions,
+  onGoToTower,
   onOpenFriendsModal
 } = defineProps<Props>();
 
@@ -201,6 +203,23 @@ const goToPokemonUpgrade = () => {
             <p class="text-xs text-white/80 mb-auto">Aventures</p>
             <Button v-if="onGoToExpeditions" @click="onGoToExpeditions" variant="secondary" size="sm" class="w-full text-xs py-1.5">
               Partir
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-2">
+        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-error/20 to-red-600/30 border border-error/30">
+          <div class="absolute inset-0 bg-[url('/images/background/tower.jpg')] bg-cover bg-center opacity-40"></div>
+          <div class="absolute inset-0 bg-black/40"></div>
+          <div class="relative p-4 flex flex-col h-32">
+            <div class="flex items-center mb-2">
+              <span class="text-lg mr-2">🔥</span>
+              <h3 class="text-sm font-bold text-error">Tour Infernale</h3>
+            </div>
+            <p class="text-xs text-white/80 mb-auto">Défis épiques</p>
+            <Button v-if="onGoToTower" @click="onGoToTower" variant="secondary" size="sm" class="w-full text-xs py-1.5">
+              Défier
             </Button>
           </div>
         </div>
