@@ -5,7 +5,7 @@ import Avatar from "@/Components/UI/Avatar.vue";
 import Badge from "@/Components/UI/Badge.vue";
 import { Link } from "@inertiajs/vue3";
 import type { UserFriend } from '@/types/friend';
-import FriendGiftCountdown from "@/Components/friends/FriendGiftCountdown.vue";
+import FriendGiftCountdown from "@/Components/Friends/FriendGiftCountdown.vue";
 
 const props = defineProps<{
   friend: UserFriend;
