@@ -5,12 +5,16 @@ import UserMenu from '@/Components/Profile/UserMenu.vue';
 import TrainerProfile from '@/Components/Profile/TrainerProfile.vue';
 import Button from '@/Components/UI/Button.vue';
 import Badge from '@/Components/UI/Badge.vue';
+import Badge from '@/Components/UI/Badge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import { router } from '@inertiajs/vue3';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
 import type { LevelReward, LevelRewardPreview } from "@/types/user";
+import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
+import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
+import { ref, computed } from 'vue';
 import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
 import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
 import { ref, computed } from 'vue';
@@ -33,6 +37,8 @@ interface Props {
   onOpenFriendsModal?: () => void;
   daily_quests?: DailyQuest[];
   daily_quest_stats?: DailyQuestStats;
+  daily_quests?: DailyQuest[];
+  daily_quest_stats?: DailyQuestStats;
 }
 
 const { 
@@ -53,6 +59,9 @@ const {
   onOpenFriendsModal,
   daily_quests = [],
   daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
+  onOpenFriendsModal,
+  daily_quests = [],
+  daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -65,6 +74,20 @@ const goToShop = () => {
 
 const goToPokemonUpgrade = () => {
   router.visit('/pokemon-upgrade');
+};
+
+const dailyQuestsModalOpen = ref(false);
+
+const unclaimedQuestsCount = computed(() => 
+  daily_quests.filter(q => q.is_completed && !q.is_claimed).length
+);
+
+const handleQuestClaimed = (data: any) => {
+  router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
+};
+
+const handleBonusClaimed = (data: any) => {
+  router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
 };
 
 const dailyQuestsModalOpen = ref(false);
@@ -276,6 +299,14 @@ const handleBonusClaimed = (data: any) => {
       </div>
     </div>
   </div>
+  <DailyQuestsModal
+    :show="dailyQuestsModalOpen"
+    :onClose="() => dailyQuestsModalOpen = false"
+    :initial-quests="daily_quests"
+    :initial-stats="daily_quest_stats"
+    @questClaimed="handleQuestClaimed"
+    @bonusClaimed="handleBonusClaimed"
+  />
   <DailyQuestsModal
     :show="dailyQuestsModalOpen"
     :onClose="() => dailyQuestsModalOpen = false"
