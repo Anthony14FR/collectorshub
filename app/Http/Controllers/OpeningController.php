@@ -59,8 +59,8 @@ class OpeningController extends Controller
             $pokemons = [];
 
             for ($i = 0; $i < $quantity; $i++) {
-                $pokemon = $this->drawRandomPokemon($ballType);
-                $pokemons[] = $this->addPokemonToPokedex($user, $pokemon);
+                $pokemonData = $this->drawRandomPokemon($ballType);
+                $pokemons[] = $this->addPokemonToPokedex($user, $pokemonData);
             }
 
             $inventory->quantity -= $quantity;
@@ -77,10 +77,15 @@ class OpeningController extends Controller
     private function drawRandomPokemon($ballType)
     {
         $rarityProbabilities = $this->configService->getRarityProbabilities();
+
+        if (!isset($rarityProbabilities['ball_types'])) {
+            throw new \Exception('Configuration des probabilités des balls non trouvée');
+        }
+
         $rarityChances = $rarityProbabilities['ball_types'][$ballType] ?? null;
 
         if (!$rarityChances) {
-            throw new \Exception('Type de ball non pris en charge: ' . $ballType);
+            throw new \Exception('Type de ball non pris en charge: ' . $ballType . '. Types disponibles: ' . implode(',', array_keys($rarityProbabilities['ball_types'])));
         }
 
         $rand = rand(1, 100);
@@ -95,13 +100,39 @@ class OpeningController extends Controller
             }
         }
 
-        return Pokemon::where('rarity', $selectedRarity)
+        $pokemon = Pokemon::where('rarity', $selectedRarity)
+            ->where('is_shiny', false)
             ->inRandomOrder()
-            ->firstOrFail();
+            ->first();
+
+        if (!$pokemon) {
+            throw new \Exception('Aucun Pokémon trouvé pour la rareté: ' . $selectedRarity);
+        }
+
+        $shinyRate = $this->configService->getShinyRate();
+        $isShiny = rand(1, 100) <= $shinyRate;
+
+        if ($isShiny) {
+            $shinyPokemon = Pokemon::where('pokedex_id', $pokemon->pokedex_id)
+                ->where('is_shiny', true)
+                ->first();
+
+            if ($shinyPokemon) {
+                $pokemon = $shinyPokemon;
+            }
+        }
+
+        return [
+            'pokemon' => $pokemon,
+            'is_shiny' => $isShiny
+        ];
     }
 
-    private function addPokemonToPokedex($user, $pokemon)
+    private function addPokemonToPokedex($user, $pokemonData)
     {
+        $pokemon = $pokemonData['pokemon'];
+        $isShiny = $pokemonData['is_shiny'];
+
         $pokedexEntry = $user->pokedex()->create([
             'pokemon_id' => $pokemon->id,
             'nickname' => null,
@@ -119,7 +150,7 @@ class OpeningController extends Controller
             'name' => $pokemon->name,
             'types' => $pokemon->types,
             'rarity' => $pokemon->rarity,
-            'is_shiny' => $pokemon->is_shiny
+            'is_shiny' => $isShiny
         ];
     }
 }
