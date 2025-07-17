@@ -377,7 +377,6 @@ const getAvatarSrc = (user: User) => {
           </p>
         </div>
         <Button
-          v-if="activeTab === 'search'"
           @click="refreshSuggestions"
           :loading="refreshingSuggestions"
           :disabled="!canRefresh"

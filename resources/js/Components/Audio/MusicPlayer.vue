@@ -24,6 +24,7 @@ const {
 } = useMusicPlayer()
 
 const audioRef = ref<HTMLAudioElement>()
+const playerRef = ref<HTMLDivElement>()
 const showTrackList = ref(false)
 const showVolumeSlider = ref(false)
 const isDraggingVolume = ref(false)
@@ -107,6 +108,18 @@ const handleVolumeWheel = (event: WheelEvent) => {
   setVolume(newVolume)
 }
 
+const handleClickOutside = (event: MouseEvent) => {
+  if (
+    isVisible.value && 
+    playerRef.value && 
+    !playerRef.value.contains(event.target as Node)
+  ) {
+    toggleVisibility()
+    showTrackList.value = false
+    showVolumeSlider.value = false
+  }
+}
+
 onMounted(() => {
   if (audioRef.value) {
     audioRef.value.addEventListener('ended', () => {
@@ -115,12 +128,16 @@ onMounted(() => {
     
     initAudio(audioRef.value)
   }
+  
+  document.addEventListener('mousedown', handleClickOutside)
 })
 
 onUnmounted(() => {
   if (isDraggingVolume.value) {
     isDraggingVolume.value = false
   }
+  
+  document.removeEventListener('mousedown', handleClickOutside)
 })
 </script>
 
@@ -130,6 +147,7 @@ onUnmounted(() => {
   <Teleport to="body">
     <div
       v-if="isVisible"
+      ref="playerRef"
       class="fixed bottom-4 right-4 z-50 bg-base-100/80 backdrop-blur-lg rounded-xl border border-base-300/40 shadow-2xl overflow-hidden transition-all duration-300 ease-in-out"
       :class="showTrackList ? 'w-80' : 'w-72'"
     >
@@ -298,8 +316,71 @@ onUnmounted(() => {
       v-if="!isVisible"
       @click="toggleVisibility"
       class="fixed bottom-4 right-4 z-50 w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-lg rounded-full border border-primary/30 shadow-lg flex items-center justify-center transition-all duration-300 hover:from-primary/30 hover:to-secondary/30 hover:scale-110"
+      :class="isPlaying ? 'music-playing' : ''"
     >
-      <span class="text-lg">🎵</span>
+      <span class="text-lg transition-transform duration-300" :class="isPlaying ? 'music-note-playing' : ''">🎵</span>
     </button>
   </Teleport>
 </template>
+
+<style scoped>
+
+.music-playing {
+  animation: musicPulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(var(--primary), 0.4), 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.music-note-playing {
+  animation: musicNoteFloat 2s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(var(--primary), 0.3), 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(var(--primary), 0.6), 0 6px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes musicNoteFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-1px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+}
+
+.music-playing::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, rgba(var(--primary), 0.3), rgba(var(--secondary), 0.3));
+  border-radius: 50%;
+  z-index: -1;
+  animation: musicRipple 2s linear infinite;
+}
+
+@keyframes musicRipple {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+</style>
