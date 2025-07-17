@@ -7,14 +7,20 @@ use App\Models\Pokemon;
 use App\Services\GameConfigurationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class OpeningController extends Controller
 {
+    private $balls;
+
     public function __construct(
         private GameConfigurationService $configService
     ) {
+        $this->balls = Cache::remember('balls', 3600, function () {
+            return Item::where('type', 'ball')->get()->keyBy('name');
+        });
     }
 
     public function index()
@@ -37,7 +43,7 @@ class OpeningController extends Controller
         $ballType = $request->ball_type;
         $quantity = $request->quantity;
 
-        $ball = Item::where('name', $ballType)->where('type', 'ball')->first();
+        $ball = $this->balls[$ballType] ?? null;
 
         if (!$ball) {
             return response()->json([
@@ -56,11 +62,40 @@ class OpeningController extends Controller
         }
 
         return DB::transaction(function () use ($user, $ball, $ballType, $quantity, $inventory) {
-            $pokemons = [];
+            $pokemonsData = [];
+            $pokedexData = [];
 
             for ($i = 0; $i < $quantity; $i++) {
                 $pokemonData = $this->drawRandomPokemon($ballType);
-                $pokemons[] = $this->addPokemonToPokedex($user, $pokemonData);
+                $pokemonsData[] = $pokemonData;
+
+                $pokedexData[] = [
+                    'user_id' => $user->id,
+                    'pokemon_id' => $pokemonData['pokemon']->id,
+                    'nickname' => null,
+                    'level' => 1,
+                    'star' => 0,
+                    'hp_left' => $pokemonData['pokemon']->hp,
+                    'is_in_team' => false,
+                    'is_favorite' => false,
+                    'obtained_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+
+            DB::table('pokedex')->insert($pokedexData);
+
+            $pokemons = [];
+            foreach ($pokemonsData as $pokemonData) {
+                $pokemons[] = [
+                    'id' => null,
+                    'pokemon_id' => $pokemonData['pokemon']->id,
+                    'name' => $pokemonData['pokemon']->name,
+                    'types' => $pokemonData['pokemon']->types,
+                    'rarity' => $pokemonData['pokemon']->rarity,
+                    'is_shiny' => $pokemonData['is_shiny']
+                ];
             }
 
             $inventory->quantity -= $quantity;
