@@ -9,7 +9,7 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import type { PageProps } from '@/types';
 import type { Inventory } from '@/types/inventory';
-import type { Leaderboards } from '@/types/leaderboard';
+import HelpModal from '@/Components/UI/HelpModal.vue'
 import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
 import type { Success, UserSuccess } from '@/types/success';
@@ -71,6 +71,7 @@ const friendsModalOpen = ref(false);
 const friendsData = ref([...friends]);
 const friendRequestsData = ref([...friend_requests]);
 const suggestionsData = ref([...suggestions]);
+const showHelpModal = ref(false)
 
 
 const sendGift = (friendId) => {
@@ -256,6 +257,13 @@ const goToTower = () => {
              :message="`🎉 Bienvenue ${auth.user.username} ! Votre email a été vérifié avec succès. Votre aventure Pokémon peut commencer !`"
              dismissible @dismiss="dismissWelcomeAlert" />
     </div>
+    <button 
+      @click="showHelpModal = true"
+      class="fixed bottom-4 left-4 w-12 h-12 bg-info hover:bg-info/80 cursor-pointer hover:bg-base-300 text-white rounded-full flex items-center justify-center shadow-lg transition-all z-50"
+      title="Aide"
+    >
+      <span class="text-xl font-bold">?</span>
+    </button>
     <FriendsModal
       :show="friendsModalOpen"
       :onClose="() => friendsModalOpen = false"
@@ -269,4 +277,5 @@ const goToTower = () => {
       @dataRefreshed="handleDataRefreshed"
     />
   </div>
+  <HelpModal :show="showHelpModal" :onClose="() => showHelpModal = false" />
 </template>
