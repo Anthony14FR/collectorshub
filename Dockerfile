@@ -3,14 +3,15 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+RUN npm ci --only=production
+
 COPY vite.config.js tsconfig.json ./
-
-RUN npm ci
-
 COPY resources ./resources
 COPY public ./public
 
 RUN npm run build
+
+FROM composer:latest AS composer
 
 FROM php:8.2-fpm-alpine AS app
 
@@ -44,7 +45,7 @@ RUN apk add --no-cache \
 
 RUN pecl install redis && docker-php-ext-enable redis
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
@@ -52,8 +53,7 @@ RUN adduser -u 1000 -G www-data -s /bin/sh -D www-data 2>/dev/null || true
 
 COPY composer.json composer.lock ./
 COPY artisan ./
-
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 COPY . .
 
@@ -62,9 +62,6 @@ COPY --from=frontend-builder /app/public/build ./public/build
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
-
-RUN touch /var/www/html/database/database.sqlite \
-    && chown www-data:www-data /var/www/html/database/database.sqlite
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
@@ -87,9 +84,7 @@ FROM app AS development
 ENV APP_ENV=local
 ENV APP_DEBUG=true
 
-RUN composer install --optimize-autoloader
-
-RUN apk add --no-cache nodejs npm
+RUN composer install --optimize-autoloader --no-interaction
 
 RUN echo "opcache.enable=0" > /usr/local/etc/php/conf.d/opcache.ini
 

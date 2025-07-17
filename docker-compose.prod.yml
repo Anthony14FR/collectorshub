@@ -91,68 +91,68 @@ services:
       timeout: 3s
       retries: 3
 
-  queue-worker:
-    build:
-      context: .
-      target: production
-      dockerfile: Dockerfile
-    container_name: collectorshub_queue_prod
-    restart: unless-stopped
-    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
-    environment:
-      - APP_NAME=CollectorsHub
-      - APP_ENV=production
-      - APP_KEY=${APP_KEY}
-      - APP_DEBUG=false
-      - DB_CONNECTION=pgsql
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-collectorshub_prod}
-      - DB_USERNAME=${DB_USERNAME:-collectorshub_user}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - REDIS_HOST=redis
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
-      - REDIS_PORT=6379
-      - QUEUE_CONNECTION=redis
-    volumes:
-      - app_storage:/var/www/html/storage
-    networks:
-      - collectorshub_network
-    depends_on:
-      - postgres
-      - redis
-      - app
+  # queue-worker:
+  #   build:
+  #     context: .
+  #     target: production
+  #     dockerfile: Dockerfile
+  #   container_name: collectorshub_queue_prod
+  #   restart: unless-stopped
+  #   command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+  #   environment:
+  #     - APP_NAME=CollectorsHub
+  #     - APP_ENV=production
+  #     - APP_KEY=${APP_KEY}
+  #     - APP_DEBUG=false
+  #     - DB_CONNECTION=pgsql
+  #     - DB_HOST=postgres
+  #     - DB_PORT=5432
+  #     - DB_DATABASE=${DB_DATABASE:-collectorshub_prod}
+  #     - DB_USERNAME=${DB_USERNAME:-collectorshub_user}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_HOST=redis
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
+  #     - REDIS_PORT=6379
+  #     - QUEUE_CONNECTION=redis
+  #   volumes:
+  #     - app_storage:/var/www/html/storage
+  #   networks:
+  #     - collectorshub_network
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #     - app
 
-  scheduler:
-    build:
-      context: .
-      target: production
-      dockerfile: Dockerfile
-    container_name: collectorshub_scheduler_prod
-    restart: unless-stopped
-    command: sh -c "while true; do php artisan schedule:run && sleep 60; done"
-    environment:
-      - APP_NAME=CollectorsHub
-      - APP_ENV=production
-      - APP_KEY=${APP_KEY}
-      - APP_DEBUG=false
-      - DB_CONNECTION=pgsql
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-collectorshub_prod}
-      - DB_USERNAME=${DB_USERNAME:-collectorshub_user}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - REDIS_HOST=redis
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
-      - REDIS_PORT=6379
-    volumes:
-      - app_storage:/var/www/html/storage
-    networks:
-      - collectorshub_network
-    depends_on:
-      - postgres
-      - redis
-      - app
+  # scheduler:
+  #   build:
+  #     context: .
+  #     target: production
+  #     dockerfile: Dockerfile
+  #   container_name: collectorshub_scheduler_prod
+  #   restart: unless-stopped
+  #   command: sh -c "while true; do php artisan schedule:run && sleep 60; done"
+  #   environment:
+  #     - APP_NAME=CollectorsHub
+  #     - APP_ENV=production
+  #     - APP_KEY=${APP_KEY}
+  #     - APP_DEBUG=false
+  #     - DB_CONNECTION=pgsql
+  #     - DB_HOST=postgres
+  #     - DB_PORT=5432
+  #     - DB_DATABASE=${DB_DATABASE:-collectorshub_prod}
+  #     - DB_USERNAME=${DB_USERNAME:-collectorshub_user}
+  #     - DB_PASSWORD=${DB_PASSWORD}
+  #     - REDIS_HOST=redis
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
+  #     - REDIS_PORT=6379
+  #   volumes:
+  #     - app_storage:/var/www/html/storage
+  #   networks:
+  #     - collectorshub_network
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #     - app
 
 networks:
   collectorshub_network:
