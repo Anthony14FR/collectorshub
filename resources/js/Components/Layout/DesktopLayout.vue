@@ -6,13 +6,8 @@ import GameInventory from '@/Components/Game/GameInventory.vue';
 import UserMenu from '@/Components/Profile/UserMenu.vue';
 import PokedexSection from '@/Components/Game/PokedexSection.vue';
 import Button from '@/Components/UI/Button.vue';
-import Badge from '@/Components/UI/Badge.vue';
-import Badge from '@/Components/UI/Badge.vue';
 import { router } from '@inertiajs/vue3';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
-import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
-import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
-import { ref, computed } from 'vue';
 import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
 import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
 import { ref, computed } from 'vue';
@@ -62,9 +57,6 @@ const {
   onOpenFriendsModal,
   daily_quests = [],
   daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
-  onOpenFriendsModal,
-  daily_quests = [],
-  daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
 } = defineProps<Props>();
 
 const dailyQuestsModalOpen = ref(false);
@@ -72,13 +64,6 @@ const dailyQuestsModalOpen = ref(false);
 const unclaimedQuestsCount = computed(() => 
   daily_quests.filter(q => q.is_completed && !q.is_claimed).length
 );
-
-const dailyQuestsModalOpen = ref(false);
-
-const unclaimedQuestsCount = computed(() => 
-  daily_quests.filter(q => q.is_completed && !q.is_claimed).length
-);
-
 const goToInvocation = () => {
   router.visit('/opening');
 };
@@ -89,14 +74,6 @@ const goToShop = () => {
 
 const goToPokemonUpgrade = () => {
   router.visit('/pokemon-upgrade');
-};
-
-const handleQuestClaimed = (data: any) => {
-  router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
-};
-
-const handleBonusClaimed = (data: any) => {
-  router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
 };
 
 const handleQuestClaimed = (data: any) => {
@@ -382,14 +359,6 @@ const handleBonusClaimed = (data: any) => {
         </div>
       </div>
     </SideSection>
-    <DailyQuestsModal
-      :show="dailyQuestsModalOpen"
-      :onClose="() => dailyQuestsModalOpen = false"
-      :initial-quests="daily_quests"
-      :initial-stats="daily_quest_stats"
-      @questClaimed="handleQuestClaimed"
-      @bonusClaimed="handleBonusClaimed"
-    />
     <DailyQuestsModal
       :show="dailyQuestsModalOpen"
       :onClose="() => dailyQuestsModalOpen = false"

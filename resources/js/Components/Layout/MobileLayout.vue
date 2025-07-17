@@ -5,16 +5,12 @@ import UserMenu from '@/Components/Profile/UserMenu.vue';
 import TrainerProfile from '@/Components/Profile/TrainerProfile.vue';
 import Button from '@/Components/UI/Button.vue';
 import Badge from '@/Components/UI/Badge.vue';
-import Badge from '@/Components/UI/Badge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import { router } from '@inertiajs/vue3';
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
 import type { LevelReward, LevelRewardPreview } from "@/types/user";
-import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
-import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
-import { ref, computed } from 'vue';
 import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
 import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
 import { ref, computed } from 'vue';
@@ -37,8 +33,6 @@ interface Props {
   onOpenFriendsModal?: () => void;
   daily_quests?: DailyQuest[];
   daily_quest_stats?: DailyQuestStats;
-  daily_quests?: DailyQuest[];
-  daily_quest_stats?: DailyQuestStats;
 }
 
 const { 
@@ -56,9 +50,6 @@ const {
   level_rewards_preview,
   onGoToExpeditions,
   onGoToTower,
-  onOpenFriendsModal,
-  daily_quests = [],
-  daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
   onOpenFriendsModal,
   daily_quests = [],
   daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
@@ -90,19 +81,6 @@ const handleBonusClaimed = (data: any) => {
   router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
 };
 
-const dailyQuestsModalOpen = ref(false);
-
-const unclaimedQuestsCount = computed(() => 
-  daily_quests.filter(q => q.is_completed && !q.is_claimed).length
-);
-
-const handleQuestClaimed = (data: any) => {
-  router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
-};
-
-const handleBonusClaimed = (data: any) => {
-  router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
-};
 </script>
 
 <template>
@@ -111,7 +89,7 @@ const handleBonusClaimed = (data: any) => {
       <LevelDisplay :user="user" :responsive="true" :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview" />
     </div>
 
-    <div class="mb-3 mx-5">
+    <div class="mb-3 mt-3 relative mx-5">
       <Button 
         @click="dailyQuestsModalOpen = true"
         variant="secondary" 
@@ -120,16 +98,14 @@ const handleBonusClaimed = (data: any) => {
       >
         <div class="flex items-center justify-center gap-2">
           <span>Quêtes</span>
-          <Badge 
-            v-if="unclaimedQuestsCount > 0" 
-            variant="error" 
-            size="sm"
-            class="absolute -top-2 -right-2"
-          >
-            {{ unclaimedQuestsCount }}
-          </Badge>
         </div>
       </Button>
+      <div v-if="unclaimedQuestsCount > 0" class="absolute top-0 right-0 z-20" bis_skin_checked="1">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+        </span>
+      </div>
     </div>
 
     <div class="space-y-3">
@@ -299,14 +275,6 @@ const handleBonusClaimed = (data: any) => {
       </div>
     </div>
   </div>
-  <DailyQuestsModal
-    :show="dailyQuestsModalOpen"
-    :onClose="() => dailyQuestsModalOpen = false"
-    :initial-quests="daily_quests"
-    :initial-stats="daily_quest_stats"
-    @questClaimed="handleQuestClaimed"
-    @bonusClaimed="handleBonusClaimed"
-  />
   <DailyQuestsModal
     :show="dailyQuestsModalOpen"
     :onClose="() => dailyQuestsModalOpen = false"
