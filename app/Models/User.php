@@ -52,6 +52,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'unlocked_backgrounds',
         'totp_secret',
         'totp_enabled',
+        'infernal_tower_current_level',
+        'infernal_tower_daily_defeats',
+        'infernal_tower_last_reset',
     ];
 
     protected $hidden = [
@@ -65,6 +68,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'cash' => 0,
         'role' => 'user',
         'status' => 'active',
+        'infernal_tower_current_level' => 1,
+        'infernal_tower_daily_defeats' => 10,
     ];
 
     protected $casts = [
@@ -78,6 +83,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'provider_verified_at' => 'datetime',
         'claimed_level_rewards' => 'array',
         'unlocked_backgrounds' => 'array',
+        'infernal_tower_current_level' => 'integer',
+        'infernal_tower_daily_defeats' => 'integer',
+        'infernal_tower_last_reset' => 'datetime',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
@@ -167,7 +175,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getUnclaimedCount(): int
     {
-        return $this->userSuccesses()->where('is_claimed', false)->count();
+        return $this->unclaimedSuccesses()->count();
     }
 
     public function sendEmailVerificationNotification()
@@ -201,6 +209,22 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withTimestamps();
     }
 
+    public function resetInfernalTowerDailyDefeats(): void
+    {
+        $now = now();
+
+        if (is_null($this->infernal_tower_last_reset) || $this->infernal_tower_last_reset->isToday() === false) {
+            $this->infernal_tower_daily_defeats = 10;
+            $this->infernal_tower_last_reset = $now;
+            $this->save();
+        }
+    }
+
+    public function getRawDailyDefeats(): int
+    {
+        return $this->attributes['infernal_tower_daily_defeats'] ?? 0;
+    }
+
     public function userFriends()
     {
         return $this->hasMany(UserFriend::class, 'user_id');
@@ -217,7 +241,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserFriend::class, 'friend_id')->where('status', 'pending');
     }
 
-    // --- Relations pour les cadeaux d'amis ---
     public function userFriendGiftsSent()
     {
         return $this->hasMany(UserFriendGift::class, 'sender_id');
