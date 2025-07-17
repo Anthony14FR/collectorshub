@@ -92,26 +92,23 @@ const handleBonusClaimed = (data: any) => {
         <LevelDisplay :user="user" :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview" />
       </div>
 
-      <div class="mb-3">
+      <div class="mb-3 mt-3 relative">
         <Button 
           @click="dailyQuestsModalOpen = true"
-          variant="primary" 
+          variant="secondary" 
           size="sm"
           class="w-full relative"
         >
           <div class="flex items-center justify-center gap-2">
-            <span>📋</span>
             <span>Quêtes</span>
-            <Badge 
-              v-if="unclaimedQuestsCount > 0" 
-              variant="error" 
-              size="sm"
-              class="absolute -top-2 -right-2"
-            >
-              {{ unclaimedQuestsCount }}
-            </Badge>
           </div>
         </Button>
+        <div v-if="unclaimedQuestsCount > 0" class="absolute top-0 right-0 z-20" bis_skin_checked="1">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-error"></span>
+          </span>
+        </div>
       </div>
 
       <div class="z-20 mb-14">
