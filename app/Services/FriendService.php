@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\DB;
 
 class FriendService
 {
+    protected $successService;
+
+    public function __construct(SuccessService $successService)
+    {
+        $this->successService = $successService;
+    }
+
     public function sendFriendRequest(User $user, User $target): bool
     {
         if ($user->id === $target->id) {
@@ -59,6 +66,10 @@ class FriendService
                 'status' => 'accepted',
             ]);
         });
+
+        $this->successService->checkAndUnlockSuccesses($user);
+        $this->successService->checkAndUnlockSuccesses($requester);
+
         return true;
     }
 

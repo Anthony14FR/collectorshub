@@ -38,6 +38,12 @@ class SuccessService
                 return $this->checkCaptureRequirements($user, $requirements);
             case 'rarity':
                 return $this->checkRarityRequirements($user, $requirements);
+            case 'friend':
+                return $this->checkFriendRequirements($user, $requirements);
+            case 'tower':
+                return $this->checkTowerRequirements($user, $requirements);
+            case 'expedition':
+                return $this->checkExpeditionRequirements($user, $requirements);
             default:
                 return false;
         }
@@ -113,7 +119,15 @@ class SuccessService
     private function checkPokedexRequirements(User $user, array $requirements): bool
     {
         if (isset($requirements['count'])) {
-            $count = $user->pokedex()->count();
+            $query = $user->pokedex();
+
+            if (isset($requirements['shiny'])) {
+                $query->whereHas('pokemon', function ($pokemonQuery) use ($requirements) {
+                    $pokemonQuery->where('is_shiny', $requirements['shiny']);
+                });
+            }
+
+            $count = $query->count();
             return $count >= $requirements['count'];
         }
 
@@ -155,12 +169,49 @@ class SuccessService
     private function checkRarityRequirements(User $user, array $requirements): bool
     {
         if (isset($requirements['rarity']) && isset($requirements['count'])) {
-            $count = $user->pokedex()
-                ->whereHas('pokemon', function ($query) use ($requirements) {
-                    $query->where('rarity', $requirements['rarity']);
-                })
-                ->count();
+            $query = $user->pokedex()
+                ->whereHas('pokemon', function ($pokemonQuery) use ($requirements) {
+                    $pokemonQuery->where('rarity', $requirements['rarity']);
+
+                    if (isset($requirements['shiny'])) {
+                        $pokemonQuery->where('is_shiny', $requirements['shiny']);
+                    }
+                });
+
+            $count = $query->count();
             return $count >= $requirements['count'];
+        }
+
+        return false;
+    }
+
+    private function checkFriendRequirements(User $user, array $requirements): bool
+    {
+        if (isset($requirements['count'])) {
+            $friendCount = $user->friends()->count();
+            return $friendCount >= $requirements['count'];
+        }
+
+        return false;
+    }
+
+    private function checkTowerRequirements(User $user, array $requirements): bool
+    {
+        if (isset($requirements['level'])) {
+            $completedLevels = $user->infernal_tower_current_level - 1;
+            return $completedLevels >= $requirements['level'];
+        }
+
+        return false;
+    }
+
+    private function checkExpeditionRequirements(User $user, array $requirements): bool
+    {
+        if (isset($requirements['count'])) {
+            $completedExpeditions = $user->userExpeditions()
+                ->where('status', 'completed')
+                ->count();
+            return $completedExpeditions >= $requirements['count'];
         }
 
         return false;

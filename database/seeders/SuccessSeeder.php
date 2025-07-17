@@ -212,11 +212,114 @@ class SuccessSeeder extends Seeder
                 'requirements' => ['count' => 7, 'rarity' => 'legendary', 'shiny' => true],
                 'cash_reward' => 30000,
                 'xp_reward' => 15000
+            ],
+            [
+                'key' => '21',
+                'title' => 'Premier ami',
+                'description' => 'Ajouter ton premier ami.',
+                'image' => '27.png',
+                'type' => 'friend',
+                'requirements' => ['count' => 1],
+                'cash_reward' => 500,
+                'xp_reward' => 250
+            ],
+            [
+                'key' => '22',
+                'title' => 'Grimpeur débutant',
+                'description' => 'Terminer 50 étages dans la tour infernale.',
+                'image' => '21.png',
+                'type' => 'tower',
+                'requirements' => ['level' => 50],
+                'cash_reward' => 3500,
+                'xp_reward' => 1500
+            ],
+            [
+                'key' => '23',
+                'title' => 'Grimpeur confirmé',
+                'description' => 'Terminer 100 étages dans la tour infernale.',
+                'image' => '28.png',
+                'type' => 'tower',
+                'requirements' => ['level' => 100],
+                'cash_reward' => 25000,
+                'xp_reward' => 5000
+            ],
+            [
+                'key' => '24',
+                'title' => 'Maître grimpeur',
+                'description' => 'Terminer 200 étages dans la tour infernale.',
+                'image' => '29.png',
+                'type' => 'tower',
+                'requirements' => ['level' => 200],
+                'cash_reward' => 35000,
+                'xp_reward' => 10000
+            ],
+            [
+                'key' => '25',
+                'title' => 'Conquérant de la tour',
+                'description' => 'Terminer 300 étages dans la tour infernale.',
+                'image' => '22.png',
+                'type' => 'tower',
+                'requirements' => ['level' => 300],
+                'cash_reward' => 50000,
+                'xp_reward' => 20000
+            ],
+            [
+                'key' => '26',
+                'title' => 'Légende de la tour',
+                'description' => 'Terminer 450 étages dans la tour infernale.',
+                'image' => '23.png',
+                'type' => 'tower',
+                'requirements' => ['level' => 450],
+                'cash_reward' => 100000,
+                'xp_reward' => 35000
+            ],
+            [
+                'key' => '27',
+                'title' => 'Explorateur débutant',
+                'description' => 'Terminer 5 expéditions.',
+                'image' => '24.png',
+                'type' => 'expedition',
+                'requirements' => ['count' => 5],
+                'cash_reward' => 1500,
+                'xp_reward' => 1500
+            ],
+            [
+                'key' => '28',
+                'title' => 'Explorateur confirmé',
+                'description' => 'Terminer 25 expéditions.',
+                'image' => '30.png',
+                'type' => 'expedition',
+                'requirements' => ['count' => 25],
+                'cash_reward' => 5500,
+                'xp_reward' => 6000
+            ],
+            [
+                'key' => '29',
+                'title' => 'Maître explorateur',
+                'description' => 'Terminer 50 expéditions.',
+                'image' => '25.png',
+                'type' => 'expedition',
+                'requirements' => ['count' => 50],
+                'cash_reward' => 10000,
+                'xp_reward' => 10000
+            ],
+            [
+                'key' => '30',
+                'title' => 'Légende de l\'exploration',
+                'description' => 'Terminer 100 expéditions.',
+                'image' => '26.png',
+                'type' => 'expedition',
+                'requirements' => ['count' => 100],
+                'cash_reward' => 20000,
+                'xp_reward' => 20000
             ]
         ];
 
         foreach ($successes as $success) {
-            Success::create($success);
+            Success::updateOrCreate(
+                ['key' => $success['key']],
+                $success
+            );
         }
     }
 }
