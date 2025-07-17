@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Cache;
 
 class InfernalTowerService
 {
+    protected $successService;
+
+    public function __construct(SuccessService $successService)
+    {
+        $this->successService = $successService;
+    }
+
     public function getTowerLevels(User $user)
     {
         $currentLevel = $user->infernal_tower_current_level;
@@ -69,6 +76,8 @@ class InfernalTowerService
                 $user->save();
 
                 $this->applyRewards($user, $towerLevel->rewards);
+
+                $this->successService->checkAndUnlockSuccesses($user);
 
                 return ['success' => true, 'message' => 'Félicitations, vous avez vaincu ce niveau !', 'rewards' => $towerLevel->rewards];
             } else {
