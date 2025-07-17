@@ -109,10 +109,14 @@ docker-up-prod:
 	@echo "🏭 Démarrage de l'environnement de production..."
 	docker compose -f docker-compose.prod.yml build
 	docker compose -f docker-compose.prod.yml up -d
-	@echo "⏳ Attente que les services soient prêts..."
-	sleep 15
-	docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
 	@echo "✅ Environnement de production démarré !"
+
+docker-prod-mep:
+	make main
+	make install
+	docker compose -f docker-compose.prod.yml build --no-cache
+	docker compose -f docker-compose.prod.yml up -d
+	docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
 
 docker-prod-seed:
 	docker compose -f docker-compose.prod.yml exec app php artisan db:seed --force

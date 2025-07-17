@@ -27,7 +27,8 @@ class GameConfigurationController extends Controller
             'categories' => [
                 'level_rewards' => 'Récompenses de niveau',
                 'rarity_probabilities' => 'Probabilités de rareté',
-                'xp_rewards' => 'Gains d\'XP'
+                'xp_rewards' => 'Gains d\'XP',
+                'shiny_rate' => 'Taux de shiny'
             ]
         ]);
     }
@@ -37,7 +38,7 @@ class GameConfigurationController extends Controller
         $request->validate([
             'category' => 'required|string',
             'key' => 'required|string',
-            'value' => 'required|array'
+            'value' => 'required'
         ]);
 
         GameConfiguration::setValue(
@@ -108,6 +109,9 @@ class GameConfigurationController extends Controller
                         'first_catch_bonus' => 15
                     ]
                 ]
+            ],
+            'shiny_rate' => [
+                'chance' => 1
             ]
         ];
 

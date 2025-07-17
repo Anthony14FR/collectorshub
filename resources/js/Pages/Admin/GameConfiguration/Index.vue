@@ -330,7 +330,8 @@ const getCategoryIcon = (category: string): string => {
   const icons: Record<string, string> = {
     'level_rewards': '🎯',
     'rarity_probabilities': '🎲',
-    'xp_rewards': '⭐'
+    'xp_rewards': '⭐',
+    'shiny_rate': '✨'
   }
   return icons[category] || '⚙️'
 }

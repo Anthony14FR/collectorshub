@@ -67,6 +67,12 @@ class GameConfigurationSeeder extends Seeder
                     ]
                 ],
                 'description' => 'Gains d\'XP par rareté et bonus'
+            ],
+            [
+                'category' => 'shiny_rate',
+                'key' => 'chance',
+                'value' => 1,
+                'description' => 'Taux de chance d\'obtenir un Pokémon shiny (en pourcentage)'
             ]
         ];
 
