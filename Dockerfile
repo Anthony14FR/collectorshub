@@ -13,6 +13,26 @@ RUN npm run build
 
 FROM composer:latest AS composer
 
+FROM php:8.2-fpm-alpine AS php-builder
+
+RUN apk add --no-cache \
+    oniguruma-dev \
+    libxml2-dev \
+    postgresql-dev \
+    autoconf \
+    g++ \
+    make \
+    && docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \
+    mbstring \
+    xml \
+    bcmath \
+    opcache
+
+RUN pecl install redis && docker-php-ext-enable redis
+
 FROM php:8.2-fpm-alpine AS app
 
 ENV APP_ENV=production
@@ -24,26 +44,10 @@ RUN apk add --no-cache \
     zip \
     unzip \
     git \
-    curl \
-    oniguruma-dev \
-    libxml2-dev \
-    postgresql-dev \
-    sqlite \
-    sqlite-dev \
-    autoconf \
-    g++ \
-    make \
-    && docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
-    pdo_sqlite \
-    mbstring \
-    xml \
-    bcmath \
-    opcache
+    curl
 
-RUN pecl install redis && docker-php-ext-enable redis
+COPY --from=php-builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=php-builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
@@ -55,9 +59,9 @@ COPY composer.json composer.lock ./
 COPY artisan ./
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
-COPY . .
-
 COPY --from=frontend-builder /app/public/build ./public/build
+
+COPY . .
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
