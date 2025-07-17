@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\TotpService;
 use App\Services\XpService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,6 +50,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'claimed_level_rewards',
         'background',
         'unlocked_backgrounds',
+        'totp_secret',
+        'totp_enabled',
     ];
 
     protected $hidden = [
@@ -134,8 +137,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function successes()
     {
         return $this->belongsToMany(Success::class, 'user_successes')
-                    ->withTimestamps()
-                    ->withPivot('unlocked_at', 'is_claimed', 'claimed_at');
+            ->withTimestamps()
+            ->withPivot('unlocked_at', 'is_claimed', 'claimed_at');
     }
 
     public function userSuccesses()
@@ -146,15 +149,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function unclaimedSuccesses()
     {
         return $this->userSuccesses()
-                    ->where('is_claimed', false)
-                    ->with('success');
+            ->where('is_claimed', false)
+            ->with('success');
     }
 
     public function claimedSuccesses()
     {
         return $this->userSuccesses()
-                    ->where('is_claimed', true)
-                    ->with('success');
+            ->where('is_claimed', true)
+            ->with('success');
     }
 
     public function hasSuccess($successKey): bool
@@ -228,5 +231,58 @@ class User extends Authenticatable implements MustVerifyEmail
     public function friendGiftsToClaim()
     {
         return $this->userFriendGiftsReceived()->where('is_claimed', false);
+    }
+
+    public function enableTotp(string $verificationCode): bool
+    {
+        $totpService = app(TotpService::class);
+
+        if (!$this->totp_secret) {
+            $this->totp_secret = $totpService->generateSecret();
+        }
+
+        if (!$totpService->verifyCode($this->totp_secret, $verificationCode)) {
+            return false;
+        }
+
+        $this->totp_enabled = true;
+        $this->save();
+
+        return true;
+    }
+
+    public function disableTotp(): void
+    {
+        $this->totp_enabled = false;
+        $this->totp_secret = null;
+        $this->save();
+    }
+
+    public function hasTotpEnabled(): bool
+    {
+        return $this->totp_enabled && !is_null($this->totp_secret);
+    }
+
+    public function verifyTotpCode(string $code): bool
+    {
+        if (!$this->hasTotpEnabled()) {
+            return false;
+        }
+
+        return app(TotpService::class)->verifyCode($this->totp_secret, $code);
+    }
+
+    public function getTotpQrUrl(): string
+    {
+        if (!$this->totp_secret) {
+            $this->totp_secret = app(TotpService::class)->generateSecret();
+            $this->save();
+        }
+
+        return app(TotpService::class)->getQrCodeUrl(
+            $this->totp_secret,
+            config('app.name'),
+            $this->email
+        );
     }
 }
