@@ -31,6 +31,9 @@ return new class () extends Migration {
             $table->integer('special_defense');
             $table->integer('generation')->nullable();
             $table->timestamps();
+
+            $table->index(['rarity', 'is_shiny']);
+            $table->index(['pokedex_id', 'is_shiny']);
         });
     }
 
