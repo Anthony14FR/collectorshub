@@ -55,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'infernal_tower_current_level',
         'infernal_tower_daily_defeats',
         'infernal_tower_last_reset',
+        'daily_quest_bonus_claimed_date',
     ];
 
     protected $hidden = [
@@ -86,6 +87,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'infernal_tower_current_level' => 'integer',
         'infernal_tower_daily_defeats' => 'integer',
         'infernal_tower_last_reset' => 'datetime',
+        'daily_quest_bonus_claimed_date' => 'date',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
@@ -307,5 +309,21 @@ class User extends Authenticatable implements MustVerifyEmail
             config('app.name'),
             $this->email
         );
+    }
+
+    public function dailyQuestProgress(): HasMany
+    {
+        return $this->hasMany(UserDailyQuestProgress::class);
+    }
+
+    public function todayQuestProgress(): HasMany
+    {
+        return $this->dailyQuestProgress()->where('date', today());
+    }
+
+    public function canClaimDailyBonus(): bool
+    {
+        return is_null($this->daily_quest_bonus_claimed_date) ||
+               !$this->daily_quest_bonus_claimed_date->isToday();
     }
 }

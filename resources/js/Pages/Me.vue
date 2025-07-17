@@ -43,6 +43,8 @@ interface Props extends PageProps {
   friend_requests: FriendRequest[];
   friends: UserFriend[];
   suggestions: User[];
+  daily_quests?: any[];
+  daily_quest_stats?: any;
 }
 
 const {
@@ -61,6 +63,8 @@ const {
   friend_requests = [],
   friends = [],
   suggestions = [],
+  daily_quests = [],
+  daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
 } = defineProps<Props>();
 
 const pokedexModalOpen = ref(false);
@@ -198,6 +202,8 @@ const goToTower = () => {
         :onGoToTower="goToTower"
         :onOpenFriendsModal="openFriendsModal"
         :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
+        :daily_quests="daily_quests"
+        :daily_quest_stats="daily_quest_stats"
       />
 
       <DesktopLayout
@@ -217,6 +223,8 @@ const goToTower = () => {
         :onGoToTower="goToTower"
         :onOpenFriendsModal="openFriendsModal"
         :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
+        :daily_quests="daily_quests"
+        :daily_quest_stats="daily_quest_stats"
       />
     </div>
 

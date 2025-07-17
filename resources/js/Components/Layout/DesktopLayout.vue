@@ -6,8 +6,12 @@ import GameInventory from '@/Components/Game/GameInventory.vue';
 import UserMenu from '@/Components/Profile/UserMenu.vue';
 import PokedexSection from '@/Components/Game/PokedexSection.vue';
 import Button from '@/Components/UI/Button.vue';
+import Badge from '@/Components/UI/Badge.vue';
 import { router } from '@inertiajs/vue3';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
+import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
+import { ref, computed } from 'vue';
 
 import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
@@ -30,6 +34,8 @@ interface Props {
   onGoToExpeditions?: () => void;
   onGoToTower?: () => void;
   onOpenFriendsModal?: () => void;
+  daily_quests?: DailyQuest[];
+  daily_quest_stats?: DailyQuestStats;
 }
 
 const { 
@@ -47,8 +53,16 @@ const {
   level_rewards_preview,
   onGoToExpeditions,
   onGoToTower,
-  onOpenFriendsModal
+  onOpenFriendsModal,
+  daily_quests = [],
+  daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
 } = defineProps<Props>();
+
+const dailyQuestsModalOpen = ref(false);
+
+const unclaimedQuestsCount = computed(() => 
+  daily_quests.filter(q => q.is_completed && !q.is_claimed).length
+);
 
 const goToInvocation = () => {
   router.visit('/opening');
@@ -61,6 +75,14 @@ const goToShop = () => {
 const goToPokemonUpgrade = () => {
   router.visit('/pokemon-upgrade');
 };
+
+const handleQuestClaimed = (data: any) => {
+  router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
+};
+
+const handleBonusClaimed = (data: any) => {
+  router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
+};
 </script>
 
 <template>
@@ -68,6 +90,28 @@ const goToPokemonUpgrade = () => {
     <div class="flex flex-col space-y-1 w-72 mx-auto">
       <div class="flex justify-center mt-4">
         <LevelDisplay :user="user" :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview" />
+      </div>
+
+      <div class="mb-3">
+        <Button 
+          @click="dailyQuestsModalOpen = true"
+          variant="primary" 
+          size="sm"
+          class="w-full relative"
+        >
+          <div class="flex items-center justify-center gap-2">
+            <span>📋</span>
+            <span>Quêtes</span>
+            <Badge 
+              v-if="unclaimedQuestsCount > 0" 
+              variant="error" 
+              size="sm"
+              class="absolute -top-2 -right-2"
+            >
+              {{ unclaimedQuestsCount }}
+            </Badge>
+          </div>
+        </Button>
       </div>
 
       <div class="z-20 mb-14">
@@ -318,5 +362,13 @@ const goToPokemonUpgrade = () => {
         </div>
       </div>
     </SideSection>
+    <DailyQuestsModal
+      :show="dailyQuestsModalOpen"
+      :onClose="() => dailyQuestsModalOpen = false"
+      :initial-quests="daily_quests"
+      :initial-stats="daily_quest_stats"
+      @questClaimed="handleQuestClaimed"
+      @bonusClaimed="handleBonusClaimed"
+    />
   </div>
 </template>

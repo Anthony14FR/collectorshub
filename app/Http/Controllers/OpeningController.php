@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Pokemon;
+use App\Services\DailyQuestService;
 use App\Services\GameConfigurationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,8 @@ use Inertia\Inertia;
 class OpeningController extends Controller
 {
     public function __construct(
-        private GameConfigurationService $configService
+        private GameConfigurationService $configService,
+        private DailyQuestService $dailyQuestService
     ) {
     }
 
@@ -65,6 +67,8 @@ class OpeningController extends Controller
 
             $inventory->quantity -= $quantity;
             $inventory->save();
+
+            $this->dailyQuestService->incrementQuestProgress($user, 'invoke_pokemon', $quantity);
 
             return response()->json([
                 'success' => true,
