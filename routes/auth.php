@@ -42,6 +42,11 @@ Route::middleware('guest')->group(function () {
     Route::get('auth/{provider}/callback', [SocialAuthController::class, 'callback'])
         ->name('social.callback')
         ->where('provider', 'google|discord');
+
+    Route::get('totp/verify', [AuthenticatedSessionController::class, 'showTotpVerification'])
+        ->name('totp.verify');
+    Route::post('totp/verify', [AuthenticatedSessionController::class, 'verifyTotp'])
+        ->name('totp.verify.post');
 });
 
 // Route de vérification email - DOIT être accessible même déconnecté
@@ -64,6 +69,8 @@ Route::middleware('auth')->group(function () {
 
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+    Route::get('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->name('logout.post');
 });

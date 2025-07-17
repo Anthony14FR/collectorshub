@@ -6,6 +6,7 @@ import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import Alert from '@/Components/UI/Alert.vue';
+import Badge from '@/Components/UI/Badge.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 
@@ -15,6 +16,7 @@ interface Props extends PageProps {
   };
   mustVerifyEmail?: boolean;
   status?: string;
+  success?: string;
 }
 
 const props = defineProps<Props>();
@@ -65,11 +67,24 @@ const backgroundForm = reactive({
   errors: {} as Record<string, string>,
 });
 
+const totpForm = reactive({
+  enabled: props.auth.user.totp_enabled || false,
+  processing: false,
+  errors: {} as Record<string, string>,
+});
+
+const updateTotpState = () => {
+  totpForm.enabled = props.auth.user.totp_enabled || false;
+};
+
+updateTotpState();
+
 
 const showProfileModal = ref(false);
 const showPasswordModal = ref(false);
 const showAvatarModal = ref(false);
 const showBackgroundModal = ref(false);
+const showTotpModal = ref(false);
 const showAlert = ref(false);
 const alertType = ref<'success' | 'error'>('success');
 const alertMessage = ref('');
@@ -197,8 +212,49 @@ const showSuccessAlert = (message: string) => {
   }, 4000);
 };
 
+if (props.success) {
+  showSuccessAlert(props.success);
+}
+
+const showErrorAlert = (message: string) => {
+  alertType.value = 'error';
+  alertMessage.value = message;
+  showAlert.value = true;
+  setTimeout(() => {
+    showAlert.value = false;
+  }, 4000);
+};
+
 const goToProfile = () => {
   router.visit('/me');
+};
+
+const toggleTotp = () => {
+  if (totpForm.enabled) {
+    disableTotp();
+  } else {
+    enableTotp();
+  }
+};
+
+const disableTotp = () => {
+  totpForm.processing = true;
+  
+  router.post('/profile/totp/disable', {}, {
+    onSuccess: () => {
+      totpForm.processing = false;
+      updateTotpState();
+    },
+    onError: (errors: Record<string, string>) => {
+      totpForm.errors = errors;
+      totpForm.processing = false;
+      showErrorAlert('Erreur lors de la désactivation du TOTP');
+    }
+  });
+};
+
+const enableTotp = () => {
+  router.visit('/profile/totp');
 };
 </script>
 
@@ -304,22 +360,65 @@ const goToProfile = () => {
 
                 <div class="space-y-4">
                   <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold flex items-center gap-2">
-                      <span class="text-xl">🔐</span>
-                      Sécurité
-                    </h3>
-                    <Button @click="showPasswordModal = true" variant="secondary" size="sm">
-                      Changer
-                    </Button>
-                  </div>
-                  <div class="space-y-3">
                     <div>
-                      <label class="text-sm font-medium text-base-content/70">Mot de passe</label>
-                      <div class="mt-1 p-3 bg-base-200/50 rounded-lg">••••••••</div>
+                      <h3 class="text-lg font-semibold flex items-center gap-2">
+                        <span class="text-xl">🔐</span>
+                        Sécurité
+                      </h3>
+                      <p class="text-sm text-base-content/60 mt-1">
+                        Gérez la sécurité de votre compte et l'authentification à deux facteurs
+                      </p>
                     </div>
-                    <div>
-                      <label class="text-sm font-medium text-base-content/70">Membre depuis</label>
-                      <div class="mt-1 p-3 bg-base-200/50 rounded-lg">{{ formattedJoinDate }}</div>
+                  </div>
+                  
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30">
+                      <div>
+                        <label class="text-sm font-medium text-base-content/70">Mot de passe</label>
+                        <div class="mt-1 text-base-content">••••••••</div>
+                      </div>
+                      <Button @click="showPasswordModal = true" variant="secondary" size="sm">
+                        Changer
+                      </Button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30 gap-3">
+                      <div class="flex-1">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2 sm:mb-0">
+                          <label class="text-sm font-medium text-base-content/70">
+                            Authentification à deux facteurs
+                          </label>
+                          <Badge 
+                            :variant="totpForm.enabled ? 'success' : 'ghost'" 
+                            size="sm"
+                          >
+                            {{ totpForm.enabled ? 'Activé' : 'Désactivé' }}
+                          </Badge>
+                        </div>
+                        <p class="text-xs text-base-content/50">
+                          {{ totpForm.enabled 
+                            ? 'Votre compte est protégé par un authentificateur' 
+                            : 'Ajoutez une couche de sécurité supplémentaire avec un authentificateur'
+                          }}
+                        </p>
+                      </div>
+                      <Button 
+                        @click="toggleTotp" 
+                        :variant="totpForm.enabled ? 'secondary' : 'primary'" 
+                        size="sm"
+                        :disabled="totpForm.processing"
+                        class="w-full sm:w-auto"
+                      >
+                        <span v-if="totpForm.processing" class="loading loading-spinner loading-xs"></span>
+                        {{ totpForm.enabled ? 'Désactiver' : 'Configurer' }}
+                      </Button>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30">
+                      <div>
+                        <label class="text-sm font-medium text-base-content/70">Membre depuis</label>
+                        <div class="mt-1 text-base-content">{{ formattedJoinDate }}</div>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -22,6 +22,8 @@ export type User = {
     experience_for_next_level: number;
     experience_percentage: number;
     claimed_level_rewards?: string[];
+    totp_enabled?: boolean;
+    totp_secret?: string;
 }
 
 export type PokedexEntry = {

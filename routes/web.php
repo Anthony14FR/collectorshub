@@ -32,6 +32,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route pour Me
     Route::get('/me', [MeController::class, 'index'])->name('me');
 
+    // Routes 2FA
+    Route::get('/profile/totp', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'setupTotp'])->name('totp.setup');
+    Route::post('/profile/totp/enable', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'enableTotp'])->name('totp.enable');
+    Route::post('/profile/totp/disable', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'disableTotp'])->name('totp.disable');
+
     // Route pour voir le profil d'un utilisateur
     Route::get('/profile/{user:username}', [UserProfileController::class, 'show'])->middleware(['verified'])->name('user.profile.show');
 
