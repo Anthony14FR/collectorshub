@@ -1,12 +1,11 @@
 <?php
 
 use App\Http\Controllers\ExpeditionController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\InfernalTowerController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PokemonUpgradeController;
-use App\Http\Controllers\FriendController;
 use Illuminate\Support\Facades\Route;
-
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::post('/opening', [OpeningController::class, 'open'])->name('opening.open');
