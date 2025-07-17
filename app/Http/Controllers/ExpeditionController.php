@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expedition;
+use App\Services\DailyQuestService;
 use App\Services\ExpeditionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,9 +13,12 @@ class ExpeditionController extends Controller
 {
     protected $expeditionService;
 
-    public function __construct(ExpeditionService $expeditionService)
-    {
+    public function __construct(
+        ExpeditionService $expeditionService,
+        DailyQuestService $dailyQuestService
+    ) {
         $this->expeditionService = $expeditionService;
+        $this->dailyQuestService = $dailyQuestService;
     }
 
     public function index()
@@ -91,6 +95,7 @@ class ExpeditionController extends Controller
             $result = $this->expeditionService->claimExpedition($user, $request->user_expedition_id);
 
             if ($result['success']) {
+                $this->dailyQuestService->incrementQuestProgress($user, 'complete_expedition');
                 return response()->json([
                     'success' => true,
                     'message' => $result['message'],

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DailyQuestService;
 use App\Services\InfernalTowerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,9 +12,12 @@ class InfernalTowerController extends Controller
 {
     protected $infernalTowerService;
 
-    public function __construct(InfernalTowerService $infernalTowerService)
-    {
+    public function __construct(
+        InfernalTowerService $infernalTowerService,
+        DailyQuestService $dailyQuestService
+    ) {
         $this->infernalTowerService = $infernalTowerService;
+        $this->dailyQuestService = $dailyQuestService;
     }
 
     public function index()
@@ -53,6 +57,8 @@ class InfernalTowerController extends Controller
         }
 
         $result = $this->infernalTowerService->attemptLevel($user, $request->level);
+
+        $this->dailyQuestService->incrementQuestProgress($user, 'use_tower_attempts');
 
         return response()->json($result);
     }
