@@ -2,8 +2,12 @@ FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
 
+ENV NODE_ENV=production
+ENV VITE_APP_URL=https://collectorshub.fr
+ENV VITE_APP_NAME=CollectorsHub
+
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci --ignore-scripts
 
 COPY vite.config.js tsconfig.json ./
 COPY resources ./resources
@@ -21,8 +25,9 @@ RUN apk add --no-cache \
     postgresql-dev \
     autoconf \
     g++ \
-    make \
-    && docker-php-ext-install \
+    make
+
+RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
     pdo_pgsql \
@@ -44,7 +49,8 @@ RUN apk add --no-cache \
     zip \
     unzip \
     git \
-    curl
+    curl \
+    postgresql-libs
 
 COPY --from=php-builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=php-builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
