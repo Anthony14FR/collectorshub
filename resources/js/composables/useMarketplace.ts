@@ -1,16 +1,15 @@
-import { ref, computed } from 'vue';
-import { router } from '@inertiajs/vue3';
-import type { 
-  MarketplaceListing, 
+import type {
   MarketplaceFilters,
-  NormalizedPokemon 
+  MarketplaceListing,
+  NormalizedPokemon
 } from '@/types/marketplace';
-import { 
-  normalizePokemonData,
-  formatPrice,
+import {
   calculateMarketplaceStats,
-  filterListings
+  formatPrice,
+  normalizePokemonData
 } from '@/utils/marketplace';
+import { router } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 
 export function useMarketplace() {
   const loading = ref(false);
@@ -39,24 +38,24 @@ export function useMarketplace() {
 
   const typeOptions = [
     { value: '', label: 'Tous' },
-    { value: 'normal', label: 'Normal' },
-    { value: 'fire', label: 'Feu' },
-    { value: 'water', label: 'Eau' },
-    { value: 'electric', label: 'Électrique' },
-    { value: 'grass', label: 'Plante' },
-    { value: 'ice', label: 'Glace' },
-    { value: 'fighting', label: 'Combat' },
-    { value: 'poison', label: 'Poison' },
-    { value: 'ground', label: 'Sol' },
-    { value: 'flying', label: 'Vol' },
-    { value: 'psychic', label: 'Psy' },
-    { value: 'bug', label: 'Insecte' },
-    { value: 'rock', label: 'Roche' },
-    { value: 'ghost', label: 'Spectre' },
-    { value: 'dragon', label: 'Dragon' },
-    { value: 'dark', label: 'Ténèbres' },
-    { value: 'steel', label: 'Acier' },
-    { value: 'fairy', label: 'Fée' }
+    { value: 'Normal', label: 'Normal' },
+    { value: 'Feu', label: 'Feu' },
+    { value: 'Eau', label: 'Eau' },
+    { value: 'Electrik', label: 'Électrique' },
+    { value: 'Plante', label: 'Plante' },
+    { value: 'Glace', label: 'Glace' },
+    { value: 'Combat', label: 'Combat' },
+    { value: 'Poison', label: 'Poison' },
+    { value: 'Sol', label: 'Sol' },
+    { value: 'Vol', label: 'Vol' },
+    { value: 'Psy', label: 'Psy' },
+    { value: 'Insecte', label: 'Insecte' },
+    { value: 'Roche', label: 'Roche' },
+    { value: 'Spectre', label: 'Spectre' },
+    { value: 'Dragon', label: 'Dragon' },
+    { value: 'Tenebres', label: 'Ténèbres' },
+    { value: 'Acier', label: 'Acier' },
+    { value: 'Fee', label: 'Fée' }
   ];
 
   const shinyOptions = [
@@ -66,17 +65,17 @@ export function useMarketplace() {
   ];
 
   const stats = computed(() => calculateMarketplaceStats(otherListings.value));
-  
+
   const displayedListings = computed(() => otherListings.value);
 
   const getPokemonData = (listing: MarketplaceListing): NormalizedPokemon => {
     return normalizePokemonData(listing);
   };
 
-  const initializeData = (data: { 
-    myListings: MarketplaceListing[], 
+  const initializeData = (data: {
+    myListings: MarketplaceListing[],
     otherListings: MarketplaceListing[],
-    userId?: number 
+    userId?: number
   }) => {
     myListings.value = data.myListings || [];
     otherListings.value = data.otherListings || [];
@@ -87,10 +86,10 @@ export function useMarketplace() {
 
   const applyFilters = async () => {
     loading.value = true;
-    
+
     try {
       const params: any = {};
-      
+
       if (filters.value.rarity) params.rarity = filters.value.rarity;
       if (filters.value.type) params.type = filters.value.type;
       if (filters.value.isShiny) params.isShiny = filters.value.isShiny;
@@ -99,11 +98,11 @@ export function useMarketplace() {
 
       const response = await fetch(`/marketplace/listings?${new URLSearchParams(params)}`);
       const data = await response.json();
-      
-      const filteredData = currentUserId.value 
+
+      const filteredData = currentUserId.value
         ? data.filter((listing: MarketplaceListing) => listing.seller_id !== currentUserId.value)
         : data;
-      
+
       otherListings.value = filteredData;
     } catch (error) {
       console.error('Erreur lors de la récupération des annonces:', error);

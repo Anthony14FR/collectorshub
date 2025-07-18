@@ -50,6 +50,9 @@ interface Props extends PageProps {
   suggestions: User[];
   daily_quests?: any[];
   daily_quest_stats?: any;
+  expeditions?: any[];
+  has_completed_expeditions?: boolean;
+  has_infernal_tower_attempts?: boolean;
 }
 
 interface RefreshedData {
@@ -79,6 +82,8 @@ const {
   suggestions = [],
   daily_quests = [],
   daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
+  has_completed_expeditions = false,
+  has_infernal_tower_attempts = false,
 } = defineProps<Props>();
 
 const pokedexModalOpen = ref(false);
@@ -197,47 +202,31 @@ const goToTower = () => {
     <BackgroundEffects />
 
     <div class="relative z-50 h-screen w-screen overflow-x-hidden">
-      <MobileLayout
-        :user="auth.user"
-        :inventory="inventory"
-        :pokedex="pokedex"
-        :level_rewards_to_claim="level_rewards_to_claim"
-        :level_rewards_preview="level_rewards_preview"
-        :team-pokemons="userTeamPokemons"
-        :onOpenPokedexModal="() => pokedexModalOpen = true"
-        :onGoToMarketplace="goToMarketplace"
-        :onGoToLeaderboard="goToLeaderboard"
-        :onOpenTeamManagementModal="openTeamManagementModal"
-        :onOpenBadgesModal="openBadgesModal"
-        :has-unclaimed-successes="unclaimed_successes.length > 0"
-        :onGoToExpeditions="goToExpeditions"
-        :onGoToTower="goToTower"
-        :onOpenFriendsModal="openFriendsModal"
-        :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
-        :daily_quests="daily_quests"
-        :daily_quest_stats="daily_quest_stats"
-      />
+      <MobileLayout :user="auth.user" :inventory="inventory" :pokedex="pokedex"
+                    :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview"
+                    :team-pokemons="userTeamPokemons" :onOpenPokedexModal="() => pokedexModalOpen = true"
+                    :onGoToMarketplace="goToMarketplace" :onGoToLeaderboard="goToLeaderboard"
+                    :onOpenTeamManagementModal="openTeamManagementModal" :onOpenBadgesModal="openBadgesModal"
+                    :has-unclaimed-successes="unclaimed_successes.length > 0" :onGoToExpeditions="goToExpeditions"
+                    :onGoToTower="goToTower" :onOpenFriendsModal="openFriendsModal"
+                    :has-unclaimed-gifts="friend_gifts_to_claim.length > 0" :daily_quests="daily_quests"
+                    :daily_quest_stats="daily_quest_stats" :announcements="announcements" :marketplace-history="marketplace_history"
+                    :unreadNotificationsCount="unread_notifications_count" :hasFriendRequests="friend_requests.length > 0"
+                    :hasUnclaimedFriendGifts="friend_gifts_to_claim.length > 0" :hasCompletedExpeditions="has_completed_expeditions"
+                    :hasInfernalTowerAttempts="has_infernal_tower_attempts" />
 
-      <DesktopLayout
-        :user="auth.user"
-        :inventory="inventory"
-        :pokedex="pokedex"
-        :level_rewards_to_claim="level_rewards_to_claim"
-        :level_rewards_preview="level_rewards_preview"
-        :team-pokemons="userTeamPokemons"
-        :onOpenPokedexModal="() => pokedexModalOpen = true"
-        :onGoToMarketplace="goToMarketplace"
-        :onGoToLeaderboard="goToLeaderboard"
-        :onOpenTeamManagementModal="openTeamManagementModal"
-        :onOpenBadgesModal="openBadgesModal"
-        :has-unclaimed-successes="unclaimed_successes.length > 0"
-        :onGoToExpeditions="goToExpeditions"
-        :onGoToTower="goToTower"
-        :onOpenFriendsModal="openFriendsModal"
-        :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
-        :daily_quests="daily_quests"
-        :daily_quest_stats="daily_quest_stats"
-      />
+      <DesktopLayout :user="auth.user" :inventory="inventory" :pokedex="pokedex"
+                     :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview"
+                     :team-pokemons="userTeamPokemons" :onOpenPokedexModal="() => pokedexModalOpen = true"
+                     :onGoToMarketplace="goToMarketplace" :onGoToLeaderboard="goToLeaderboard"
+                     :onOpenTeamManagementModal="openTeamManagementModal" :onOpenBadgesModal="openBadgesModal"
+                     :has-unclaimed-successes="unclaimed_successes.length > 0" :onGoToExpeditions="goToExpeditions"
+                     :onGoToTower="goToTower" :onOpenFriendsModal="openFriendsModal"
+                     :has-unclaimed-gifts="friend_gifts_to_claim.length > 0" :daily_quests="daily_quests"
+                     :daily_quest_stats="daily_quest_stats" :announcements="announcements" :marketplace-history="marketplace_history"
+                     :unreadNotificationsCount="unread_notifications_count" :hasFriendRequests="friend_requests.length > 0"
+                     :hasUnclaimedFriendGifts="friend_gifts_to_claim.length > 0" :hasCompletedExpeditions="has_completed_expeditions"
+                     :hasInfernalTowerAttempts="has_infernal_tower_attempts" />
     </div>
 
     <PokedexModal :show="pokedexModalOpen" :user-pokedex="pokedex" :all-pokemons="all_pokemons"

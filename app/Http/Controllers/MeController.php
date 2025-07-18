@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pokemon;
 use App\Models\Success;
 use App\Services\DailyQuestService;
+use App\Services\ExpeditionService;
 use App\Services\FriendService;
 use App\Services\LeaderboardService;
 use App\Services\LevelRewardService;
@@ -21,6 +22,7 @@ class MeController extends Controller
     protected FriendService $friendService;
     protected UserFriendGiftService $userFriendGiftService;
     protected DailyQuestService $dailyQuestService;
+    protected ExpeditionService $expeditionService;
 
     public function __construct(
         LeaderboardService $leaderboardService,
@@ -28,7 +30,8 @@ class MeController extends Controller
         LevelRewardService $levelRewardService,
         FriendService $friendService,
         UserFriendGiftService $userFriendGiftService,
-        DailyQuestService $dailyQuestService
+        DailyQuestService $dailyQuestService,
+        ExpeditionService $expeditionService
     ) {
         $this->leaderboardService = $leaderboardService;
         $this->successService = $successService;
@@ -36,6 +39,7 @@ class MeController extends Controller
         $this->friendService = $friendService;
         $this->userFriendGiftService = $userFriendGiftService;
         $this->dailyQuestService = $dailyQuestService;
+        $this->expeditionService = $expeditionService;
     }
 
     public function index()
@@ -69,6 +73,13 @@ class MeController extends Controller
         $dailyQuests = $this->dailyQuestService->getUserTodayProgress($user);
         $dailyQuestStats = $this->dailyQuestService->getCompletionStats($user);
 
+        $expeditions = $this->expeditionService->getDailyExpeditions($user);
+        $hasCompletedExpeditions = collect($expeditions)->where('can_be_claimed', true)->isNotEmpty();
+
+        $user->resetInfernalTowerDailyDefeats();
+        $user->refresh();
+        $hasInfernalTowerAttempts = $user->getRawDailyDefeats() > 0;
+
         return Inertia::render('Me', [
             'user' => $user,
             'pokedex' => $pokedex,
@@ -89,7 +100,10 @@ class MeController extends Controller
             'friends' => $friends,
             'suggestions' => $suggestions,
             'daily_quests' => $dailyQuests,
-            'daily_quest_stats' => $dailyQuestStats
+            'daily_quest_stats' => $dailyQuestStats,
+            'expeditions' => $expeditions,
+            'has_completed_expeditions' => $hasCompletedExpeditions,
+            'has_infernal_tower_attempts' => $hasInfernalTowerAttempts
         ]);
     }
 }

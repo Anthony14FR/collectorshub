@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use App\Models\Pokedex;
 use App\Models\Pokemon;
 use App\Services\DailyQuestService;
 use App\Services\GameConfigurationService;
@@ -65,13 +66,13 @@ class OpeningController extends Controller
 
         return DB::transaction(function () use ($user, $ball, $ballType, $quantity, $inventory) {
             $pokemonsData = [];
-            $pokedexData = [];
+            $pokedexEntries = [];
 
             for ($i = 0; $i < $quantity; $i++) {
                 $pokemonData = $this->drawRandomPokemon($ballType);
                 $pokemonsData[] = $pokemonData;
 
-                $pokedexData[] = [
+                $pokedexEntries[] = Pokedex::create([
                     'user_id' => $user->id,
                     'pokemon_id' => $pokemonData['pokemon']->id,
                     'nickname' => null,
@@ -80,18 +81,14 @@ class OpeningController extends Controller
                     'hp_left' => $pokemonData['pokemon']->hp,
                     'is_in_team' => false,
                     'is_favorite' => false,
-                    'obtained_at' => now(),
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ];
+                    'obtained_at' => now()
+                ]);
             }
 
-            DB::table('pokedex')->insert($pokedexData);
-
             $pokemons = [];
-            foreach ($pokemonsData as $pokemonData) {
+            foreach ($pokemonsData as $index => $pokemonData) {
                 $pokemons[] = [
-                    'id' => null,
+                    'id' => $pokedexEntries[$index]->id,
                     'pokemon_id' => $pokemonData['pokemon']->id,
                     'name' => $pokemonData['pokemon']->name,
                     'types' => $pokemonData['pokemon']->types,
@@ -163,32 +160,6 @@ class OpeningController extends Controller
 
         return [
             'pokemon' => $pokemon,
-            'is_shiny' => $isShiny
-        ];
-    }
-
-    private function addPokemonToPokedex($user, $pokemonData)
-    {
-        $pokemon = $pokemonData['pokemon'];
-        $isShiny = $pokemonData['is_shiny'];
-
-        $pokedexEntry = $user->pokedex()->create([
-            'pokemon_id' => $pokemon->id,
-            'nickname' => null,
-            'level' => 1,
-            'star' => 0,
-            'hp_left' => $pokemon->hp,
-            'is_in_team' => false,
-            'is_favorite' => false,
-            'obtained_at' => now()
-        ]);
-
-        return [
-            'id' => $pokedexEntry->id,
-            'pokemon_id' => $pokemon->id,
-            'name' => $pokemon->name,
-            'types' => $pokemon->types,
-            'rarity' => $pokemon->rarity,
             'is_shiny' => $isShiny
         ];
     }

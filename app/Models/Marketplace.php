@@ -33,8 +33,8 @@ class Marketplace extends Model
         parent::boot();
 
         static::saving(function ($marketplace) {
-            if ($marketplace->price < 0) {
-                throw new \Exception('Le prix ne peut pas être négatif');
+            if ($marketplace->price < 1) {
+                throw new \Exception('Le prix ne peut pas être inférieur à 1');
             }
 
             if (!in_array($marketplace->status, ['active', 'sold', 'cancelled'])) {
@@ -76,17 +76,5 @@ class Marketplace extends Model
     public function pokemon(): BelongsTo
     {
         return $this->belongsTo(Pokedex::class, 'pokemon_id');
-    }
-
-    public static function getPriceRange(string $rarity): array
-    {
-        $ranges = [
-            'normal' => ['min' => 10, 'max' => 1000],
-            'rare' => ['min' => 100, 'max' => 5000],
-            'epic' => ['min' => 1000, 'max' => 20000],
-            'legendary' => ['min' => 10000, 'max' => 100000],
-        ];
-
-        return $ranges[$rarity] ?? $ranges['normal'];
     }
 }

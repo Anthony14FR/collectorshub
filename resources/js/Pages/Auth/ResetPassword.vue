@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 interface Props {
   token: string;
@@ -22,10 +23,25 @@ const form = reactive({
 });
 
 const passwordInput = ref<HTMLInputElement>();
+const { trackAuthAction, startTimer, trackTimeSpent, trackFormError } = useMatomoTracking();
+const pageStartTime = ref(0);
+
+onMounted(() => {
+  pageStartTime.value = startTimer();
+  trackAuthAction('reset_password_view');
+});
+
+onUnmounted(() => {
+  if (pageStartTime.value) {
+    trackTimeSpent(pageStartTime.value, 'Authentication', 'Reset Password Page');
+  }
+});
 
 const submit = () => {
   form.processing = true;
   form.errors = {};
+  
+  trackAuthAction('password_reset', 'Reset attempt');
 
   router.post('/reset-password', {
     token: form.token,
@@ -41,10 +57,20 @@ const submit = () => {
     onError: (errors: Record<string, string>) => {
       form.processing = false;
       form.errors = errors;
+      
+      Object.keys(errors).forEach(field => {
+        trackFormError('Reset Password', field);
+      });
+      
+      trackAuthAction('password_reset', 'Reset error');
+      
       if (errors.password) {
         passwordInput.value?.focus();
       }
     },
+    onSuccess: () => {
+      trackAuthAction('password_reset', 'Reset success');
+    }
   });
 };
 </script>

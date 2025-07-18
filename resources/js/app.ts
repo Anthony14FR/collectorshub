@@ -7,6 +7,7 @@ import { createApp, DefineComponent, h } from 'vue';
 import PrimeVue from 'primevue/config';
 import VirtualScroller from 'primevue/virtualscroller';
 import musicPlayerPlugin from './plugins/musicPlayer';
+import { useMatomoTracking } from './composables/useMatomoTracking';
 
 const appName: string = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -18,12 +19,20 @@ createInertiaApp({
       import.meta.glob<DefineComponent>('./Pages/**/*.vue'),
     ),
   setup({ el, App, props, plugin }: any) {
-    return createApp({ render: () => h(App, props) })
+    const app = createApp({ render: () => h(App, props) })
       .use(plugin)
       .use(PrimeVue)
       .use(musicPlayerPlugin)
-      .component('VirtualScroller', VirtualScroller)
-      .mount(el);
+      .component('VirtualScroller', VirtualScroller);
+
+    app.mount(el);
+    
+    setTimeout(() => {
+      const { checkForFlashEvents } = useMatomoTracking();
+      checkForFlashEvents();
+    }, 100);
+
+    return app;
   },
   progress: {
     color: '#4B5563',

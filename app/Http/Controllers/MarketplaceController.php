@@ -48,7 +48,10 @@ class MarketplaceController extends Controller
     {
         $validated = $request->validate([
             'pokemon_id' => 'required|integer|exists:pokedex,id',
-            'price' => 'required|integer|min:10|max:1000000',
+            'price' => 'required|integer|min:1|max:999999999',
+        ], [
+            'price.max' => 'Le prix ne peut pas être supérieur à :max.',
+            'price.min' => 'Le prix ne peut pas être inférieur à :min.',
         ]);
 
         $user = auth()->user();
@@ -79,13 +82,6 @@ class MarketplaceController extends Controller
         if ($pokedexEntry->is_in_team) {
             return back()->withErrors([
                 'message' => 'Impossible de vendre un Pokemon de votre équipe'
-            ]);
-        }
-
-        $priceRange = Marketplace::getPriceRange($pokedexEntry->pokemon->rarity);
-        if ($price < $priceRange['min'] || $price > $priceRange['max']) {
-            return back()->withErrors([
-                'message' => "Le prix doit être entre {$priceRange['min']} et {$priceRange['max']} pour un Pokemon {$pokedexEntry->pokemon->rarity}"
             ]);
         }
 
@@ -211,7 +207,10 @@ class MarketplaceController extends Controller
 
         if ($request->has('type')) {
             $query->whereHas('pokemon.pokemon', function ($q) use ($request) {
-                $q->whereJsonContains('types', $request->type);
+                $q->whereRaw('EXISTS (
+                    SELECT 1 FROM json_each(types) 
+                    WHERE json_extract(value, "$.name") = ?
+                )', [$request->type]);
             });
         }
 

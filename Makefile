@@ -72,7 +72,7 @@ docker-prod-up: ## Démarre l'environnement de production Docker
 docker-prod-mep: ## Rafraîchit l'environnement de production Docker
 	make main
 	make install
-	docker compose -f docker-compose.prod.yml build --no-cache
+	docker compose -f docker-compose.prod.yml build
 	docker compose -f docker-compose.prod.yml up -d
 	docker compose -f docker-compose.prod.yml exec app php artisan migrate
 

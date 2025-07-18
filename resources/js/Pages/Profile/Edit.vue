@@ -264,7 +264,7 @@ const enableTotp = () => {
   <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-y-auto lg:overflow-hidden">
+    <div class="relative z-10 h-screen w-screen overflow-y-auto">
       <div
         class="lg:hidden flex items-center justify-between p-4 bg-base-100/60 backdrop-blur-sm border-b border-base-300/30">
         <Button @click="goToProfile" variant="outline" size="sm">

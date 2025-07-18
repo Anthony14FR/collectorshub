@@ -5,7 +5,8 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { nextTick, reactive, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 interface Props {
   canResetPassword?: boolean;
@@ -23,10 +24,25 @@ const form = reactive({
 });
 
 const passwordInput = ref<HTMLInputElement>();
+const { trackAuthAction, startTimer, trackTimeSpent, trackFormError } = useMatomoTracking();
+const pageStartTime = ref(0);
+
+onMounted(() => {
+  pageStartTime.value = startTimer();
+  trackAuthAction('login_page_view');
+});
+
+onUnmounted(() => {
+  if (pageStartTime.value) {
+    trackTimeSpent(pageStartTime.value, 'Authentication', 'Login Page');
+  }
+});
 
 const submit = () => {
   form.processing = true;
   form.errors = {};
+
+  trackAuthAction('login_attempt');
 
   router.post('/login', {
     login: form.login,
@@ -39,11 +55,22 @@ const submit = () => {
     onError: (errors: Record<string, string>) => {
       form.processing = false;
       form.errors = errors;
+      
+      // Track les erreurs spécifiques
+      Object.keys(errors).forEach(field => {
+        trackFormError('Login', field);
+      });
+      
+      trackAuthAction('login_error', Object.keys(errors).join(', '));
+      
       if (errors.password) {
         form.password = '';
         nextTick(() => passwordInput.value?.focus());
       }
     },
+    onSuccess: () => {
+      trackAuthAction('login_success', 'Classic Login');
+    }
   });
 };
 </script>
