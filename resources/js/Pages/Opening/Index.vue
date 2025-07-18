@@ -5,8 +5,8 @@ import GachaBall from '@/Components/Game/GachaBall.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import { Head, router, usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { Head, router } from '@inertiajs/vue3';
+import { computed, getCurrentInstance, ref } from 'vue';
 
 import type { PageProps } from '@/types';
 import type { Inventory } from '@/types/inventory';
@@ -39,7 +39,8 @@ interface Props extends PageProps {
 }
 
 const { auth, inventory } = defineProps<Props>();
-const page = usePage();
+const instance = getCurrentInstance();
+const page = computed(() => instance?.appContext.app.config.globalProperties.$page);
 
 const isInvoking = ref(false);
 const showEvolutionAnimation = ref(false);
@@ -129,7 +130,7 @@ const startInvocation = async (ballType: string, quantity: number) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': page.props.csrf_token as string || '',
+        'X-CSRF-TOKEN': page.value?.props?.csrf_token as string || '',
       },
       body: JSON.stringify({
         ball_type: ballType,

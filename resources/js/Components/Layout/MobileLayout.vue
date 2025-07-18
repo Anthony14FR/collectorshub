@@ -1,17 +1,17 @@
 <script setup lang="ts">
+import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
 import GameInventory from '@/Components/Game/GameInventory.vue';
 import LevelDisplay from '@/Components/Profile/LevelDisplay.vue';
 import TrainerProfile from '@/Components/Profile/TrainerProfile.vue';
 import UserMenu from '@/Components/Profile/UserMenu.vue';
 import Button from '@/Components/UI/Button.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
 import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
-import DailyQuestsModal from '@/Components/DailyQuests/DailyQuestsModal.vue';
-import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
-import { ref, computed } from 'vue';
 import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
 import { router } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 
 interface Props {
   user: User;
@@ -34,6 +34,10 @@ interface Props {
   onOpenFriendsModal?: () => void;
   daily_quests?: DailyQuest[];
   daily_quest_stats?: DailyQuestStats;
+  hasFriendRequests?: boolean;
+  hasUnclaimedFriendGifts?: boolean;
+  hasCompletedExpeditions?: boolean;
+  hasInfernalTowerAttempts?: boolean;
 }
 
 const {
@@ -55,6 +59,10 @@ const {
   onOpenFriendsModal,
   daily_quests = [],
   daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
+  hasFriendRequests = false,
+  hasUnclaimedFriendGifts = false,
+  hasCompletedExpeditions = false,
+  hasInfernalTowerAttempts = false,
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -71,15 +79,15 @@ const goToPokemonUpgrade = () => {
 
 const dailyQuestsModalOpen = ref(false);
 
-const unclaimedQuestsCount = computed(() => 
+const unclaimedQuestsCount = computed(() =>
   daily_quests.filter(q => q.is_completed && !q.is_claimed).length
 );
 
-const handleQuestClaimed = (data: any) => {
+const handleQuestClaimed = (_data: any) => {
   router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
 };
 
-const handleBonusClaimed = (data: any) => {
+const handleBonusClaimed = (_data: any) => {
   router.reload({ only: ['auth', 'daily_quests', 'daily_quest_stats'] });
 };
 
@@ -93,12 +101,7 @@ const handleBonusClaimed = (data: any) => {
     </div>
 
     <div class="mb-3 mt-3 relative mx-5">
-      <Button 
-        @click="dailyQuestsModalOpen = true"
-        variant="secondary" 
-        size="sm"
-        class="w-full relative"
-      >
+      <Button @click="dailyQuestsModalOpen = true" variant="secondary" size="sm" class="w-full relative">
         <div class="flex items-center justify-center gap-2">
           <span>Quêtes</span>
         </div>
@@ -188,21 +191,30 @@ const handleBonusClaimed = (data: any) => {
           </div>
         </div>
 
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/40 border border-secondary/30">
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/40 border border-secondary/30">
           <div class="absolute inset-0 bg-[url('/images/friends.jpg')] bg-cover bg-center opacity-30"></div>
+          <div v-if="hasFriendRequests || hasUnclaimedFriendGifts" class="absolute top-2 right-2 z-20">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span>
+            </span>
+          </div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
               <img src="/images/icons/friends.png" alt="Amis" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-secondary">Amis</h3>
             </div>
             <p class="text-xs text-white/80 mb-auto">Gérer mes amis</p>
-            <Button v-if="onOpenFriendsModal" @click="onOpenFriendsModal" variant="secondary" size="sm" class="w-full text-xs py-1.5">
+            <Button v-if="onOpenFriendsModal" @click="onOpenFriendsModal" variant="secondary" size="sm"
+                    class="w-full text-xs py-1.5">
               Voir
             </Button>
           </div>
         </div>
 
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-warning/30 to-amber-500/40 border border-warning/40">
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-warning/30 to-amber-500/40 border border-warning/40">
           <div class="absolute inset-0 bg-[url('/images/background/upgrade.gif')] bg-cover bg-center opacity-40"></div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
@@ -256,6 +268,12 @@ const handleBonusClaimed = (data: any) => {
           class="relative overflow-hidden rounded-xl bg-gradient-to-br from-success/20 to-emerald-600/30 border border-success/30">
           <div class="absolute inset-0 bg-[url('/images/background/expeditions.gif')] bg-cover bg-center opacity-30">
           </div>
+          <div v-if="hasCompletedExpeditions" class="absolute top-2 right-2 z-20">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span>
+            </span>
+          </div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
               <img src="/images/icons/treasure-map.webp" alt="Expedition" class="w-5 h-5 mr-2">
@@ -271,9 +289,16 @@ const handleBonusClaimed = (data: any) => {
       </div>
 
       <div class="grid grid-cols-1 gap-2">
-        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-error/20 to-red-600/30 border border-error/30">
+        <div
+          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-error/20 to-red-600/30 border border-error/30">
           <div class="absolute inset-0 bg-[url('/images/background/tower.jpg')] bg-cover bg-center opacity-40"></div>
           <div class="absolute inset-0 bg-black/40"></div>
+          <div v-if="hasInfernalTowerAttempts" class="absolute top-2 right-2 z-20">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-error"></span>
+            </span>
+          </div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
               <span class="text-lg mr-2">🔥</span>
@@ -295,12 +320,7 @@ const handleBonusClaimed = (data: any) => {
       </div>
     </div>
   </div>
-  <DailyQuestsModal
-    :show="dailyQuestsModalOpen"
-    :onClose="() => dailyQuestsModalOpen = false"
-    :initial-quests="daily_quests"
-    :initial-stats="daily_quest_stats"
-    @questClaimed="handleQuestClaimed"
-    @bonusClaimed="handleBonusClaimed"
-  />
+  <DailyQuestsModal :show="dailyQuestsModalOpen" :onClose="() => dailyQuestsModalOpen = false"
+                    :initial-quests="daily_quests" :initial-stats="daily_quest_stats" @questClaimed="handleQuestClaimed"
+                    @bonusClaimed="handleBonusClaimed" />
 </template>

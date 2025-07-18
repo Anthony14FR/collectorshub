@@ -211,7 +211,10 @@ class MarketplaceController extends Controller
 
         if ($request->has('type')) {
             $query->whereHas('pokemon.pokemon', function ($q) use ($request) {
-                $q->whereJsonContains('types', $request->type);
+                $q->whereRaw('EXISTS (
+                    SELECT 1 FROM json_each(types) 
+                    WHERE json_extract(value, "$.name") = ?
+                )', [$request->type]);
             });
         }
 
