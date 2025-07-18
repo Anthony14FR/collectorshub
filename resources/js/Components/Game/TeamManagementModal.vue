@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { router } from '@inertiajs/vue3';
 import type { Pokedex } from '@/types/pokedex';
 import Modal from '@/Components/UI/Modal.vue';
@@ -23,6 +23,7 @@ const searchQuery = ref('');
 const rarityFilter = ref('all');
 const shinyFilter = ref('all');
 const sortFilter = ref('cp');
+const forceRerenderKey = ref(0);
 
 const rarities = [
   { value: 'all', label: 'Toutes les raretés' },
@@ -46,6 +47,7 @@ const sortOptions = [
 
 watch(() => props.userPokemons, (newPokemons) => {
   localPokemons.value = JSON.parse(JSON.stringify(newPokemons));
+  forceRerenderKey.value++;
 }, { immediate: true, deep: true });
 
 const team = computed(() => localPokemons.value.filter(p => p.is_in_team).sort((a,b) => (a.team_position ?? 99) - (b.team_position ?? 99)));
@@ -59,31 +61,34 @@ const filteredAvailablePokemons = computed(() => {
     .filter(p => !p.is_in_team)
     .filter(p => {
       if (!searchQuery.value) return true;
-      return p.pokemon.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+      return p.pokemon?.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) || false;
     })
     .filter(p => {
       if (rarityFilter.value === 'all') return true;
-      return p.pokemon.rarity === rarityFilter.value;
+      return p.pokemon?.rarity === rarityFilter.value;
     })
     .filter(p => {
       if (shinyFilter.value === 'all') return true;
-      if (shinyFilter.value === 'shiny') return p.pokemon.is_shiny;
-      if (shinyFilter.value === 'not_shiny') return !p.pokemon.is_shiny;
+      if (shinyFilter.value === 'shiny') return p.pokemon?.is_shiny === true;
+      if (shinyFilter.value === 'not_shiny') return p.pokemon?.is_shiny === false;
       return false;
     });
 
   return filtered.sort((a, b) => {
     switch (sortFilter.value) {
     case 'cp':
-      return b.cp - a.cp;
+      return (b.cp || 0) - (a.cp || 0);
     case 'level':
       return b.level - a.level;
     case 'name':
-      return a.pokemon.name.localeCompare(b.pokemon.name);
+      const nameA = a.pokemon?.name || '';
+      const nameB = b.pokemon?.name || '';
+      return nameA.localeCompare(nameB);
     case 'rarity':
       const rarityOrder = { 'legendary': 4, 'epic': 3, 'rare': 2, 'normal': 1 };
-      return (rarityOrder[b.pokemon.rarity as keyof typeof rarityOrder] || 0) - 
-        (rarityOrder[a.pokemon.rarity as keyof typeof rarityOrder] || 0);
+      const rarityA = a.pokemon?.rarity as keyof typeof rarityOrder;
+      const rarityB = b.pokemon?.rarity as keyof typeof rarityOrder;
+      return (rarityOrder[rarityB] || 0) - (rarityOrder[rarityA] || 0);
     default:
       return 0;
     }
@@ -107,6 +112,10 @@ const addToTeam = (pokemon: Pokedex) => {
     onSuccess: () => {
       pokemon.is_in_team = true;
       pokemon.team_position = newPosition;
+      
+      nextTick(() => {
+        forceRerenderKey.value++;
+      });
     },
     onFinish: () => { processing.value = false; }
   });
@@ -120,6 +129,9 @@ const removeFromTeam = (pokemon: Pokedex) => {
     onSuccess: () => {
       pokemon.is_in_team = false;
       pokemon.team_position = null;
+      nextTick(() => {
+        forceRerenderKey.value++;
+      });
     },
     onFinish: () => { processing.value = false; }
   });
@@ -140,10 +152,10 @@ const removeFromTeam = (pokemon: Pokedex) => {
     <div class="p-4 bg-base-100/70">
       <div class="mb-8">
         <h3 class="text-lg font-semibold mb-4 text-base-content">Mon Équipe ({{ team.length }}/6)</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <div v-for="n in 6" :key="`team-slot-${n}`" class="bg-base-200/50 rounded-xl border-2 border-dashed border-base-300/50 flex items-center justify-center p-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" :key="`team-${forceRerenderKey}`">
+          <div v-for="n in 6" :key="`team-slot-${n}-${forceRerenderKey}`" class="bg-base-200/50 rounded-xl border-2 border-dashed border-base-300/50 flex items-center justify-center p-2">
             <div v-if="team[n-1]" @click="removeFromTeam(team[n-1])" class="text-center w-full h-full relative group cursor-pointer">
-              <PokedexModalCard :displayPokemon="{pokedexInfo: team[n-1], pokemon: team[n-1].pokemon, owned: true, count: 1 }" />
+              <PokedexModalCard v-if="team[n-1]?.pokemon" :displayPokemon="{pokedexInfo: team[n-1], pokemon: team[n-1].pokemon!, owned: true, count: 1 }" />
               <div class="absolute inset-0 bg-black/70 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 <span class="text-white font-bold text-lg tracking-wider">Retirer</span>
               </div>
@@ -164,10 +176,10 @@ const removeFromTeam = (pokemon: Pokedex) => {
           </div>
         </div>
                 
-        <div class="h-[40vh] overflow-y-auto p-2 bg-base-200/30 rounded-lg">
+        <div class="h-[40vh] overflow-y-auto p-2 bg-base-200/30 rounded-lg" :key="`available-${forceRerenderKey}`">
           <div v-if="filteredAvailablePokemons.length > 0" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            <div v-for="p in filteredAvailablePokemons" :key="p.id" @click="addToTeam(p)" class="relative group" :class="{'opacity-50 cursor-not-allowed': team.length >= 6 || processing}">
-              <PokedexModalCard :displayPokemon="{pokedexInfo: p, pokemon: p.pokemon, owned: true, count: 1 }" />
+            <div v-for="p in filteredAvailablePokemons" :key="`pokemon-${p.id}-${forceRerenderKey}`" @click="addToTeam(p)" class="relative group" :class="{'opacity-50 cursor-not-allowed': team.length >= 6 || processing}">
+              <PokedexModalCard v-if="p.pokemon" :displayPokemon="{pokedexInfo: p, pokemon: p.pokemon!, owned: true, count: 1 }" />
               <div v-if="team.length < 6" class="absolute inset-0 bg-black/70 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                 <span class="text-white font-bold text-lg tracking-wider">Ajouter</span>
               </div>
