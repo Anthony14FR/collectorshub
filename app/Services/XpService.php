@@ -85,7 +85,7 @@ class XpService
 
     public function getExperiencePercentage(User $user): float
     {
-        $xpForCurrentLevel = $this->getTotalExperienceForLevel($user->level);
+        $xpForCurrentLevel = $this->getTotalExperienceForLevel($user->level ?? 1);
         $xpForNextLevel = $this->getTotalExperienceForLevel($user->level + 1);
 
         $xpNeededForLevelUp = $xpForNextLevel - $xpForCurrentLevel;

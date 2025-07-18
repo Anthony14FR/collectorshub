@@ -45,6 +45,10 @@ class MeController extends Controller
         $levelRewardsToClaim = $this->levelRewardService->getAvailableRewards($user);
         $levelRewardsPreview = $this->levelRewardService->getPreviewRewards($user);
 
+        $announcements = $user->notifications()->announcements()->limit(10)->get();
+        $marketplaceHistory = $user->notifications()->marketplaceHistory()->limit(20)->get();
+        $unreadNotificationsCount = $user->notifications()->unread()->count();
+
         $friendsGiftsToClaim = $user->friendGiftsToClaim()->get();
 
         $friends = $this->friendService->getFormattedFriends($user, $this->userFriendGiftService);
@@ -63,6 +67,9 @@ class MeController extends Controller
             'progress' => $progress,
             'level_rewards_to_claim' => $levelRewardsToClaim,
             'level_rewards_preview' => $levelRewardsPreview,
+            'announcements' => $announcements,
+            'marketplace_history' => $marketplaceHistory,
+            'unread_notifications_count' => $unreadNotificationsCount,
             'friend_gifts_to_claim' => $friendsGiftsToClaim,
             'friend_requests' => $friendRequests,
             'friends' => $friends,

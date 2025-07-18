@@ -13,10 +13,13 @@ import HelpModal from '@/Components/UI/HelpModal.vue'
 import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
 import type { Success, UserSuccess } from '@/types/success';
+import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
+import { Head, router } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import type { User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
-import type { LevelReward, LevelRewardPreview } from '@/types/user';
+import type { LevelReward, LevelRewardPreview, AvailableLevelReward } from '@/types/user';
 import type { UserFriend, UserFriendGift, FriendRequest } from '@/types/friend';
 import FriendsModal from '@/Components/Friends/FriendsModal.vue';
 
@@ -30,8 +33,11 @@ interface Props extends PageProps {
   successes?: Success[];
   unclaimed_successes?: UserSuccess[];
   claimed_successes?: UserSuccess[];
-  level_rewards_to_claim?: LevelReward[];
+  level_rewards_to_claim?: AvailableLevelReward[];
   level_rewards_preview?: LevelRewardPreview;
+  announcements?: any[];
+  marketplace_history?: any[];
+  unread_notifications_count?: number;
   progress?: {
     total: number;
     unlocked: number;
@@ -56,6 +62,9 @@ const {
   claimed_successes = [],
   level_rewards_to_claim = [],
   level_rewards_preview,
+  announcements = [],
+  marketplace_history = [],
+  unread_notifications_count = 0,
   progress = { total: 0, unlocked: 0, claimed: 0, unclaimed: 0, percentage: 0 },
   friend_gifts_to_claim = [],
   friend_requests = [],
@@ -182,6 +191,7 @@ const goToTower = () => {
     <BackgroundEffects />
 
     <div class="relative z-50 h-screen w-screen overflow-x-hidden">
+
       <MobileLayout
         :user="auth.user"
         :inventory="inventory"
@@ -199,6 +209,9 @@ const goToTower = () => {
         :onGoToTower="goToTower"
         :onOpenFriendsModal="openFriendsModal"
         :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
+        :announcements="announcements"
+        :marketplace-history="marketplace_history"
+        :unread-notifications-count="unread_notifications_count"
       />
 
       <DesktopLayout
@@ -218,6 +231,9 @@ const goToTower = () => {
         :onGoToTower="goToTower"
         :onOpenFriendsModal="openFriendsModal"
         :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
+        :announcements="announcements"
+        :marketplace-history="marketplace_history"
+        :unread-notifications-count="unread_notifications_count"
       />
     </div>
 
