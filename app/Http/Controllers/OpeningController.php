@@ -4,13 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Pokemon;
+use App\Services\GameConfigurationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class OpeningController extends Controller
 {
+    private $balls;
+
+    public function __construct(
+        private GameConfigurationService $configService
+    ) {
+        $this->balls = Cache::remember('balls', 3600, function () {
+            return Item::where('type', 'ball')->get()->keyBy('name');
+        });
+    }
+
     public function index()
     {
         $inventory = Auth::user()->inventory()->with('item')->get();
@@ -31,7 +43,7 @@ class OpeningController extends Controller
         $ballType = $request->ball_type;
         $quantity = $request->quantity;
 
-        $ball = Item::where('name', $ballType)->where('type', 'ball')->first();
+        $ball = $this->balls[$ballType] ?? null;
 
         if (!$ball) {
             return response()->json([
@@ -50,11 +62,40 @@ class OpeningController extends Controller
         }
 
         return DB::transaction(function () use ($user, $ball, $ballType, $quantity, $inventory) {
-            $pokemons = [];
+            $pokemonsData = [];
+            $pokedexData = [];
 
             for ($i = 0; $i < $quantity; $i++) {
-                $pokemon = $this->drawRandomPokemon($ballType);
-                $pokemons[] = $this->addPokemonToPokedex($user, $pokemon);
+                $pokemonData = $this->drawRandomPokemon($ballType);
+                $pokemonsData[] = $pokemonData;
+
+                $pokedexData[] = [
+                    'user_id' => $user->id,
+                    'pokemon_id' => $pokemonData['pokemon']->id,
+                    'nickname' => null,
+                    'level' => 1,
+                    'star' => 0,
+                    'hp_left' => $pokemonData['pokemon']->hp,
+                    'is_in_team' => false,
+                    'is_favorite' => false,
+                    'obtained_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+
+            DB::table('pokedex')->insert($pokedexData);
+
+            $pokemons = [];
+            foreach ($pokemonsData as $pokemonData) {
+                $pokemons[] = [
+                    'id' => null,
+                    'pokemon_id' => $pokemonData['pokemon']->id,
+                    'name' => $pokemonData['pokemon']->name,
+                    'types' => $pokemonData['pokemon']->types,
+                    'rarity' => $pokemonData['pokemon']->rarity,
+                    'is_shiny' => $pokemonData['is_shiny']
+                ];
             }
 
             $inventory->quantity -= $quantity;
@@ -70,29 +111,16 @@ class OpeningController extends Controller
 
     private function drawRandomPokemon($ballType)
     {
-        $rarityChances = [];
+        $rarityProbabilities = $this->configService->getRarityProbabilities();
 
-        switch ($ballType) {
-            case 'Pokeball':
-                $rarityChances = [
-                    'normal' => 70,
-                    'rare' => 27,
-                    'epic' => 2.7,
-                    'legendary' => 0.3
-                ];
-                break;
+        if (!isset($rarityProbabilities['ball_types'])) {
+            throw new \Exception('Configuration des probabilités des balls non trouvée');
+        }
 
-            case 'Masterball':
-                $rarityChances = [
-                    'normal' => 34,
-                    'rare' => 60,
-                    'epic' => 5,
-                    'legendary' => 1
-                ];
-                break;
+        $rarityChances = $rarityProbabilities['ball_types'][$ballType] ?? null;
 
-            default:
-                throw new \Exception('Type de ball non pris en charge: ' . $ballType);
+        if (!$rarityChances) {
+            throw new \Exception('Type de ball non pris en charge: ' . $ballType . '. Types disponibles: ' . implode(',', array_keys($rarityProbabilities['ball_types'])));
         }
 
         $rand = rand(1, 100);
@@ -107,13 +135,39 @@ class OpeningController extends Controller
             }
         }
 
-        return Pokemon::where('rarity', $selectedRarity)
+        $pokemon = Pokemon::where('rarity', $selectedRarity)
+            ->where('is_shiny', false)
             ->inRandomOrder()
-            ->firstOrFail();
+            ->first();
+
+        if (!$pokemon) {
+            throw new \Exception('Aucun Pokémon trouvé pour la rareté: ' . $selectedRarity);
+        }
+
+        $shinyRate = $this->configService->getShinyRate();
+        $isShiny = rand(1, 100) <= $shinyRate;
+
+        if ($isShiny) {
+            $shinyPokemon = Pokemon::where('pokedex_id', $pokemon->pokedex_id)
+                ->where('is_shiny', true)
+                ->first();
+
+            if ($shinyPokemon) {
+                $pokemon = $shinyPokemon;
+            }
+        }
+
+        return [
+            'pokemon' => $pokemon,
+            'is_shiny' => $isShiny
+        ];
     }
 
-    private function addPokemonToPokedex($user, $pokemon)
+    private function addPokemonToPokedex($user, $pokemonData)
     {
+        $pokemon = $pokemonData['pokemon'];
+        $isShiny = $pokemonData['is_shiny'];
+
         $pokedexEntry = $user->pokedex()->create([
             'pokemon_id' => $pokemon->id,
             'nickname' => null,
@@ -131,7 +185,7 @@ class OpeningController extends Controller
             'name' => $pokemon->name,
             'types' => $pokemon->types,
             'rarity' => $pokemon->rarity,
-            'is_shiny' => $pokemon->is_shiny
+            'is_shiny' => $isShiny
         ];
     }
 }

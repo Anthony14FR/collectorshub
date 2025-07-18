@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import CPBadge from '@/Components/UI/CPBadge.vue';
 import TeamPokemonCard from '@/Components/Profile/TeamPokemonCard.vue';
 import type { LeaderboardUser } from '@/types/leaderboard';
@@ -52,18 +53,37 @@ const getRankColor = computed(() => {
         {{ user.rank }}
       </div>
       
-      <div class="relative overflow-hidden rounded-full w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0">
+      <div class="relative overflow-hidden rounded-full w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 border-2 border-base-300/50 shadow-lg">
+        <div 
+          v-if="user.background"
+          class="absolute inset-0 w-full h-full rounded-full overflow-hidden"
+          :style="{
+            backgroundImage: `url(${user.background})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }"
+        >
+          <div class="absolute inset-0 bg-black/40 rounded-full"></div>
+        </div>
+        <div 
+          v-else
+          class="absolute inset-0 w-full h-full rounded-full bg-gradient-to-br from-primary/20 to-secondary/20"
+        ></div>
+        
         <img 
           :src="user.avatar || `/images/trainer/${(user.id % 10) + 1}.png`"
           :alt="user.username"
-          class="w-full h-full object-cover"
+          class="relative z-10 w-full h-full object-cover rounded-full"
           style="image-rendering: pixelated;"
         />
       </div>
       
       <div class="flex-1 min-w-0">
         <div class="font-bold text-base-content truncate">
-          {{ user.username }}
+          <Link :href="`/profile/${user.username}`" class="text-primary hover:underline">
+            {{ user.username }}
+          </Link>
           <span v-if="isCurrentUser" class="text-xs text-primary ml-2">(Vous)</span>
         </div>
         <div class="text-sm text-base-content/70">

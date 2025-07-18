@@ -3,10 +3,12 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExpeditionController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\GameConfigurationController;
+use App\Http\Controllers\Admin\Pokemons\PokemonController;
 use App\Http\Controllers\Admin\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'admin'])
+Route::middleware(['auth', 'verified', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -17,6 +19,9 @@ Route::middleware(['auth', 'admin'])
         // Users
         Route::resource('users', UserController::class);
 
+        // Pokemons
+        Route::resource('pokemons', PokemonController::class);
+
         // Expeditions
         Route::resource('expeditions', ExpeditionController::class);
         Route::post('expeditions/{expedition}/toggle', [ExpeditionController::class, 'toggle'])->name('expeditions.toggle');
@@ -26,5 +31,10 @@ Route::middleware(['auth', 'admin'])
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::get('notifications/create', [NotificationController::class, 'create'])->name('notifications.create');
         Route::post('notifications', [NotificationController::class, 'store'])->name('notifications.store');
+
+        // Game Configuration
+        Route::get('game-configuration', [GameConfigurationController::class, 'index'])->name('game-configuration.index');
+        Route::post('game-configuration/update', [GameConfigurationController::class, 'update'])->name('game-configuration.update');
+        Route::post('game-configuration/reset-category', [GameConfigurationController::class, 'resetCategory'])->name('game-configuration.reset-category');
 
     });

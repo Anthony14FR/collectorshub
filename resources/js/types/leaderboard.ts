@@ -4,6 +4,7 @@ export interface LeaderboardUser {
     username: string;
     level: number;
     avatar?: string;
+    background?: string;
     value?: number;
     team_cp?: number;
     team_pokemons?: any[];

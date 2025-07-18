@@ -22,6 +22,7 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'success' => session('success'),
             'userRoles' => User::ROLES,
             'userStatuses' => User::STATUSES,
         ]);
@@ -67,6 +68,35 @@ class ProfileController extends Controller
         $user->save();
 
         return back()->with('status', 'Avatar mis à jour !');
+    }
+
+    public function updateBackground(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $unlocked = $user->unlocked_backgrounds;
+        if (is_string($unlocked)) {
+            $unlocked = json_decode($unlocked, true);
+        }
+        $unlocked = $unlocked ?? [];
+
+        $request->validate([
+            'background' => [
+                'required',
+                function ($attribute, $value, $fail) use ($unlocked) {
+                    if ($value === '/images/section-me-background.jpg') {
+                        return;
+                    }
+                    if (!in_array($value, $unlocked)) {
+                        $fail('Background non débloqué.');
+                    }
+                }
+            ]
+        ]);
+
+        $user->background = $request->background;
+        $user->save();
+
+        return back()->with('status', 'Background mis à jour !');
     }
 
     /**

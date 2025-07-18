@@ -3,12 +3,6 @@ set -e
 
 echo "🚀 Démarrage de CollectorsHub..."
 
-if [ ! -f /var/www/html/database/database.sqlite ]; then
-    echo "📦 Création de la base de données SQLite..."
-    touch /var/www/html/database/database.sqlite
-    chown www-data:www-data /var/www/html/database/database.sqlite
-fi
-
 if [ "$DB_CONNECTION" = "pgsql" ]; then
     echo "⏳ Attente de PostgreSQL..."
     until php artisan migrate:status > /dev/null 2>&1; do

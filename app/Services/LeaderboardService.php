@@ -15,14 +15,16 @@ class LeaderboardService
             $query->limit($limit);
         }
 
-        $topUsers = $query->get(['id', 'username', 'cash', 'level'])
+        $topUsers = $query->get(['id', 'username', 'cash', 'level', 'avatar', 'background'])
             ->map(function ($user, $index) {
                 return [
                     'rank' => $index + 1,
                     'id' => $user->id,
                     'username' => $user->username,
                     'value' => $user->cash,
-                    'level' => $user->level
+                    'level' => $user->level,
+                    'avatar' => $user->avatar,
+                    'background' => $user->background
                 ];
             });
 
@@ -48,7 +50,7 @@ class LeaderboardService
             $query->limit($limit);
         }
 
-        $topUsers = $query->get(['id', 'username', 'experience', 'level', 'avatar'])
+        $topUsers = $query->get(['id', 'username', 'experience', 'level', 'avatar', 'background'])
             ->map(function ($user, $index) {
                 return [
                     'rank' => $index + 1,
@@ -57,7 +59,8 @@ class LeaderboardService
                     'value' => $user->level,
                     'experience' => $user->experience,
                     'level' => $user->level,
-                    'avatar' => $user->avatar
+                    'avatar' => $user->avatar,
+                    'background' => $user->background
                 ];
             });
 
@@ -91,7 +94,8 @@ class LeaderboardService
             'username' => $user->username,
             'value' => $user->level,
             'level' => $user->level,
-            'avatar' => $user->avatar
+            'avatar' => $user->avatar,
+            'background' => $user->background
         ];
     }
 
@@ -105,14 +109,16 @@ class LeaderboardService
             $query->limit($limit);
         }
 
-        $topUsers = $query->get(['id', 'username', 'level', 'pokedex_count'])
+        $topUsers = $query->get(['id', 'username', 'level', 'pokedex_count', 'avatar', 'background'])
             ->map(function ($user, $index) {
                 return [
                     'rank' => $index + 1,
                     'id' => $user->id,
                     'username' => $user->username,
                     'value' => $user->pokedex_count,
-                    'level' => $user->level
+                    'level' => $user->level,
+                    'avatar' => $user->avatar,
+                    'background' => $user->background
                 ];
             });
 
@@ -139,7 +145,9 @@ class LeaderboardService
             'id' => $user->id,
             'username' => $user->username,
             'value' => $user->cash,
-            'level' => $user->level
+            'level' => $user->level,
+            'avatar' => $user->avatar,
+            'background' => $user->background
         ];
     }
 
@@ -173,7 +181,9 @@ class LeaderboardService
             'id' => $user->id,
             'username' => $user->username,
             'value' => $userPokemonCount,
-            'level' => $user->level
+            'level' => $user->level,
+            'avatar' => $user->avatar,
+            'background' => $user->background
         ];
     }
 
@@ -194,7 +204,7 @@ class LeaderboardService
                 ->with(['pokemon'])
                 ->orderBy('team_position');
             }])
-            ->get()
+            ->get(['id', 'username', 'level', 'avatar', 'background'])
             ->map(function ($user) {
                 $teamCP = $user->pokedex->sum('cp');
                 return [
@@ -202,6 +212,7 @@ class LeaderboardService
                     'username' => $user->username,
                     'level' => $user->level,
                     'avatar' => $user->avatar,
+                    'background' => $user->background,
                     'team_cp' => $teamCP,
                     'team_pokemons' => $user->pokedex->values()->toArray()
                 ];
@@ -237,6 +248,7 @@ class LeaderboardService
                 'value' => $userTeamCP,
                 'level' => $currentUser->level,
                 'avatar' => $currentUser->avatar,
+                'background' => $currentUser->background,
                 'team_cp' => $userTeamCP
             ];
         }

@@ -6,7 +6,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* Bundler mode */
     "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
@@ -14,20 +13,17 @@
     "noEmit": true,
     "jsx": "preserve",
 
-    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    /* Path mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["resources/js/*"],
       "ziggy-js": ["./vendor/tightenco/ziggy"]
     },
 
-    /* Vue specific */
     "types": ["node", "vite/client"]
   },
   "include": [

@@ -8,7 +8,7 @@ use App\Models\PromoCode;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class PromoCodeController extends Controller
@@ -75,55 +75,63 @@ class PromoCodeController extends Controller
     public function useCode(Request $request)
     {
         $request->validate([
-            'code' => 'required|string',
+            'code' => 'required|string|max:20'
         ]);
 
+        $user = auth()->user();
+        $code = strtoupper(trim($request->code));
+
         try {
-            $userId = Auth::id();
-            $code = $request->code;
+            $rewards = DB::transaction(function () use ($user, $code) {
+                $promoCode = PromoCode::where('code', $code)
+                    ->where('is_active', true)
+                    ->where(function ($query) {
+                        $query->where('start_date', '<=', now())
+                            ->where('end_date', '>=', now());
+                    })
+                    ->first();
 
-            $promoCode = PromoCode::where('code', $code)
-                ->where('is_active', true)
-                ->where(function ($query) {
-                    $query->whereNull('expires_at')
-                        ->orWhere('expires_at', '>', now());
-                })
-                ->with(['items', 'users'])
-                ->first();
+                if (!$promoCode) {
+                    throw new \Exception('Code promo invalide ou expiré');
+                }
 
-            if (!$promoCode) {
-                return redirect()->route('promocodes.index')->with('flash', [
-                    'type' => 'error',
-                    'title' => 'Code Invalide',
-                    'message' => 'Ce code promotionnel est invalide ou a expiré.'
-                ]);
-            }
+                if ($promoCode->max_uses > 0 && $promoCode->current_uses >= $promoCode->max_uses) {
+                    throw new \Exception('Ce code promo a atteint sa limite d\'utilisation');
+                }
 
-            if (!$promoCode->is_global) {
-                $canUse = $promoCode->users()->where('users.id', $userId)->exists();
-                if (!$canUse) {
-                    return redirect()->route('promocodes.index')->with('flash', [
-                        'type' => 'error',
-                        'title' => 'Accès Refusé',
-                        'message' => 'Ce code n\'est pas disponible pour votre compte.'
+                if ($promoCode->is_global) {
+                    $alreadyUsed = $promoCode->users()
+                        ->where('user_id', $user->id)
+                        ->where('is_used', true)
+                        ->exists();
+                } else {
+                    $alreadyUsed = $promoCode->users()
+                        ->where('user_id', $user->id)
+                        ->exists();
+                }
+
+                if ($alreadyUsed) {
+                    throw new \Exception('Vous avez déjà utilisé ce code promo');
+                }
+
+                $rewards = $this->processRewards($promoCode, $user->id);
+
+                if ($promoCode->is_global) {
+                    $promoCode->users()->attach($user->id, [
+                        'is_used' => true,
+                        'used_at' => now()
+                    ]);
+                } else {
+                    $promoCode->users()->attach($user->id, [
+                        'is_used' => false,
+                        'used_at' => null
                     ]);
                 }
-            }
 
-            $usageRecord = $promoCode->users()
-                ->where('users.id', $userId)
-                ->wherePivot('is_used', true)
-                ->first();
+                $promoCode->increment('current_uses');
 
-            if ($usageRecord) {
-                return redirect()->route('promocodes.index')->with('flash', [
-                    'type' => 'error',
-                    'title' => 'Code Déjà Utilisé',
-                    'message' => 'Vous avez déjà utilisé ce code promotionnel.'
-                ]);
-            }
-
-            $rewards = $this->processRewards($promoCode, $userId);
+                return $rewards;
+            });
 
             return redirect()->route('promocodes.index')->with('flash', [
                 'type' => 'success',
@@ -134,8 +142,8 @@ class PromoCodeController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('promocodes.index')->with('flash', [
                 'type' => 'error',
-                'title' => 'Erreur Serveur',
-                'message' => 'Une erreur inattendue est survenue.'
+                'title' => 'Erreur',
+                'message' => $e->getMessage()
             ]);
         }
     }
@@ -180,18 +188,6 @@ class PromoCodeController extends Controller
             }
 
             $inventoryItem->save();
-        }
-
-        if ($promoCode->is_global) {
-            $promoCode->users()->attach($userId, [
-                'is_used' => true,
-                'used_at' => now()
-            ]);
-        } else {
-            $promoCode->users()->updateExistingPivot($userId, [
-                'is_used' => true,
-                'used_at' => now()
-            ]);
         }
 
         return $rewards;

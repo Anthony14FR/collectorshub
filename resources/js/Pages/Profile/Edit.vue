@@ -6,6 +6,7 @@ import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import Alert from '@/Components/UI/Alert.vue';
+import Badge from '@/Components/UI/Badge.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
 
@@ -15,6 +16,7 @@ interface Props extends PageProps {
   };
   mustVerifyEmail?: boolean;
   status?: string;
+  success?: string;
 }
 
 const props = defineProps<Props>();
@@ -24,6 +26,19 @@ const unlockedAvatars = Array.isArray(props.auth.user.unlocked_avatars)
   : props.auth.user.unlocked_avatars 
     ? JSON.parse(props.auth.user.unlocked_avatars)
     : [];
+
+const unlockedBackgrounds = Array.isArray(props.auth.user.unlocked_backgrounds)
+  ? props.auth.user.unlocked_backgrounds
+  : props.auth.user.unlocked_backgrounds 
+    ? JSON.parse(props.auth.user.unlocked_backgrounds)
+    : [];
+
+const allAvailableBackgrounds = computed(() => {
+  const defaultBg = '/images/section-me-background.jpg';
+  const otherBackgrounds = unlockedBackgrounds.filter((bg: string) => bg !== defaultBg);
+  const result = [defaultBg, ...otherBackgrounds];
+  return result;
+});
 
 const profileForm = reactive({
   username: props.auth.user.username,
@@ -46,10 +61,30 @@ const avatarForm = reactive({
   errors: {} as Record<string, string>,
 });
 
+const backgroundForm = reactive({
+  background: props.auth.user.background,
+  processing: false,
+  errors: {} as Record<string, string>,
+});
+
+const totpForm = reactive({
+  enabled: props.auth.user.totp_enabled || false,
+  processing: false,
+  errors: {} as Record<string, string>,
+});
+
+const updateTotpState = () => {
+  totpForm.enabled = props.auth.user.totp_enabled || false;
+};
+
+updateTotpState();
+
 
 const showProfileModal = ref(false);
 const showPasswordModal = ref(false);
 const showAvatarModal = ref(false);
+const showBackgroundModal = ref(false);
+const showTotpModal = ref(false);
 const showAlert = ref(false);
 const alertType = ref<'success' | 'error'>('success');
 const alertMessage = ref('');
@@ -126,6 +161,29 @@ const updateAvatar = () => {
   });
 };
 
+const updateBackground = () => {
+  backgroundForm.processing = true;
+  backgroundForm.errors = {};
+  
+  router.patch("/background", { 
+    background: backgroundForm.background 
+  }, {
+    onSuccess: () => {
+      backgroundForm.processing = false;
+      showBackgroundModal.value = false;
+      showSuccessAlert("Background mis à jour avec succès !");
+    },
+    onError: (errors: Record<string, string>) => {
+      backgroundForm.processing = false;
+      backgroundForm.errors = errors;
+    },
+  });
+};
+
+const selectBackground = (backgroundPath: string) => {
+  backgroundForm.background = backgroundPath;
+};
+
 const cancelProfileEdit = () => {
   profileForm.username = props.auth.user.username;
   profileForm.email = props.auth.user.email;
@@ -154,8 +212,49 @@ const showSuccessAlert = (message: string) => {
   }, 4000);
 };
 
+if (props.success) {
+  showSuccessAlert(props.success);
+}
+
+const showErrorAlert = (message: string) => {
+  alertType.value = 'error';
+  alertMessage.value = message;
+  showAlert.value = true;
+  setTimeout(() => {
+    showAlert.value = false;
+  }, 4000);
+};
+
 const goToProfile = () => {
   router.visit('/me');
+};
+
+const toggleTotp = () => {
+  if (totpForm.enabled) {
+    disableTotp();
+  } else {
+    enableTotp();
+  }
+};
+
+const disableTotp = () => {
+  totpForm.processing = true;
+  
+  router.post('/profile/totp/disable', {}, {
+    onSuccess: () => {
+      totpForm.processing = false;
+      updateTotpState();
+    },
+    onError: (errors: Record<string, string>) => {
+      totpForm.errors = errors;
+      totpForm.processing = false;
+      showErrorAlert('Erreur lors de la désactivation du TOTP');
+    }
+  });
+};
+
+const enableTotp = () => {
+  router.visit('/profile/totp');
 };
 </script>
 
@@ -226,6 +325,12 @@ const goToProfile = () => {
                     </span>
                   </div>
                 </div>
+                <Button 
+                  @click="showBackgroundModal = true"
+                  variant="secondary"
+                >
+                  🎨 Changer le fond
+                </Button>
               </div>
             </div>
 
@@ -255,22 +360,65 @@ const goToProfile = () => {
 
                 <div class="space-y-4">
                   <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold flex items-center gap-2">
-                      <span class="text-xl">🔐</span>
-                      Sécurité
-                    </h3>
-                    <Button @click="showPasswordModal = true" variant="secondary" size="sm">
-                      Changer
-                    </Button>
-                  </div>
-                  <div class="space-y-3">
                     <div>
-                      <label class="text-sm font-medium text-base-content/70">Mot de passe</label>
-                      <div class="mt-1 p-3 bg-base-200/50 rounded-lg">••••••••</div>
+                      <h3 class="text-lg font-semibold flex items-center gap-2">
+                        <span class="text-xl">🔐</span>
+                        Sécurité
+                      </h3>
+                      <p class="text-sm text-base-content/60 mt-1">
+                        Gérez la sécurité de votre compte et l'authentification à deux facteurs
+                      </p>
                     </div>
-                    <div>
-                      <label class="text-sm font-medium text-base-content/70">Membre depuis</label>
-                      <div class="mt-1 p-3 bg-base-200/50 rounded-lg">{{ formattedJoinDate }}</div>
+                  </div>
+                  
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30">
+                      <div>
+                        <label class="text-sm font-medium text-base-content/70">Mot de passe</label>
+                        <div class="mt-1 text-base-content">••••••••</div>
+                      </div>
+                      <Button @click="showPasswordModal = true" variant="secondary" size="sm">
+                        Changer
+                      </Button>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30 gap-3">
+                      <div class="flex-1">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2 sm:mb-0">
+                          <label class="text-sm font-medium text-base-content/70">
+                            Authentification à deux facteurs
+                          </label>
+                          <Badge 
+                            :variant="totpForm.enabled ? 'success' : 'ghost'" 
+                            size="sm"
+                          >
+                            {{ totpForm.enabled ? 'Activé' : 'Désactivé' }}
+                          </Badge>
+                        </div>
+                        <p class="text-xs text-base-content/50">
+                          {{ totpForm.enabled 
+                            ? 'Votre compte est protégé par un authentificateur' 
+                            : 'Ajoutez une couche de sécurité supplémentaire avec un authentificateur'
+                          }}
+                        </p>
+                      </div>
+                      <Button 
+                        @click="toggleTotp" 
+                        :variant="totpForm.enabled ? 'secondary' : 'primary'" 
+                        size="sm"
+                        :disabled="totpForm.processing"
+                        class="w-full sm:w-auto"
+                      >
+                        <span v-if="totpForm.processing" class="loading loading-spinner loading-xs"></span>
+                        {{ totpForm.enabled ? 'Désactiver' : 'Configurer' }}
+                      </Button>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30">
+                      <div>
+                        <label class="text-sm font-medium text-base-content/70">Membre depuis</label>
+                        <div class="mt-1 text-base-content">{{ formattedJoinDate }}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -298,8 +446,8 @@ const goToProfile = () => {
           </div>
 
           <div class="text-center">
-            <Button @click="goToProfile" variant="outline" size="lg" class="min-w-48">
-              ← Retour au profil
+            <Button @click="goToProfile" variant="secondary" size="lg" class="min-w-48">
+              ← Retour à la page d'accueil
             </Button>
           </div>
         </div>
@@ -441,6 +589,58 @@ const goToProfile = () => {
             </Button>
             <Button @click="updateAvatar" :disabled="avatarForm.processing">
               {{ avatarForm.processing ? 'Mise à jour...' : 'Confirmer' }}
+            </Button>
+          </div>
+        </div>
+      </template>
+    </Modal>
+
+    <Modal :show="showBackgroundModal" @close="showBackgroundModal = false" max-width="4xl">
+      <template #header>
+        <h3 class="text-lg font-bold">Choisir un Background</h3>
+      </template>
+      <template #default>
+        <div class="p-4">
+          <div v-if="allAvailableBackgrounds.length === 0" class="text-center py-8">
+            <p class="text-xl mb-2">🎨</p>
+            <p class="text-sm mb-4">Aucun background disponible</p>
+            <Button @click="() => { showBackgroundModal = false; router.visit('/shop'); }" variant="primary">
+              Aller au Shop
+            </Button>
+          </div>
+          <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div
+              v-for="background in allAvailableBackgrounds"
+              :key="background"
+              @click="selectBackground(background)"
+              class="relative cursor-pointer rounded-lg overflow-hidden transition-all duration-200 border-2 aspect-video"
+              :class="[
+                backgroundForm.background === background 
+                  ? 'border-secondary shadow-lg shadow-secondary/30 scale-105' 
+                  : 'border-base-300/30 hover:border-secondary/50 hover:scale-105'
+              ]"
+            >
+              <img
+                :src="background"
+                alt="Background"
+                class="w-full h-full object-cover"
+              />
+              <div
+                v-if="backgroundForm.background === background"
+                class="absolute inset-0 bg-secondary/20 flex items-center justify-center"
+              >
+                <svg class="w-8 h-8 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-3 justify-end mt-6">
+            <Button @click="showBackgroundModal = false" variant="outline" type="button">
+              Annuler
+            </Button>
+            <Button @click="updateBackground" :disabled="backgroundForm.processing">
+              {{ backgroundForm.processing ? 'Mise à jour...' : 'Confirmer' }}
             </Button>
           </div>
         </div>

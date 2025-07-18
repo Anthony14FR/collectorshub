@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\DB;
 
 class ExpeditionService
 {
+    protected $successService;
+
+    public function __construct(SuccessService $successService)
+    {
+        $this->successService = $successService;
+    }
+
     public function getDailyExpeditions(User $user): array
     {
         $existingUserExpeditions = UserExpedition::where('user_id', $user->id)
@@ -249,7 +256,12 @@ class ExpeditionService
 
             $rewards = $this->processRewards($user, $userExpedition->expedition->rewards);
 
-            $userExpedition->delete();
+            $userExpedition->update([
+                'status' => 'completed',
+                'claimed_at' => $claimedAt
+            ]);
+
+            $this->successService->checkAndUnlockSuccesses($user);
 
             return [
                 'success' => true,

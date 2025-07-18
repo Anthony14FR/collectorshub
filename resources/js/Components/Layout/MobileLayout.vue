@@ -27,6 +27,8 @@ interface Props {
   announcements?: any[];
   marketplaceHistory?: any[];
   unreadNotificationsCount?: number;
+  onGoToTower?: () => void;
+  onOpenFriendsModal?: () => void;
 }
 
 const {
@@ -44,6 +46,8 @@ const {
   level_rewards_preview,
   onGoToExpeditions,
   unreadNotificationsCount = 0,
+  onGoToTower,
+  onOpenFriendsModal
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -143,8 +147,21 @@ const goToPokemonUpgrade = () => {
           </div>
         </div>
 
-        <div
-          class="relative overflow-hidden rounded-xl bg-gradient-to-br from-warning/30 to-amber-500/40 border border-warning/40">
+        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/40 border border-secondary/30">
+          <div class="absolute inset-0 bg-[url('/images/friends.jpg')] bg-cover bg-center opacity-30"></div>
+          <div class="relative p-4 flex flex-col h-32">
+            <div class="flex items-center mb-2">
+              <img src="/images/icons/friends.png" alt="Amis" class="w-5 h-5 mr-2">
+              <h3 class="text-sm font-bold text-secondary">Amis</h3>
+            </div>
+            <p class="text-xs text-white/80 mb-auto">Gérer mes amis</p>
+            <Button v-if="onOpenFriendsModal" @click="onOpenFriendsModal" variant="secondary" size="sm" class="w-full text-xs py-1.5">
+              Voir
+            </Button>
+          </div>
+        </div>
+
+        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-warning/30 to-amber-500/40 border border-warning/40">
           <div class="absolute inset-0 bg-[url('/images/background/upgrade.gif')] bg-cover bg-center opacity-40"></div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
@@ -207,6 +224,23 @@ const goToPokemonUpgrade = () => {
             <Button v-if="onGoToExpeditions" @click="onGoToExpeditions" variant="secondary" size="sm"
                     class="w-full text-xs py-1.5">
               Partir
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-2">
+        <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-error/20 to-red-600/30 border border-error/30">
+          <div class="absolute inset-0 bg-[url('/images/background/tower.jpg')] bg-cover bg-center opacity-40"></div>
+          <div class="absolute inset-0 bg-black/40"></div>
+          <div class="relative p-4 flex flex-col h-32">
+            <div class="flex items-center mb-2">
+              <span class="text-lg mr-2">🔥</span>
+              <h3 class="text-sm font-bold text-error">Tour Infernale</h3>
+            </div>
+            <p class="text-xs text-white/80 mb-auto">Défis épiques</p>
+            <Button v-if="onGoToTower" @click="onGoToTower" variant="secondary" size="sm" class="w-full text-xs py-1.5">
+              Défier
             </Button>
           </div>
         </div>

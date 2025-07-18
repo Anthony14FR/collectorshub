@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExpeditionController;
+use App\Http\Controllers\InfernalTowerController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LevelRewardController;
 use App\Http\Controllers\MarketplaceController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SuccessController;
+use App\Http\Controllers\UserProfileController;
 use App\Models\Pokedex;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -27,15 +29,24 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Route pour Me
-    Route::get('/me', [MeController::class, 'index'])->middleware(['verified'])->name('me');
+    Route::get('/me', [MeController::class, 'index'])->name('me');
+
+    // Routes 2FA
+    Route::get('/profile/totp', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'setupTotp'])->name('totp.setup');
+    Route::post('/profile/totp/enable', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'enableTotp'])->name('totp.enable');
+    Route::post('/profile/totp/disable', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'disableTotp'])->name('totp.disable');
+
+    // Route pour voir le profil d'un utilisateur
+    Route::get('/profile/{user:username}', [UserProfileController::class, 'show'])->middleware(['verified'])->name('user.profile.show');
 
     // Routes pour Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::patch('/avatar', [ProfileController::class, 'updateAvatar'])->name('avatar.update');
+    Route::patch('/background', [ProfileController::class, 'updateBackground'])->name('background.update');
 
     // Routes pour Pokedex
     Route::get('/pokedex/user-pokemons', [PokedexController::class, 'getUserPokemons'])->name('pokedex.user-pokemons');
@@ -90,6 +101,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+
+    // Route pour la Tour Infernale
+    Route::get('/tower', [InfernalTowerController::class, 'index'])->name('tower.index');
+
+    // Gestion des amis
+    Route::get('/friends', [\App\Http\Controllers\FriendController::class, 'index'])->name('friends.index');
+    Route::post('/friends/send-request', [\App\Http\Controllers\FriendController::class, 'sendRequest'])->name('friends.sendRequest');
+    Route::post('/friends/accept-request', [\App\Http\Controllers\FriendController::class, 'acceptRequest'])->name('friends.acceptRequest');
+    Route::post('/friends/remove', [\App\Http\Controllers\FriendController::class, 'remove'])->name('friends.remove');
+    Route::get('/friends/search', [\App\Http\Controllers\FriendController::class, 'search'])->name('friends.search');
+
+    // Gestion des cadeaux d'amis
+    Route::post('/friend-gifts/send', [\App\Http\Controllers\UserFriendGiftController::class, 'send'])->name('friend-gifts.send');
+    Route::post('/friend-gifts/claim', [\App\Http\Controllers\UserFriendGiftController::class, 'claim'])->name('friend-gifts.claim');
+    Route::post('/friend-gifts/claim-all', [\App\Http\Controllers\UserFriendGiftController::class, 'claimAll'])->name('friend-gifts.claim-all');
+    Route::post('/friend-gifts/send-all', [\App\Http\Controllers\UserFriendGiftController::class, 'sendToAll'])->name('friend-gifts.send-all');
 });
 
 require __DIR__ . '/admin.php';

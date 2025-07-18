@@ -30,6 +30,8 @@ interface Props {
   announcements?: any[];
   marketplaceHistory?: any[];
   unreadNotificationsCount?: number;
+  onGoToTower?: () => void;
+  onOpenFriendsModal?: () => void;
 }
 
 const {
@@ -47,6 +49,8 @@ const {
   level_rewards_preview,
   onGoToExpeditions,
   unreadNotificationsCount = 0,
+  onGoToTower,
+  onOpenFriendsModal
 } = defineProps<Props>();
 
 const goToInvocation = () => {
@@ -131,7 +135,7 @@ const goToPokemonUpgrade = () => {
             </span>
           </div>
           <div class="relative z-10">
-            <h3 class="mb-1 bg-gradient-to-r from-info to-info/80 bg-clip-text text-base font-bold text-transparent">
+            <h3 class="mb-1  font-bold">
               Badges
             </h3>
             <p class="text-xs text-base-content/70">
@@ -167,6 +171,29 @@ const goToPokemonUpgrade = () => {
           </div>
         </div>
 
+        <div
+          class="flex flex-row items-center justify-between overflow-hidden p-4 backdrop-blur-sm relative"
+          style="background-image: url('/images/friends.jpg'); background-size: cover; background-position: center;"
+        >
+          <div class="absolute inset-0 bg-black/70" />
+          <div class="relative z-10">
+            <h3 class="mb-1 bg-gradient-to-r from-secondary to-secondary/80 bg-clip-text text-base font-bold text-transparent">
+              Amis
+            </h3>
+            <p class="text-xs text-base-content/70">
+              Gérer mes amis & cadeaux
+            </p>
+          </div>
+          <Button
+            v-if="onOpenFriendsModal"
+            @click="onOpenFriendsModal"
+            variant="secondary"
+            size="sm"
+            class="relative z-10"
+          >
+            <img src="/images/icons/friends.png" alt="Amis" class="w-10 h-10" />
+          </Button>
+        </div>
       </div>
     </SideSection>
 
@@ -197,7 +224,8 @@ const goToPokemonUpgrade = () => {
               </div>
             </div>
           </div>
-          <p>Augmentez le niveau d'étoiles de vos Pokémon</p>
+          
+          <p class="text-white">Augmentez le niveau d'étoiles de vos Pokémon</p>
 
           <div class="flex">
             <Button @click="goToPokemonUpgrade" variant="secondary" size="sm" class="shadow-lg w-full">
@@ -223,6 +251,32 @@ const goToPokemonUpgrade = () => {
           </p>
           <Button v-if="onGoToExpeditions" @click="onGoToExpeditions" variant="secondary" size="sm" class="w-full">
             Commencer une expédition
+          </Button>
+        </div>
+      </div>
+    </SideSection>
+    <SideSection position="right" :top="false" class="top-[655px]">
+      <div
+        class="relative h-40 overflow-hidden border-2 border-error bg-base-100/60 p-4 flex flex-col justify-end"
+        style="background-image: url('/images/background/tower.jpg'); background-size: cover; background-position: center;"
+      >
+        <div class="absolute inset-0 bg-gradient-to-t from-error/70 to-transparent" />
+        <div class="relative z-10">
+          <h3 class="mb-1 text-lg font-bold text-white flex items-center">
+            <span class="text-xl mr-2">🔥</span>
+            Tour Infernale
+          </h3>
+          <p class="mb-3 text-xs text-white/80">
+            Défiez les dresseurs les plus puissants
+          </p>
+          <Button
+            v-if="onGoToTower"
+            @click="onGoToTower"
+            variant="secondary"
+            size="sm"
+            class="w-full"
+          >
+            Entrer dans la tour
           </Button>
         </div>
       </div>

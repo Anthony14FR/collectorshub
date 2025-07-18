@@ -39,6 +39,7 @@ export { default as SideSection } from './Layout/SideSection.vue';
 // Composables
 export { useMarketplace } from '../composables/useMarketplace';
 export { useSelling } from '../composables/useSelling';
+export { useMusicPlayer } from '../composables/useMusicPlayer';
 
 // Utils
 export * from '../utils/marketplace';
@@ -50,3 +51,7 @@ export type * from '../types/marketplace';
 // Leaderboard Components
 export { default as PodiumCard } from './Leaderboard/PodiumCard.vue';
 export { default as LeaderboardRow } from './Leaderboard/LeaderboardRow.vue';
+
+
+// Audio Components
+export { default as MusicPlayer } from './Audio/MusicPlayer.vue';
