@@ -9,9 +9,6 @@ use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
-    /**
-     * Afficher la page des notifications de l'utilisateur
-     */
     public function index()
     {
         $user = Auth::user();
@@ -27,12 +24,8 @@ class NotificationController extends Controller
         ]);
     }
 
-    /**
-     * Marquer une notification comme lue
-     */
     public function markAsRead(Notification $notification): JsonResponse
     {
-        // Vérifier que la notification appartient à l'utilisateur connecté
         if ($notification->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -42,9 +35,6 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Marquer toutes les notifications comme lues
-     */
     public function markAllAsRead(): JsonResponse
     {
         Auth::user()->notifications()->unread()->update([
@@ -55,9 +45,6 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Supprimer une notification
-     */
     public function destroy(Notification $notification): JsonResponse
     {
         if ($notification->user_id !== Auth::id()) {
@@ -69,9 +56,6 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Obtenir le nombre de notifications non lues
-     */
     public function getUnreadCount(): JsonResponse
     {
         $count = Auth::user()->notifications()->unread()->count();

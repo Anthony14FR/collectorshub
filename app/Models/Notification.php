@@ -32,17 +32,11 @@ class Notification extends Model
     public const TYPE_MARKETPLACE_BUY = 'marketplace_buy';
     public const TYPE_MARKETPLACE_SELL = 'marketplace_sell';
 
-    /**
-     * Relation avec l'utilisateur
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Marquer comme lu
-     */
     public function markAsRead(): void
     {
         if (!$this->is_read) {
@@ -53,33 +47,21 @@ class Notification extends Model
         }
     }
 
-    /**
-     * Scope pour les notifications non lues
-     */
     public function scopeUnread($query)
     {
         return $query->where('is_read', false);
     }
 
-    /**
-     * Scope pour les annonces
-     */
     public function scopeAnnouncements($query)
     {
         return $query->where('type', self::TYPE_ANNOUNCEMENT);
     }
 
-    /**
-     * Scope pour l'historique marketplace
-     */
     public function scopeMarketplaceHistory($query)
     {
         return $query->whereIn('type', [self::TYPE_MARKETPLACE_BUY, self::TYPE_MARKETPLACE_SELL]);
     }
 
-    /**
-     * Créer une notification d'achat marketplace
-     */
     public static function createMarketplaceBuy(int $userId, array $data): self
     {
         return self::create([
@@ -91,9 +73,6 @@ class Notification extends Model
         ]);
     }
 
-    /**
-     * Créer une notification de vente marketplace
-     */
     public static function createMarketplaceSell(int $userId, array $data): self
     {
         return self::create([
@@ -105,9 +84,6 @@ class Notification extends Model
         ]);
     }
 
-    /**
-     * Créer une annonce
-     */
     public static function createAnnouncement(int $userId, string $title, string $message, array $data = []): self
     {
         return self::create([

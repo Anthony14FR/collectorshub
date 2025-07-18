@@ -10,9 +10,6 @@ use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
-    /**
-     * Afficher la page de création d'annonces
-     */
     public function create()
     {
         $users = User::select(['id', 'name', 'username', 'email', 'level', 'role'])
@@ -24,9 +21,6 @@ class NotificationController extends Controller
         ]);
     }
 
-    /**
-     * Envoyer une annonce
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -66,9 +60,6 @@ class NotificationController extends Controller
         }
     }
 
-    /**
-     * Afficher l'historique des annonces
-     */
     public function index()
     {
         $announcements = Notification::announcements()
