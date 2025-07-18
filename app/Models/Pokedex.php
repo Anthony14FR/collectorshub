@@ -21,7 +21,8 @@ class Pokedex extends Model
         'is_in_team',
         'is_favorite',
         'obtained_at',
-        'cp'
+        'cp',
+        'team_position'
     ];
 
     protected $casts = [
