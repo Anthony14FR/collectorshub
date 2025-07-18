@@ -73,15 +73,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue'
 import Button from '@/Components/UI/Button.vue'
 import Input from '@/Components/UI/Input.vue'
+import { useMatomoTracking } from '@/composables/useMatomoTracking'
 
 const processing = ref(false)
 const verificationCode = ref('')
 const errors = ref({} as Record<string, string>)
+const { trackAuthAction, startTimer, trackTimeSpent, trackFormError } = useMatomoTracking()
+const pageStartTime = ref(0)
+
+onMounted(() => {
+  pageStartTime.value = startTimer()
+  trackAuthAction('totp_verification_view')
+})
+
+onUnmounted(() => {
+  if (pageStartTime.value) {
+    trackTimeSpent(pageStartTime.value, 'Authentication', 'TOTP Verification Page')
+  }
+})
 
 const handleCodeInput = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -94,20 +108,30 @@ const verifyTotp = async () => {
   processing.value = true
   errors.value = {}
   
+  trackAuthAction('totp_verification', 'Verify attempt')
+  
   router.post('/totp/verify', {
     code: verificationCode.value
   }, {
     onSuccess: () => {
       processing.value = false
+      trackAuthAction('totp_verification', 'Verify success')
     },
     onError: (responseErrors: Record<string, string>) => {
       errors.value = responseErrors
       processing.value = false
+      
+      Object.keys(responseErrors).forEach(field => {
+        trackFormError('TOTP Verification', field)
+      })
+      
+      trackAuthAction('totp_verification', 'Verify error')
     }
   })
 }
 
 const goBack = () => {
+  trackAuthAction('totp_verification', 'Navigate back to login')
   router.visit('/login')
 }
 </script> 

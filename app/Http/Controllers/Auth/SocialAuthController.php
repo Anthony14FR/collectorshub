@@ -33,10 +33,12 @@ class SocialAuthController extends Controller
             $socialUser = Socialite::driver($provider)->user();
 
             $user = $this->findExistingSocialUser($provider, $socialUser);
+            $isNewUser = false;
 
             if ($user) {
                 $this->updateSocialUserData($user, $provider, $socialUser);
                 Auth::login($user);
+                $this->trackSocialLoginSuccess($provider, 'existing_user');
                 return $this->redirectAfterLogin($user->fresh());
             }
 
@@ -45,11 +47,14 @@ class SocialAuthController extends Controller
             if ($existingUser) {
                 $this->linkSocialAccount($existingUser, $provider, $socialUser);
                 Auth::login($existingUser);
+                $this->trackSocialLoginSuccess($provider, 'linked_account');
                 return $this->redirectAfterLogin($existingUser->fresh());
             }
 
             $newUser = $this->createUserFromSocialData($provider, $socialUser);
             Auth::login($newUser);
+            $isNewUser = true;
+            $this->trackSocialLoginSuccess($provider, 'new_user');
 
             return $this->redirectAfterLogin($newUser->fresh());
 
@@ -58,6 +63,8 @@ class SocialAuthController extends Controller
                 'provider' => $provider,
                 'error' => $e->getMessage()
             ]);
+
+            $this->trackSocialLoginError($provider, $e->getMessage());
 
             return redirect('/login')->with('status', 'Erreur lors de la connexion avec ' . ucfirst($provider) . '. Veuillez réessayer.');
         }
@@ -205,5 +212,50 @@ class SocialAuthController extends Controller
         }
 
         return redirect()->intended(route('me', absolute: false));
+    }
+
+    private function trackSocialLoginSuccess(string $provider, string $userType): void
+    {
+        $trackingData = [
+            'event' => 'social_login_success',
+            'provider' => $provider,
+            'user_type' => $userType,
+            'timestamp' => now()->toISOString(),
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent()
+        ];
+
+        if (app()->environment('local')) {
+            logger()->info('Matomo Social Login Success', $trackingData);
+        }
+        session()->flash('matomo_event', [
+            'category' => 'Social Login',
+            'action' => 'success',
+            'name' => $provider,
+            'value' => $userType
+        ]);
+    }
+
+    private function trackSocialLoginError(string $provider, string $errorMessage): void
+    {
+        $trackingData = [
+            'event' => 'social_login_error',
+            'provider' => $provider,
+            'error' => $errorMessage,
+            'timestamp' => now()->toISOString(),
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent()
+        ];
+
+        if (app()->environment('local')) {
+            logger()->info('Matomo Social Login Error', $trackingData);
+        }
+
+        session()->flash('matomo_event', [
+            'category' => 'Social Login',
+            'action' => 'error',
+            'name' => $provider,
+            'value' => $errorMessage
+        ]);
     }
 }

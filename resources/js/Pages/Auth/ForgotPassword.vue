@@ -4,7 +4,8 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 interface Props {
   status?: string;
@@ -19,9 +20,24 @@ const form = reactive({
 });
 
 const loginInput = ref<HTMLInputElement>();
+const { trackAuthAction, startTimer, trackTimeSpent } = useMatomoTracking();
+const pageStartTime = ref(0);
+
+onMounted(() => {
+  pageStartTime.value = startTimer();
+  trackAuthAction('forgot_password_view');
+});
+
+onUnmounted(() => {
+  if (pageStartTime.value) {
+    trackTimeSpent(pageStartTime.value, 'Authentication', 'Forgot Password Page');
+  }
+});
 
 const submit = () => {
   form.processing = true;
+  
+  trackAuthAction('password_reset', 'Request sent');
 
   router.post('/forgot-password', {
     login: form.login,
@@ -29,10 +45,12 @@ const submit = () => {
     onFinish: () => {
       form.processing = false;
       form.submitted = true;
+      trackAuthAction('password_reset', 'Request completed');
     },
     onError: () => {
       form.processing = false;
       form.submitted = true;
+      trackAuthAction('password_reset', 'Request error');
     },
   });
 };

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { computed, onUnmounted, reactive, ref } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Alert from '@/Components/UI/Alert.vue';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 interface Props {
   status?: string;
@@ -19,6 +20,13 @@ const form = reactive({
 const lastSentTime = ref<number>(0);
 const remainingTime = ref<number>(0);
 const intervalId = ref<number | null>(null);
+const { trackAuthAction, startTimer, trackTimeSpent } = useMatomoTracking();
+const pageStartTime = ref<number>(0);
+
+onMounted(() => {
+  pageStartTime.value = startTimer();
+  trackAuthAction('verify_email_view');
+});
 
 const canResend = computed(() => remainingTime.value <= 0 && !form.processing);
 
@@ -26,15 +34,18 @@ const submit = () => {
   if (!canResend.value) return;
 
   form.processing = true;
+  trackAuthAction('email_verification', 'Resend request');
 
   router.post('/email/verification-notification', {}, {
     onSuccess: () => {
       form.processing = false;
       form.recentlySent = true;
+      trackAuthAction('email_verification', 'Resend success');
       startCountdown();
     },
     onError: () => {
       form.processing = false;
+      trackAuthAction('email_verification', 'Resend error');
     },
   });
 };
@@ -59,10 +70,15 @@ const startCountdown = () => {
 };
 
 const logout = () => {
+  trackAuthAction('email_verification', 'Logout from verify page');
   router.post('/logout');
 };
 
 onUnmounted(() => {
+  if (pageStartTime.value) {
+    trackTimeSpent(pageStartTime.value, 'Authentication', 'Verify Email Page');
+  }
+  
   if (intervalId.value) {
     clearInterval(intervalId.value);
   }

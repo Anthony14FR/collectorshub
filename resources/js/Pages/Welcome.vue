@@ -180,7 +180,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import Lenis from 'lenis'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
@@ -188,14 +188,28 @@ import AppNavbar from '@/Components/UI/AppNavbar.vue'
 import Button from '@/Components/UI/Button.vue'
 import Badge from '@/Components/UI/Badge.vue'
 import { router } from '@inertiajs/vue3'
+import { useMatomoTracking } from '@/composables/useMatomoTracking'
 
 let lenis = null
+const { trackLandingPageAction, startTimer, trackTimeSpent, trackUserNavigation } = useMatomoTracking()
+const pageStartTime = ref(0)
 
 const goToRegister = () => {
+  trackLandingPageAction('register_click');
+  trackUserNavigation('Landing Page', 'Register');
   router.visit('/register');
 };
 
+const goToLogin = () => {
+  trackLandingPageAction('login_click');
+  trackUserNavigation('Landing Page', 'Login');
+  router.visit('/login');
+};
+
 onMounted(() => {
+  pageStartTime.value = startTimer()
+  trackLandingPageAction('view')
+
   AOS.init({
     duration: 800,
     easing: 'ease-out-cubic',
@@ -207,16 +221,33 @@ onMounted(() => {
     autoRaf: true,
   })
 
+  let hasScrolled = false
   lenis.on('scroll', (e) => {
+    if (e.scroll > 100 && !hasScrolled) {
+      hasScrolled = true
+      trackLandingPageAction('scroll')
+    }
+
     document.querySelectorAll('[data-speed]').forEach((el) => {
       const speed = el.getAttribute('data-speed')
       const yPos = -(e.scroll * speed)
       el.style.transform = `translateY(${yPos}px)`
     })
   })
+
+  const handleBeforeUnload = () => {
+    trackTimeSpent(pageStartTime.value, 'Landing Page', 'Time on Page')
+    trackLandingPageAction('exit')
+  }
+
+  window.addEventListener('beforeunload', handleBeforeUnload)
 })
 
 onUnmounted(() => {
+  if (pageStartTime.value) {
+    trackTimeSpent(pageStartTime.value, 'Landing Page', 'Time on Page')
+  }
+  
   lenis?.destroy()
 })
 </script>

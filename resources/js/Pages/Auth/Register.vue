@@ -4,7 +4,8 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, nextTick, reactive, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 const AVATAR_OPTIONS = [1, 2];
 const AVATAR_PATH = (id: number) => `/images/trainer/${id}.png`;
@@ -23,6 +24,47 @@ const form = reactive({
 });
 
 const nameInput = ref<HTMLInputElement>();
+const { trackAuthAction, trackRegistrationFlow, trackAvatarSelection, trackFormError, startTimer, trackTimeSpent } = useMatomoTracking();
+const pageStartTime = ref(0);
+const stepStartTimes = new Map();
+
+onMounted(() => {
+  pageStartTime.value = startTimer();
+  stepStartTimes.set(1, startTimer());
+  trackAuthAction('register_page_view');
+  trackRegistrationFlow(1, 'view', 'Avatar Selection');
+});
+
+onUnmounted(() => {
+  if (pageStartTime.value) {
+    trackTimeSpent(pageStartTime.value, 'Authentication', 'Register Page');
+  }
+});
+
+watch(() => form.avatar, (newAvatar) => {
+  const avatarId = AVATAR_OPTIONS.find(id => AVATAR_PATH(id) === newAvatar);
+  if (avatarId) {
+    trackAvatarSelection(avatarId);
+  }
+});
+
+watch(currentStep, (newStep, oldStep) => {
+  if (oldStep && stepStartTimes.has(oldStep)) {
+    const timeSpent = Math.round((Date.now() - stepStartTimes.get(oldStep)) / 1000);
+    trackRegistrationFlow(oldStep, 'complete', `Time: ${timeSpent}s`);
+  }
+  
+  stepStartTimes.set(newStep, startTimer());
+  
+  const stepNames = {
+    1: 'Avatar Selection',
+    2: 'Account Information',
+    3: 'Password Security',
+    4: 'Review & Confirm'
+  };
+  
+  trackRegistrationFlow(newStep, 'view', stepNames[newStep as keyof typeof stepNames]);
+});
 
 const progressPercentage = computed(() => {
   return (currentStep.value / totalSteps) * 100;
@@ -61,6 +103,9 @@ const submit = () => {
 
   form.processing = true;
   form.errors = {};
+  
+  trackAuthAction('register_start');
+  trackRegistrationFlow(4, 'complete', 'Submit Attempt');
 
   router.post(
     "/register",
@@ -81,15 +126,28 @@ const submit = () => {
         form.processing = false;
         form.errors = errors;
 
+        Object.keys(errors).forEach(field => {
+          trackFormError('Register', field);
+        });
+        
+        trackAuthAction('register_error', Object.keys(errors).join(', '));
+
         if (errors.avatar) {
           currentStep.value = 1;
+          trackRegistrationFlow(1, 'error', 'Avatar validation error');
         } else if (errors.username || errors.email) {
           currentStep.value = 2;
+          trackRegistrationFlow(2, 'error', 'Account info validation error');
           nextTick(() => nameInput.value?.focus());
         } else if (errors.password || errors.password_confirmation) {
           currentStep.value = 3;
+          trackRegistrationFlow(3, 'error', 'Password validation error');
         }
       },
+      onSuccess: () => {
+        trackAuthAction('register_success', 'Classic Registration');
+        trackRegistrationFlow(4, 'complete', 'Registration Successful');
+      }
     }
   );
 };
@@ -120,7 +178,6 @@ const submit = () => {
           </p>
         </div>
 
-        <!-- Social Login Buttons -->
         <div class="mb-6">
           <SocialLoginButtons text="S'inscrire avec" />
         </div>
