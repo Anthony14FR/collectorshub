@@ -31,9 +31,25 @@ class MarketplaceSeeder extends Seeder
 
             foreach ($availablePokemons as $pokemon) {
                 $rarity = $pokemon->pokemon->rarity;
-                $priceRange = Marketplace::getPriceRange($rarity);
+                $price = 0;
 
-                $price = rand($priceRange['min'], $priceRange['max']);
+                switch ($rarity) {
+                    case 'common':
+                        $price = rand(500, 1500);
+                        break;
+                    case 'rare':
+                        $price = rand(1500, 5000);
+                        break;
+                    case 'epic':
+                        $price = rand(5000, 15000);
+                        break;
+                    case 'legendary':
+                        $price = rand(15000, 50000);
+                        break;
+                    default:
+                        $price = rand(1000, 3000);
+                        break;
+                }
 
                 Marketplace::firstOrCreate(
                     [
