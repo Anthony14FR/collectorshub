@@ -63,7 +63,7 @@ services:
       retries: 3
 
   mariadb:
-    image: mariadb:11
+    image: mariadb:latest
     container_name: collectorshub_mariadb_prod
     restart: unless-stopped
     environment:
