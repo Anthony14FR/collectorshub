@@ -11,7 +11,7 @@ return new class () extends Migration {
     public function up()
     {
         Schema::create('pokemon', function (Blueprint $table) {
-            $table->integer('id')->primary();
+            $table->unsignedBigInteger('id')->primary();
             $table->integer('pokedex_id');
             $table->string('name', 50);
             $table->json('types');
