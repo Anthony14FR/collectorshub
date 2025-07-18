@@ -21,7 +21,7 @@ class InfernalTowerLevelSeeder extends Seeder
 
         foreach ($levels as $level) {
             $level['trainer_avatar'] = $trainerAvatars[array_rand($trainerAvatars)];
-            InfernalTowerLevel::create($level);
+            InfernalTowerLevel::firstOrCreate(['level' => $level['level']], $level);
         }
     }
 }

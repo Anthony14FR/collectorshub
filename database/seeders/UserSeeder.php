@@ -19,37 +19,41 @@ class UserSeeder extends Seeder
         $hashedAdminPassword = Hash::make('admin');
         $hashedUserPassword = Hash::make('user');
 
-        $admin = User::create([
-            'username' => 'admin',
-            'email' => 'admin@orus.com',
-            'password' => $hashedAdminPassword,
-            'email_verified_at' => now(),
-            'level' => 1,
-            'experience' => 12,
-            'cash' => 1000000,
-            'last_login' => now(),
-            'role' => 'admin',
-            'status' => 'active',
-            'avatar' => '/images/trainer/2.png',
-            'unlocked_avatars' => json_encode(['/images/trainer/1.png', '/images/trainer/2.png']),
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@orus.com'],
+            [
+                'username' => 'admin',
+                'password' => $hashedAdminPassword,
+                'email_verified_at' => now(),
+                'level' => 1,
+                'experience' => 12,
+                'cash' => 1000000,
+                'last_login' => now(),
+                'role' => 'admin',
+                'status' => 'active',
+                'avatar' => '/images/trainer/2.png',
+                'unlocked_avatars' => json_encode(['/images/trainer/1.png', '/images/trainer/2.png']),
+            ]
+        );
 
         $admin->assignRole($adminRole);
 
-        $user = User::create([
-            'username' => 'user',
-            'email' => 'user@orus.com',
-            'password' => $hashedUserPassword,
-            'email_verified_at' => now(),
-            'level' => 1,
-            'experience' => 12,
-            'cash' => 1000000,
-            'last_login' => now(),
-            'role' => 'user',
-            'status' => 'active',
-            'avatar' => '/images/trainer/2.png',
-            'unlocked_avatars' => json_encode(['/images/trainer/1.png', '/images/trainer/2.png']),
-        ]);
+        $user = User::firstOrCreate(
+            ['email' => 'user@orus.com'],
+            [
+                'username' => 'user',
+                'password' => $hashedUserPassword,
+                'email_verified_at' => now(),
+                'level' => 1,
+                'experience' => 12,
+                'cash' => 1000000,
+                'last_login' => now(),
+                'role' => 'user',
+                'status' => 'active',
+                'avatar' => '/images/trainer/2.png',
+                'unlocked_avatars' => json_encode(['/images/trainer/1.png', '/images/trainer/2.png']),
+            ]
+        );
 
         $user->assignRole($userRole);
 

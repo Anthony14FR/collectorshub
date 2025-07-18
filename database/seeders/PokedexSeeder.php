@@ -22,12 +22,14 @@ class PokedexSeeder extends Seeder
             throw new \Exception('Admin user not found. Run UserSeeder first.');
         }
 
-        Pokedex::create([
-            'user_id' => $admin->id,
-            'pokemon_id' => $pokemon->id,
-            'is_in_team' => false,
-            'level' => 1,
-        ]);
+        if (!Pokedex::where('user_id', $admin->id)->where('pokemon_id', $pokemon->id)->exists()) {
+            Pokedex::create([
+                'user_id' => $admin->id,
+                'pokemon_id' => $pokemon->id,
+                'is_in_team' => false,
+                'level' => 1,
+            ]);
+        }
 
         $this->seedUpgradePokemon($admin);
     }
@@ -40,7 +42,14 @@ class PokedexSeeder extends Seeder
             $pikachu = Pokemon::first();
         }
 
-        for ($i = 0; $i < 170; $i++) {
+        $existingPikachuCount = Pokedex::where('user_id', $admin->id)
+            ->where('pokemon_id', $pikachu->id)
+            ->where('star', 0)
+            ->count();
+
+        $pikachuToCreate = 170 - $existingPikachuCount;
+
+        for ($i = 0; $i < $pikachuToCreate; $i++) {
             Pokedex::create([
                 'user_id' => $admin->id,
                 'pokemon_id' => $pikachu->id,
@@ -57,7 +66,13 @@ class PokedexSeeder extends Seeder
         $randomPokemons = Pokemon::where('id', '!=', $pikachu->id)->take(5)->get();
 
         foreach ($randomPokemons as $pokemon) {
-            for ($i = 0; $i < 2; $i++) {
+            $existingStar1PokemonCount = Pokedex::where('user_id', $admin->id)
+                ->where('pokemon_id', $pokemon->id)
+                ->where('star', 1)
+                ->count();
+            $star1PokemonToCreate = 2 - $existingStar1PokemonCount;
+
+            for ($i = 0; $i < $star1PokemonToCreate; $i++) {
                 Pokedex::create([
                     'user_id' => $admin->id,
                     'pokemon_id' => $pokemon->id,
@@ -71,7 +86,13 @@ class PokedexSeeder extends Seeder
                 ]);
             }
 
-            for ($i = 0; $i < 6; $i++) {
+            $existingStar3PokemonCount = Pokedex::where('user_id', $admin->id)
+                ->where('pokemon_id', $pokemon->id)
+                ->where('star', 3)
+                ->count();
+            $star3PokemonToCreate = 6 - $existingStar3PokemonCount;
+
+            for ($i = 0; $i < $star3PokemonToCreate; $i++) {
                 Pokedex::create([
                     'user_id' => $admin->id,
                     'pokemon_id' => $pokemon->id,

@@ -168,14 +168,18 @@ class ExpeditionSeeder extends Seeder
 
         $rewards = $this->generateRewards($rarity);
 
-        return Expedition::create([
-            'name' => $name,
-            'description' => $description,
-            'rarity' => $rarity,
-            'duration_minutes' => $duration,
-            'rewards' => $rewards,
-            'is_active' => true
-        ]);
+        return Expedition::firstOrCreate(
+            [
+                'name' => $name,
+                'rarity' => $rarity
+            ],
+            [
+                'description' => $description,
+                'duration_minutes' => $duration,
+                'rewards' => $rewards,
+                'is_active' => true
+            ]
+        );
     }
 
     private function generateRewards($rarity)
@@ -207,12 +211,16 @@ class ExpeditionSeeder extends Seeder
             if ($range[1] > 0) {
                 $quantity = rand($range[0], $range[1]);
                 if ($quantity > 0) {
-                    ExpeditionRequirement::create([
-                        'expedition_id' => $expedition->id,
-                        'type' => 'rarity',
-                        'value' => $pokemonRarity,
-                        'quantity' => $quantity
-                    ]);
+                    ExpeditionRequirement::firstOrCreate(
+                        [
+                            'expedition_id' => $expedition->id,
+                            'type' => 'rarity',
+                            'value' => $pokemonRarity
+                        ],
+                        [
+                            'quantity' => $quantity
+                        ]
+                    );
                 }
             }
         }
@@ -224,12 +232,16 @@ class ExpeditionSeeder extends Seeder
             $selectedTypes = $this->selectRandomTypes($numTypes);
 
             foreach ($selectedTypes as $type) {
-                ExpeditionRequirement::create([
-                    'expedition_id' => $expedition->id,
-                    'type' => 'type',
-                    'value' => $type,
-                    'quantity' => 1
-                ]);
+                ExpeditionRequirement::firstOrCreate(
+                    [
+                        'expedition_id' => $expedition->id,
+                        'type' => 'type',
+                        'value' => $type
+                    ],
+                    [
+                        'quantity' => 1
+                    ]
+                );
             }
         }
     }

@@ -316,10 +316,7 @@ class SuccessSeeder extends Seeder
         ];
 
         foreach ($successes as $success) {
-            Success::updateOrCreate(
-                ['key' => $success['key']],
-                $success
-            );
+            Success::updateOrCreate(['key' => $success['key']], $success);
         }
     }
 }
