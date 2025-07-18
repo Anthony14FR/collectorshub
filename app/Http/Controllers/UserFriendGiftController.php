@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\UserFriendGift;
+use App\Services\DailyQuestService;
 use App\Services\UserFriendGiftService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,9 +13,12 @@ class UserFriendGiftController extends Controller
 {
     protected UserFriendGiftService $giftService;
 
-    public function __construct(UserFriendGiftService $giftService)
-    {
+    public function __construct(
+        UserFriendGiftService $giftService,
+        DailyQuestService $dailyQuestService
+    ) {
         $this->giftService = $giftService;
+        $this->dailyQuestService = $dailyQuestService;
     }
 
     public function send(Request $request)
@@ -22,6 +26,10 @@ class UserFriendGiftController extends Controller
         $user = Auth::user();
         $receiver = User::findOrFail($request->input('receiver_id'));
         $ok = $this->giftService->sendGift($user, $receiver);
+
+        if ($ok) {
+            $this->dailyQuestService->incrementQuestProgress($user, 'send_friend_gifts');
+        }
 
         return redirect()->route('me')->with(
             $ok ? 'success' : 'error',
@@ -33,6 +41,10 @@ class UserFriendGiftController extends Controller
     {
         $user = Auth::user();
         $count = $this->giftService->sendToAllFriends($user);
+
+        if ($count > 0) {
+            $this->dailyQuestService->incrementQuestProgress($user, 'send_friend_gifts', $count);
+        }
 
         return redirect()->route('me')->with(
             'success',
