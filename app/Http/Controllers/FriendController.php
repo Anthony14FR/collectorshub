@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserFriend;
 use App\Services\FriendService;
+use App\Services\UserFriendGiftService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -22,7 +23,7 @@ class FriendController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $userFriendGiftService = app(\App\Services\UserFriendGiftService::class);
+        $userFriendGiftService = app(UserFriendGiftService::class);
         $friends = $user->friends()->get()->map(function ($friend) use ($user, $userFriendGiftService) {
             $hasSentGiftToday = $userFriendGiftService->getSentGiftToday($user, $friend) !== null;
             $gift = $friend->userFriendGiftsSent()
@@ -165,7 +166,7 @@ class FriendController extends Controller
         Cache::put($cacheKey, now(), 15);
 
         try {
-            $userFriendGiftService = app(\App\Services\UserFriendGiftService::class);
+            $userFriendGiftService = app(UserFriendGiftService::class);
 
             $friends = $user->friends()->get()->map(function ($friend) use ($user, $userFriendGiftService) {
                 $lastSentGift = $userFriendGiftService->getLastSentGift($user, $friend);

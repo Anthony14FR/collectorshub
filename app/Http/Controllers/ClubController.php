@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Club;
 use App\Models\ClubRequest;
+use App\Models\User;
 use App\Services\ClubService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -173,7 +174,7 @@ class ClubController extends Controller
         ]);
 
         try {
-            $member = \App\Models\User::findOrFail($validated['user_id']);
+            $member = User::findOrFail($validated['user_id']);
             $this->clubService->removeMember($club, $member);
             return back()->with('success', 'Membre expulsé');
         } catch (\Exception $e) {
@@ -192,7 +193,7 @@ class ClubController extends Controller
         ]);
 
         try {
-            $newLeader = \App\Models\User::findOrFail($validated['user_id']);
+            $newLeader = User::findOrFail($validated['user_id']);
             $this->clubService->transferLeadership($club, $newLeader);
             return back()->with('success', 'Leadership transféré avec succès. Vous êtes maintenant membre du club.');
         } catch (\Exception $e) {
