@@ -21,6 +21,7 @@ export interface PokedexEntry {
   is_in_team: boolean;
   obtained_at: string;
   pokemon: BasePokemon;
+  cp?: number;
 }
 
 export interface MarketplaceListing {
@@ -35,11 +36,6 @@ export interface MarketplaceListing {
     id: number;
     username: string;
   };
-}
-
-export interface PriceRange {
-  min: number;
-  max: number;
 }
 
 export interface MarketplaceFilters {
