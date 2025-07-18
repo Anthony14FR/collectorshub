@@ -3,8 +3,7 @@ import { router } from '@inertiajs/vue3';
 import type { PokedexEntry, MarketplaceListing } from '@/types/marketplace';
 import { 
   normalizePokedexEntry, 
-  formatPrice, 
-  getPriceRangeForRarity,
+  formatPrice,
   canSellPokemon,
   isValidPrice 
 } from '@/utils/marketplace';
@@ -18,7 +17,6 @@ export function useSelling() {
   const showCancelModal = ref(false);
   const listingToCancel = ref<MarketplaceListing | null>(null);
   const processing = ref(false);
-  const priceRange = ref({ min: 10, max: 1000000 });
 
   const form = ref({
     pokemon_id: '',
@@ -36,12 +34,11 @@ export function useSelling() {
   const canSubmit = computed(() => {
     if (!selectedPokemon.value) return false;
     
-    const rarity = selectedPokemon.value.pokemon.rarity;
     const price = Number(form.value.price);
     
     return form.value.pokemon_id &&
            form.value.price &&
-           isValidPrice(price, rarity);
+           isValidPrice(price);
   });
 
   const initializeData = (data: { userPokemons: PokedexEntry[], myListings: MarketplaceListing[] }) => {
@@ -54,22 +51,7 @@ export function useSelling() {
     form.value.pokemon_id = pokemon.id.toString();
     selectedPokemon.value = pokemon;
     
-    updatePriceRange();
     showCreateModal.value = false;
-  };
-
-  const updatePriceRange = () => {
-    if (!selectedPokemon.value) return;
-
-    const rarity = selectedPokemon.value.pokemon.rarity;
-    priceRange.value = getPriceRangeForRarity(rarity);
-
-    const currentPrice = Number(form.value.price);
-    if (!currentPrice || currentPrice < priceRange.value.min) {
-      form.value.price = priceRange.value.min.toString();
-    } else if (currentPrice > priceRange.value.max) {
-      form.value.price = priceRange.value.max.toString();
-    }
   };
 
   const resetForm = () => {
@@ -151,7 +133,6 @@ export function useSelling() {
     showCancelModal,
     listingToCancel,
     processing,
-    priceRange,
     form,
     
     availablePokemons,
@@ -159,11 +140,9 @@ export function useSelling() {
     
     normalizePokedexEntry,
     formatPrice,
-    getPriceRangeForRarity,
     
     initializeData,
     selectPokemon,
-    updatePriceRange,
     resetForm,
     openCreateModal,
     showPokemonDetails,
