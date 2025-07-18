@@ -2,15 +2,40 @@ FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
 
+ENV NODE_ENV=production
+
 COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+
 COPY vite.config.js tsconfig.json ./
-
-RUN npm ci
-
 COPY resources ./resources
 COPY public ./public
 
+RUN npm install --production=false --ignore-scripts
 RUN npm run build
+
+FROM composer:latest AS composer
+
+FROM php:8.2-fpm-alpine AS php-builder
+
+RUN apk add --no-cache \
+    oniguruma-dev \
+    libxml2-dev \
+    postgresql-dev \
+    autoconf \
+    g++ \
+    make
+
+RUN docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \
+    mbstring \
+    xml \
+    bcmath \
+    opcache
+
+RUN pecl install redis && docker-php-ext-enable redis
 
 FROM php:8.2-fpm-alpine AS app
 
@@ -24,27 +49,12 @@ RUN apk add --no-cache \
     unzip \
     git \
     curl \
-    oniguruma-dev \
-    libxml2-dev \
-    postgresql-dev \
-    sqlite \
-    sqlite-dev \
-    autoconf \
-    g++ \
-    make \
-    && docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
-    pdo_sqlite \
-    mbstring \
-    xml \
-    bcmath \
-    opcache
+    postgresql-libs
 
-RUN pecl install redis && docker-php-ext-enable redis
+COPY --from=php-builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=php-builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
@@ -52,19 +62,15 @@ RUN adduser -u 1000 -G www-data -s /bin/sh -D www-data 2>/dev/null || true
 
 COPY composer.json composer.lock ./
 COPY artisan ./
-
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-
-COPY . .
+RUN composer install --optimize-autoloader --no-scripts --no-interaction
 
 COPY --from=frontend-builder /app/public/build ./public/build
+
+COPY . .
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
-
-RUN touch /var/www/html/database/database.sqlite \
-    && chown www-data:www-data /var/www/html/database/database.sqlite
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
@@ -87,9 +93,7 @@ FROM app AS development
 ENV APP_ENV=local
 ENV APP_DEBUG=true
 
-RUN composer install --optimize-autoloader
-
-RUN apk add --no-cache nodejs npm
+RUN composer install --optimize-autoloader --no-interaction
 
 RUN echo "opcache.enable=0" > /usr/local/etc/php/conf.d/opcache.ini
 
