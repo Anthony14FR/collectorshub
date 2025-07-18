@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Marketplace;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -162,6 +163,26 @@ class MarketplaceController extends Controller
                 $listing->sold_at = now();
                 $listing->buyer_id = $user->id;
                 $listing->save();
+
+                $pokemonName = $pokemon->pokemon->name;
+                $pokemonData = [
+                    'pokemon_name' => $pokemonName,
+                    'pokemon_id' => $pokemon->pokemon_id,
+                    'price' => $listing->price,
+                    'rarity' => $pokemon->pokemon->rarity,
+                    'types' => collect($pokemon->pokemon->types)->pluck('name')->toArray(),
+                    'stars' => $pokemon->star,
+                    'cp' => $pokemon->cp,
+                    'is_shiny' => $pokemon->pokemon->is_shiny,
+                ];
+
+                Notification::createMarketplaceBuy($user->id, array_merge($pokemonData, [
+                    'seller_name' => $seller->name,
+                ]));
+
+                Notification::createMarketplaceSell($seller->id, array_merge($pokemonData, [
+                    'buyer_name' => $user->name,
+                ]));
             });
 
             return redirect()->route('marketplace.index')->with('success', 'Pokemon acheté avec succès');

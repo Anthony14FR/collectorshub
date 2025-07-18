@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import type { Pokemon } from '@/types/pokemon';
-import type { Pokedex } from '@/types/pokedex';
 import CountBadge from '@/Components/UI/CountBadge.vue';
-import StarsBadge from '@/Components/UI/StarsBadge.vue';
-import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import CPBadge from '@/Components/UI/CPBadge.vue';
+import RarityBadge from '@/Components/UI/RarityBadge.vue';
+import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import type { BasePokemon, PokedexEntry as MarketplacePokedexEntry } from '@/types/marketplace';
+import type { Pokedex } from '@/types/pokedex';
+import type { Pokemon } from '@/types/pokemon';
 
 interface DisplayPokemon {
-  pokedexInfo: Pokedex | null;
-  pokemon: Pokemon;
+  pokedexInfo: Pokedex | MarketplacePokedexEntry | null;
+  pokemon: Pokemon | BasePokemon;
   owned: boolean;
   count: number;
 }
@@ -19,7 +20,7 @@ interface Props {
 
 const { displayPokemon } = defineProps<Props>();
 
-const getStars = (pokedex: Pokedex | null) => {
+const getStars = (pokedex: Pokedex | MarketplacePokedexEntry | null) => {
   if (pokedex?.star !== undefined) {
     return pokedex.star;
   }
@@ -36,15 +37,25 @@ const getStars = (pokedex: Pokedex | null) => {
 };
 
 const getImagePath = () => {
-  const pokemonId = displayPokemon.pokemon.is_shiny 
-    ? (displayPokemon.pokemon.id - 1000) + '_S' 
+  const pokemonId = displayPokemon.pokemon.is_shiny
+    ? (displayPokemon.pokemon.id - 1000) + '_S'
     : displayPokemon.pokemon.id;
   return `/images/pokemon-gifs/${pokemonId}.gif`;
 };
 
 const getPokemonCP = () => {
   if (!displayPokemon.pokedexInfo) return 0;
-  return displayPokemon.pokedexInfo.cp;
+  if ('cp' in displayPokemon.pokedexInfo) {
+    return displayPokemon.pokedexInfo.cp || 0;
+  }
+  return 0;
+};
+
+const getPokemonName = () => {
+  if (displayPokemon.pokedexInfo && 'nickname' in displayPokemon.pokedexInfo) {
+    return displayPokemon.pokedexInfo.nickname || displayPokemon.pokemon.name;
+  }
+  return displayPokemon.pokemon.name;
 };
 </script>
 
@@ -54,17 +65,12 @@ const getPokemonCP = () => {
     :class="{
       'border-base-300/30 hover:border-primary/50 hover:bg-base-200': displayPokemon.owned,
       'border-transparent': !displayPokemon.owned,
-    }"
-  >
+    }">
     <div class="flex flex-col items-center text-center">
       <div class="relative w-24 h-24 mb-2">
-        <img
-          :src="getImagePath()"
-          :alt="displayPokemon.pokemon.name"
-          class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-200"
-          :class="{ 'brightness-0 opacity-60': !displayPokemon.owned }"
-          style="image-rendering: pixelated;"
-        />
+        <img :src="getImagePath()" :alt="displayPokemon.pokemon.name"
+             class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-200"
+             :class="{ 'brightness-0 opacity-60': !displayPokemon.owned }" style="image-rendering: pixelated;" />
         <CountBadge v-if="displayPokemon.owned" :count="displayPokemon.count" />
       </div>
 
@@ -75,15 +81,17 @@ const getPokemonCP = () => {
         <div class="absolute -top-1 -right-1">
           <CPBadge :cp="getPokemonCP()" size="xs" :show-label="false" />
         </div>
-        <div v-if="displayPokemon.pokemon.is_shiny" class="absolute top-4 -right-1 w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
+        <div v-if="displayPokemon.pokemon.is_shiny"
+             class="absolute top-4 -right-1 w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
           <span class="text-yellow-400 text-sm">✨</span>
         </div>
-        <h4 class="font-bold text-base-content truncate">{{ displayPokemon.pokedexInfo.nickname || displayPokemon.pokemon.name }}</h4>
+        <h4 class="font-bold text-base-content truncate">{{ getPokemonName() }}</h4>
         <RarityBadge :rarity="displayPokemon.pokemon.rarity" size="xs" />
       </div>
-            
+
       <div v-else class="w-full">
-        <h4 class="font-bold text-base-content/70">#{{ displayPokemon.pokemon.id < 1000 ? displayPokemon.pokemon.id : displayPokemon.pokemon.id - 1000 }} ???</h4>
+        <h4 class="font-bold text-base-content/70">#{{ displayPokemon.pokemon.id < 1000 ? displayPokemon.pokemon.id :
+          displayPokemon.pokemon.id - 1000 }} ???</h4>
         <p class="text-xs text-base-content/50">Non capturé</p>
       </div>
     </div>

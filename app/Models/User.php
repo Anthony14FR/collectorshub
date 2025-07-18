@@ -94,7 +94,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getExperienceForCurrentLevelAttribute(): int
     {
-        return app(XpService::class)->getTotalExperienceForLevel($this->level);
+        return app(XpService::class)->getTotalExperienceForLevel($this->level ?? 1);
     }
 
     public function getExperienceForNextLevelAttribute(): int
@@ -142,6 +142,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(PromoCode::class, 'promo_code_users')
             ->withPivot(['is_used', 'used_at'])
             ->withTimestamps();
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
     }
 
     public function successes()

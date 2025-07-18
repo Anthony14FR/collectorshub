@@ -1,12 +1,12 @@
 <script setup>
-import { ref } from "vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
+import BuyItemModal from "@/Components/Shop/BuyItemModal.vue";
+import InventoryModal from "@/Components/Shop/InventoryModal.vue";
+import ShopItemsList from "@/Components/Shop/ShopItemsList.vue";
 import Alert from "@/Components/UI/Alert.vue";
 import BackgroundEffects from "@/Components/UI/BackgroundEffects.vue";
 import Button from "@/Components/UI/Button.vue";
-import ShopItemsList from "@/Components/Shop/ShopItemsList.vue";
-import BuyItemModal from "@/Components/Shop/BuyItemModal.vue";
-import InventoryModal from "@/Components/Shop/InventoryModal.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
 
 const props = defineProps({
   user: Object,
@@ -57,6 +57,7 @@ const handleTabChange = (tab) => {
 </script>
 
 <template>
+
   <Head title="Boutique" />
 
   <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
@@ -65,7 +66,8 @@ const handleTabChange = (tab) => {
     <div class="relative z-10 min-h-screen w-full overflow-x-hidden">
       <div class="flex justify-center pt-4 mb-4">
         <div class="text-center">
-          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1
+            class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
             BOUTIQUE
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
@@ -113,44 +115,30 @@ const handleTabChange = (tab) => {
               <Alert type="error" :message="$page.props.errors.message" />
             </div>
 
-            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[600px] sm:h-[650px] md:h-[700px] xl:h-[700px] flex flex-col">
-              <ShopItemsList 
-                :items="items"
-                :inventory="inventory"
-                :userAvatars="user.unlocked_avatars || []"
-                :activeTab="activeTab"
-                :userBackgrounds="user.unlocked_backgrounds || []"
-                @buy="openBuyModal"
-                @changeTab="handleTabChange"
-              />
+            <div
+              class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[600px] sm:h-[650px] md:h-[700px] xl:h-[700px] flex flex-col">
+              <ShopItemsList :items="items" :inventory="inventory" :userAvatars="user.unlocked_avatars || []"
+                             :activeTab="activeTab" :userBackgrounds="user.unlocked_backgrounds || []" @buy="openBuyModal"
+                             @changeTab="handleTabChange" />
             </div>
           </div>
         </div>
       </div>
 
-      <BuyItemModal 
-        :show="showBuyModal"
-        :item="selectedItem"
-        :userCash="user.cash"
-        :processing="processing"
-        @close="showBuyModal = false"
-        @confirm="buyItem"
-      />
+      <BuyItemModal :show="showBuyModal" :item="selectedItem" :userCash="user.cash" :processing="processing"
+                    @close="showBuyModal = false" @confirm="buyItem" />
 
-      <InventoryModal 
-        :show="showInventoryModal"
-        :inventory="inventory"
-        @close="showInventoryModal = false"
-      />
+      <InventoryModal :show="showInventoryModal" :inventory="inventory" @close="showInventoryModal = false" />
     </div>
   </div>
 </template>
 
 <style scoped>
 .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

@@ -1,24 +1,25 @@
 <script setup lang="ts">
+import FriendsModal from '@/Components/Friends/FriendsModal.vue';
 import LeaderboardSection from '@/Components/Game/LeaderboardSection.vue';
 import TeamManagementModal from '@/Components/Game/TeamManagementModal.vue';
 import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
 import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
 import BadgesModal from '@/Components/Profile/BadgesModal.vue';
+import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import HelpModal from '@/Components/UI/HelpModal.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import type { PageProps } from '@/types';
+import type { FriendRequest, UserFriend, UserFriendGift } from '@/types/friend';
 import type { Inventory } from '@/types/inventory';
 import type { Leaderboards } from '@/types/leaderboard';
 import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
 import type { Success, UserSuccess } from '@/types/success';
-import type { User } from '@/types/user';
+import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
-import type { LevelReward, LevelRewardPreview } from '@/types/user';
-import type { UserFriend, UserFriendGift, FriendRequest } from '@/types/friend';
-import FriendsModal from '@/Components/Friends/FriendsModal.vue';
 
 interface Props extends PageProps {
   auth: {
@@ -27,11 +28,15 @@ interface Props extends PageProps {
   inventory?: Inventory[];
   pokedex?: Pokedex[];
   all_pokemons?: Pokemon[];
+  leaderboards?: Leaderboards;
   successes?: Success[];
   unclaimed_successes?: UserSuccess[];
   claimed_successes?: UserSuccess[];
-  level_rewards_to_claim?: LevelReward[];
+  level_rewards_to_claim?: AvailableLevelReward[];
   level_rewards_preview?: LevelRewardPreview;
+  announcements?: any[];
+  marketplace_history?: any[];
+  unread_notifications_count?: number;
   progress?: {
     total: number;
     unlocked: number;
@@ -47,6 +52,12 @@ interface Props extends PageProps {
   daily_quest_stats?: any;
 }
 
+interface RefreshedData {
+  friends?: UserFriend[];
+  friend_requests?: FriendRequest[];
+  suggestions?: User[];
+}
+
 const {
   auth,
   inventory = [],
@@ -58,6 +69,9 @@ const {
   claimed_successes = [],
   level_rewards_to_claim = [],
   level_rewards_preview,
+  announcements = [],
+  marketplace_history = [],
+  unread_notifications_count = 0,
   progress = { total: 0, unlocked: 0, claimed: 0, unclaimed: 0, percentage: 0 },
   friend_gifts_to_claim = [],
   friend_requests = [],
@@ -70,14 +84,16 @@ const {
 const pokedexModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 const badgesModalOpen = ref(false);
+const leaderboardModalOpen = ref(false);
 
 const friendsModalOpen = ref(false);
 const friendsData = ref([...friends]);
 const friendRequestsData = ref([...friend_requests]);
 const suggestionsData = ref([...suggestions]);
+const showHelpModal = ref(false)
 
 
-const sendGift = (friendId) => {
+const sendGift = (friendId: number) => {
   router.post(
     "/friend-gifts/send",
     { receiver_id: friendId },
@@ -85,7 +101,7 @@ const sendGift = (friendId) => {
   );
 };
 
-const claimGift = (giftId) => {
+const claimGift = (giftId: number) => {
   router.post(
     "/friend-gifts/claim",
     { gift_id: giftId },
@@ -93,7 +109,7 @@ const claimGift = (giftId) => {
   );
 };
 
-const removeFriend = (friendId) => {
+const removeFriend = (friendId: number) => {
   router.post(
     "/friends/remove",
     { target_id: friendId },
@@ -123,11 +139,7 @@ const userTeamPokemons = computed(() => {
     .slice(0, 6);
 });
 
-const refreshInventory = async () => {
-  const { data } = await axios.get('/me/inventory');
-};
-
-const handleDataRefreshed = (newData) => {
+const handleDataRefreshed = (newData: RefreshedData) => {
   if (newData.friends) {
     friendsData.value = newData.friends;
   }
@@ -137,7 +149,7 @@ const handleDataRefreshed = (newData) => {
   if (newData.suggestions) {
     suggestionsData.value = newData.suggestions;
   }
-  
+
   friendsData.value = [...friendsData.value];
   friendRequestsData.value = [...friendRequestsData.value];
   suggestionsData.value = [...suggestionsData.value];
@@ -264,17 +276,15 @@ const goToTower = () => {
              :message="`🎉 Bienvenue ${auth.user.username} ! Votre email a été vérifié avec succès. Votre aventure Pokémon peut commencer !`"
              dismissible @dismiss="dismissWelcomeAlert" />
     </div>
-    <FriendsModal
-      :show="friendsModalOpen"
-      :onClose="() => friendsModalOpen = false"
-      :friends="friendsData"
-      :friend_requests="friendRequestsData"
-      :suggestions="suggestionsData"
-      :currentUserId="auth.user.id"
-      @send-gift="sendGift"
-      @claim-gift="claimGift"
-      @remove-friend="removeFriend"
-      @dataRefreshed="handleDataRefreshed"
-    />
+    <button @click="showHelpModal = true"
+            class="fixed bottom-4 left-4 w-12 h-12 bg-info hover:bg-info/80 cursor-pointer hover:bg-base-300 text-white rounded-full flex items-center justify-center shadow-lg transition-all z-50"
+            title="Aide">
+      <span class="text-xl font-bold">?</span>
+    </button>
+    <FriendsModal :show="friendsModalOpen" :onClose="() => friendsModalOpen = false" :friends="friendsData"
+                  :friend_requests="friendRequestsData" :suggestions="suggestionsData" :currentUserId="auth.user.id"
+                  @send-gift="sendGift" @claim-gift="claimGift" @remove-friend="removeFriend"
+                  @dataRefreshed="handleDataRefreshed" />
   </div>
+  <HelpModal :show="showHelpModal" :onClose="() => showHelpModal = false" />
 </template>

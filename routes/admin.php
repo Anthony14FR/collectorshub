@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExpeditionController;
 use App\Http\Controllers\Admin\GameConfigurationController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\Pokemons\PokemonController;
 use App\Http\Controllers\Admin\Users\UserController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,11 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::resource('expeditions', ExpeditionController::class);
         Route::post('expeditions/{expedition}/toggle', [ExpeditionController::class, 'toggle'])->name('expeditions.toggle');
         Route::post('expeditions/{expedition}/duplicate', [ExpeditionController::class, 'duplicate'])->name('expeditions.duplicate');
+
+        // Notifications
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('notifications/create', [NotificationController::class, 'create'])->name('notifications.create');
+        Route::post('notifications', [NotificationController::class, 'store'])->name('notifications.store');
 
         // Game Configuration
         Route::get('game-configuration', [GameConfigurationController::class, 'index'])->name('game-configuration.index');
