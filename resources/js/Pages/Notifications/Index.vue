@@ -65,16 +65,20 @@ const getPokemonCP = (notification: Notification): number => {
 
 const markAsRead = async (notificationId: number) => {
   try {
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const response = await fetch(`/notifications/${notificationId}/read`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': (window as any).Laravel?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        'X-CSRF-TOKEN': token || '',
+        'Accept': 'application/json',
       },
     });
 
     if (response.ok) {
       router.reload({ only: ['announcements', 'marketplace_history', 'unread_count'] });
+    } else {
+      console.error('Erreur lors du marquage comme lu:', response.status);
     }
   } catch (error) {
     console.error('Erreur lors du marquage comme lu:', error);
@@ -83,19 +87,23 @@ const markAsRead = async (notificationId: number) => {
 
 const markAllAsRead = async () => {
   try {
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const response = await fetch('/notifications/read-all', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': (window as any).Laravel?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        'X-CSRF-TOKEN': token || '',
+        'Accept': 'application/json',
       },
     });
 
     if (response.ok) {
       router.reload({ only: ['announcements', 'marketplace_history', 'unread_count'] });
+    } else {
+      console.error('Erreur lors du marquage tout comme lu:', response.status);
     }
   } catch (error) {
-    console.error('Erreur lors du marquage comme lu:', error);
+    console.error('Erreur lors du marquage tout comme lu:', error);
   }
 };
 
@@ -171,8 +179,7 @@ const goBack = () => {
                 class="w-8 h-8 bg-gradient-to-br from-info/50 to-primary/50 rounded-lg flex items-center justify-center text-lg">
                 📬</div>
               <div>
-                <h1
-                  class="text-xl font-bold bg-gradient-to-r from-info to-primary bg-clip-text text-transparent">
+                <h1 class="text-xl font-bold bg-gradient-to-r from-info to-primary bg-clip-text text-transparent">
                   Boîte de réception
                 </h1>
                 <p class="text-sm text-base-content/70">Gérez vos notifications</p>
@@ -246,12 +253,10 @@ const goBack = () => {
                     <span class="text-2xl">{{ getNotificationIcon(notification.type) }}</span>
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-3 mb-2">
-                        <h4
-                          :class="['text-base font-medium', !notification.is_read ? 'font-bold' : '']">
+                        <h4 :class="['text-base font-medium', !notification.is_read ? 'font-bold' : '']">
                           {{ notification.title }}
                         </h4>
-                        <span v-if="!notification.is_read"
-                              class="w-3 h-3 bg-primary rounded-full animate-pulse"></span>
+                        <span v-if="!notification.is_read" class="w-3 h-3 bg-primary rounded-full animate-pulse"></span>
                       </div>
                       <p class="text-sm text-base-content/80 break-words mb-2">{{
                         notification.message
@@ -284,16 +289,15 @@ const goBack = () => {
                       <div class="flex flex-col items-center gap-4 mb-3">
                         <!-- Top badges -->
                         <div class="flex w-full justify-between items-center">
-                          <CPBadge :cp="getPokemonCP(notification)" size="xs"
-                                   :show-label="false" />
+                          <CPBadge :cp="getPokemonCP(notification)" size="xs" :show-label="false" />
                           <div class="flex items-center gap-2">
                             <StarsBadge :stars="getPokemonStars(notification)" size="sm" />
                             <div v-if="notification.data.is_shiny"
                                  class="w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
                               <span class="text-yellow-400 text-xs">✨</span>
                             </div>
-                            <div v-if="!notification.is_read"
-                                 class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+                            <div v-if="!notification.is_read" class="w-3 h-3 bg-primary rounded-full animate-pulse">
+                            </div>
                           </div>
                         </div>
 
@@ -310,12 +314,9 @@ const goBack = () => {
                           <div class="flex justify-between">
                             <div>
                               <div class="flex items-start gap-1">
-                                <h4
-                                  class="font-bold text-base text-base-content flex items-center gap-1 mt-2">
+                                <h4 class="font-bold text-base text-base-content flex items-center gap-1 mt-2">
                                   {{ notification.data.pokemon_name }}
-                                  <RarityBadge
-                                    :rarity="getPokemonRarity(notification)"
-                                    size="xs" />
+                                  <RarityBadge :rarity="getPokemonRarity(notification)" size="xs" />
                                 </h4>
                               </div>
                             </div>
@@ -327,23 +328,19 @@ const goBack = () => {
                           </div>
 
                           <div class="flex flex-wrap gap-1">
-                            <PokemonTypeBadge
-                              v-for="(type, index) in getPokemonTypes(notification)"
-                              :key="index" :type="type" size="xxs" />
+                            <PokemonTypeBadge v-for="(type, index) in getPokemonTypes(notification)" :key="index"
+                                              :type="type" size="xxs" />
                           </div>
                         </div>
                       </div>
 
                       <!-- Bottom section -->
-                      <div
-                        class="flex items-center justify-between mt-auto pt-2 border-t border-base-300/20">
+                      <div class="flex items-center justify-between mt-auto pt-2 border-t border-base-300/20">
                         <div class="text-xs text-base-content/70">
-                          <span
-                            v-if="notification.data.seller_name && notification.type === 'marketplace_buy'">
+                          <span v-if="notification.data.seller_name && notification.type === 'marketplace_buy'">
                             Vendeur : {{ notification.data.seller_name }}
                           </span>
-                          <span
-                            v-if="notification.data.buyer_name && notification.type === 'marketplace_sell'">
+                          <span v-if="notification.data.buyer_name && notification.type === 'marketplace_sell'">
                             Acheteur : {{ notification.data.buyer_name }}
                           </span>
                           <div class="text-xs text-base-content/50 mt-1">
