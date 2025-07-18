@@ -26,5 +26,9 @@ class PokedexObserver
     public function updated(Pokedex $pokedex)
     {
         $this->successService->checkAndUnlockSuccesses($pokedex->user);
+
+        if ($pokedex->is_in_team && $pokedex->user->isInClub()) {
+            $pokedex->user->club()->first()->updateTotalCp();
+        }
     }
 }

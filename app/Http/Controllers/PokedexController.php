@@ -31,6 +31,7 @@ class PokedexController extends Controller
         ]);
 
         $userId = Auth::id();
+        $user = Auth::user();
 
         $teamCount = Pokedex::where('user_id', $userId)
             ->where('is_in_team', true)
@@ -49,12 +50,17 @@ class PokedexController extends Controller
             'team_position' => $request->position,
         ]);
 
+        if ($user->isInClub()) {
+            $user->club()->first()->updateTotalCp();
+        }
+
         return redirect()->back()->with('success', 'Pokémon ajouté à l\'équipe !');
     }
 
     public function removeFromTeam(Request $request, $id)
     {
         $userId = Auth::id();
+        $user = Auth::user();
 
         $pokemon = Pokedex::where('user_id', $userId)
             ->where('id', $id)
@@ -65,6 +71,10 @@ class PokedexController extends Controller
             'is_in_team' => false,
             'team_position' => null,
         ]);
+
+        if ($user->isInClub()) {
+            $user->club()->first()->updateTotalCp();
+        }
 
         return redirect()->back()->with('success', 'Pokémon retiré de l\'équipe.');
     }

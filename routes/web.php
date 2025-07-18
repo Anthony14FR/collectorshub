@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClubController;
 use App\Http\Controllers\ExpeditionController;
 use App\Http\Controllers\InfernalTowerController;
 use App\Http\Controllers\LeaderboardController;
@@ -110,6 +111,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/friend-gifts/claim', [\App\Http\Controllers\UserFriendGiftController::class, 'claim'])->name('friend-gifts.claim');
     Route::post('/friend-gifts/claim-all', [\App\Http\Controllers\UserFriendGiftController::class, 'claimAll'])->name('friend-gifts.claim-all');
     Route::post('/friend-gifts/send-all', [\App\Http\Controllers\UserFriendGiftController::class, 'sendToAll'])->name('friend-gifts.send-all');
+
+    // Routes pour les Clubs
+    Route::get('/clubs', [ClubController::class, 'index'])->name('club.index');
+    Route::get('/clubs/create', [ClubController::class, 'create'])->name('club.create');
+    Route::post('/clubs', [ClubController::class, 'store'])->name('club.store');
+    Route::get('/clubs/{club}', [ClubController::class, 'show'])->name('club.show');
+    Route::post('/clubs/{club}/join', [ClubController::class, 'join'])->name('club.join');
+    Route::post('/clubs/leave', [ClubController::class, 'leave'])->name('club.leave');
+    Route::post('/club-requests/{request}/accept', [ClubController::class, 'acceptRequest'])->name('club.accept-request');
+    Route::post('/club-requests/{request}/reject', [ClubController::class, 'rejectRequest'])->name('club.reject-request');
+    Route::post('/clubs/{club}/remove-member', [ClubController::class, 'removeMember'])->name('club.remove-member');
+    Route::post('/clubs/{club}/transfer-leadership', [ClubController::class, 'transferLeadership'])->name('club.transfer-leadership');
+    Route::delete('/clubs/{club}', [ClubController::class, 'destroyClub'])->name('club.destroy');
+
 });
 
 require __DIR__ . '/admin.php';

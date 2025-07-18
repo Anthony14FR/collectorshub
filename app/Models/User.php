@@ -308,4 +308,31 @@ class User extends Authenticatable implements MustVerifyEmail
             $this->email
         );
     }
+
+    public function club()
+    {
+        return $this->belongsToMany(Club::class, 'club_members')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function ledClub()
+    {
+        return $this->hasOne(Club::class, 'leader_id');
+    }
+
+    public function clubRequests()
+    {
+        return $this->hasMany(ClubRequest::class);
+    }
+
+    public function isInClub(): bool
+    {
+        return $this->club()->exists();
+    }
+
+    public function isClubLeader(): bool
+    {
+        return $this->ledClub()->exists();
+    }
 }
