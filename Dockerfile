@@ -21,7 +21,6 @@ FROM php:8.2-fpm-alpine AS php-builder
 RUN apk add --no-cache \
     oniguruma-dev \
     libxml2-dev \
-    postgresql-dev \
     autoconf \
     g++ \
     make
@@ -29,7 +28,6 @@ RUN apk add --no-cache \
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
-    pdo_pgsql \
     mbstring \
     xml \
     bcmath \
@@ -48,8 +46,7 @@ RUN apk add --no-cache \
     zip \
     unzip \
     git \
-    curl \
-    postgresql-libs
+    curl
 
 COPY --from=php-builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=php-builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
