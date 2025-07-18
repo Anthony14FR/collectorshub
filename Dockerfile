@@ -3,8 +3,6 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV VITE_APP_URL=https://collectorshub.fr
-ENV VITE_APP_NAME=CollectorsHub
 
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
@@ -64,7 +62,7 @@ RUN adduser -u 1000 -G www-data -s /bin/sh -D www-data 2>/dev/null || true
 
 COPY composer.json composer.lock ./
 COPY artisan ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+RUN composer install --optimize-autoloader --no-scripts --no-interaction
 
 COPY --from=frontend-builder /app/public/build ./public/build
 
