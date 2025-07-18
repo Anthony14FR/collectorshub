@@ -16,6 +16,7 @@ services:
       - APP_URL=${APP_URL:-https://collectorshub.fr}
       - ASSET_URL=${APP_URL}
       - FORCE_HTTPS=true
+      - HTTPS=true
 
       - DB_CONNECTION=pgsql
       - DB_HOST=postgres

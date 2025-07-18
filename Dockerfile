@@ -13,6 +13,7 @@ COPY vite.config.js tsconfig.json ./
 COPY resources ./resources
 COPY public ./public
 
+RUN npm install --production=false --ignore-scripts
 RUN npm run build
 
 FROM composer:latest AS composer
