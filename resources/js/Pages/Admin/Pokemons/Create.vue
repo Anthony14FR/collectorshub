@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import { reactive } from 'vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
-import Select from '@/Components/UI/Select.vue';
-import { getTypeColor, getRarityColor } from '@/utils/pokemon';
+import { getRarityColor, getTypeColor } from '@/utils/pokemon';
+import { Head, router } from '@inertiajs/vue3';
+import { reactive } from 'vue';
 
-const props = defineProps<{
+const { rarities, generations, types, damageRelations } = defineProps<{
   rarities: string[];
   generations: number[];
   types: string[];
@@ -117,11 +116,11 @@ const getTotalStats = () => {
 const calculateCP = () => {
   const baseCP = getTotalStats();
   let finalCP = baseCP;
-  
+
   if (form.is_shiny) {
     finalCP = Math.floor(finalCP * 1.1);
   }
-  
+
   const multipliers: Record<string, number> = {
     normal: 1.10,
     rare: 1.50,
@@ -130,7 +129,7 @@ const calculateCP = () => {
   };
   const rarityMultiplier = multipliers[form.rarity] || 1.10;
   finalCP = Math.floor(finalCP * rarityMultiplier);
-  
+
   return finalCP * 10;
 };
 
@@ -157,7 +156,7 @@ const submit = () => {
   formData.append('special_attack', form.special_attack);
   formData.append('special_defense', form.special_defense);
   formData.append('generation', form.generation || '');
-  
+
   if (form.image) {
     formData.append('image', form.image);
   }
@@ -199,6 +198,7 @@ const resetForm = () => {
 </script>
 
 <template>
+
   <Head title="Créer un Pokémon" />
 
   <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
@@ -207,7 +207,8 @@ const resetForm = () => {
     <div class="relative z-10 h-screen w-screen overflow-hidden">
       <div class="flex justify-center pt-4 mb-4">
         <div class="text-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1
+            class="text-2xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent mb-1 tracking-wider">
             ➕ CRÉER UN POKÉMON
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
@@ -218,8 +219,10 @@ const resetForm = () => {
 
       <div v-if="form.errors.error" class="mx-auto max-w-4xl mb-4">
         <div class="alert alert-error">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>{{ form.errors.error }}</span>
         </div>
@@ -251,30 +254,14 @@ const resetForm = () => {
             </h3>
           </div>
           <div class="p-3 space-y-2">
-            <Button
-              @click="resetForm"
-              variant="outline"
-              size="sm"
-              class="w-full"
-              :disabled="form.processing"
-            >
+            <Button @click="resetForm" variant="outline" size="sm" class="w-full" :disabled="form.processing">
               🗑️ Vider le formulaire
             </Button>
             <div class="border-t border-base-300/30 pt-2">
-              <Button
-                @click="router.visit('/admin/pokemons')"
-                variant="ghost"
-                size="sm"
-                class="w-full"
-              >
+              <Button @click="router.visit('/admin/pokemons')" variant="ghost" size="sm" class="w-full">
                 ← Liste Pokémon
               </Button>
-              <Button
-                @click="router.visit('/admin')"
-                variant="ghost"
-                size="sm"
-                class="w-full mt-1"
-              >
+              <Button @click="router.visit('/admin')" variant="ghost" size="sm" class="w-full mt-1">
                 🏠 Dashboard
               </Button>
             </div>
@@ -292,13 +279,14 @@ const resetForm = () => {
           </div>
           <div class="p-3 space-y-3">
             <div class="text-center">
-              <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-error/20 to-error/10 flex items-center justify-center text-xl font-bold mb-2">
+              <div
+                class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-error/20 to-error/10 flex items-center justify-center text-xl font-bold mb-2">
                 {{ form.name ? form.name.charAt(0).toUpperCase() : '?' }}
               </div>
               <div class="text-sm font-semibold">{{ form.name || 'Nouveau Pokémon' }}</div>
               <div class="text-xs text-base-content/60">#{{ form.pokedex_id || '000' }}</div>
             </div>
-            
+
             <div class="space-y-2 text-xs">
               <div class="flex justify-between">
                 <span class="text-base-content/70">Rareté:</span>
@@ -327,11 +315,8 @@ const resetForm = () => {
             <div v-if="form.types.some(t => t.name)" class="space-y-1">
               <div class="text-xs text-base-content/70">Types:</div>
               <div class="flex flex-wrap gap-1">
-                <span
-                  v-for="type in form.types.filter(t => t.name)"
-                  :key="type.name"
-                  :class="`badge badge-xs bg-gradient-to-r ${getTypeColor(type.name)} text-white border-0`"
-                >
+                <span v-for="type in form.types.filter(t => t.name)" :key="type.name"
+                      :class="`badge badge-xs bg-gradient-to-r ${getTypeColor(type.name)} text-white border-0`">
                   {{ type.name }}
                 </span>
               </div>
@@ -341,7 +326,8 @@ const resetForm = () => {
       </div>
 
       <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[700px]">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
+        <div
+          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
           <div class="shrink-0 p-3 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
               <span class="text-lg">📝</span>
@@ -351,23 +337,18 @@ const resetForm = () => {
 
           <form @submit.prevent="submit" class="flex-1 overflow-y-auto p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               <!-- Informations de base -->
               <div class="space-y-4">
                 <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm">Informations de base</h4>
-                
+
                 <div>
-                  <label for="pokedex_id" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                  <label for="pokedex_id"
+                         class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                     Pokédex ID <span class="text-error">*</span>
                   </label>
-                  <Input
-                    id="pokedex_id"
-                    v-model="form.pokedex_id"
-                    type="number"
-                    required
-                    placeholder="1"
-                    :class="{ 'border-error': form.errors.pokedex_id }"
-                  />
+                  <Input id="pokedex_id" v-model="form.pokedex_id" type="number" required placeholder="1"
+                         :class="{ 'border-error': form.errors.pokedex_id }" />
                   <p v-if="form.errors.pokedex_id" class="mt-1 text-sm text-error">{{ form.errors.pokedex_id }}</p>
                 </div>
 
@@ -375,14 +356,8 @@ const resetForm = () => {
                   <label for="name" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                     Nom <span class="text-error">*</span>
                   </label>
-                  <Input
-                    id="name"
-                    v-model="form.name"
-                    type="text"
-                    required
-                    placeholder="Bulbizarre"
-                    :class="{ 'border-error': form.errors.name }"
-                  />
+                  <Input id="name" v-model="form.name" type="text" required placeholder="Bulbizarre"
+                         :class="{ 'border-error': form.errors.name }" />
                   <p v-if="form.errors.name" class="mt-1 text-sm text-error">{{ form.errors.name }}</p>
                 </div>
 
@@ -390,83 +365,59 @@ const resetForm = () => {
                   <label for="image" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                     Image <span class="text-error">*</span>
                   </label>
-                  <input
-                    id="image"
-                    type="file"
-                    @change="(event) => { 
-                      const target = event.target as HTMLInputElement; 
-                      if (target.files && target.files[0]) {
-                        form.image = target.files[0];
-                      }
-                    }"
-                    accept="image/*"
-                    required
-                    class="file-input file-input-bordered w-full bg-base-100/80 border-base-300/50"
-                    :class="{ 'border-error': form.errors.image }"
-                  />
+                  <input id="image" type="file" @change="(event) => {
+                           const target = event.target as HTMLInputElement;
+                           if (target.files && target.files[0]) {
+                             form.image = target.files[0];
+                           }
+                         }" accept="image/*" required
+                         class="file-input file-input-bordered w-full bg-base-100/80 border-base-300/50"
+                         :class="{ 'border-error': form.errors.image }" />
                   <p v-if="form.errors.image" class="mt-1 text-sm text-error">{{ form.errors.image }}</p>
                 </div>
 
                 <div>
-                  <label for="description" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                  <label for="description"
+                         class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                     Description <span class="text-error">*</span>
                   </label>
-                  <textarea
-                    id="description"
-                    v-model="form.description"
-                    required
-                    placeholder="Description du Pokémon..."
-                    class="textarea textarea-bordered w-full bg-base-100/80 border-base-300/50"
-                    :class="{ 'border-error': form.errors.description }"
-                    rows="3"
-                  ></textarea>
+                  <textarea id="description" v-model="form.description" required placeholder="Description du Pokémon..."
+                            class="textarea textarea-bordered w-full bg-base-100/80 border-base-300/50"
+                            :class="{ 'border-error': form.errors.description }" rows="3"></textarea>
                   <p v-if="form.errors.description" class="mt-1 text-sm text-error">{{ form.errors.description }}</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label for="height" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="height"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Taille <span class="text-error">*</span>
                     </label>
-                    <Input
-                      id="height"
-                      v-model="form.height"
-                      type="number"
-                      required
-                      placeholder="70"
-                      :class="{ 'border-error': form.errors.height }"
-                    />
+                    <Input id="height" v-model="form.height" type="number" required placeholder="70"
+                           :class="{ 'border-error': form.errors.height }" />
                     <p v-if="form.errors.height" class="mt-1 text-sm text-error">{{ form.errors.height }}</p>
                   </div>
 
                   <div>
-                    <label for="weight" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="weight"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Poids <span class="text-error">*</span>
                     </label>
-                    <Input
-                      id="weight"
-                      v-model="form.weight"
-                      type="number"
-                      required
-                      placeholder="69"
-                      :class="{ 'border-error': form.errors.weight }"
-                    />
+                    <Input id="weight" v-model="form.weight" type="number" required placeholder="69"
+                           :class="{ 'border-error': form.errors.weight }" />
                     <p v-if="form.errors.weight" class="mt-1 text-sm text-error">{{ form.errors.weight }}</p>
                   </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label for="rarity" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="rarity"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Rareté <span class="text-error">*</span>
                     </label>
-                    <select
-                      id="rarity"
-                      v-model="form.rarity"
-                      required
-                      class="select select-bordered w-full bg-base-100/80 border-base-300/50"
-                      :class="{ 'border-error': form.errors.rarity }"
-                    >
+                    <select id="rarity" v-model="form.rarity" required
+                            class="select select-bordered w-full bg-base-100/80 border-base-300/50"
+                            :class="{ 'border-error': form.errors.rarity }">
                       <option v-for="rarity in rarities" :key="rarity" :value="rarity">
                         {{ getRarityLabel(rarity) }}
                       </option>
@@ -475,15 +426,13 @@ const resetForm = () => {
                   </div>
 
                   <div>
-                    <label for="generation" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="generation"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Génération
                     </label>
-                    <select
-                      id="generation"
-                      v-model="form.generation"
-                      class="select select-bordered w-full bg-base-100/80 border-base-300/50"
-                      :class="{ 'border-error': form.errors.generation }"
-                    >
+                    <select id="generation" v-model="form.generation"
+                            class="select select-bordered w-full bg-base-100/80 border-base-300/50"
+                            :class="{ 'border-error': form.errors.generation }">
                       <option value="">Aucune</option>
                       <option v-for="gen in generations" :key="gen" :value="gen">
                         {{ gen }}
@@ -494,12 +443,7 @@ const resetForm = () => {
                 </div>
 
                 <div class="flex items-center gap-2">
-                  <input
-                    id="is_shiny"
-                    v-model="form.is_shiny"
-                    type="checkbox"
-                    class="checkbox checkbox-sm"
-                  />
+                  <input id="is_shiny" v-model="form.is_shiny" type="checkbox" class="checkbox checkbox-sm" />
                   <label for="is_shiny" class="text-sm font-bold text-base-content/70 uppercase tracking-wider">
                     Pokémon Shiny
                   </label>
@@ -509,108 +453,67 @@ const resetForm = () => {
               <!-- Statistiques -->
               <div class="space-y-4">
                 <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm">Statistiques</h4>
-                
+
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label for="hp" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       PV <span class="text-error">*</span>
                     </label>
-                    <Input
-                      id="hp"
-                      v-model="form.hp"
-                      type="number"
-                      min="1"
-                      max="255"
-                      required
-                      placeholder="45"
-                      :class="{ 'border-error': form.errors.hp }"
-                    />
+                    <Input id="hp" v-model="form.hp" type="number" min="1" max="255" required placeholder="45"
+                           :class="{ 'border-error': form.errors.hp }" />
                     <p v-if="form.errors.hp" class="mt-1 text-sm text-error">{{ form.errors.hp }}</p>
                   </div>
 
                   <div>
-                    <label for="attack" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="attack"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Attaque <span class="text-error">*</span>
                     </label>
-                    <Input
-                      id="attack"
-                      v-model="form.attack"
-                      type="number"
-                      min="1"
-                      max="255"
-                      required
-                      placeholder="49"
-                      :class="{ 'border-error': form.errors.attack }"
-                    />
+                    <Input id="attack" v-model="form.attack" type="number" min="1" max="255" required placeholder="49"
+                           :class="{ 'border-error': form.errors.attack }" />
                     <p v-if="form.errors.attack" class="mt-1 text-sm text-error">{{ form.errors.attack }}</p>
                   </div>
 
                   <div>
-                    <label for="defense" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="defense"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Défense <span class="text-error">*</span>
                     </label>
-                    <Input
-                      id="defense"
-                      v-model="form.defense"
-                      type="number"
-                      min="1"
-                      max="255"
-                      required
-                      placeholder="49"
-                      :class="{ 'border-error': form.errors.defense }"
-                    />
+                    <Input id="defense" v-model="form.defense" type="number" min="1" max="255" required placeholder="49"
+                           :class="{ 'border-error': form.errors.defense }" />
                     <p v-if="form.errors.defense" class="mt-1 text-sm text-error">{{ form.errors.defense }}</p>
                   </div>
 
                   <div>
-                    <label for="speed" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="speed"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Vitesse <span class="text-error">*</span>
                     </label>
-                    <Input
-                      id="speed"
-                      v-model="form.speed"
-                      type="number"
-                      min="1"
-                      max="255"
-                      required
-                      placeholder="45"
-                      :class="{ 'border-error': form.errors.speed }"
-                    />
+                    <Input id="speed" v-model="form.speed" type="number" min="1" max="255" required placeholder="45"
+                           :class="{ 'border-error': form.errors.speed }" />
                     <p v-if="form.errors.speed" class="mt-1 text-sm text-error">{{ form.errors.speed }}</p>
                   </div>
 
                   <div>
-                    <label for="special_attack" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="special_attack"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Att. Spé. <span class="text-error">*</span>
                     </label>
-                    <Input
-                      id="special_attack"
-                      v-model="form.special_attack"
-                      type="number"
-                      min="1"
-                      max="255"
-                      required
-                      placeholder="65"
-                      :class="{ 'border-error': form.errors.special_attack }"
-                    />
-                    <p v-if="form.errors.special_attack" class="mt-1 text-sm text-error">{{ form.errors.special_attack }}</p>
+                    <Input id="special_attack" v-model="form.special_attack" type="number" min="1" max="255" required
+                           placeholder="65" :class="{ 'border-error': form.errors.special_attack }" />
+                    <p v-if="form.errors.special_attack" class="mt-1 text-sm text-error">{{ form.errors.special_attack
+                    }}</p>
                   </div>
 
                   <div>
-                    <label for="special_defense" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                    <label for="special_defense"
+                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                       Déf. Spé. <span class="text-error">*</span>
                     </label>
-                    <Input
-                      id="special_defense"
-                      v-model="form.special_defense"
-                      type="number"
-                      min="1"
-                      max="255"
-                      required
-                      placeholder="65"
-                      :class="{ 'border-error': form.errors.special_defense }"
-                    />
-                    <p v-if="form.errors.special_defense" class="mt-1 text-sm text-error">{{ form.errors.special_defense }}</p>
+                    <Input id="special_defense" v-model="form.special_defense" type="number" min="1" max="255" required
+                           placeholder="65" :class="{ 'border-error': form.errors.special_defense }" />
+                    <p v-if="form.errors.special_defense" class="mt-1 text-sm text-error">{{ form.errors.special_defense
+                    }}</p>
                   </div>
                 </div>
 
@@ -637,33 +540,20 @@ const resetForm = () => {
                   ➕ Ajouter un type
                 </Button>
               </div>
-              
+
               <div class="space-y-3">
-                <div
-                  v-for="(type, index) in form.types"
-                  :key="index"
-                  class="flex items-center gap-3"
-                >
-                  <select
-                    v-model="type.name"
-                    @change="updateTypeImage(index)"
-                    class="select select-bordered flex-1 bg-base-100/80 border-base-300/50"
-                    :class="{ 'border-error': form.errors[`types.${index}.name`] }"
-                  >
+                <div v-for="(type, index) in form.types" :key="index" class="flex items-center gap-3">
+                  <select v-model="type.name" @change="updateTypeImage(index)"
+                          class="select select-bordered flex-1 bg-base-100/80 border-base-300/50"
+                          :class="{ 'border-error': form.errors[`types.${index}.name`] }">
                     <option value="">Sélectionner un type</option>
                     <option v-for="typeOption in types" :key="typeOption" :value="typeOption">
                       {{ typeOption }}
                     </option>
                   </select>
-                  
-                  <Button
-                    @click="removeType(index)"
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    class="text-error"
-                    :disabled="form.types.length === 1"
-                  >
+
+                  <Button @click="removeType(index)" type="button" size="sm" variant="ghost" class="text-error"
+                          :disabled="form.types.length === 1">
                     🗑️
                   </Button>
                 </div>
@@ -678,52 +568,32 @@ const resetForm = () => {
                   ➕ Ajouter une résistance
                 </Button>
               </div>
-              
+
               <div class="space-y-3">
-                <div
-                  v-for="(resistance, index) in form.resistances"
-                  :key="index"
-                  class="grid grid-cols-3 gap-3"
-                >
-                  <select
-                    v-model="resistance.name"
-                    class="select select-bordered bg-base-100/80 border-base-300/50"
-                    :class="{ 'border-error': form.errors[`resistances.${index}.name`] }"
-                  >
+                <div v-for="(resistance, index) in form.resistances" :key="index" class="grid grid-cols-3 gap-3">
+                  <select v-model="resistance.name" class="select select-bordered bg-base-100/80 border-base-300/50"
+                          :class="{ 'border-error': form.errors[`resistances.${index}.name`] }">
                     <option value="">Sélectionner un type</option>
                     <option v-for="typeOption in types" :key="typeOption" :value="typeOption">
                       {{ typeOption }}
                     </option>
                   </select>
-                  
-                  <Input
-                    v-model.number="resistance.damage_multiplier"
-                    type="number"
-                    step="0.1"
-                    placeholder="1.0"
-                    class="text-center"
-                    :class="{ 'border-error': form.errors[`resistances.${index}.damage_multiplier`] }"
-                  />
-                  
+
+                  <Input v-model.number="resistance.damage_multiplier" type="number" step="0.1" placeholder="1.0"
+                         class="text-center"
+                         :class="{ 'border-error': form.errors[`resistances.${index}.damage_multiplier`] }" />
+
                   <div class="flex gap-2">
-                    <select
-                      v-model="resistance.damage_relation"
-                      class="select select-bordered flex-1 bg-base-100/80 border-base-300/50"
-                      :class="{ 'border-error': form.errors[`resistances.${index}.damage_relation`] }"
-                    >
+                    <select v-model="resistance.damage_relation"
+                            class="select select-bordered flex-1 bg-base-100/80 border-base-300/50"
+                            :class="{ 'border-error': form.errors[`resistances.${index}.damage_relation`] }">
                       <option v-for="relation in damageRelations" :key="relation" :value="relation">
                         {{ getDamageRelationLabel(relation) }}
                       </option>
                     </select>
-                    
-                    <Button
-                      @click="removeResistance(index)"
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      class="text-error"
-                      :disabled="form.resistances.length === 1"
-                    >
+
+                    <Button @click="removeResistance(index)" type="button" size="sm" variant="ghost" class="text-error"
+                            :disabled="form.resistances.length === 1">
                       🗑️
                     </Button>
                   </div>
@@ -734,53 +604,38 @@ const resetForm = () => {
             <!-- Évolutions -->
             <div class="mt-8">
               <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-4">Évolutions</h4>
-              
+
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label for="evolution_id" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                  <label for="evolution_id"
+                         class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                     Évolution
                   </label>
-                  <Input
-                    id="evolution_id"
-                    v-model="form.evolution_id"
-                    type="number"
-                    placeholder="ID du Pokémon évolué"
-                    :class="{ 'border-error': form.errors.evolution_id }"
-                  />
+                  <Input id="evolution_id" v-model="form.evolution_id" type="number" placeholder="ID du Pokémon évolué"
+                         :class="{ 'border-error': form.errors.evolution_id }" />
                   <p v-if="form.errors.evolution_id" class="mt-1 text-sm text-error">{{ form.errors.evolution_id }}</p>
                 </div>
 
                 <div>
-                  <label for="pre_evolution_id" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                  <label for="pre_evolution_id"
+                         class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                     Pré-évolution
                   </label>
-                  <Input
-                    id="pre_evolution_id"
-                    v-model="form.pre_evolution_id"
-                    type="number"
-                    placeholder="ID du Pokémon de base"
-                    :class="{ 'border-error': form.errors.pre_evolution_id }"
-                  />
-                  <p v-if="form.errors.pre_evolution_id" class="mt-1 text-sm text-error">{{ form.errors.pre_evolution_id }}</p>
+                  <Input id="pre_evolution_id" v-model="form.pre_evolution_id" type="number"
+                         placeholder="ID du Pokémon de base" :class="{ 'border-error': form.errors.pre_evolution_id }" />
+                  <p v-if="form.errors.pre_evolution_id" class="mt-1 text-sm text-error">{{ form.errors.pre_evolution_id
+                  }}</p>
                 </div>
               </div>
             </div>
 
             <!-- Submit -->
             <div class="mt-8 flex justify-end gap-3">
-              <Button
-                @click="router.visit('/admin/pokemons')"
-                type="button"
-                variant="ghost"
-                :disabled="form.processing"
-              >
+              <Button @click="router.visit('/admin/pokemons')" type="button" variant="ghost"
+                      :disabled="form.processing">
                 Annuler
               </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                :disabled="form.processing"
-              >
+              <Button type="submit" variant="primary" :disabled="form.processing">
                 <span v-if="form.processing">⏳</span>
                 <span v-else>💾</span>
                 {{ form.processing ? 'Création...' : 'Créer le Pokémon' }}
@@ -791,4 +646,4 @@ const resetForm = () => {
       </div>
     </div>
   </div>
-</template> 
+</template>

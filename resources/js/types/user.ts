@@ -37,10 +37,12 @@ export type PokedexEntry = {
     is_in_team: boolean;
     is_favorite: boolean;
     obtained_at: string;
+    cp?: number;
     created_at: string;
     updated_at: string;
     pokemon?: {
         id: number;
+        pokedex_id: number;
         name: string;
         types: any[];
         resistances: any[];

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { User } from '@/types/user';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { reactive, computed } from 'vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Select from '@/Components/UI/Select.vue';
+import type { User } from '@/types/user';
+import { Head, router } from '@inertiajs/vue3';
+import { computed, reactive } from 'vue';
 
 const props = defineProps<{
   user: User;
@@ -100,6 +100,7 @@ const deleteUser = () => {
 </script>
 
 <template>
+
   <Head title="Modifier l'utilisateur" />
 
   <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
@@ -108,7 +109,8 @@ const deleteUser = () => {
     <div class="relative z-10 h-screen w-screen overflow-hidden">
       <div class="flex justify-center pt-4 mb-4">
         <div class="text-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1
+            class="text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
             ✏️ MODIFIER UTILISATEUR
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
@@ -127,7 +129,8 @@ const deleteUser = () => {
           </div>
           <div class="p-3">
             <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-lg font-bold">
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-lg font-bold">
                 {{ user.username.charAt(0).toUpperCase() }}
               </div>
               <div>
@@ -170,46 +173,22 @@ const deleteUser = () => {
             </h3>
           </div>
           <div class="p-3 space-y-2">
-            <Button
-              @click="resetForm"
-              variant="outline"
-              size="sm"
-              class="w-full"
-              :disabled="form.processing || !hasChanges"
-            >
+            <Button @click="resetForm" variant="outline" size="sm" class="w-full"
+                    :disabled="form.processing || !hasChanges">
               🔄 Annuler les modifications
             </Button>
-            <Button
-              @click="router.visit(`/admin/users/${user.id}`)"
-              variant="outline"
-              size="sm"
-              class="w-full"
-            >
+            <Button @click="router.visit(`/admin/users/${user.id}`)" variant="outline" size="sm" class="w-full">
               👁️ Voir le profil
             </Button>
-            <Button
-              @click="deleteUser"
-              variant="outline"
-              size="sm"
-              class="w-full text-error hover:text-error hover:bg-error/10"
-            >
+            <Button @click="deleteUser" variant="outline" size="sm"
+                    class="w-full text-error hover:text-error hover:bg-error/10">
               🗑️ Supprimer
             </Button>
             <div class="border-t border-base-300/30 pt-2">
-              <Button
-                @click="router.visit('/admin/users')"
-                variant="ghost"
-                size="sm"
-                class="w-full"
-              >
+              <Button @click="router.visit('/admin/users')" variant="ghost" size="sm" class="w-full">
                 ← Liste utilisateurs
               </Button>
-              <Button
-                @click="router.visit('/admin')"
-                variant="ghost"
-                size="sm"
-                class="w-full mt-1"
-              >
+              <Button @click="router.visit('/admin')" variant="ghost" size="sm" class="w-full mt-1">
                 🏠 Dashboard
               </Button>
             </div>
@@ -227,7 +206,8 @@ const deleteUser = () => {
           </div>
           <div class="p-3 space-y-3">
             <div class="text-center">
-              <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-xl font-bold mb-2">
+              <div
+                class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-xl font-bold mb-2">
                 {{ form.username ? form.username.charAt(0).toUpperCase() : '?' }}
               </div>
               <div class="text-sm font-semibold">{{ form.username }}</div>
@@ -283,7 +263,8 @@ const deleteUser = () => {
       </div>
 
       <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px]">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
+        <div
+          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
           <div class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
               <span class="text-lg">📝</span>
@@ -293,21 +274,16 @@ const deleteUser = () => {
 
           <form @submit.prevent="submit" class="flex-1 overflow-y-auto p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               <div>
-                <label for="username" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                <label for="username"
+                       class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                   Nom d'utilisateur <span class="text-error">*</span>
                 </label>
-                <Input
-                  id="username"
-                  v-model="form.username"
-                  type="text"
-                  required
-                  :class="{ 
-                    'border-error': form.errors.username,
-                    'border-warning': form.username !== user.username
-                  }"
-                />
+                <Input id="username" v-model="form.username" type="text" required :class="{
+                  'border-error': form.errors.username,
+                  'border-warning': form.username !== user.username
+                }" />
                 <p v-if="form.errors.username" class="mt-1 text-sm text-error">
                   {{ form.errors.username }}
                 </p>
@@ -317,36 +293,26 @@ const deleteUser = () => {
                 <label for="email" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                   Email <span class="text-error">*</span>
                 </label>
-                <Input
-                  id="email"
-                  v-model="form.email"
-                  type="email"
-                  required
-                  :class="{ 
-                    'border-error': form.errors.email,
-                    'border-warning': form.email !== user.email
-                  }"
-                />
+                <Input id="email" v-model="form.email" type="email" required :class="{
+                  'border-error': form.errors.email,
+                  'border-warning': form.email !== user.email
+                }" />
                 <p v-if="form.errors.email" class="mt-1 text-sm text-error">
                   {{ form.errors.email }}
                 </p>
               </div>
 
               <div class="md:col-span-2">
-                <label for="password" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                <label for="password"
+                       class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                   Nouveau mot de passe
                   <span class="text-xs text-base-content/50 normal-case">(laisser vide pour ne pas changer)</span>
                 </label>
-                <Input
-                  id="password"
-                  v-model="form.password"
-                  type="password"
-                  placeholder="Nouveau mot de passe (optionnel)"
-                  :class="{ 
-                    'border-error': form.errors.password,
-                    'border-warning': form.password !== ''
-                  }"
-                />
+                <Input id="password" v-model="form.password" type="password"
+                       placeholder="Nouveau mot de passe (optionnel)" :class="{
+                         'border-error': form.errors.password,
+                         'border-warning': form.password !== ''
+                       }" />
                 <p v-if="form.errors.password" class="mt-1 text-sm text-error">
                   {{ form.errors.password }}
                 </p>
@@ -356,15 +322,11 @@ const deleteUser = () => {
                 <label for="role" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                   Rôle <span class="text-error">*</span>
                 </label>
-                <Select
-                  id="role"
-                  v-model="form.role"
-                  :options="roles.map(role => ({ value: role, label: role }))"
-                  :class="{ 
-                    'border-error': form.errors.role,
-                    'border-warning': form.role !== user.role
-                  }"
-                />
+                <Select id="role" v-model="form.role" :options="roles.map(role => ({ value: role, label: role }))"
+                        :class="{
+                          'border-error': form.errors.role,
+                          'border-warning': form.role !== user.role
+                        }" />
                 <p v-if="form.errors.role" class="mt-1 text-sm text-error">
                   {{ form.errors.role }}
                 </p>
@@ -374,15 +336,11 @@ const deleteUser = () => {
                 <label for="status" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                   Statut <span class="text-error">*</span>
                 </label>
-                <Select
-                  id="status"
-                  v-model="form.status"
-                  :options="statuses.map(status => ({ value: status, label: status }))"
-                  :class="{ 
-                    'border-error': form.errors.status,
-                    'border-warning': form.status !== user.status
-                  }"
-                />
+                <Select id="status" v-model="form.status"
+                        :options="statuses.map(status => ({ value: status, label: status }))" :class="{
+                          'border-error': form.errors.status,
+                          'border-warning': form.status !== user.status
+                        }" />
                 <p v-if="form.errors.status" class="mt-1 text-sm text-error">
                   {{ form.errors.status }}
                 </p>
@@ -392,36 +350,24 @@ const deleteUser = () => {
                 <label for="level" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                   Niveau
                 </label>
-                <Input
-                  id="level"
-                  v-model.number="form.level"
-                  type="number"
-                  min="1"
-                  max="100"
-                  :class="{ 
-                    'border-error': form.errors.level,
-                    'border-warning': form.level !== user.level
-                  }"
-                />
+                <Input id="level" v-model.number="form.level" type="number" min="1" max="100" :class="{
+                  'border-error': form.errors.level,
+                  'border-warning': form.level !== user.level
+                }" />
                 <p v-if="form.errors.level" class="mt-1 text-sm text-error">
                   {{ form.errors.level }}
                 </p>
               </div>
 
               <div>
-                <label for="experience" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                <label for="experience"
+                       class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                   Expérience
                 </label>
-                <Input
-                  id="experience"
-                  v-model.number="form.experience"
-                  type="number"
-                  min="0"
-                  :class="{ 
-                    'border-error': form.errors.experience,
-                    'border-warning': form.experience !== user.experience
-                  }"
-                />
+                <Input id="experience" v-model.number="form.experience" type="number" min="0" :class="{
+                  'border-error': form.errors.experience,
+                  'border-warning': form.experience !== user.experience
+                }" />
                 <p v-if="form.errors.experience" class="mt-1 text-sm text-error">
                   {{ form.errors.experience }}
                 </p>
@@ -431,16 +377,10 @@ const deleteUser = () => {
                 <label for="cash" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
                   Cash 💰
                 </label>
-                <Input
-                  id="cash"
-                  v-model.number="form.cash"
-                  type="number"
-                  min="0"
-                  :class="{ 
-                    'border-error': form.errors.cash,
-                    'border-warning': form.cash !== user.cash
-                  }"
-                />
+                <Input id="cash" v-model.number="form.cash" type="number" min="0" :class="{
+                  'border-error': form.errors.cash,
+                  'border-warning': form.cash !== user.cash
+                }" />
                 <p v-if="form.errors.cash" class="mt-1 text-sm text-error">
                   {{ form.errors.cash }}
                 </p>
@@ -455,20 +395,10 @@ const deleteUser = () => {
                 <span v-else>Aucune modification</span>
               </div>
               <div class="flex items-center gap-3">
-                <Button
-                  @click="router.visit('/admin/users')"
-                  variant="ghost"
-                  size="md"
-                  :disabled="form.processing"
-                >
+                <Button @click="router.visit('/admin/users')" variant="ghost" size="md" :disabled="form.processing">
                   Annuler
                 </Button>
-                <Button
-                  @click="submit"
-                  variant="primary"
-                  size="md"
-                  :disabled="form.processing || !hasChanges"
-                >
+                <Button @click="submit" variant="primary" size="md" :disabled="form.processing || !hasChanges">
                   {{ form.processing ? '🔄 Mise à jour...' : '💾 Sauvegarder les modifications' }}
                 </Button>
               </div>
