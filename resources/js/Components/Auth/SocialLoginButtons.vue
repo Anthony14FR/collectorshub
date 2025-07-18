@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import Button from '@/Components/UI/Button.vue';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 interface Props {
   text?: string;
 }
 
 const { text = 'Se connecter avec' } = defineProps<Props>();
+const { trackSocialLogin, trackAuthAction } = useMatomoTracking();
 
 const handleSocialLogin = (provider: string) => {
+  trackSocialLogin(provider as 'google' | 'discord', 'click');
+  trackAuthAction('social_login_attempt', provider);
   window.location.href = `/auth/${provider}/redirect`;
 };
 </script>

@@ -2,8 +2,10 @@
 import Button from '@/Components/UI/Button.vue'
 import { Link, router } from '@inertiajs/vue3'
 import { onMounted, onUnmounted, ref } from 'vue'
+import { useMatomoTracking } from '@/composables/useMatomoTracking'
 
 const scrolled = ref(false)
+const { trackLandingPageAction, trackUserNavigation } = useMatomoTracking()
 
 const handleScroll = () => {
   scrolled.value = window.scrollY > 50
@@ -18,6 +20,10 @@ onUnmounted(() => {
 })
 
 const goToLogin = () => {
+  if (window.location.pathname === '/') {
+    trackLandingPageAction('login_click');
+    trackUserNavigation('Landing Page', 'Login');
+  }
   router.visit('/login');
 };
 </script>
@@ -60,11 +66,9 @@ const goToLogin = () => {
       </Link>
 
       <div class="flex items-center">
-        <Link href="/login">
-          <Button variant="primary" icon="user" size="md">
-            Connexion
-          </Button>
-        </Link>
+        <Button variant="primary" icon="user" size="md" @click="goToLogin">
+          Connexion
+        </Button>
       </div>
     </div>
   </nav>
