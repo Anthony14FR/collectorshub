@@ -4,12 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventory;
 use App\Models\Item;
+use App\Services\DailyQuestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ShopController extends Controller
 {
+    protected DailyQuestService $dailyQuestService;
+
+    public function __construct()
+    {
+        $this->dailyQuestService = app(DailyQuestService::class);
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -107,6 +115,8 @@ class ShopController extends Controller
             $user->cash -= $totalCost;
             $user->save();
             $inventoryItem->save();
+
+            $this->dailyQuestService->incrementQuestProgress($user, 'buy_shop_item');
 
             return redirect()->route('shop.index')->with('success', "Achat de {$quantity} {$item->name} réussi");
         } catch (\Exception $e) {

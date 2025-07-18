@@ -21,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(SuccessService::class);
         $this->app->singleton(GameConfigurationService::class);
+        $this->app->singleton(\App\Services\DailyQuestService::class);
     }
 
     /**

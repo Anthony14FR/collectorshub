@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
-import type { MarketplaceListing } from '@/types/marketplace';
-import { useMarketplace } from '@/composables/useMarketplace';
+import MarketplaceListingCard from '@/Components/Cards/MarketplaceListingCard.vue';
+import MyListingsSection from '@/Components/Game/MyListingsSection.vue';
+import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import Select from '@/Components/UI/Select.vue';
-import Input from '@/Components/UI/Input.vue';
-import Alert from '@/Components/UI/Alert.vue';
-import Modal from '@/Components/UI/Modal.vue';
 import ConfirmationModal from '@/Components/UI/ConfirmationModal.vue';
+import Input from '@/Components/UI/Input.vue';
+import Modal from '@/Components/UI/Modal.vue';
+import Select from '@/Components/UI/Select.vue';
 import Spinner from '@/Components/UI/Spinner.vue';
-import MyListingsSection from '@/Components/Game/MyListingsSection.vue';
-import MarketplaceListingCard from '@/Components/Cards/MarketplaceListingCard.vue';
+import { useMarketplace } from '@/composables/useMarketplace';
+import type { MarketplaceListing } from '@/types/marketplace';
+import { Head, router } from '@inertiajs/vue3';
+import { computed, onMounted, ref } from 'vue';
 
 interface Props {
   myListings: MarketplaceListing[];
@@ -44,7 +44,6 @@ const {
   rarityOptions,
   typeOptions,
   shinyOptions,
-  stats,
   displayedListings,
   getPokemonData,
   formatPrice,
@@ -91,6 +90,7 @@ onMounted(() => {
 
 
 <template>
+
   <Head title="Marketplace" />
 
   <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
@@ -99,7 +99,8 @@ onMounted(() => {
     <div class="relative z-10 min-h-screen w-full">
       <div class="flex justify-center pt-8 px-4">
         <div class="text-center">
-          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1
+            class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
             🏪 MARKETPLACE
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
@@ -110,12 +111,7 @@ onMounted(() => {
 
       <div class="flex flex-col lg:flex-row gap-4 p-4 lg:p-8">
         <div class="w-full lg:w-64 order-1 lg:order-1">
-          <Button
-            @click="router.visit('/me')"
-            variant="secondary"
-            size="sm"
-            class="w-full mb-4"
-          >
+          <Button @click="router.visit('/me')" variant="secondary" size="sm" class="w-full mb-4">
             ← Retour vers le menu
           </Button>
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
@@ -127,51 +123,15 @@ onMounted(() => {
             </div>
 
             <div class="p-3 space-y-3">
-              <Select
-                v-model="filters.rarity"
-                :options="rarityOptions"
-                label="Rareté"
-                variant="default"
-                size="xs"
-              />
-              <Select
-                v-model="filters.type"
-                :options="typeOptions"
-                label="Type"
-                variant="default"
-                size="xs"
-              />
-              <Select
-                v-model="filters.isShiny"
-                :options="shinyOptions"
-                label="Shiny"
-                variant="default"
-                size="xs"
-              />
-              <Input
-                v-model="filters.minPrice"
-                type="number"
-                label="Prix min"
-                placeholder="0"
-                variant="default"
-                size="sm"
-              />
-              <Input
-                v-model="filters.maxPrice"
-                type="number"
-                label="Prix max"
-                placeholder="999999"
-                variant="default"
-                size="sm"
-              />
+              <Select v-model="filters.rarity" :options="rarityOptions" label="Rareté" variant="default" size="xs" />
+              <Select v-model="filters.type" :options="typeOptions" label="Type" variant="default" size="xs" />
+              <Select v-model="filters.isShiny" :options="shinyOptions" label="Shiny" variant="default" size="xs" />
+              <Input v-model="filters.minPrice" type="number" label="Prix min" placeholder="0" variant="default"
+                     size="sm" />
+              <Input v-model="filters.maxPrice" type="number" label="Prix max" placeholder="999999" variant="default"
+                     size="sm" />
 
-              <Button
-                @click="applyFilters"
-                variant="secondary"
-                size="sm"
-                :disabled="loading"
-                class="w-full"
-              >
+              <Button @click="applyFilters" variant="secondary" size="sm" :disabled="loading" class="w-full">
                 {{ loading ? '🔄' : '🔍' }} Filtrer
               </Button>
             </div>
@@ -186,7 +146,8 @@ onMounted(() => {
             <Alert type="error" :message="props.errors.message" />
           </div>
 
-          <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[600px] lg:h-[800px] flex flex-col sm:max-w-[1000px] mx-auto">
+          <div
+            class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[600px] lg:h-[800px] flex flex-col sm:max-w-[1000px] mx-auto">
             <div class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
                 <span class="text-lg">📦</span>
@@ -194,23 +155,17 @@ onMounted(() => {
               </h3>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-4" >
+            <div class="flex-1 overflow-y-auto p-4">
               <div v-if="loading" class="flex justify-center items-center py-12">
                 <Spinner size="md" />
               </div>
 
-              <div v-else-if="paginatedListings.length > 0" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                <div
-                  v-for="listing in paginatedListings"
-                  :key="listing.id"
-                  class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group"
-                >
-                  <MarketplaceListingCard 
-                    :listing="listing"
-                    :user-cash="userCash"
-                    :loading="loading"
-                    @purchase="showPurchaseConfirm"
-                  />
+              <div v-else-if="paginatedListings.length > 0"
+                   class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div v-for="listing in paginatedListings" :key="listing.id"
+                     class="bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 group">
+                  <MarketplaceListingCard :listing="listing" :user-cash="userCash" :loading="loading"
+                                          @purchase="showPurchaseConfirm" />
                 </div>
               </div>
 
@@ -221,42 +176,32 @@ onMounted(() => {
               </div>
             </div>
 
-            <div v-if="totalPages > 1" class="shrink-0 bg-gradient-to-r from-warning/10 to-warning/5 px-4 py-3 border-t border-warning/20">
+            <div v-if="totalPages > 1"
+                 class="shrink-0 bg-gradient-to-r from-warning/10 to-warning/5 px-4 py-3 border-t border-warning/20">
               <div class="flex justify-center items-center gap-2">
-                <Button
-                  @click="changePage(currentPage - 1)"
-                  :disabled="currentPage === 1"
-                  variant="ghost"
-                  size="sm"
-                >
+                <Button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" variant="ghost" size="sm">
                   ←
                 </Button>
 
                 <span v-for="page in totalPages" :key="page">
-                  <Button
-                    @click="changePage(page)"
-                    :variant="currentPage === page ? 'primary' : 'ghost'"
-                    size="sm"
-                    class="min-w-[2rem]"
-                  >
+                  <Button @click="changePage(page)" :variant="currentPage === page ? 'primary' : 'ghost'" size="sm"
+                          class="min-w-[2rem]">
                     {{ page }}
                   </Button>
                 </span>
 
-                <Button
-                  @click="changePage(currentPage + 1)"
-                  :disabled="currentPage === totalPages"
-                  variant="ghost"
-                  size="sm"
-                >
+                <Button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" variant="ghost"
+                        size="sm">
                   →
                 </Button>
               </div>
             </div>
 
-            <div v-if="displayedListings.length > 0" class="shrink-0 bg-gradient-to-r from-warning/10 to-warning/5 px-3 py-2 border-t border-warning/20">
+            <div v-if="displayedListings.length > 0"
+                 class="shrink-0 bg-gradient-to-r from-warning/10 to-warning/5 px-3 py-2 border-t border-warning/20">
               <div class="text-xs text-center text-base-content/70">
-                {{ displayedListings.length }} annonce{{ displayedListings.length > 1 ? 's' : '' }} trouvée{{ displayedListings.length > 1 ? 's' : '' }}
+                {{ displayedListings.length }} annonce{{ displayedListings.length > 1 ? 's' : '' }} trouvée{{
+                  displayedListings.length > 1 ? 's' : '' }}
                 {{ totalPages > 1 ? ` - Page ${currentPage}/${totalPages}` : '' }}
               </div>
             </div>
@@ -273,22 +218,13 @@ onMounted(() => {
             </div>
 
             <div class="p-3">
-              <Button
-                @click="router.visit('/marketplace/sell')"
-                variant="secondary"
-                size="sm"
-                class="w-full"
-              >
+              <Button @click="router.visit('/marketplace/sell')" variant="secondary" size="sm" class="w-full">
                 🏷️ Vendre
               </Button>
             </div>
           </div>
 
-          <MyListingsSection
-            :listings="myListings"
-            :show-cancel-button="true"
-            @cancel-listing="showCancelConfirm"
-          />
+          <MyListingsSection :listings="myListings" :show-cancel-button="true" @cancel-listing="showCancelConfirm" />
 
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="bg-gradient-to-r from-success/10 to-success/5 px-3 py-2 border-b border-success/20">
@@ -302,19 +238,14 @@ onMounted(() => {
         </div>
       </div>
 
-      <ConfirmationModal
-        :show="showPurchaseModal"
-        :listing="selectedListing"
-        :user-cash="userCash"
-        :loading="loading"
-        @close="closeModals"
-        @confirm="confirmPurchase"
-      />
+      <ConfirmationModal :show="showPurchaseModal" :listing="selectedListing" :user-cash="userCash" :loading="loading"
+                         @close="closeModals" @confirm="confirmPurchase" />
 
       <Modal :show="showCancelModal" @close="closeModals">
         <template #header>
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
+            <div
+              class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
               <span class="text-lg">🗑️</span>
             </div>
             <div class="flex flex-col">
@@ -337,23 +268,12 @@ onMounted(() => {
             </p>
 
             <div class="flex gap-3">
-              <Button
-                @click="closeModals"
-                variant="outline"
-                size="lg"
-                class="flex-1"
-                :disabled="loading"
-              >
+              <Button @click="closeModals" variant="outline" size="lg" class="flex-1" :disabled="loading">
                 Annuler
               </Button>
 
-              <Button
-                @click="confirmCancel"
-                variant="outline"
-                size="lg"
-                class="flex-1 !border-error !text-error hover:!bg-error hover:!text-white"
-                :disabled="loading"
-              >
+              <Button @click="confirmCancel" variant="outline" size="lg"
+                      class="flex-1 !border-error !text-error hover:!bg-error hover:!text-white" :disabled="loading">
                 {{ loading ? '🔄 En cours...' : '🗑️ Confirmer' }}
               </Button>
             </div>

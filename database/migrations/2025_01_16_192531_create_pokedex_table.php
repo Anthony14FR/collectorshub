@@ -13,7 +13,8 @@ return new class () extends Migration {
         Schema::create('pokedex', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('pokemon_id')->constrained('pokemon');
+            $table->unsignedBigInteger('pokemon_id');
+            $table->foreign('pokemon_id')->references('id')->on('pokemon');
             $table->string('nickname', 50)->nullable();
             $table->integer('cp')->default(0);
             $table->integer('level')->default(1);

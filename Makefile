@@ -1,4 +1,4 @@
-.PHONY: help install setup start clear-cache refresh log main main-rebuild
+.PHONY: help install setup start clear-cache refresh log main main-rebuild docker-dev-up docker-dev-restart docker-dev-start docker-prod-up docker-prod-mep docker-prod-seed docker-prod-refresh docker-prod-migrate docker-prod-restart docker-prod-down docker-prod-stop docker-prod-rebuild docker-prod-logs docker-shell docker-clean docker-prod-artisan docker-prod-composer docker-prod-npm
 
 help: ## Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -12,7 +12,6 @@ setup: ## Configure le projet (env, key, dépendances et base de données)
 	@if [ ! -f .env ]; then cp .env.example .env; fi
 	php artisan key:generate
 	make refresh
-	@echo "Configuration terminee. Le projet est pret a etre utilise."
 
 start: ## Démarre les serveurs front (Vite) et back (Laravel)
 ifeq ($(OS),Windows_NT)
@@ -45,136 +44,82 @@ main-rebuild: ## Checkout main, pull, et rebuild + refresh
 	make refresh
 
 # Commandes Docker
-
-docker-up-dev:
-	@echo "🚀 Démarrage de l'environnement de développement Docker..."
-	@echo "📦 Construction des images Docker..."
+docker-dev-up: ## Démarre l'environnement de développement Docker
 	docker compose build
-	@echo "🆙 Démarrage des services..."
 	docker compose up -d
-	@echo "⏳ Attente que les services soient prêts..."
 	sleep 10
-	@echo "🔑 Génération de la clé Laravel..."
 	docker compose exec app php artisan key:generate --force
-	@echo "📦 Installation des dépendances PHP..."
 	docker compose exec app composer install
-	@echo "📦 Installation des dépendances Node.js..."
 	docker compose exec app npm install
-	@echo "🗄️ Création de la base de données SQLite..."
 	docker compose exec app touch /var/www/html/database/database.sqlite
-	@echo "📊 Exécution des migrations..."
 	docker compose exec app php artisan migrate --force
-	@echo "🌱 Exécution des seeders..."
 	docker compose exec app php artisan db:seed --force
-	@echo "🎯 Optimisation des caches..."
 	docker compose exec app php artisan config:cache
-	@echo ""
-	@echo "✅ Environnement de développement prêt !"
-	@echo "🌐 Application: http://localhost:8000"
-	@echo "⚡ Pour démarrer Vite: make docker-vite"
-	@echo "📧 Mailpit: http://localhost:8025"
-	@echo ""
-	@echo "📝 Commandes utiles:"
-	@echo "  make docker-restart - Redémarrer (après stop)"
-	@echo "  make docker-dev     - Redémarrer + Vite"
-	@echo "  make docker-logs    - Voir les logs"
-	@echo "  make docker-shell   - Entrer dans le container"
-	@echo "  make docker-vite    - Démarrer Vite en mode dev"
-	@echo "  make docker-stop    - Arrêter (garde données)"
-	@echo "  make docker-down    - Arrêter + reset complet"
 
-docker-restart:
-	@echo "🔄 Redémarrage rapide des services Docker..."
+docker-dev-restart: ## Redémarre l'environnement de développement Docker
 	docker compose up -d
-	@echo "⏳ Attente que les services soient prêts..."
 	sleep 5
-	@echo "✅ Services redémarrés !"
-	@echo "🌐 Application: http://localhost:8000"
-	@echo "📧 Mailpit: http://localhost:8025"
-	@echo "💡 Si vous avez fait 'docker-down', utilisez 'make docker-up-dev' à la place."
 
-docker-dev:
-	@echo "🔄 Redémarrage complet de l'environnement de développement..."
+docker-dev-start: ## Démarre l'environnement de développement Docker
 	docker compose up -d
-	@echo "⏳ Attente que les services soient prêts..."
 	sleep 5
-	@echo "✅ Services redémarrés !"
-	@echo "🌐 Application: http://localhost:8000"
-	@echo "📧 Mailpit: http://localhost:8025"
-	@echo "⚡ Démarrage de Vite..."
-	@echo "🌐 Vite sera accessible sur: http://localhost:5173"
 	docker compose exec app npm run dev -- --host 0.0.0.0
 
-docker-up-prod:
-	@echo "🏭 Démarrage de l'environnement de production..."
+docker-prod-up: ## Démarre l'environnement de production Docker
 	docker compose -f docker-compose.prod.yml build
 	docker compose -f docker-compose.prod.yml up -d
-	@echo "✅ Environnement de production démarré !"
 
-docker-prod-mep:
+docker-prod-mep: ## Rafraîchit l'environnement de production Docker
 	make main
 	make install
 	docker compose -f docker-compose.prod.yml build --no-cache
 	docker compose -f docker-compose.prod.yml up -d
-	docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
+	docker compose -f docker-compose.prod.yml exec app php artisan migrate
 
-docker-prod-seed:
-	docker compose -f docker-compose.prod.yml exec app php artisan db:seed --force
+docker-prod-seed: ## Exécute les seeders de la base de données de production
+	docker compose -f docker-compose.prod.yml exec app php artisan db:seed
 
-docker-prod-refresh:
+docker-prod-refresh: ## Rafraîchit l'environnement de production Docker
 	docker compose -f docker-compose.prod.yml exec app php artisan migrate:fresh --seed
 
-docker-prod-migrate:
-	docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
+docker-prod-migrate: ## Exécute les migrations de la base de données de production
+	docker compose -f docker-compose.prod.yml exec app php artisan migrate
 
-docker-prod-restart:
+docker-prod-restart: ## Redémarre l'environnement de production Docker
 	docker compose -f docker-compose.prod.yml down
 	docker compose -f docker-compose.prod.yml up -d
 
-docker-down:
-	@echo "🛑 Arrêt et suppression des services Docker..."
+docker-prod-down: ## Arrête et supprime les conteneurs Docker
 	docker compose down -v --remove-orphans
 	docker compose -f docker-compose.prod.yml down -v --remove-orphans 2>/dev/null || true
-	@echo "🗑️  Suppression de la base de données SQLite..."
 	rm -f ./database/database.sqlite
-	@echo "✅ Environnement complètement nettoyé. Utilisez 'make docker-up-dev' pour redémarrer."
 
-docker-stop:
-	@echo "⏸️  Arrêt des services Docker (sans suppression)..."
-	docker compose stop
-	@echo "✅ Services arrêtés. Données conservées."
-	@echo "🔄 Utilisez 'make docker-restart' pour redémarrer rapidement."
+docker-prod-stop: ## Arrête les conteneurs Docker
+	docker compose -f docker-compose.prod.yml down
 
-docker-rebuild:
-	@echo "🔄 Rebuild de l'environnement Docker..."
-	make docker-down
+docker-prod-rebuild: ## Rebuild l'environnement Docker
+	make docker-prod-down
 	docker compose build --no-cache
-	make docker-up-dev
+	make docker-prod-up
 
-docker-logs:
-	docker compose logs -f
+docker-prod-logs: ## Affiche les logs des conteneurs Docker
+	docker compose -f docker-compose.prod.yml logs -f
 
-docker-shell:
+docker-shell: ## Ouvre un shell dans le conteneur Docker
 	docker compose exec app sh
 
-docker-clean:
-	@echo "⚠️  Nettoyage complet de Docker..."
+docker-clean: ## Nettoie l'environnement Docker
 	@echo "❓ Êtes-vous sûr ? (y/N)"
 	@read confirm && [ "$$confirm" = "y" ] || exit 1
-	make docker-down
-	docker compose down -v --remove-orphans
+	make docker-prod-down
+	docker compose -f docker-compose.prod.yml down -v --remove-orphans
 	docker system prune -af --volumes
 
-docker-artisan:
-	docker compose exec app php artisan $(CMD)
+docker-prod-artisan: ## Exécute une commande Artisan dans le conteneur Docker
+	docker compose -f docker-compose.prod.yml exec app php artisan $(CMD)
 
-docker-composer:
-	docker compose exec app composer $(CMD)
+docker-prod-composer: ## Exécute une commande Composer dans le conteneur Docker
+	docker compose -f docker-compose.prod.yml exec app composer $(CMD)
 
-docker-npm:
-	docker compose exec app npm $(CMD)
-
-docker-vite:
-	@echo "⚡ Démarrage de Vite en mode développement..."
-	@echo "🌐 Vite sera accessible sur: http://localhost:5173"
-	docker compose exec app npm run dev -- --host 0.0.0.0
+docker-prod-npm: ## Exécute une commande NPM dans le conteneur Docker
+	docker compose -f docker-compose.prod.yml exec app npm $(CMD)

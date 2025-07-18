@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
+import { Head, router } from '@inertiajs/vue3';
+import { onMounted, ref } from 'vue';
 
 interface Props {
   auth: {
@@ -132,8 +132,8 @@ const goBack = () => {
 };
 
 const getCsrfToken = () => {
-  return (window as any).Laravel?.csrfToken || 
-    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+  return (window as any).Laravel?.csrfToken ||
+    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
     '';
 };
 
@@ -145,9 +145,9 @@ const showNotification = (type: 'success' | 'error' | 'warning' | 'info', messag
     message,
     show: true
   };
-  
+
   notifications.value.push(notification);
-  
+
   setTimeout(() => {
     const index = notifications.value.findIndex(n => n.id === id);
     if (index > -1) {
@@ -180,7 +180,7 @@ const clearCache = async () => {
     });
 
     const data = await response.json();
-    
+
     if (data.success) {
       showNotification('success', data.message);
     } else {
@@ -221,7 +221,7 @@ const confirmMaintenanceAction = async () => {
     });
 
     const data = await response.json();
-    
+
     if (data.success) {
       isMaintenanceMode.value = maintenanceAction.value === 'enable';
       showNotification('success', data.message);
@@ -245,6 +245,7 @@ onMounted(() => {
 </script>
 
 <template>
+
   <Head title="Dashboard Admin" />
 
   <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
@@ -253,7 +254,8 @@ onMounted(() => {
     <div class="relative z-10 h-screen w-screen overflow-hidden">
       <div class="flex justify-center pt-4 mb-4">
         <div class="text-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1
+            class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider">
             🔧 DASHBOARD ADMIN
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
@@ -302,17 +304,11 @@ onMounted(() => {
             </h3>
           </div>
           <div class="p-3 space-y-2">
-            <Button
-              v-for="tool in quickTools"
-              :key="tool.route"
-              @click="goToSection(tool.route)"
-              variant="outline"
-              size="sm"
-              class="w-full justify-start"
-            >
+            <Button v-for="tool in quickTools" :key="tool.route" @click="goToSection(tool.route)" variant="outline"
+                    size="sm" class="w-full justify-start">
               {{ tool.icon }} {{ tool.label }}
             </Button>
-            
+
             <div class="pt-2 border-t border-base-300/30">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs text-base-content/70">Mode Maintenance</span>
@@ -325,14 +321,9 @@ onMounted(() => {
                   </span>
                 </div>
               </div>
-              
-              <Button
-                @click="toggleMaintenance"
-                :disabled="isLoadingMaintenance"
-                :variant="isMaintenanceMode ? 'secondary' : 'outline'"
-                size="sm"
-                class="w-full justify-start"
-              >
+
+              <Button @click="toggleMaintenance" :disabled="isLoadingMaintenance"
+                      :variant="isMaintenanceMode ? 'secondary' : 'outline'" size="sm" class="w-full justify-start">
                 <span v-if="isLoadingMaintenance">⏳</span>
                 <span v-else>🔧</span>
                 {{ isLoadingMaintenance ? 'Chargement...' : (isMaintenanceMode ? 'Désactiver' : 'Activer') }}
@@ -375,12 +366,16 @@ onMounted(() => {
             <Button @click="goToSection('/admin/logs')" variant="outline" size="sm" class="w-full">
               📝 Voir les logs
             </Button>
+            <Button @click="router.visit('/admin/notifications/create')" variant="outline" size="sm" class="w-full">
+              📢 Créer une annonce
+            </Button>
           </div>
         </div>
       </div>
 
       <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[700px]">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
+        <div
+          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
           <div class="shrink-0 p-3 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
               <span class="text-lg">🎛️</span>
@@ -390,16 +385,12 @@ onMounted(() => {
 
           <div class="flex-1 overflow-y-auto p-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div
-                v-for="section in adminSections"
-                :key="section.route"
-                @click="goToSection(section.route)"
-                class="group bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 cursor-pointer hover:scale-105"
-              >
+              <div v-for="section in adminSections" :key="section.route" @click="goToSection(section.route)"
+                   class="group bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 cursor-pointer hover:scale-105">
                 <div class="flex items-start justify-between mb-3">
                   <div class="text-2xl">{{ section.icon }}</div>
                   <div class="text-right">
-                    <div                     :class="[
+                    <div :class="[
                       'text-lg font-bold',
                       section.color === 'info' ? 'text-info' :
                       section.color === 'primary' ? 'text-primary' :
@@ -447,24 +438,25 @@ onMounted(() => {
           <div class="text-4xl mb-4">⚠️</div>
           <h3 class="text-lg font-bold mb-2">Confirmation requise</h3>
           <p class="text-base-content/70 mb-6">
-            Êtes-vous sûr de vouloir 
+            Êtes-vous sûr de vouloir
             <span :class="maintenanceAction === 'enable' ? 'text-error font-bold' : 'text-success font-bold'">
               {{ maintenanceAction === 'enable' ? 'ACTIVER' : 'DÉSACTIVER' }}
             </span>
             le mode maintenance ?
           </p>
-          
+
           <div v-if="maintenanceAction === 'enable'" class="bg-error/10 border border-error/20 rounded-lg p-3 mb-4">
             <p class="text-sm text-error">
               ⚠️ Cela rendra le site inaccessible aux utilisateurs
             </p>
           </div>
-          
+
           <div class="flex gap-3">
             <Button @click="cancelMaintenanceAction" variant="outline" class="flex-1">
               Annuler
             </Button>
-            <Button @click="confirmMaintenanceAction" :variant="maintenanceAction === 'enable' ? 'secondary' : 'primary'" class="flex-1">
+            <Button @click="confirmMaintenanceAction"
+                    :variant="maintenanceAction === 'enable' ? 'secondary' : 'primary'" class="flex-1">
               Confirmer
             </Button>
           </div>
@@ -474,62 +466,37 @@ onMounted(() => {
 
     <!-- Système de notifications -->
     <div class="fixed top-4 right-4 z-50 space-y-2">
-      <div
-        v-for="notification in notifications"
-        :key="notification.id"
-        :class="[
-          'alert transition-all duration-300 transform max-w-md',
-          notification.show ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0',
-          notification.type === 'success' ? 'bg-green-100 border-green-500 text-green-800' :
-          notification.type === 'error' ? 'bg-red-100 border-red-500 text-red-800' :
-          notification.type === 'warning' ? 'alert-warning' :
-          'alert-info'
-        ]"
-      >
+      <div v-for="notification in notifications" :key="notification.id" :class="[
+        'alert transition-all duration-300 transform max-w-md',
+        notification.show ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0',
+        notification.type === 'success' ? 'bg-green-100 border-green-500 text-green-800' :
+        notification.type === 'error' ? 'bg-red-100 border-red-500 text-red-800' :
+        notification.type === 'warning' ? 'alert-warning' :
+        'alert-info'
+      ]">
         <div class="flex items-center justify-between w-full">
           <div class="flex items-center gap-2">
-            <svg
-              v-if="notification.type === 'success'"
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg v-if="notification.type === 'success'" class="w-5 h-5" fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            <svg
-              v-else-if="notification.type === 'error'"
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg v-else-if="notification.type === 'error'" class="w-5 h-5" fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
-            <svg
-              v-else-if="notification.type === 'warning'"
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            <svg v-else-if="notification.type === 'warning'" class="w-5 h-5" fill="none" stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z">
+              </path>
             </svg>
-            <svg
-              v-else
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <span class="text-sm font-medium">{{ notification.message }}</span>
           </div>
-          <button
-            @click="removeNotification(notification.id)"
-            class="btn btn-ghost btn-xs ml-2"
-          >
+          <button @click="removeNotification(notification.id)" class="btn btn-ghost btn-xs ml-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>

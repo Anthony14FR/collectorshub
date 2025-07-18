@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { PokedexEntry } from '@/types/marketplace';
-import type { Pokedex } from '@/types/pokedex';
-import { parseTypes } from '@/utils/marketplace';
 import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import type { PokedexEntry } from '@/types/marketplace';
+import type { Pokedex } from '@/types/pokedex';
+import { parseTypes } from '@/utils/marketplace';
 
 interface Props {
   entry: PokedexEntry | Pokedex;
@@ -33,8 +33,8 @@ const getStars = () => {
   }
   const rarity = entry.pokemon?.rarity;
   if (!rarity) return 1;
-    
-  switch(rarity) {
+
+  switch (rarity) {
   case 'normal': return 1;
   case 'rare': return 2;
   case 'epic': return 3;
@@ -46,31 +46,31 @@ const getStars = () => {
 const getRarityForBadge = () => {
   const rarity = entry.pokemon?.rarity;
   if (!rarity) return undefined;
-    
+
   const validRarities = ['normal', 'rare', 'epic', 'legendary'];
   return validRarities.includes(rarity) ? rarity : 'normal';
 };
 </script>
 
 <template>
-  <div
-    :class="[
-      cardClasses[variant],
-      'text-center transition-all duration-300 group cursor-pointer hover:scale-105 relative'
-    ]"
-  >
-    <div v-if="entry.pokemon.is_shiny" class="absolute top-2 right-2 w-6 h-6 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
+  <div :class="[
+    cardClasses[variant],
+    'text-center transition-all duration-300 group cursor-pointer hover:scale-105 relative'
+  ]">
+    <div v-if="entry.pokemon?.is_shiny"
+         class="absolute top-2 right-2 w-6 h-6 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
       <span class="text-yellow-400 text-sm">✨</span>
     </div>
 
     <div v-if="entry.is_favorite" :class="[
       'absolute w-6 h-6 bg-red-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-red-500/30',
-      entry.pokemon.is_shiny ? 'top-10 right-2' : 'top-2 right-2'
+      entry.pokemon?.is_shiny ? 'top-10 right-2' : 'top-2 right-2'
     ]">
       <span class="text-red-400 text-sm">❤️</span>
     </div>
 
-    <div class="absolute top-2 left-2 w-auto h-5 bg-base-100/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-base-300/30 px-2">
+    <div
+      class="absolute top-2 left-2 w-auto h-5 bg-base-100/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-base-300/30 px-2">
       <span class="text-base-content text-xs font-bold">N°{{ entry.pokemon_id }}</span>
     </div>
 
@@ -85,11 +85,10 @@ const getRarityForBadge = () => {
     <div class="flex justify-center items-center mb-3" :class="variant === 'modal' ? 'h-24' : 'h-auto'">
       <div class="relative">
         <img
-          :src="`/images/pokemon-gifs/${entry.pokemon.is_shiny ? (entry.pokemon.id - 1000) + '_S' : entry.pokemon.id}.gif`"
+          :src="`/images/pokemon-gifs/${entry.pokemon?.is_shiny ? (entry.pokemon?.id ? entry.pokemon.id - 1000 : 0) + '_S' : entry.pokemon?.id || 0}.gif`"
           :alt="entry.pokemon?.name"
           :class="[sizeClasses[size], 'object-contain group-hover:scale-110 transition-transform duration-300']"
-          style="image-rendering: pixelated;"
-        />
+          style="image-rendering: pixelated;" />
       </div>
     </div>
 
@@ -101,17 +100,13 @@ const getRarityForBadge = () => {
         Niv. {{ entry.level }}
       </p>
 
-      <div v-if="entry.pokemon.types" class="flex justify-center gap-1 mb-2">
-        <PokemonTypeBadge
-          v-for="type in parseTypes(entry.pokemon.types)"
-          :key="type"
-          :type="type"
-          size="xs"
-        />
+      <div v-if="entry.pokemon?.types" class="flex justify-center gap-1 mb-2">
+        <PokemonTypeBadge v-for="type in parseTypes(entry.pokemon?.types || [])" :key="type" :type="type" size="xs" />
       </div>
 
       <div v-if="entry.is_in_team" class="flex justify-center gap-1 mb-2">
-        <span v-if="entry.is_in_team" class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100/80 text-blue-600 border border-blue-200">
+        <span v-if="entry.is_in_team"
+              class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100/80 text-blue-600 border border-blue-200">
           ⭐ Équipe
         </span>
       </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pokedex;
+use App\Services\DailyQuestService;
 use App\Services\PokemonUpgradeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,9 +14,12 @@ class PokemonUpgradeController extends Controller
 {
     protected PokemonUpgradeService $upgradeService;
 
-    public function __construct(PokemonUpgradeService $upgradeService)
-    {
+    public function __construct(
+        PokemonUpgradeService $upgradeService,
+        DailyQuestService $dailyQuestService
+    ) {
         $this->upgradeService = $upgradeService;
+        $this->dailyQuestService = $dailyQuestService;
     }
 
     public function index()
@@ -160,6 +164,8 @@ class PokemonUpgradeController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Erreur lors de l\'amélioration : ' . $e->getMessage()]);
         }
+
+        $this->dailyQuestService->incrementQuestProgress(Auth::user(), 'upgrade_pokemon');
 
         return back()->with('success', 'Pokémon amélioré avec succès !');
     }

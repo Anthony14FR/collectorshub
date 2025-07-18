@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Pokemon;
+use App\Services\DailyQuestService;
 use App\Services\GameConfigurationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,8 @@ class OpeningController extends Controller
     private $balls;
 
     public function __construct(
-        private GameConfigurationService $configService
+        private GameConfigurationService $configService,
+        private DailyQuestService $dailyQuestService
     ) {
         $this->balls = Cache::remember('balls', 3600, function () {
             return Item::where('type', 'ball')->get()->keyBy('name');
@@ -100,6 +102,8 @@ class OpeningController extends Controller
 
             $inventory->quantity -= $quantity;
             $inventory->save();
+
+            $this->dailyQuestService->incrementQuestProgress($user, 'invoke_pokemon', $quantity);
 
             return response()->json([
                 'success' => true,

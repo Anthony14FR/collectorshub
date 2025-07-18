@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue'
 import Button from '@/Components/UI/Button.vue'
+import { Head, router } from '@inertiajs/vue3'
+import { computed, ref, watch } from 'vue'
 
 import TeamManagementModal from '@/Components/Game/TeamManagementModal.vue'
 import TowerLevelCard from '@/Components/InfernalTower/TowerLevelCard.vue'
 import TrainerProfile from '@/Components/Profile/TrainerProfile.vue'
 import CPBadge from '@/Components/UI/CPBadge.vue'
-import TeamPokemonCard from '@/Components/Profile/TeamPokemonCard.vue'
 
 interface InfernalTowerLevel {
   level: number;
@@ -148,7 +147,7 @@ const showMessage = (message: string, type: 'success' | 'error' | 'info' | 'warn
   alertMessage.value = message;
   alertType.value = type;
   showAlert.value = true;
-    
+
   setTimeout(() => {
     showAlert.value = false;
   }, 5000);
@@ -159,7 +158,7 @@ const attemptLevel = async () => {
     showMessage('Une tentative est déjà en cours...', 'warning');
     return;
   }
-    
+
   if (userDailyDefeats.value <= 0) {
     showMessage('Vous avez épuisé toutes vos défaites quotidiennes. Revenez demain !', 'error');
     return;
@@ -168,7 +167,7 @@ const attemptLevel = async () => {
   isAttempting.value = true;
   isBattling.value = true;
   battleResult.value = null;
-    
+
   try {
     const response = await fetch('/api/tower/attempt', {
       method: 'POST',
@@ -180,9 +179,9 @@ const attemptLevel = async () => {
     });
 
     const data = await response.json();
-    
+
     battleResult.value = data.success ? 'victory' : 'defeat';
-    
+
     setTimeout(() => {
       if (data.success) {
         const rewardsText = [
@@ -191,9 +190,9 @@ const attemptLevel = async () => {
           data.rewards.money ? `💰 ${data.rewards.money}💰` : '',
           data.rewards.exp ? `⭐ ${data.rewards.exp} EXP` : ''
         ].filter(Boolean).join(' • ');
-        
+
         showMessage(`🎉 VICTOIRE ! Niveau ${userCurrentLevel.value} vaincu !\n🎁 Récompenses: ${rewardsText}`, 'success');
-              
+
         router.reload({
           only: ['user', 'pokedex', 'teamPokemons', 'currentLevel', 'levels', 'dailyDefeats', 'userTeamCp'],
           onSuccess: (page: any) => {
@@ -210,14 +209,14 @@ const attemptLevel = async () => {
         userDailyDefeats.value = data.daily_defeats;
         showMessage(`💥 DÉFAITE ! ${data.message}\n🔥 Défaites restantes: ${data.daily_defeats}/10`, 'error');
       }
-      
+
       setTimeout(() => {
         isAttempting.value = false;
         isBattling.value = false;
         battleResult.value = null;
       }, 1000);
     }, 800);
-    
+
   } catch (error) {
     console.error('Erreur lors du combat:', error);
     showMessage('❌ Erreur lors du combat', 'error');
@@ -236,6 +235,7 @@ const goBack = () => {
 </script>
 
 <template>
+
   <Head title="Tour Infernale" />
 
   <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
@@ -255,14 +255,12 @@ const goBack = () => {
           </div>
         </div>
 
-        <div 
-          v-if="showAlert" 
-          class="fixed top-4 right-4 z-50 max-w-sm animate-in slide-in-from-right-2 duration-300"
-        >
+        <div v-if="showAlert" class="fixed top-4 right-4 z-50 max-w-sm animate-in slide-in-from-right-2 duration-300">
           <div class="bg-base-100/90 backdrop-blur-sm border border-base-300/50 rounded-xl p-4 shadow-lg">
             <div class="flex items-start gap-3">
               <div class="flex-shrink-0">
-                <div v-if="alertType === 'success'" class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center">
+                <div v-if="alertType === 'success'"
+                     class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center">
                   <span class="text-success text-sm">✓</span>
                 </div>
                 <div v-else class="w-6 h-6 rounded-full bg-error/20 flex items-center justify-center">
@@ -272,10 +270,8 @@ const goBack = () => {
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-base-content/90">{{ alertMessage }}</p>
               </div>
-              <button 
-                @click="showAlert = false"
-                class="flex-shrink-0 w-5 h-5 rounded-full hover:bg-base-300/50 flex items-center justify-center transition-colors"
-              >
+              <button @click="showAlert = false"
+                      class="flex-shrink-0 w-5 h-5 rounded-full hover:bg-base-300/50 flex items-center justify-center transition-colors">
                 <span class="text-base-content/60 text-xs">✕</span>
               </button>
             </div>
@@ -286,11 +282,8 @@ const goBack = () => {
           <div :class="[
             battleResult === 'defeat' ? 'animate-shake' : ''
           ]">
-            <TrainerProfile
-              :user="user as User"
-              :teamPokemons="teamPokemons"
-              :onOpenPokedexModal="() => teamManagementModalOpen = true"
-            />
+            <TrainerProfile :user="user as User" :teamPokemons="teamPokemons"
+                            :onOpenPokedexModal="() => teamManagementModalOpen = true" />
           </div>
 
           <!-- Profil de l'adversaire -->
@@ -299,56 +292,50 @@ const goBack = () => {
           ]">
             <div class="flex flex-col items-center space-y-4 mt-14">
               <div class="mb-2">
-                <CPBadge 
-                  :cp="currentLevelData.team_cp"
-                  size="lg"
-                  variant="gradient"
-                  :show-label="true"
-                />
+                <CPBadge :cp="currentLevelData.team_cp" size="lg" variant="gradient" :show-label="true" />
               </div>
 
               <div class="relative flex items-center justify-center">
                 <div class="absolute sm:-left-28 -left-16 flex flex-col space-y-2">
                   <template v-for="(pokemon, index) in displayEnemyLeftTeam" :key="index">
-                    <div v-if="pokemon" class="relative w-20 h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 overflow-hidden flex-shrink-0">
-                      <img 
-                        :src="`/images/pokemon-gifs/${pokemon.pokemon_id}${pokemon.is_shiny ? '_S' : ''}.gif`"
-                        :alt="pokemon.name"
-                        class="w-full h-full object-contain"
-                      />
-                      <div class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-1 py-0.5 text-center">
+                    <div v-if="pokemon"
+                         class="relative w-20 h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 overflow-hidden flex-shrink-0">
+                      <img :src="`/images/pokemon-gifs/${pokemon.pokemon_id}${pokemon.is_shiny ? '_S' : ''}.gif`"
+                           :alt="pokemon.name" class="w-full h-full object-contain" />
+                      <div
+                        class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-1 py-0.5 text-center">
                         {{ pokemon.cp }}
                       </div>
                     </div>
-                    <div v-else class="relative w-20 h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 opacity-50">
-                      <img src="/images/items/pokeball.png" alt="placeholder" class="w-8 h-8 object-contain opacity-50" />
+                    <div v-else
+                         class="relative w-20 h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 opacity-50">
+                      <img src="/images/items/pokeball.png" alt="placeholder"
+                           class="w-8 h-8 object-contain opacity-50" />
                     </div>
                   </template>
                 </div>
 
                 <div class="w-48 h-48">
-                  <img
-                    :src="`/images/trainer/${currentLevelData.trainer_avatar}`"
-                    :alt="`Dresseur niveau ${currentLevelData.level}`"
-                    class="w-full h-full object-cover"
-                    style="image-rendering: pixelated"
-                  />
+                  <img :src="`/images/trainer/${currentLevelData.trainer_avatar}`"
+                       :alt="`Dresseur niveau ${currentLevelData.level}`" class="w-full h-full object-cover"
+                       style="image-rendering: pixelated" />
                 </div>
 
                 <div class="absolute sm:-right-28 -right-16 flex flex-col space-y-2">
                   <template v-for="(pokemon, index) in displayEnemyRightTeam" :key="index + 3">
-                    <div v-if="pokemon" class="relative w-20 h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 overflow-hidden flex-shrink-0">
-                      <img 
-                        :src="`/images/pokemon-gifs/${pokemon.pokemon_id}${pokemon.is_shiny ? '_S' : ''}.gif`"
-                        :alt="pokemon.name"
-                        class="w-full h-full object-contain"
-                      />
-                      <div class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-1 py-0.5 text-center">
+                    <div v-if="pokemon"
+                         class="relative w-20 h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 overflow-hidden flex-shrink-0">
+                      <img :src="`/images/pokemon-gifs/${pokemon.pokemon_id}${pokemon.is_shiny ? '_S' : ''}.gif`"
+                           :alt="pokemon.name" class="w-full h-full object-contain" />
+                      <div
+                        class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-1 py-0.5 text-center">
                         {{ pokemon.cp }}
                       </div>
                     </div>
-                    <div v-else class="relative w-20 h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 opacity-50">
-                      <img src="/images/items/pokeball.png" alt="placeholder" class="w-8 h-8 object-contain opacity-50" />
+                    <div v-else
+                         class="relative w-20 h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 opacity-50">
+                      <img src="/images/items/pokeball.png" alt="placeholder"
+                           class="w-8 h-8 object-contain opacity-50" />
                     </div>
                   </template>
                 </div>
@@ -359,14 +346,9 @@ const goBack = () => {
                   Dresseur de la Tour
                 </h2>
                 <div class="text-lg text-base-content/70 mb-4">Niveau {{ currentLevelData.level }}</div>
-                
-                <Button 
-                  @click="attemptLevel"
-                  :disabled="userDailyDefeats <= 0 || isAttempting"
-                  :variant="userDailyDefeats <= 0 ? 'outline' : 'primary'"
-                  size="lg"
-                  class="min-w-[200px]"
-                >
+
+                <Button @click="attemptLevel" :disabled="userDailyDefeats <= 0 || isAttempting"
+                        :variant="userDailyDefeats <= 0 ? 'outline' : 'primary'" size="lg" class="min-w-[200px]">
                   <span v-if="isAttempting">⚔️ Combat en cours...</span>
                   <span v-else-if="userDailyDefeats > 0">⚔️ Combattre</span>
                   <span v-else>Plus de tentatives</span>
@@ -385,7 +367,8 @@ const goBack = () => {
             <div class="text-xs text-base-content/70 font-medium uppercase tracking-wider">Niveau actuel</div>
           </div>
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl p-4 border border-base-300/30 text-center">
-            <div :class="['text-3xl font-bold mb-1', userDailyDefeats > 0 ? 'text-base-content' : 'text-base-content/50']">
+            <div
+              :class="['text-3xl font-bold mb-1', userDailyDefeats > 0 ? 'text-base-content' : 'text-base-content/50']">
               {{ userDailyDefeats }}/10
             </div>
             <div class="text-xs text-base-content/70 font-medium uppercase tracking-wider">Défaites restantes</div>
@@ -397,7 +380,8 @@ const goBack = () => {
             <div class="text-3xl font-bold text-base-content mb-1">{{ userTeamCp.toLocaleString() }}</div>
             <div class="text-xs text-base-content/70 font-medium uppercase tracking-wider">CP de votre équipe</div>
           </div>
-          <div v-if="currentLevelData" class="bg-base-100/60 backdrop-blur-sm rounded-xl p-4 border border-base-300/30 text-center">
+          <div v-if="currentLevelData"
+               class="bg-base-100/60 backdrop-blur-sm rounded-xl p-4 border border-base-300/30 text-center">
             <div class="text-3xl font-bold text-base-content mb-1">{{ currentLevelData.success_rate }}%</div>
             <div class="text-xs text-base-content/70 font-medium uppercase tracking-wider">Chance de réussite</div>
           </div>
@@ -406,7 +390,8 @@ const goBack = () => {
         <div v-if="otherLevels.length > 0" class="mt-12">
           <div class="flex items-center gap-4 mb-8">
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-error/20 to-accent/20 flex items-center justify-center border border-error/20">
+              <div
+                class="w-8 h-8 rounded-lg bg-gradient-to-br from-error/20 to-accent/20 flex items-center justify-center border border-error/20">
                 <span class="text-lg">⚔️</span>
               </div>
               <h3 class="text-2xl font-bold">
@@ -415,24 +400,18 @@ const goBack = () => {
             </div>
             <div class="flex-1 h-px bg-gradient-to-r from-error/30 via-transparent to-transparent"></div>
             <div class="text-sm text-base-content/60 bg-base-100/40 px-3 py-1 rounded-full border border-base-300/30">
-              {{ otherLevels.length }} niveau{{ otherLevels.length > 1 ? 's' : '' }} disponible{{ otherLevels.length > 1 ? 's' : '' }}
+              {{ otherLevels.length }} niveau{{ otherLevels.length > 1 ? 's' : '' }} disponible{{ otherLevels.length > 1
+                ? 's' :
+                  '' }}
             </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div
-              v-for="(level, index) in otherLevels"
-              :key="level.level"
-              :style="{ 'animation-delay': `${index * 100}ms` }"
-              class="animate-in slide-in-from-bottom-4 duration-500 fill-mode-both"
-            >
-              <TowerLevelCard
-                :level="level"
-                :isCurrentLevel="false"
-                :onAttempt="attemptLevel"
-                :dailyDefeats="userDailyDefeats"
-                :isAttempting="isAttempting"
-              />
+            <div v-for="(level, index) in otherLevels" :key="level.level"
+                 :style="{ 'animation-delay': `${index * 100}ms` }"
+                 class="animate-in slide-in-from-bottom-4 duration-500 fill-mode-both">
+              <TowerLevelCard :level="level" :isCurrentLevel="false" :onAttempt="attemptLevel"
+                              :dailyDefeats="userDailyDefeats" :isAttempting="isAttempting" />
             </div>
           </div>
 
@@ -446,22 +425,29 @@ const goBack = () => {
       </div>
     </div>
 
-    <TeamManagementModal
-      :show="teamManagementModalOpen"
-      :onClose="() => teamManagementModalOpen = false"
-      :userPokemons="pokedex"
-    />
+    <TeamManagementModal :show="teamManagementModalOpen" :onClose="() => teamManagementModalOpen = false"
+                         :userPokemons="pokedex" />
   </div>
 </template>
 
 <style scoped>
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 .animate-shake {
   animation: shake 0.15s ease-in-out 4;
 }
-</style> 
+</style>

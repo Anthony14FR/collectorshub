@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             ExpeditionSeeder::class,
             InfernalTowerLevelSeeder::class,
             ClubSeeder::class,
+            DailyQuestSeeder::class,
         ]);
     }
 }

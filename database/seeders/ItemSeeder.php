@@ -32,7 +32,7 @@ class ItemSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            Item::create($item);
+            Item::firstOrCreate(['name' => $item['name']], $item);
         }
 
         $avatarDir = public_path('images/trainer');
@@ -44,7 +44,7 @@ class ItemSeeder extends Seeder
         $files->each(function ($file) {
             $basename = pathinfo($file, PATHINFO_FILENAME);
             $relativePath = '/images/trainer/' . basename($file);
-            Item::create([
+            Item::firstOrCreate(['image' => $relativePath], [
                 'name' => 'Avatar ' . $basename,
                 'description' => "Débloque l'avatar $basename pour votre profil.",
                 'type' => 'avatar',
@@ -95,7 +95,7 @@ class ItemSeeder extends Seeder
         ];
 
         foreach ($backgrounds as $background) {
-            Item::create([
+            Item::firstOrCreate(['name' => $background['name']], [
                 'name' => $background['name'],
                 'description' => $background['description'],
                 'type' => 'background',

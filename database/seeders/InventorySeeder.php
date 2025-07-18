@@ -26,8 +26,8 @@ class InventorySeeder extends Seeder
             return;
         }
 
-        $pokemons = Pokemon::inRandomOrder()->limit(20)->get();
-        $items = Item::inRandomOrder()->limit(10)->get();
+        $pokemons = Pokemon::orderBy('id')->limit(20)->get();
+        $items = Item::orderBy('id')->limit(10)->get();
 
         if ($pokemons->isEmpty() || $items->isEmpty()) {
             $this->command->error('Aucun Pokémon ou item trouvé. Exécutez d\'abord PokemonSeeder et ItemSeeder.');
@@ -38,34 +38,38 @@ class InventorySeeder extends Seeder
         $inventoryCount = 0;
 
         foreach ($pokemons->take(15) as $pokemon) {
-            Pokedex::create([
-                'user_id' => $admin->id,
-                'pokemon_id' => $pokemon->id,
-                'nickname' => null,
-                'level' => rand(1, 50),
-                'star' => rand(1, 5),
-                'hp_left' => $pokemon->hp,
-                'is_in_team' => false,
-                'is_favorite' => (rand(1, 100) <= 20),
-                'obtained_at' => now()
-            ]);
-            $pokedexCount++;
-        }
-
-        foreach ($users as $user) {
-            foreach ($pokemons->take(8) as $pokemon) {
+            if (!Pokedex::where('user_id', $admin->id)->where('pokemon_id', $pokemon->id)->exists()) {
                 Pokedex::create([
-                    'user_id' => $user->id,
+                    'user_id' => $admin->id,
                     'pokemon_id' => $pokemon->id,
                     'nickname' => null,
-                    'level' => rand(1, 30),
-                    'star' => rand(1, 3),
+                    'level' => rand(1, 50),
+                    'star' => rand(1, 5),
                     'hp_left' => $pokemon->hp,
                     'is_in_team' => false,
                     'is_favorite' => (rand(1, 100) <= 20),
                     'obtained_at' => now()
                 ]);
                 $pokedexCount++;
+            }
+        }
+
+        foreach ($users as $user) {
+            foreach ($pokemons->take(8) as $pokemon) {
+                if (!Pokedex::where('user_id', $user->id)->where('pokemon_id', $pokemon->id)->exists()) {
+                    Pokedex::create([
+                        'user_id' => $user->id,
+                        'pokemon_id' => $pokemon->id,
+                        'nickname' => null,
+                        'level' => rand(1, 30),
+                        'star' => rand(1, 3),
+                        'hp_left' => $pokemon->hp,
+                        'is_in_team' => false,
+                        'is_favorite' => (rand(1, 100) <= 20),
+                        'obtained_at' => now()
+                    ]);
+                    $pokedexCount++;
+                }
             }
         }
 
@@ -108,8 +112,6 @@ class InventorySeeder extends Seeder
             ->first();
 
         if ($existingInventory) {
-            $newQuantity = min($existingInventory->quantity + $quantity, 999);
-            $existingInventory->update(['quantity' => $newQuantity]);
             return false;
         } else {
             Inventory::create([

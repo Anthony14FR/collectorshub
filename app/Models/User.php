@@ -55,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'infernal_tower_current_level',
         'infernal_tower_daily_defeats',
         'infernal_tower_last_reset',
+        'daily_quest_bonus_claimed_date',
     ];
 
     protected $hidden = [
@@ -86,13 +87,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'infernal_tower_current_level' => 'integer',
         'infernal_tower_daily_defeats' => 'integer',
         'infernal_tower_last_reset' => 'datetime',
+        'daily_quest_bonus_claimed_date' => 'date',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
 
     public function getExperienceForCurrentLevelAttribute(): int
     {
-        return app(XpService::class)->getTotalExperienceForLevel($this->level);
+        return app(XpService::class)->getTotalExperienceForLevel($this->level ?? 1);
     }
 
     public function getExperienceForNextLevelAttribute(): int
@@ -140,6 +142,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(PromoCode::class, 'promo_code_users')
             ->withPivot(['is_used', 'used_at'])
             ->withTimestamps();
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
     }
 
     public function successes()
@@ -334,5 +341,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isClubLeader(): bool
     {
         return $this->ledClub()->exists();
+    }
+
+    public function dailyQuestProgress(): HasMany
+    {
+        return $this->hasMany(UserDailyQuestProgress::class);
+    }
+
+    public function todayQuestProgress(): HasMany
+    {
+        return $this->dailyQuestProgress()->where('date', today());
+    }
+
+    public function canClaimDailyBonus(): bool
+    {
+        return is_null($this->daily_quest_bonus_claimed_date) ||
+               !$this->daily_quest_bonus_claimed_date->isToday();
     }
 }

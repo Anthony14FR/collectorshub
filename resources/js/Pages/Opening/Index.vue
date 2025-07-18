@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Head, router, usePage } from '@inertiajs/vue3';
+import PokemonCard from '@/Components/Cards/PokemonCard.vue';
+import EvolutionAnimation from '@/Components/Game/EvolutionAnimation.vue';
+import GachaBall from '@/Components/Game/GachaBall.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import GachaBall from '@/Components/Game/GachaBall.vue';
-import PokemonCard from '@/Components/Cards/PokemonCard.vue';
-import EvolutionAnimation from '@/Components/Game/EvolutionAnimation.vue';
+import { Head, router, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 
 import type { PageProps } from '@/types';
-import type { User } from '@/types/user';
 import type { Inventory } from '@/types/inventory';
+import type { User } from '@/types/user';
 
 type Rarity = 'normal' | 'rare' | 'epic' | 'legendary';
 
@@ -197,11 +197,6 @@ const allBallsRevealed = computed(() => {
   return revealedBalls.value.every(revealed => revealed);
 });
 
-const showAllResults = () => {
-  showGachaResults.value = false;
-  showFinalResults.value = true;
-};
-
 const closeResults = () => {
   showGachaResults.value = false;
   showFinalResults.value = false;
@@ -216,14 +211,11 @@ const closeResults = () => {
 
 const goBack = () => {
   router.visit('/me');
-};
-
-const getBallEmoji = (ballType: string) => {
-  return ballType === 'Masterball' ? '🏐' : '⚾';
-};
+}
 </script>
 
 <template>
+
   <Head title="Invocation" />
 
   <div class="sm:h-screen sm:w-screen bg-gradient-to-br from-base-200 to-base-300 relative">
@@ -232,7 +224,8 @@ const getBallEmoji = (ballType: string) => {
     <div class="relative z-10 sm:h-screen  sm:w-screen">
       <div class="flex justify-center pt-4 mb-4">
         <div class="text-center sm:mt-0 mt-14">
-          <h1 class="sm:text-2xl text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1
+            class="sm:text-2xl text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-1 tracking-wider">
             ⚡ INVOCATION
           </h1>
           <p class="sm:text-xs text-[10px] text-base-content/70 uppercase tracking-wider">
@@ -242,21 +235,18 @@ const getBallEmoji = (ballType: string) => {
       </div>
 
       <div class="absolute sm:left-8 left-4 sm:top-20 top-4">
-        <Button
-          @click="goBack"
-          variant="ghost"
-          size="sm"
-          class="!bg-base-100/60 !backdrop-blur-sm"
-        >
+        <Button @click="goBack" variant="ghost" size="sm" class="!bg-base-100/60 !backdrop-blur-sm">
           ← Retour
         </Button>
       </div>
 
       <div class="flex flex-col md:flex-row justify-center items-start gap-8 mt-12 md:mt-24">
         <div class="flex-1 w-full max-w-md px-4 md:px-0 mt-8 md:mt-0 block sm:hidden mb-16">
-          <div class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
+          <div
+            class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
             <div class="text-7xl mb-4 animate-pulse">🎰</div>
-            <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">Machine à Invocation</h2>
+            <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">
+              Machine à Invocation</h2>
             <p class="text-base-content/70 text-center mb-2">
               Tente ta chance et découvre quels Pokémon tu vas obtenir !<br>
               Plus tu ouvres de balls, plus tu as de chances d'obtenir des Pokémon rares ou shiny.
@@ -300,25 +290,15 @@ const getBallEmoji = (ballType: string) => {
               </div>
             </div>
             <div class="p-3 space-y-2">
-              <Button
-                @click="startInvocation('Pokeball', 1)"
-                :disabled="!canInvoke('Pokeball', 1)"
-                variant="secondary"
-                size="sm"
-                class="w-full flex items-center justify-center gap-2"
-                :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Pokeball', 1) }"
-              >
+              <Button @click="startInvocation('Pokeball', 1)" :disabled="!canInvoke('Pokeball', 1)" variant="secondary"
+                      size="sm" class="w-full flex items-center justify-center gap-2"
+                      :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Pokeball', 1) }">
                 <img src="/images/items/pokeball.png" alt="Pokeball" class="w-6 h-6 inline-block" />
                 Invoquer x1
               </Button>
-              <Button
-                @click="startInvocation('Pokeball', 10)"
-                :disabled="!canInvoke('Pokeball', 10)"
-                variant="primary"
-                size="sm"
-                class="w-full flex items-center justify-center gap-2"
-                :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Pokeball', 10) }"
-              >
+              <Button @click="startInvocation('Pokeball', 10)" :disabled="!canInvoke('Pokeball', 10)" variant="primary"
+                      size="sm" class="w-full flex items-center justify-center gap-2"
+                      :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Pokeball', 10) }">
                 <img src="/images/items/pokeball.png" alt="Pokeball" class="w-6 h-6 inline-block" />
                 Invoquer x10
               </Button>
@@ -327,9 +307,11 @@ const getBallEmoji = (ballType: string) => {
         </div>
 
         <div class="flex-1 w-full max-w-md px-4 md:px-0 mt-8 md:mt-0 hidden sm:block">
-          <div class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
+          <div
+            class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
             <div class="text-7xl mb-4 animate-pulse">🎰</div>
-            <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">Machine à Invocation</h2>
+            <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">
+              Machine à Invocation</h2>
             <p class="text-base-content/70 text-center mb-2">
               Tente ta chance et découvre quels Pokémon tu vas obtenir !<br>
               Plus tu ouvres de balls, plus tu as de chances d'obtenir des Pokémon rares ou shiny.
@@ -374,25 +356,15 @@ const getBallEmoji = (ballType: string) => {
               </div>
             </div>
             <div class="p-3 space-y-2">
-              <Button
-                @click="startInvocation('Masterball', 1)"
-                :disabled="!canInvoke('Masterball', 1)"
-                variant="secondary"
-                size="sm"
-                class="w-full flex items-center justify-center gap-2"
-                :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Masterball', 1) }"
-              >
+              <Button @click="startInvocation('Masterball', 1)" :disabled="!canInvoke('Masterball', 1)"
+                      variant="secondary" size="sm" class="w-full flex items-center justify-center gap-2"
+                      :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Masterball', 1) }">
                 <img src="/images/items/masterball.png" alt="Masterball" class="w-6 h-6 inline-block" />
                 Invoquer x1
               </Button>
-              <Button
-                @click="startInvocation('Masterball', 10)"
-                :disabled="!canInvoke('Masterball', 10)"
-                variant="primary"
-                size="sm"
-                class="w-full flex items-center justify-center gap-2"
-                :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Masterball', 10) }"
-              >
+              <Button @click="startInvocation('Masterball', 10)" :disabled="!canInvoke('Masterball', 10)"
+                      variant="primary" size="sm" class="w-full flex items-center justify-center gap-2"
+                      :class="{ 'opacity-50 cursor-not-allowed': !canInvoke('Masterball', 10) }">
                 <img src="/images/items/masterball.png" alt="Masterball" class="w-6 h-6 inline-block" />
                 Invoquer x10
               </Button>
@@ -411,23 +383,13 @@ const getBallEmoji = (ballType: string) => {
       </div>
     </div>
 
-    <EvolutionAnimation
-      v-if="showEvolutionAnimation"
-      :max-rarity="getMaxRarity()"
-      :has-shiny="hasShinyPokemon()"
-      @completed="onEvolutionCompleted"
-    />
+    <EvolutionAnimation v-if="showEvolutionAnimation" :max-rarity="getMaxRarity()" :has-shiny="hasShinyPokemon()"
+                        @completed="onEvolutionCompleted" />
 
-    <div
-      v-if="showGachaResults"
-      class="fixed inset-0 z-40 flex items-center justify-center overflow-hidden"
-      :class="{ 'animate-fadeIn': transitionToResults }"
-    >
-      <img
-        src="/images/invocation_background.png"
-        alt="Background"
-        class="absolute inset-0 w-full h-full object-cover"
-      />
+    <div v-if="showGachaResults" class="fixed inset-0 z-40 flex items-center justify-center overflow-hidden"
+         :class="{ 'animate-fadeIn': transitionToResults }">
+      <img src="/images/invocation_background.png" alt="Background"
+           class="absolute inset-0 w-full h-full object-cover" />
       <div class="absolute inset-0 bg-black/60"></div>
 
       <div class="relative text-center max-w-6xl mx-auto px-6 h-full flex flex-col justify-center">
@@ -437,52 +399,30 @@ const getBallEmoji = (ballType: string) => {
         <p class="text-white/50 mb-20 animate-slideDown " style="animation-delay: 0.2s;">
           Survolez les balls pour apercevoir leur rareté, puis cliquez pour révéler !
         </p>
-        <div 
-          :class="[
-            'mb-8',
-            invocationResults.length === 1
-              ? 'flex justify-center'
-              : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-x-2 gap-y-24 sm:gap-x-4 sm:gap-y-8 md:gap-x-6 md:gap-y-8 lg:gap-12'
-          ]"
-        >
-          <div
-            v-for="(pokemon, index) in invocationResults"
-            :key="index"
-            class="transition-all duration-400 ease-out"
-            :class="{
-              'opacity-0 translate-y-8 scale-0': !ballsReady,
-              'opacity-100 translate-y-0 scale-100': ballsReady
-            }"
-            :style="{
-              transitionDelay: ballsReady ? `${index * 15}ms` : '0ms'
-            }"
-          >
-            <GachaBall
-              :ball-type="currentBallType"
-              :pokemon="pokemon"
-              :index="index"
-              :revealed="revealedBalls[index]"
-              @reveal="revealBall"
-            />
+        <div :class="[
+          'mb-8',
+          invocationResults.length === 1
+            ? 'flex justify-center'
+            : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-x-2 gap-y-24 sm:gap-x-4 sm:gap-y-8 md:gap-x-6 md:gap-y-8 lg:gap-12'
+        ]">
+          <div v-for="(pokemon, index) in invocationResults" :key="index" class="transition-all duration-400 ease-out"
+               :class="{
+                 'opacity-0 translate-y-8 scale-0': !ballsReady,
+                 'opacity-100 translate-y-0 scale-100': ballsReady
+               }" :style="{
+                 transitionDelay: ballsReady ? `${index * 15}ms` : '0ms'
+               }">
+            <GachaBall :ball-type="currentBallType" :pokemon="pokemon" :index="index" :revealed="revealedBalls[index]"
+                       @reveal="revealBall" />
           </div>
         </div>
         <div class="flex gap-4 justify-center sm:mt-20 mt-5 animate-slideUp" style="animation-delay: 1s;">
-          <Button
-            @click="revealAllBalls"
-            variant="outline"
-            size="lg"
-            :disabled="allBallsRevealed"
-            class="bg-white/10 backdrop-blur-sm hover:bg-white/20"
-          >
+          <Button @click="revealAllBalls" variant="outline" size="lg" :disabled="allBallsRevealed"
+                  class="bg-white/10 backdrop-blur-sm hover:bg-white/20">
             Tout révéler
           </Button>
-          <Button
-            v-if="allBallsRevealed"
-            @click="closeResults"
-            variant="ghost"
-            size="lg"
-            class="bg-white/10 backdrop-blur-sm hover:bg-white/20"
-          >
+          <Button v-if="allBallsRevealed" @click="closeResults" variant="ghost" size="lg"
+                  class="bg-white/10 backdrop-blur-sm hover:bg-white/20">
             Fermer
           </Button>
         </div>
@@ -496,33 +436,21 @@ const getBallEmoji = (ballType: string) => {
             🎉 Résumé de l'invocation
           </h2>
           <p class="text-base-content/70 mt-2">
-            {{ transformedResults.length }} nouveau{{ transformedResults.length > 1 ? 'x' : '' }} Pokémon ajouté{{ transformedResults.length > 1 ? 's' : '' }} à votre collection !
+            {{ transformedResults.length }} nouveau{{ transformedResults.length > 1 ? 'x' : '' }} Pokémon ajouté{{
+              transformedResults.length > 1 ? 's' : '' }} à votre collection !
           </p>
         </div>
       </template>
       <template #default>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <div
-            v-for="(pokemon, index) in transformedResults"
-            :key="index"
-            class="transform transition-all duration-300 animate-slide-in-up"
-            :style="{ animationDelay: `${index * 50}ms` }"
-          >
-            <PokemonCard
-              :entry="pokemon"
-              size="large"
-              variant="modal"
-              :show-details="true"
-            />
+          <div v-for="(pokemon, index) in transformedResults" :key="index"
+               class="transform transition-all duration-300 animate-slide-in-up"
+               :style="{ animationDelay: `${index * 50}ms` }">
+            <PokemonCard :entry="pokemon" size="large" variant="modal" :show-details="true" />
           </div>
         </div>
         <div class="text-center mt-8">
-          <Button
-            @click="closeResults"
-            variant="primary"
-            size="lg"
-            class="min-w-48"
-          >
+          <Button @click="closeResults" variant="primary" size="lg" class="min-w-48">
             🎉 Parfait !
           </Button>
         </div>
@@ -533,62 +461,66 @@ const getBallEmoji = (ballType: string) => {
 
 <style scoped>
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slide-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fadeIn {
-    animation: fadeIn 0.8s ease-out;
+  animation: fadeIn 0.8s ease-out;
 }
 
 .animate-slideDown {
-    animation: slideDown 0.6s ease-out forwards;
-    opacity: 0;
+  animation: slideDown 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 .animate-slideUp {
-    animation: slideUp 0.6s ease-out forwards;
-    opacity: 0;
+  animation: slideUp 0.6s ease-out forwards;
+  opacity: 0;
 }
 
 .animate-slide-in-up {
-    animation: slide-in-up 0.5s ease-out forwards;
+  animation: slide-in-up 0.5s ease-out forwards;
 }
 </style>

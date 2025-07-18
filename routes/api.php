@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DailyQuestController;
 use App\Http\Controllers\ExpeditionController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\InfernalTowerController;
@@ -23,4 +24,8 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::get('/friends/suggestions', [FriendController::class, 'suggestions']);
     Route::get('/friends/pending-requests', [FriendController::class, 'getPendingRequests']);
     Route::post('/friends/refresh', [FriendController::class, 'refresh']);
+
+    Route::get('/daily-quests', [DailyQuestController::class, 'index'])->name('api.daily-quests.index');
+    Route::post('/daily-quests/claim', [DailyQuestController::class, 'claimQuest'])->name('api.daily-quests.claim');
+    Route::post('/daily-quests/claim-bonus', [DailyQuestController::class, 'claimBonusReward'])->name('api.daily-quests.claim-bonus');
 });

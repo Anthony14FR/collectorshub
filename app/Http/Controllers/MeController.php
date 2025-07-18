@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pokemon;
 use App\Models\Success;
+use App\Services\DailyQuestService;
 use App\Services\FriendService;
 use App\Services\LeaderboardService;
 use App\Services\LevelRewardService;
@@ -19,14 +20,22 @@ class MeController extends Controller
     protected LevelRewardService $levelRewardService;
     protected FriendService $friendService;
     protected UserFriendGiftService $userFriendGiftService;
+    protected DailyQuestService $dailyQuestService;
 
-    public function __construct(LeaderboardService $leaderboardService, SuccessService $successService, LevelRewardService $levelRewardService, FriendService $friendService, UserFriendGiftService $userFriendGiftService)
-    {
+    public function __construct(
+        LeaderboardService $leaderboardService,
+        SuccessService $successService,
+        LevelRewardService $levelRewardService,
+        FriendService $friendService,
+        UserFriendGiftService $userFriendGiftService,
+        DailyQuestService $dailyQuestService
+    ) {
         $this->leaderboardService = $leaderboardService;
         $this->successService = $successService;
         $this->levelRewardService = $levelRewardService;
         $this->friendService = $friendService;
         $this->userFriendGiftService = $userFriendGiftService;
+        $this->dailyQuestService = $dailyQuestService;
     }
 
     public function index()
@@ -45,11 +54,20 @@ class MeController extends Controller
         $levelRewardsToClaim = $this->levelRewardService->getAvailableRewards($user);
         $levelRewardsPreview = $this->levelRewardService->getPreviewRewards($user);
 
+        $announcements = $user->notifications()->announcements()->limit(10)->get();
+        $marketplaceHistory = $user->notifications()->marketplaceHistory()->limit(20)->get();
+        $unreadNotificationsCount = $user->notifications()->unread()->count();
+
         $friendsGiftsToClaim = $user->friendGiftsToClaim()->get();
 
         $friends = $this->friendService->getFormattedFriends($user, $this->userFriendGiftService);
         $friendRequests = $this->friendService->getFormattedFriendRequests($user);
         $suggestions = $this->friendService->getFormattedFriendSuggestions($user);
+
+
+
+        $dailyQuests = $this->dailyQuestService->getUserTodayProgress($user);
+        $dailyQuestStats = $this->dailyQuestService->getCompletionStats($user);
 
         return Inertia::render('Me', [
             'user' => $user,
@@ -63,10 +81,15 @@ class MeController extends Controller
             'progress' => $progress,
             'level_rewards_to_claim' => $levelRewardsToClaim,
             'level_rewards_preview' => $levelRewardsPreview,
+            'announcements' => $announcements,
+            'marketplace_history' => $marketplaceHistory,
+            'unread_notifications_count' => $unreadNotificationsCount,
             'friend_gifts_to_claim' => $friendsGiftsToClaim,
             'friend_requests' => $friendRequests,
             'friends' => $friends,
-            'suggestions' => $suggestions
+            'suggestions' => $suggestions,
+            'daily_quests' => $dailyQuests,
+            'daily_quest_stats' => $dailyQuestStats
         ]);
     }
 }

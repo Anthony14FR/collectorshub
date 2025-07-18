@@ -170,11 +170,8 @@
         </div>
         
         <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center" data-aos="fade-up" data-aos-delay="400">
-          <Button variant="primary" icon="lightning" size="md">
+          <Button variant="primary" icon="lightning" size="md" @click="goToRegister">
             Commencer Maintenant
-          </Button>
-          <Button variant="secondary" icon="collection" size="md">
-            Voir la collection
           </Button>
         </div>
       </div>
@@ -190,8 +187,13 @@ import 'aos/dist/aos.css'
 import AppNavbar from '@/Components/UI/AppNavbar.vue'
 import Button from '@/Components/UI/Button.vue'
 import Badge from '@/Components/UI/Badge.vue'
+import { router } from '@inertiajs/vue3'
 
 let lenis = null
+
+const goToRegister = () => {
+  router.visit('/register');
+};
 
 onMounted(() => {
   AOS.init({
