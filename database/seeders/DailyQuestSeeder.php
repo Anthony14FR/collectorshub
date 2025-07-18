@@ -67,7 +67,7 @@ class DailyQuestSeeder extends Seeder
         ];
 
         foreach ($quests as $quest) {
-            DailyQuest::create($quest);
+            DailyQuest::updateOrCreate(['key' => $quest['key']], $quest);
         }
 
         $this->command->info('6 quêtes quotidiennes créées avec succès !');

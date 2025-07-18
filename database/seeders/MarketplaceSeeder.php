@@ -10,7 +10,7 @@ class MarketplaceSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::all();
+        $users = User::orderBy('id')->limit(5)->get();
 
         if ($users->isEmpty()) {
             $this->command->error('Aucun utilisateur trouvé. Exécutez d\'abord UserSeeder.');
@@ -35,14 +35,18 @@ class MarketplaceSeeder extends Seeder
 
                 $price = rand($priceRange['min'], $priceRange['max']);
 
-                Marketplace::create([
-                    'seller_id' => $user->id,
-                    'pokemon_id' => $pokemon->id,
-                    'price' => $price,
-                    'status' => 'active',
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
+                Marketplace::firstOrCreate(
+                    [
+                        'seller_id' => $user->id,
+                        'pokemon_id' => $pokemon->id
+                    ],
+                    [
+                        'price' => $price,
+                        'status' => 'active',
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]
+                );
             }
         }
 
