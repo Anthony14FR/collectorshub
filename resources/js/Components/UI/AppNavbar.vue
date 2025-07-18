@@ -1,6 +1,6 @@
 <script setup>
 import Button from '@/Components/UI/Button.vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 const scrolled = ref(false)
@@ -16,6 +16,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
+
+const goToLogin = () => {
+  router.visit('/login');
+};
 </script>
 
 <template>
@@ -38,7 +42,7 @@ onUnmounted(() => {
     </div>
 
     <div class="relative px-8 py-4 flex items-center justify-between">
-      <RouterLink to="/" class="flex items-center group">
+      <Link href="/" class="flex items-center group">
         <div class="relative">
           <div class="mr-4 group-hover:scale-110 transition-all duration-300">
             <img src="/images/logo.png" alt="Logo"
@@ -53,41 +57,7 @@ onUnmounted(() => {
           </span>
           <span class="text-xs text-base-content/60 -mt-1">Collection Pokémon</span>
         </div>
-      </RouterLink>
-
-      <div class="flex items-center gap-2">
-        <RouterLink to="/collection"
-                    class="group relative overflow-hidden px-6 py-3 text-sm font-medium text-base-content/70 hover:text-primary transition-all duration-300 cursor-pointer rounded-2xl hover:bg-gradient-to-r hover:from-primary/5 hover:to-secondary/5 before:absolute before:inset-0 before:bg-gradient-to-r before:from-primary/0 before:via-primary/10 before:to-primary/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-2xl"
-                    active-class="!text-primary !bg-gradient-to-r !from-primary/10 !to-secondary/10">
-          <span class="relative z-10 flex items-center gap-3">
-            <div
-              class="w-5 h-5 rounded-lg bg-primary/15 flex items-center justify-center group-hover:bg-primary/25 group-hover:scale-110 transition-all duration-300">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                </path>
-              </svg>
-            </div>
-            Collection
-          </span>
-        </RouterLink>
-
-        <RouterLink to="/gacha"
-                    class="group relative overflow-hidden px-6 py-3 text-sm font-medium text-base-content/70 hover:text-secondary transition-all duration-300 cursor-pointer rounded-2xl hover:bg-gradient-to-r hover:from-secondary/5 hover:to-accent/5 before:absolute before:inset-0 before:bg-gradient-to-r before:from-secondary/0 before:via-secondary/10 before:to-secondary/0 before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-700 before:rounded-2xl"
-                    active-class="!text-secondary !bg-gradient-to-r !from-secondary/10 !to-accent/10">
-          <span class="relative z-10 flex items-center gap-3">
-            <div
-              class="w-5 h-5 rounded-lg bg-secondary/15 flex items-center justify-center group-hover:bg-secondary/25 group-hover:scale-110 transition-all duration-300">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7">
-                </path>
-              </svg>
-            </div>
-            Gacha
-          </span>
-        </RouterLink>
-      </div>
+      </Link>
 
       <div class="flex items-center">
         <Link href="/login">
@@ -109,58 +79,9 @@ onUnmounted(() => {
         </svg>
       </div>
       <ul tabindex="0"
-          class="menu menu-sm dropdown-content mt-4 z-[1] p-4 shadow-2xl bg-gradient-to-br from-base-100/95 via-base-100/90 to-base-100/95 backdrop-blur-2xl rounded-3xl w-64">
-        <li class="mb-2">
-          <RouterLink to="/"
-                      class="group text-base-content/70 hover:text-primary hover:bg-primary/5 transition-all duration-300 cursor-pointer p-4 rounded-2xl">
-            <div class="flex items-center gap-4">
-              <div
-                class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                  </path>
-                </svg>
-              </div>
-              <span class="font-medium">Accueil</span>
-            </div>
-          </RouterLink>
-        </li>
-        <li class="mb-2">
-          <RouterLink to="/collection"
-                      class="group text-base-content/70 hover:text-primary hover:bg-primary/5 transition-all duration-300 cursor-pointer p-4 rounded-2xl">
-            <div class="flex items-center gap-4">
-              <div
-                class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                  </path>
-                </svg>
-              </div>
-              <span class="font-medium">Collection</span>
-            </div>
-          </RouterLink>
-        </li>
-        <li class="mb-4">
-          <RouterLink to="/gacha"
-                      class="group text-base-content/70 hover:text-secondary hover:bg-secondary/5 transition-all duration-300 cursor-pointer p-4 rounded-2xl">
-            <div class="flex items-center gap-4">
-              <div
-                class="w-8 h-8 rounded-xl bg-secondary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7">
-                  </path>
-                </svg>
-              </div>
-              <span class="font-medium">Gacha</span>
-            </div>
-          </RouterLink>
-        </li>
-        <div class="divider opacity-30"></div>
+          class="menu menu-sm dropdown-content mt-4 z-[1] p-4 shadow-2xl bg-gradient-to-br from-base-100/95 via-base-100/90 to-base-100/95 backdrop-blur-2xl rounded-3xl w-64"> 
         <li>
-          <Button variant="primary" icon="user" size="sm">
+          <Button variant="primary" icon="user" size="sm" @click="goToLogin"> 
             Connexion
           </Button>
         </li>
