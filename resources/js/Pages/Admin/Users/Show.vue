@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { User } from '@/types/user';
-import { Head, router } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
+import type { User } from '@/types/user';
+import { Head, router } from '@inertiajs/vue3';
 
-defineProps<{
+const { user } = defineProps<{
   user: User;
 }>();
 
@@ -35,6 +35,7 @@ const deleteUser = () => {
 </script>
 
 <template>
+
   <Head :title="`Utilisateur: ${user.username}`" />
 
   <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
@@ -43,7 +44,8 @@ const deleteUser = () => {
     <div class="relative z-10 h-screen w-screen overflow-hidden">
       <div class="flex justify-center pt-4 mb-4">
         <div class="text-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent mb-1 tracking-wider">
+          <h1
+            class="text-2xl font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent mb-1 tracking-wider">
             👤 PROFIL UTILISATEUR
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
@@ -61,37 +63,18 @@ const deleteUser = () => {
             </h3>
           </div>
           <div class="p-3 space-y-2">
-            <Button
-              @click="router.visit(`/admin/users/${user.id}/edit`)"
-              variant="secondary"
-              size="sm"
-              class="w-full"
-            >
+            <Button @click="router.visit(`/admin/users/${user.id}/edit`)" variant="secondary" size="sm" class="w-full">
               ✏️ Modifier
             </Button>
-            <Button
-              @click="deleteUser"
-              variant="outline"
-              size="sm"
-              class="w-full text-error hover:text-error hover:bg-error/10"
-            >
+            <Button @click="deleteUser" variant="outline" size="sm"
+                    class="w-full text-error hover:text-error hover:bg-error/10">
               🗑️ Supprimer
             </Button>
             <div class="border-t border-base-300/30 pt-2">
-              <Button
-                @click="router.visit('/admin/users')"
-                variant="outline"
-                size="sm"
-                class="w-full"
-              >
+              <Button @click="router.visit('/admin/users')" variant="outline" size="sm" class="w-full">
                 ← Liste utilisateurs
               </Button>
-              <Button
-                @click="router.visit('/admin')"
-                variant="ghost"
-                size="sm"
-                class="w-full mt-1"
-              >
+              <Button @click="router.visit('/admin')" variant="ghost" size="sm" class="w-full mt-1">
                 🏠 Dashboard
               </Button>
             </div>
@@ -123,10 +106,12 @@ const deleteUser = () => {
       </div>
 
       <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px]">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
+        <div
+          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
           <div class="shrink-0 p-6 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
             <div class="flex items-center gap-4">
-              <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-2xl font-bold">
+              <div
+                class="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-2xl font-bold">
                 {{ user.username.charAt(0).toUpperCase() }}
               </div>
               <div class="flex-1">
@@ -156,7 +141,7 @@ const deleteUser = () => {
 
           <div class="flex-1 overflow-y-auto p-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
+
               <div class="bg-base-200/30 backdrop-blur-sm rounded-xl p-5 border border-base-300/20">
                 <h4 class="text-lg font-bold text-base-content mb-4 flex items-center gap-2">
                   📊 Informations générales
@@ -228,13 +213,14 @@ const deleteUser = () => {
                     <dt class="text-sm font-medium text-base-content/70">Inscription</dt>
                     <dd class="text-sm text-base-content text-right">
                       <div>{{ new Date(user.created_at).toLocaleDateString('fr-FR') }}</div>
-                      <div class="text-xs text-base-content/60">{{ new Date(user.created_at).toLocaleTimeString('fr-FR') }}</div>
+                      <div class="text-xs text-base-content/60">{{ new Date(user.created_at).toLocaleTimeString('fr-FR')
+                      }}</div>
                     </dd>
                   </div>
                   <div class="flex justify-between items-start">
                     <dt class="text-sm font-medium text-base-content/70">Dernière connexion</dt>
                     <dd class="text-sm text-base-content text-right">
-                      {{ user.last_login ? 
+                      {{ user.last_login ?
                         new Date(user.last_login).toLocaleDateString('fr-FR') :
                         'Jamais' }}
                       <div v-if="user.last_login" class="text-xs text-base-content/60">
@@ -273,7 +259,8 @@ const deleteUser = () => {
                       {{ new Date(user.created_at).toISOString() }}
                     </dd>
                   </div>
-                  <div v-if="user.updated_at && user.updated_at !== user.created_at" class="flex justify-between items-start">
+                  <div v-if="user.updated_at && user.updated_at !== user.created_at"
+                       class="flex justify-between items-start">
                     <dt class="text-sm font-medium text-base-content/70">Modifié le</dt>
                     <dd class="text-xs text-base-content/60 text-right font-mono">
                       {{ new Date(user.updated_at).toISOString() }}

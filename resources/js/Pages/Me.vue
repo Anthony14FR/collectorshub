@@ -1,27 +1,25 @@
 <script setup lang="ts">
+import FriendsModal from '@/Components/Friends/FriendsModal.vue';
 import LeaderboardSection from '@/Components/Game/LeaderboardSection.vue';
 import TeamManagementModal from '@/Components/Game/TeamManagementModal.vue';
 import DesktopLayout from '@/Components/Layout/DesktopLayout.vue';
 import MobileLayout from '@/Components/Layout/MobileLayout.vue';
 import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
 import BadgesModal from '@/Components/Profile/BadgesModal.vue';
+import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import HelpModal from '@/Components/UI/HelpModal.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import type { PageProps } from '@/types';
+import type { FriendRequest, UserFriend, UserFriendGift } from '@/types/friend';
 import type { Inventory } from '@/types/inventory';
-import HelpModal from '@/Components/UI/HelpModal.vue'
+import type { Leaderboards } from '@/types/leaderboard';
 import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
 import type { Success, UserSuccess } from '@/types/success';
 import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
-import type { User } from '@/types/user';
-import { Head, router } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
-import type { LevelReward, LevelRewardPreview, AvailableLevelReward } from '@/types/user';
-import type { UserFriend, UserFriendGift, FriendRequest } from '@/types/friend';
-import FriendsModal from '@/Components/Friends/FriendsModal.vue';
 
 interface Props extends PageProps {
   auth: {
@@ -30,6 +28,7 @@ interface Props extends PageProps {
   inventory?: Inventory[];
   pokedex?: Pokedex[];
   all_pokemons?: Pokemon[];
+  leaderboards?: Leaderboards;
   successes?: Success[];
   unclaimed_successes?: UserSuccess[];
   claimed_successes?: UserSuccess[];
@@ -49,6 +48,12 @@ interface Props extends PageProps {
   friend_requests: FriendRequest[];
   friends: UserFriend[];
   suggestions: User[];
+}
+
+interface RefreshedData {
+  friends?: UserFriend[];
+  friend_requests?: FriendRequest[];
+  suggestions?: User[];
 }
 
 const {
@@ -75,6 +80,7 @@ const {
 const pokedexModalOpen = ref(false);
 const teamManagementModalOpen = ref(false);
 const badgesModalOpen = ref(false);
+const leaderboardModalOpen = ref(false);
 
 const friendsModalOpen = ref(false);
 const friendsData = ref([...friends]);
@@ -83,7 +89,7 @@ const suggestionsData = ref([...suggestions]);
 const showHelpModal = ref(false)
 
 
-const sendGift = (friendId) => {
+const sendGift = (friendId: number) => {
   router.post(
     "/friend-gifts/send",
     { receiver_id: friendId },
@@ -91,7 +97,7 @@ const sendGift = (friendId) => {
   );
 };
 
-const claimGift = (giftId) => {
+const claimGift = (giftId: number) => {
   router.post(
     "/friend-gifts/claim",
     { gift_id: giftId },
@@ -99,7 +105,7 @@ const claimGift = (giftId) => {
   );
 };
 
-const removeFriend = (friendId) => {
+const removeFriend = (friendId: number) => {
   router.post(
     "/friends/remove",
     { target_id: friendId },
@@ -129,11 +135,7 @@ const userTeamPokemons = computed(() => {
     .slice(0, 6);
 });
 
-const refreshInventory = async () => {
-  const { data } = await axios.get('/me/inventory');
-};
-
-const handleDataRefreshed = (newData) => {
+const handleDataRefreshed = (newData: RefreshedData) => {
   if (newData.friends) {
     friendsData.value = newData.friends;
   }
@@ -143,7 +145,7 @@ const handleDataRefreshed = (newData) => {
   if (newData.suggestions) {
     suggestionsData.value = newData.suggestions;
   }
-  
+
   friendsData.value = [...friendsData.value];
   friendRequestsData.value = [...friendRequestsData.value];
   suggestionsData.value = [...suggestionsData.value];
@@ -192,49 +194,25 @@ const goToTower = () => {
 
     <div class="relative z-50 h-screen w-screen overflow-x-hidden">
 
-      <MobileLayout
-        :user="auth.user"
-        :inventory="inventory"
-        :pokedex="pokedex"
-        :level_rewards_to_claim="level_rewards_to_claim"
-        :level_rewards_preview="level_rewards_preview"
-        :team-pokemons="userTeamPokemons"
-        :onOpenPokedexModal="() => pokedexModalOpen = true"
-        :onGoToMarketplace="goToMarketplace"
-        :onGoToLeaderboard="goToLeaderboard"
-        :onOpenTeamManagementModal="openTeamManagementModal"
-        :onOpenBadgesModal="openBadgesModal"
-        :has-unclaimed-successes="unclaimed_successes.length > 0"
-        :onGoToExpeditions="goToExpeditions"
-        :onGoToTower="goToTower"
-        :onOpenFriendsModal="openFriendsModal"
-        :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
-        :announcements="announcements"
-        :marketplace-history="marketplace_history"
-        :unread-notifications-count="unread_notifications_count"
-      />
+      <MobileLayout :user="auth.user" :inventory="inventory" :pokedex="pokedex"
+                    :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview"
+                    :team-pokemons="userTeamPokemons" :onOpenPokedexModal="() => pokedexModalOpen = true"
+                    :onGoToMarketplace="goToMarketplace" :onGoToLeaderboard="goToLeaderboard"
+                    :onOpenTeamManagementModal="openTeamManagementModal" :onOpenBadgesModal="openBadgesModal"
+                    :has-unclaimed-successes="unclaimed_successes.length > 0" :onGoToExpeditions="goToExpeditions"
+                    :onGoToTower="goToTower" :onOpenFriendsModal="openFriendsModal"
+                    :has-unclaimed-gifts="friend_gifts_to_claim.length > 0" :announcements="announcements"
+                    :marketplace-history="marketplace_history" :unread-notifications-count="unread_notifications_count" />
 
-      <DesktopLayout
-        :user="auth.user"
-        :inventory="inventory"
-        :pokedex="pokedex"
-        :level_rewards_to_claim="level_rewards_to_claim"
-        :level_rewards_preview="level_rewards_preview"
-        :team-pokemons="userTeamPokemons"
-        :onOpenPokedexModal="() => pokedexModalOpen = true"
-        :onGoToMarketplace="goToMarketplace"
-        :onGoToLeaderboard="goToLeaderboard"
-        :onOpenTeamManagementModal="openTeamManagementModal"
-        :onOpenBadgesModal="openBadgesModal"
-        :has-unclaimed-successes="unclaimed_successes.length > 0"
-        :onGoToExpeditions="goToExpeditions"
-        :onGoToTower="goToTower"
-        :onOpenFriendsModal="openFriendsModal"
-        :has-unclaimed-gifts="friend_gifts_to_claim.length > 0"
-        :announcements="announcements"
-        :marketplace-history="marketplace_history"
-        :unread-notifications-count="unread_notifications_count"
-      />
+      <DesktopLayout :user="auth.user" :inventory="inventory" :pokedex="pokedex"
+                     :level_rewards_to_claim="level_rewards_to_claim" :level_rewards_preview="level_rewards_preview"
+                     :team-pokemons="userTeamPokemons" :onOpenPokedexModal="() => pokedexModalOpen = true"
+                     :onGoToMarketplace="goToMarketplace" :onGoToLeaderboard="goToLeaderboard"
+                     :onOpenTeamManagementModal="openTeamManagementModal" :onOpenBadgesModal="openBadgesModal"
+                     :has-unclaimed-successes="unclaimed_successes.length > 0" :onGoToExpeditions="goToExpeditions"
+                     :onGoToTower="goToTower" :onOpenFriendsModal="openFriendsModal"
+                     :has-unclaimed-gifts="friend_gifts_to_claim.length > 0" :announcements="announcements"
+                     :marketplace-history="marketplace_history" :unread-notifications-count="unread_notifications_count" />
     </div>
 
     <PokedexModal :show="pokedexModalOpen" :user-pokedex="pokedex" :all-pokemons="all_pokemons"
@@ -273,25 +251,15 @@ const goToTower = () => {
              :message="`🎉 Bienvenue ${auth.user.username} ! Votre email a été vérifié avec succès. Votre aventure Pokémon peut commencer !`"
              dismissible @dismiss="dismissWelcomeAlert" />
     </div>
-    <button 
-      @click="showHelpModal = true"
-      class="fixed bottom-4 left-4 w-12 h-12 bg-info hover:bg-info/80 cursor-pointer hover:bg-base-300 text-white rounded-full flex items-center justify-center shadow-lg transition-all z-50"
-      title="Aide"
-    >
+    <button @click="showHelpModal = true"
+            class="fixed bottom-4 left-4 w-12 h-12 bg-info hover:bg-info/80 cursor-pointer hover:bg-base-300 text-white rounded-full flex items-center justify-center shadow-lg transition-all z-50"
+            title="Aide">
       <span class="text-xl font-bold">?</span>
     </button>
-    <FriendsModal
-      :show="friendsModalOpen"
-      :onClose="() => friendsModalOpen = false"
-      :friends="friendsData"
-      :friend_requests="friendRequestsData"
-      :suggestions="suggestionsData"
-      :currentUserId="auth.user.id"
-      @send-gift="sendGift"
-      @claim-gift="claimGift"
-      @remove-friend="removeFriend"
-      @dataRefreshed="handleDataRefreshed"
-    />
+    <FriendsModal :show="friendsModalOpen" :onClose="() => friendsModalOpen = false" :friends="friendsData"
+                  :friend_requests="friendRequestsData" :suggestions="suggestionsData" :currentUserId="auth.user.id"
+                  @send-gift="sendGift" @claim-gift="claimGift" @remove-friend="removeFriend"
+                  @dataRefreshed="handleDataRefreshed" />
   </div>
   <HelpModal :show="showHelpModal" :onClose="() => showHelpModal = false" />
 </template>

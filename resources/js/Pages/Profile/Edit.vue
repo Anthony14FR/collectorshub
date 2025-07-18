@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue';
-import { Head, router, Link } from '@inertiajs/vue3';
+import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import Badge from '@/Components/UI/Badge.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import Alert from '@/Components/UI/Alert.vue';
-import Badge from '@/Components/UI/Badge.vue';
 import type { PageProps } from '@/types';
 import type { User } from '@/types/user';
+import { Head, router } from '@inertiajs/vue3';
+import { computed, reactive, ref } from 'vue';
 
 interface Props extends PageProps {
   auth: {
@@ -23,13 +23,13 @@ const props = defineProps<Props>();
 
 const unlockedAvatars = Array.isArray(props.auth.user.unlocked_avatars)
   ? props.auth.user.unlocked_avatars
-  : props.auth.user.unlocked_avatars 
+  : props.auth.user.unlocked_avatars
     ? JSON.parse(props.auth.user.unlocked_avatars)
     : [];
 
 const unlockedBackgrounds = Array.isArray(props.auth.user.unlocked_backgrounds)
   ? props.auth.user.unlocked_backgrounds
-  : props.auth.user.unlocked_backgrounds 
+  : props.auth.user.unlocked_backgrounds
     ? JSON.parse(props.auth.user.unlocked_backgrounds)
     : [];
 
@@ -84,7 +84,6 @@ const showProfileModal = ref(false);
 const showPasswordModal = ref(false);
 const showAvatarModal = ref(false);
 const showBackgroundModal = ref(false);
-const showTotpModal = ref(false);
 const showAlert = ref(false);
 const alertType = ref<'success' | 'error'>('success');
 const alertMessage = ref('');
@@ -145,9 +144,9 @@ const updatePassword = () => {
 const updateAvatar = () => {
   avatarForm.processing = true;
   avatarForm.errors = {};
-  
-  router.patch("/avatar", { 
-    avatar: avatarForm.avatar 
+
+  router.patch("/avatar", {
+    avatar: avatarForm.avatar
   }, {
     onSuccess: () => {
       avatarForm.processing = false;
@@ -164,9 +163,9 @@ const updateAvatar = () => {
 const updateBackground = () => {
   backgroundForm.processing = true;
   backgroundForm.errors = {};
-  
-  router.patch("/background", { 
-    background: backgroundForm.background 
+
+  router.patch("/background", {
+    background: backgroundForm.background
   }, {
     onSuccess: () => {
       backgroundForm.processing = false;
@@ -239,7 +238,7 @@ const toggleTotp = () => {
 
 const disableTotp = () => {
   totpForm.processing = true;
-  
+
   router.post('/profile/totp/disable', {}, {
     onSuccess: () => {
       totpForm.processing = false;
@@ -259,13 +258,15 @@ const enableTotp = () => {
 </script>
 
 <template>
+
   <Head title="Éditer mon profil" />
 
   <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
 
     <div class="relative z-10 h-screen w-screen overflow-y-auto lg:overflow-hidden">
-      <div class="lg:hidden flex items-center justify-between p-4 bg-base-100/60 backdrop-blur-sm border-b border-base-300/30">
+      <div
+        class="lg:hidden flex items-center justify-between p-4 bg-base-100/60 backdrop-blur-sm border-b border-base-300/30">
         <Button @click="goToProfile" variant="outline" size="sm">
           ← Retour
         </Button>
@@ -277,7 +278,8 @@ const enableTotp = () => {
 
       <div class="hidden lg:flex justify-center pt-8 mb-8">
         <div class="text-center">
-          <h1 class="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-2 tracking-wider">
+          <h1
+            class="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-2 tracking-wider">
             ⚙️ PROFIL
           </h1>
           <p class="text-sm text-base-content/70 uppercase tracking-wider">
@@ -298,18 +300,14 @@ const enableTotp = () => {
             <div class="p-4 lg:p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/20">
               <div class="flex items-center gap-4">
                 <div class="relative">
-                  <img
-                    :src="auth.user.avatar || '/images/trainer/1.png'"
-                    :alt="auth.user.username"
-                    class="w-16 h-16 lg:w-20 lg:h-20 rounded-full border-4 border-primary/30 bg-base-200 object-cover"
-                    style="image-rendering: pixelated"
-                  />
-                  <button 
-                    @click="showAvatarModal = true"
-                    class="absolute -bottom-1 -right-1 w-6 h-6 lg:w-8 lg:h-8 bg-primary text-primary-content rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors"
-                  >
+                  <img :src="auth.user.avatar || '/images/trainer/1.png'" :alt="auth.user.username"
+                       class="w-16 h-16 lg:w-20 lg:h-20 rounded-full border-4 border-primary/30 bg-base-200 object-cover"
+                       style="image-rendering: pixelated" />
+                  <button @click="showAvatarModal = true"
+                          class="absolute -bottom-1 -right-1 w-6 h-6 lg:w-8 lg:h-8 bg-primary text-primary-content rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors">
                     <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
                   </button>
                 </div>
@@ -325,10 +323,7 @@ const enableTotp = () => {
                     </span>
                   </div>
                 </div>
-                <Button 
-                  @click="showBackgroundModal = true"
-                  variant="secondary"
-                >
+                <Button @click="showBackgroundModal = true" variant="secondary">
                   🎨 Changer le fond
                 </Button>
               </div>
@@ -370,9 +365,10 @@ const enableTotp = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30">
+                    <div
+                      class="flex items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30">
                       <div>
                         <label class="text-sm font-medium text-base-content/70">Mot de passe</label>
                         <div class="mt-1 text-base-content">••••••••</div>
@@ -382,39 +378,33 @@ const enableTotp = () => {
                       </Button>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30 gap-3">
+                    <div
+                      class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30 gap-3">
                       <div class="flex-1">
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2 sm:mb-0">
                           <label class="text-sm font-medium text-base-content/70">
                             Authentification à deux facteurs
                           </label>
-                          <Badge 
-                            :variant="totpForm.enabled ? 'success' : 'ghost'" 
-                            size="sm"
-                          >
+                          <Badge :variant="totpForm.enabled ? 'success' : 'ghost'" size="sm">
                             {{ totpForm.enabled ? 'Activé' : 'Désactivé' }}
                           </Badge>
                         </div>
                         <p class="text-xs text-base-content/50">
-                          {{ totpForm.enabled 
-                            ? 'Votre compte est protégé par un authentificateur' 
+                          {{ totpForm.enabled
+                            ? 'Votre compte est protégé par un authentificateur'
                             : 'Ajoutez une couche de sécurité supplémentaire avec un authentificateur'
                           }}
                         </p>
                       </div>
-                      <Button 
-                        @click="toggleTotp" 
-                        :variant="totpForm.enabled ? 'secondary' : 'primary'" 
-                        size="sm"
-                        :disabled="totpForm.processing"
-                        class="w-full sm:w-auto"
-                      >
+                      <Button @click="toggleTotp" :variant="totpForm.enabled ? 'secondary' : 'primary'" size="sm"
+                              :disabled="totpForm.processing" class="w-full sm:w-auto">
                         <span v-if="totpForm.processing" class="loading loading-spinner loading-xs"></span>
                         {{ totpForm.enabled ? 'Désactiver' : 'Configurer' }}
                       </Button>
                     </div>
 
-                    <div class="flex items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30">
+                    <div
+                      class="flex items-center justify-between p-4 bg-base-200/30 rounded-lg border border-base-300/30">
                       <div>
                         <label class="text-sm font-medium text-base-content/70">Membre depuis</label>
                         <div class="mt-1 text-base-content">{{ formattedJoinDate }}</div>
@@ -457,7 +447,8 @@ const enableTotp = () => {
     <Modal :show="showProfileModal" @close="cancelProfileEdit">
       <template #header>
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
             <span class="text-lg">👤</span>
           </div>
           <h3 class="text-xl font-bold">Modifier le profil</h3>
@@ -466,22 +457,11 @@ const enableTotp = () => {
       <template #default>
         <form @submit.prevent="updateProfile" class="space-y-6">
           <div>
-            <Input
-              v-model="profileForm.username"
-              label="Nom d'utilisateur"
-              type="text"
-              required
-              :error="profileForm.errors.username"
-            />
+            <Input v-model="profileForm.username" label="Nom d'utilisateur" type="text" required
+                   :error="profileForm.errors.username" />
           </div>
           <div>
-            <Input
-              v-model="profileForm.email"
-              label="Email"
-              type="email"
-              required
-              :error="profileForm.errors.email"
-            />
+            <Input v-model="profileForm.email" label="Email" type="email" required :error="profileForm.errors.email" />
           </div>
           <div class="flex gap-3 justify-end">
             <Button @click="cancelProfileEdit" variant="outline" type="button">
@@ -498,7 +478,8 @@ const enableTotp = () => {
     <Modal :show="showPasswordModal" @close="cancelPasswordEdit">
       <template #header>
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-error/20 rounded-lg flex items-center justify-center">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-warning/20 to-error/20 rounded-lg flex items-center justify-center">
             <span class="text-lg">🔐</span>
           </div>
           <h3 class="text-xl font-bold">Changer le mot de passe</h3>
@@ -507,30 +488,16 @@ const enableTotp = () => {
       <template #default>
         <form @submit.prevent="updatePassword" class="space-y-6">
           <div>
-            <Input
-              v-model="passwordForm.current_password"
-              label="Mot de passe actuel"
-              type="password"
-              required
-              :error="passwordForm.errors.current_password"
-            />
+            <Input v-model="passwordForm.current_password" label="Mot de passe actuel" type="password" required
+                   :error="passwordForm.errors.current_password" />
           </div>
           <div>
-            <Input
-              v-model="passwordForm.password"
-              label="Nouveau mot de passe"
-              type="password"
-              required
-              :error="passwordForm.errors.password"
-            />
+            <Input v-model="passwordForm.password" label="Nouveau mot de passe" type="password" required
+                   :error="passwordForm.errors.password" />
           </div>
           <div>
-            <Input
-              v-model="passwordForm.password_confirmation"
-              label="Confirmer le nouveau mot de passe"
-              type="password"
-              required
-            />
+            <Input v-model="passwordForm.password_confirmation" label="Confirmer le nouveau mot de passe"
+                   type="password" required />
           </div>
           <div class="flex gap-3 justify-end">
             <Button @click="cancelPasswordEdit" variant="outline" type="button">
@@ -547,7 +514,8 @@ const enableTotp = () => {
     <Modal :show="showAvatarModal" @close="showAvatarModal = false">
       <template #header>
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-accent/20 to-primary/20 rounded-lg flex items-center justify-center">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-accent/20 to-primary/20 rounded-lg flex items-center justify-center">
             <span class="text-lg">🎭</span>
           </div>
           <h3 class="text-xl font-bold">Choisir un avatar</h3>
@@ -556,29 +524,20 @@ const enableTotp = () => {
       <template #default>
         <div class="space-y-6">
           <div class="grid grid-cols-4 lg:grid-cols-6 gap-4">
-            <div
-              v-for="avatar in unlockedAvatars"
-              :key="avatar"
-              @click="selectAvatar(avatar)"
-              :class="[
-                'relative cursor-pointer rounded-xl border-3 transition-all duration-200 overflow-hidden',
-                avatarForm.avatar === avatar 
-                  ? 'border-primary shadow-lg shadow-primary/30 scale-105' 
-                  : 'border-base-300/30 hover:border-primary/50 hover:scale-105'
-              ]"
-            >
-              <img
-                :src="avatar"
-                alt="Avatar"
-                class="w-full h-full object-cover aspect-square"
-                style="image-rendering: pixelated"
-              />
-              <div
-                v-if="avatarForm.avatar === avatar"
-                class="absolute inset-0 bg-primary/20 flex items-center justify-center"
-              >
+            <div v-for="avatar in unlockedAvatars" :key="avatar" @click="selectAvatar(avatar)" :class="[
+              'relative cursor-pointer rounded-xl border-3 transition-all duration-200 overflow-hidden',
+              avatarForm.avatar === avatar
+                ? 'border-primary shadow-lg shadow-primary/30 scale-105'
+                : 'border-base-300/30 hover:border-primary/50 hover:scale-105'
+            ]">
+              <img :src="avatar" alt="Avatar" class="w-full h-full object-cover aspect-square"
+                   style="image-rendering: pixelated" />
+              <div v-if="avatarForm.avatar === avatar"
+                   class="absolute inset-0 bg-primary/20 flex items-center justify-center">
                 <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd" />
                 </svg>
               </div>
             </div>
@@ -609,28 +568,20 @@ const enableTotp = () => {
             </Button>
           </div>
           <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div
-              v-for="background in allAvailableBackgrounds"
-              :key="background"
-              @click="selectBackground(background)"
-              class="relative cursor-pointer rounded-lg overflow-hidden transition-all duration-200 border-2 aspect-video"
-              :class="[
-                backgroundForm.background === background 
-                  ? 'border-secondary shadow-lg shadow-secondary/30 scale-105' 
-                  : 'border-base-300/30 hover:border-secondary/50 hover:scale-105'
-              ]"
-            >
-              <img
-                :src="background"
-                alt="Background"
-                class="w-full h-full object-cover"
-              />
-              <div
-                v-if="backgroundForm.background === background"
-                class="absolute inset-0 bg-secondary/20 flex items-center justify-center"
-              >
+            <div v-for="background in allAvailableBackgrounds" :key="background" @click="selectBackground(background)"
+                 class="relative cursor-pointer rounded-lg overflow-hidden transition-all duration-200 border-2 aspect-video"
+                 :class="[
+                   backgroundForm.background === background
+                     ? 'border-secondary shadow-lg shadow-secondary/30 scale-105'
+                     : 'border-base-300/30 hover:border-secondary/50 hover:scale-105'
+                 ]">
+              <img :src="background" alt="Background" class="w-full h-full object-cover" />
+              <div v-if="backgroundForm.background === background"
+                   class="absolute inset-0 bg-secondary/20 flex items-center justify-center">
                 <svg class="w-8 h-8 text-secondary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd" />
                 </svg>
               </div>
             </div>

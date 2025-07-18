@@ -14,3 +14,10 @@ export interface LeaderboardData {
     top: LeaderboardUser[];
     current_user: LeaderboardUser;
 }
+
+export interface Leaderboards {
+    cash?: LeaderboardData;
+    experience?: LeaderboardData;
+    pokemon_count?: LeaderboardData;
+    team_cp?: LeaderboardData;
+}
