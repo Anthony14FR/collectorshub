@@ -99,7 +99,7 @@ docker-prod-stop: ## Arrête les conteneurs Docker
 
 docker-prod-rebuild: ## Rebuild l'environnement Docker
 	make docker-prod-down
-	docker compose build --no-cache
+	docker compose build
 	make docker-prod-up
 
 docker-prod-logs: ## Affiche les logs des conteneurs Docker
