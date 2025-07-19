@@ -258,4 +258,61 @@ class LeaderboardService
             'current_user' => $userRank
         ];
     }
+
+    public function getClubLeaderboard(User $currentUser, $limit = 100): array
+    {
+        $query = \App\Models\Club::with(['leader'])
+            ->orderBy('total_cp', 'desc');
+
+        if ($limit !== 'all') {
+            $query->limit($limit);
+        }
+
+        $topClubs = $query->get(['id', 'name', 'leader_id', 'total_cp', 'icon'])
+            ->map(function ($club, $index) {
+                return [
+                    'rank' => $index + 1,
+                    'id' => $club->id,
+                    'username' => $club->name,
+                    'name' => $club->name,
+                    'value' => $club->total_cp,
+                    'total_cp' => $club->total_cp,
+                    'level' => $club->leader ? $club->leader->level : 1,
+                    'avatar' => $club->leader ? $club->leader->avatar : null,
+                    'background' => $club->leader ? $club->leader->background : null,
+                    'leader_id' => $club->leader_id,
+                    'icon' => $club->icon
+                ];
+            });
+
+        if ($limit === 'all') {
+            return ['top' => $topClubs];
+        }
+
+        $userClub = $currentUser->club()->first();
+        $userRank = null;
+
+        if ($userClub) {
+            $rank = \App\Models\Club::where('total_cp', '>', $userClub->total_cp)->count() + 1;
+
+            $userRank = [
+                'rank' => $rank,
+                'id' => $userClub->id,
+                'username' => $userClub->name,
+                'name' => $userClub->name,
+                'value' => $userClub->total_cp,
+                'total_cp' => $userClub->total_cp,
+                'level' => $userClub->leader ? $userClub->leader->level : 1,
+                'avatar' => $userClub->leader ? $userClub->leader->avatar : null,
+                'background' => $userClub->leader ? $userClub->leader->background : null,
+                'leader_id' => $userClub->leader_id,
+                'icon' => $userClub->icon
+            ];
+        }
+
+        return [
+            'top' => $topClubs,
+            'current_user' => $userRank
+        ];
+    }
 }
