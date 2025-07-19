@@ -111,8 +111,7 @@ class MeController extends Controller
     public function dismissWelcomeModal()
     {
         $user = Auth::user();
-        $user->welcome_modal_dismissed = true;
-        $user->save();
+        $user->update(['welcome_modal_dismissed' => true]);
 
         return response()->json(['success' => true]);
     }
