@@ -7,7 +7,9 @@ import Input from '@/Components/UI/Input.vue';
 import Select from '@/Components/UI/Select.vue';
 import PokedexModalCard from '@/Components/Pokedex/PokedexModalCard.vue';
 import CPBadge from '@/Components/UI/CPBadge.vue';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 import { calculateTeamCP } from '@/utils/cp';
+
 
 interface Props {
   show: boolean;
@@ -16,6 +18,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const { trackEvent } = useMatomoTracking();
 
 const localPokemons = ref<Pokedex[]>([]);
 const processing = ref(false);
@@ -119,6 +123,7 @@ const addToTeam = (pokemon: Pokedex) => {
     },
     onFinish: () => { processing.value = false; }
   });
+  trackEvent('Pokedex', 'AddToTeam', 'User', pokemon.id);
 };
 
 const removeFromTeam = (pokemon: Pokedex) => {
@@ -135,6 +140,7 @@ const removeFromTeam = (pokemon: Pokedex) => {
     },
     onFinish: () => { processing.value = false; }
   });
+  trackEvent('Pokedex', 'RemoveFromTeam', 'User', pokemon.id);
 };
 
 </script>

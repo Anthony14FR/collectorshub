@@ -10,6 +10,7 @@ import {
 } from '@/utils/marketplace';
 import { router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 export function useMarketplace() {
   const loading = ref(false);
@@ -19,6 +20,8 @@ export function useMarketplace() {
   const selectedListing = ref<MarketplaceListing | null>(null);
   const showPurchaseModal = ref(false);
   const showCancelModal = ref(false);
+
+  const { trackEvent } = useMatomoTracking();
 
   const filters = ref<MarketplaceFilters>({
     rarity: '',
@@ -145,6 +148,9 @@ export function useMarketplace() {
         loading.value = false;
       }
     });
+    if (selectedListing.value && selectedListing.value.pokemon) {
+      trackEvent('Marketplace', 'Buy', 'Transaction', selectedListing.value.pokemon.id);
+    }
   };
 
   const confirmCancel = () => {

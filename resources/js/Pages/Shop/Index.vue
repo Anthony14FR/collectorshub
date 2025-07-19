@@ -7,6 +7,7 @@ import BackgroundEffects from "@/Components/UI/BackgroundEffects.vue";
 import Button from "@/Components/UI/Button.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 const props = defineProps({
   user: Object,
@@ -14,6 +15,8 @@ const props = defineProps({
   inventory: Array,
   errors: Object,
 });
+
+const { trackEvent } = useMatomoTracking();
 
 const selectedItem = ref(null);
 const showBuyModal = ref(false);
@@ -45,6 +48,7 @@ const buyItem = (data) => {
       processing.value = false;
     }
   });
+  trackEvent('Shop', 'Buy', 'Transaction', data.item_id);
 };
 
 const formatPrice = (price) => {

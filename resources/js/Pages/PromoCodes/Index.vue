@@ -6,6 +6,7 @@ import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import { Head, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 interface Props {
   promoCodes?: any[];
@@ -32,6 +33,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const { trackEvent } = useMatomoTracking();
 
 const form = ref({
   code: '',
@@ -109,6 +112,7 @@ const submitCode = () => {
       form.value.processing = false;
     }
   });
+  trackEvent('PromoCode', 'Use', 'PromoCodes', form.value.code);
 };
 
 const closeRewardsModal = () => {

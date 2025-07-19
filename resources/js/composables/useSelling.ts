@@ -7,6 +7,7 @@ import {
   canSellPokemon,
   isValidPrice 
 } from '@/utils/marketplace';
+import { useMatomoTracking } from '@/composables/useMatomoTracking';
 
 export function useSelling() {
   const userPokemons = ref<PokedexEntry[]>([]);
@@ -17,6 +18,8 @@ export function useSelling() {
   const showCancelModal = ref(false);
   const listingToCancel = ref<MarketplaceListing | null>(null);
   const processing = ref(false);
+
+  const { trackEvent } = useMatomoTracking();
 
   const form = ref({
     pokemon_id: '',
@@ -102,6 +105,7 @@ export function useSelling() {
         processing.value = false;
       }
     });
+    trackEvent('Marketplace', 'SubmitSell', 'Sell', Number(form.value.pokemon_id));
   };
 
   const confirmCancel = () => {
