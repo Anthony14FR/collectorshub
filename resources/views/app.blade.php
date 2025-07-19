@@ -53,7 +53,9 @@
             '@type' => 'WebSite',
             'name' => 'Collector\'s Hub',
             'url' => 'https://collectorshub.fr',
-            'description' => 'La plateforme ultime pour les collectionneurs de Pokémon',
+            'description' => 'La plateforme ultime pour les collectionneurs - CollectorsHub',
+            'headline' => 'Collector\'s Hub - La plateforme ultime pour les collectionneurs',
+            'alternativeHeadline' => 'CollectorsHub - Rejoignez l\'aventure ultime',
             'potentialAction' => [
                 '@type' => 'SearchAction',
                 'target' => 'https://collectorshub.fr/search?q={search_term_string}',

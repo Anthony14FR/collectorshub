@@ -22,11 +22,14 @@
       </div>
 
       <div class="absolute inset-0 z-[5] flex items-center justify-center -mt-96" data-speed="-0.8">
-        <h1
-          class="text-base-100/80 text-4xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-[10rem] 2xl:text-[12rem] font-black drop-shadow-2xl text-center px-4"
-        >
-          COLLECTOR'S HUB
-        </h1>
+        <div class="text-center">
+          <h1
+            class="text-base-100/80 text-4xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-[10rem] 2xl:text-[12rem] font-black drop-shadow-2xl text-center px-4"
+          >
+            COLLECTOR'S HUB
+          </h1>
+          <h2 class="sr-only">CollectorsHub - La plateforme ultime pour les collectionneurs</h2>
+        </div>
       </div>
 
       <div class="absolute inset-0 z-[20] flex items-end justify-center" data-speed="0.6">
@@ -188,6 +191,23 @@
         </div>
       </div>
     </section>
+
+    <div class="sr-only">
+      <h2>Collector's Hub - La plateforme de collection ultime</h2>
+      <p>Collector's Hub est la plateforme de référence pour tous les passionnés de collection. Rejoignez une communauté active de milliers de collectionneurs et commencez votre aventure dès aujourd'hui. Notre plateforme Collector's Hub vous offre une expérience unique de collection avec des fonctionnalités avancées et une interface moderne.</p>
+      
+      <h3>Pourquoi choisir Collector's Hub ?</h3>
+      <p>Collector's Hub se distingue par sa simplicité d'utilisation et ses fonctionnalités innovantes. Notre plateforme Collector's Hub propose un système de collection complet avec marketplace intégré, système de niveaux, expéditions et défis quotidiens. Collector's Hub est entièrement gratuit et sans publicité, offrant une expérience premium à tous les utilisateurs.</p>
+      
+      <h3>Fonctionnalités principales de Collector's Hub</h3>
+      <p>Collector's Hub propose un marketplace dynamique où vous pouvez acheter et vendre vos collections. Le système de niveaux de Collector's Hub vous permet de progresser et de débloquer de nouvelles fonctionnalités. Les expéditions de Collector's Hub vous offrent des défis quotidiens pour enrichir votre collection. Collector's Hub dispose également d'un système de succès et de récompenses pour motiver les collectionneurs.</p>
+      
+      <h3>Communauté Collector's Hub</h3>
+      <p>Rejoignez la communauté Collector's Hub et partagez votre passion avec d'autres collectionneurs. Collector's Hub favorise les échanges et les interactions entre utilisateurs. Notre plateforme Collector's Hub organise régulièrement des événements et des défis communautaires pour enrichir l'expérience de collection.</p>
+      
+      <h3>Démarrez votre aventure avec Collector's Hub</h3>
+      <p>Collector's Hub est accessible à tous, débutants comme experts. Inscrivez-vous gratuitement sur Collector's Hub et commencez votre collection dès maintenant. Collector's Hub vous accompagne dans votre progression avec des tutoriels et un support communautaire actif. Découvrez pourquoi Collector's Hub est la plateforme de collection préférée des passionnés.</p>
+    </div>
   </div>
 </template>
 
