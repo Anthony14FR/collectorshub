@@ -103,7 +103,17 @@ class MeController extends Controller
             'daily_quest_stats' => $dailyQuestStats,
             'expeditions' => $expeditions,
             'has_completed_expeditions' => $hasCompletedExpeditions,
-            'has_infernal_tower_attempts' => $hasInfernalTowerAttempts
+            'has_infernal_tower_attempts' => $hasInfernalTowerAttempts,
+            'should_show_welcome_modal' => !$user->welcome_modal_dismissed
         ]);
+    }
+
+    public function dismissWelcomeModal()
+    {
+        $user = Auth::user();
+        $user->welcome_modal_dismissed = true;
+        $user->save();
+
+        return response()->json(['success' => true]);
     }
 }

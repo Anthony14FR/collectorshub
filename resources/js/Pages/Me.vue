@@ -53,6 +53,7 @@ interface Props extends PageProps {
   expeditions?: any[];
   has_completed_expeditions?: boolean;
   has_infernal_tower_attempts?: boolean;
+  should_show_welcome_modal?: boolean;
 }
 
 interface RefreshedData {
@@ -84,6 +85,7 @@ const {
   daily_quest_stats = { total: 0, completed: 0, claimed: 0, can_claim_bonus: false, completion_percentage: 0 },
   has_completed_expeditions = false,
   has_infernal_tower_attempts = false,
+  should_show_welcome_modal = false,
 } = defineProps<Props>();
 
 const pokedexModalOpen = ref(false);
@@ -96,6 +98,7 @@ const friendsData = ref([...friends]);
 const friendRequestsData = ref([...friend_requests]);
 const suggestionsData = ref([...suggestions]);
 const showHelpModal = ref(false)
+const showWelcomeModal = ref(should_show_welcome_modal);
 
 
 const sendGift = (friendId: number) => {
@@ -191,6 +194,22 @@ const goToExpeditions = () => {
 const goToTower = () => {
   router.visit('/tower');
 }
+
+const dismissWelcomeModal = async () => {
+  try {
+    await fetch('/me/dismiss-welcome-modal', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+    });
+    showWelcomeModal.value = false;
+  } catch (error) {
+    console.error('Erreur lors de la fermeture de la modal:', error);
+    showWelcomeModal.value = false;
+  }
+}
 </script>
 
 <template>
@@ -276,4 +295,62 @@ const goToTower = () => {
                   @dataRefreshed="handleDataRefreshed" />
   </div>
   <HelpModal :show="showHelpModal" :onClose="() => showHelpModal = false" />
+
+  <Modal :show="showWelcomeModal" @close="dismissWelcomeModal" max-width="2xl">
+    <template #header>
+      <div class="text-center">
+        <h2 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          Bienvenue sur CollectorsHub !
+        </h2>
+        <p class="text-lg text-base-content/70 mt-2">
+          Bonjour <span class="font-bold text-primary">{{ auth.user.username }}</span> !
+        </p>
+      </div>
+    </template>
+    <template #default>
+      <div class="space-y-6">
+        <div class="text-center">
+          <p class="text-base-content/80 leading-relaxed mb-2">
+            Félicitations ! Votre compte a été créé avec succès et vous êtes maintenant prêt à commencer votre
+            aventure Pokémon !
+          </p>
+          <p class="text-sm text-base-content/60">
+            En tant que nouveau dresseur, vous recevez automatiquement des cadeaux de bienvenue.
+          </p>
+        </div>
+
+        <div class="bg-gradient-to-r from-success/10 to-success/5 rounded-xl p-6 border border-success/20">
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-base-100/60 rounded-xl p-4 text-center border border-info/20">
+              <div class="w-16 h-16 mx-auto mb-3 bg-info/10 rounded-full flex items-center justify-center">
+                <img src="/images/items/pokeball.png" alt="Pokeball" class="w-10 h-10 object-contain" />
+              </div>
+              <h4 class="font-bold text-info">+10 Pokeball</h4>
+            </div>
+
+            <div class="bg-base-100/60 rounded-xl p-4 text-center border border-warning/20">
+              <div class="w-16 h-16 mx-auto mb-3 bg-warning/10 rounded-full flex items-center justify-center">
+                <img src="/images/items/masterball.png" alt="Masterball" class="w-10 h-10 object-contain" />
+              </div>
+              <h4 class="font-bold text-warning">+10 Masterball</h4>
+            </div>
+
+            <div class="bg-base-100/60 rounded-xl p-4 text-center border border-accent/20">
+              <div class="w-16 h-16 mx-auto mb-3 bg-accent/10 rounded-full flex items-center justify-center">
+                <span class="text-2xl">💰</span>
+              </div>
+              <h4 class="font-bold text-accent">+50 000 coins</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center pt-4">
+          <button @click="dismissWelcomeModal" class="btn btn-primary btn-lg min-w-48">
+            🚀 Commencer l'aventure !
+          </button>
+        </div>
+      </div>
+    </template>
+  </Modal>
 </template>

@@ -56,6 +56,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'infernal_tower_daily_defeats',
         'infernal_tower_last_reset',
         'daily_quest_bonus_claimed_date',
+        'welcome_modal_dismissed',
     ];
 
     protected $hidden = [
@@ -88,6 +89,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'infernal_tower_daily_defeats' => 'integer',
         'infernal_tower_last_reset' => 'datetime',
         'daily_quest_bonus_claimed_date' => 'date',
+        'welcome_modal_dismissed' => 'boolean',
     ];
 
     protected $appends = ['experience_for_current_level', 'experience_for_next_level', 'experience_percentage'];
