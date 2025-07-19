@@ -37,8 +37,7 @@ const logout = () => {
       </template>
       <template #default>
         <div class="space-y-6">
-          <div
-            class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-primary/20">
+          <div class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-primary/20">
             <div class="flex items-center gap-3 sm:gap-4">
               <div
                 class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
@@ -118,6 +117,7 @@ const logout = () => {
               </div>
               <span class="font-medium">Admin</span>
             </Link>
+
             <Link
               href="/clubs"
               class="flex items-center gap-3 p-3 rounded-xl hover:bg-info/10 transition-all duration-300 group"
@@ -159,20 +159,12 @@ const logout = () => {
                     stroke-width="2"
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                   ></path>
-                  <button @click="logout"
-                          class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-error/10 transition-all duration-300 group text-left">
-                    <div
-                      class="w-8 h-8 bg-error/20 rounded-lg flex items-center justify-center group-hover:bg-error/30 transition-colors">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                        </path>
-                      </svg>
-                    </div>
-                    <span class="font-medium">Déconnexion</span>
-                  </button>
+                </svg>
               </div>
+              <span class="font-medium">Déconnexion</span>
+            </button>
           </div>
+        </div>
       </template>
     </Modal>
   </div>
