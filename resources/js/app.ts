@@ -9,10 +9,10 @@ import VirtualScroller from 'primevue/virtualscroller';
 import musicPlayerPlugin from './plugins/musicPlayer';
 import { useMatomoTracking } from './composables/useMatomoTracking';
 
-const appName: string = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName: string = import.meta.env.VITE_APP_NAME || 'Collector\'s Hub';
 
 createInertiaApp({
-  title: (title: string) => `${title} - ${appName}`,
+  title: (title: string) => title ? `${title} | ${appName}` : appName,
   resolve: (name: string) =>
     resolvePageComponent(
       `./Pages/${name}.vue`,

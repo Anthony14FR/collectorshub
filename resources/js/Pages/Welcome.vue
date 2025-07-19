@@ -8,14 +8,16 @@
           src="/images/background.png"
           alt="Background"
           class="w-full h-full object-cover object-center"
+          loading="lazy"
         />
       </div>
-
+      
       <div class="absolute inset-0 z-[10] -mb-20" data-speed="-0.1">
         <img
           src="/images/mountains.png"
           alt="Mountains"
           class="w-full h-full object-cover object-bottom"
+          loading="lazy"
         />
       </div>
 
@@ -33,6 +35,7 @@
           alt="Foreground 1"
           class="w-full h-auto object-cover object-bottom"
           style="margin-bottom: -1px;"
+          loading="lazy"
         />
       </div>
 
@@ -45,6 +48,7 @@
           alt="Foreground 2" 
           class="w-full h-auto object-cover object-bottom" 
           style="margin-bottom: -1px;"
+          loading="lazy"
         />
         <div class="w-full h-screen bg-base-100 -mt-1"></div>
       </div>
@@ -56,6 +60,7 @@
           src="/images/section-2-background 1.jpg" 
           alt="Pokémon background" 
           class="w-full h-full object-cover object-center opacity-10"
+          loading="lazy"
         />
       </div>
 
@@ -96,6 +101,7 @@
           src="/images/Foreground1_old.png" 
           alt="Foreground decoration" 
           class="w-full h-auto object-cover object-bottom"
+          loading="lazy"
         />
       </div>
 
@@ -189,6 +195,7 @@ import Button from '@/Components/UI/Button.vue'
 import Badge from '@/Components/UI/Badge.vue'
 import { router } from '@inertiajs/vue3'
 import { useMatomoTracking } from '@/composables/useMatomoTracking'
+import { Head } from '@inertiajs/vue3'
 
 let lenis = null
 const { trackLandingPageAction, startTimer, trackTimeSpent, trackUserNavigation } = useMatomoTracking()
