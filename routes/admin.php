@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CrudPromoCodeController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExpeditionController;
 use App\Http\Controllers\Admin\GameConfigurationController;
@@ -26,6 +27,9 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::resource('expeditions', ExpeditionController::class);
         Route::post('expeditions/{expedition}/toggle', [ExpeditionController::class, 'toggle'])->name('expeditions.toggle');
         Route::post('expeditions/{expedition}/duplicate', [ExpeditionController::class, 'duplicate'])->name('expeditions.duplicate');
+
+        // PromoCodes
+        Route::resource('promocodes', CrudPromoCodeController::class);
 
         // Notifications
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

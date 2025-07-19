@@ -60,10 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Routes pour PromoCode
     Route::get('/promocodes', [PromoCodeController::class, 'index'])->name('promocodes.index');
-    Route::get('/promocodes/create', [PromoCodeController::class, 'create'])->name('promocodes.create');
-    Route::post('/promocodes', [PromoCodeController::class, 'store'])->name('promocodes.store');
     Route::post('/promocodes/use', [PromoCodeController::class, 'useCode'])->name('promocodes.use');
-    Route::delete('/promocodes/{id}', [PromoCodeController::class, 'destroy'])->name('promocodes.destroy');
 
     // Routes pour Marketplace
     Route::get('/marketplace', [MarketplaceController::class, 'index'])->name('marketplace.index');
