@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="fr">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta http-equiv="Content-Language" content="fr" />
 
         <title inertia>{{ config('app.name', 'Collector\'s Hub') }}</title>
 
@@ -11,6 +12,7 @@
         <meta name="keywords" content="collectorshub, collector's hub, collector hub, pokemon, collection, jeu pokemon, dresseur pokemon, marketplace pokemon, pokedex, jeu gratuit" />
         <meta name="author" content="Collector's Hub" />
         <meta name="robots" content="index, follow" />
+        <meta name="language" content="fr" />
         
         <meta property="og:title" content="Collector's Hub - La plateforme ultime pour les collectionneurs de Pokémon" />
         <meta property="og:description" content="Rejoignez des milliers de dresseurs dans cette aventure épique de collection et de combat Pokémon. Gratuit, sans publicité, communauté active." />
@@ -64,7 +66,21 @@
             'publisher' => [
                 '@type' => 'Organization',
                 'name' => 'Collector\'s Hub',
-                'url' => 'https://collectorshub.fr'
+                'url' => 'https://collectorshub.fr',
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => 'https://collectorshub.fr/favicon.png',
+                    'width' => 180,
+                    'height' => 180
+                ],
+                'sameAs' => [
+                    'https://collectorshub.fr'
+                ],
+                'contactPoint' => [
+                    '@type' => 'ContactPoint',
+                    'contactType' => 'customer service',
+                    'url' => 'https://collectorshub.fr'
+                ]
             ],
             'offers' => [
                 '@type' => 'Offer',
@@ -84,7 +100,8 @@
                     [
                         '@type' => 'ListItem',
                         'position' => 2,
-                        'name' => 'Collector\'s Hub'
+                        'name' => 'Collector\'s Hub',
+                        'item' => 'https://collectorshub.fr'
                     ]
                 ]
             ]
