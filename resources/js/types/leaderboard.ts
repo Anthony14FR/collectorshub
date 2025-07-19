@@ -8,6 +8,10 @@ export interface LeaderboardUser {
     value?: number;
     team_cp?: number;
     team_pokemons?: any[];
+    name?: string;
+    total_cp?: number;
+    leader_id?: number;
+    icon?: string;
 }
 
 export interface LeaderboardData {

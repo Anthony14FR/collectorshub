@@ -17,11 +17,12 @@ interface Props extends PageProps {
   levelLeaderboard: LeaderboardData;
   cpLeaderboard: LeaderboardData;
   pokemonLeaderboard: LeaderboardData;
+  clubLeaderboard: LeaderboardData;
 }
 
-const { levelLeaderboard, cpLeaderboard, pokemonLeaderboard, auth } = defineProps<Props>();
+const { levelLeaderboard, cpLeaderboard, pokemonLeaderboard, clubLeaderboard, auth } = defineProps<Props>();
 
-const activeTab = ref<'level' | 'cp' | 'pokemon'>('level');
+const activeTab = ref<'level' | 'cp' | 'pokemon' | 'club'>('level');
 const currentPage = ref(1);
 const itemsPerPage = 20;
 
@@ -30,6 +31,7 @@ const currentLeaderboard = computed(() => {
   case 'level': return levelLeaderboard;
   case 'cp': return cpLeaderboard;
   case 'pokemon': return pokemonLeaderboard;
+  case 'club': return clubLeaderboard;
   }
 });
 
@@ -54,10 +56,11 @@ const totalPages = computed(() => {
 const tabLabels = {
   level: 'Niveau',
   cp: 'Team CP',
-  pokemon: 'Pokémon'
+  pokemon: 'Pokémon',
+  club: 'Clubs'
 };
 
-const changeTab = (tab: 'level' | 'cp' | 'pokemon') => {
+const changeTab = (tab: 'level' | 'cp' | 'pokemon' | 'club') => {
   activeTab.value = tab;
   currentPage.value = 1;
 };
@@ -120,6 +123,10 @@ const changePage = (page: number) => {
                     <span class="text-xs font-bold text-base-content">POKÉMON</span>
                     <span class="text-sm font-bold text-base-content">#{{ pokemonLeaderboard.current_user.rank }}</span>
                   </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-base-content">CLUB</span>
+                    <span class="text-sm font-bold text-base-content">#{{ clubLeaderboard.current_user?.rank || '-' }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -127,7 +134,7 @@ const changePage = (page: number) => {
 
           <div class="xl:col-span-9 order-2 xl:order-2">
             <div class="flex flex-wrap gap-2 mb-6">
-              <Button v-for="(label, tab) in tabLabels" :key="tab" @click="changeTab(tab as 'level' | 'cp' | 'pokemon')"
+              <Button v-for="(label, tab) in tabLabels" :key="tab" @click="changeTab(tab as 'level' | 'cp' | 'pokemon' | 'club')"
                       :variant="activeTab === tab ? 'primary' : 'secondary'" size="sm" class="flex-1 sm:flex-none">
                 {{ label }}
               </Button>
