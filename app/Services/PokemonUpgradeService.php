@@ -21,15 +21,21 @@ class PokemonUpgradeService
                 'main_requirement' => [
                     'star' => 0,
                     'pokemon_id' => $pokedexEntry->pokemon_id,
-                    'quantity' => 1,
+                    'quantity' => 2,
                     'description' => '1 doublon 0★ identique'
+                ],
+                'secondary_requirement' => [
+                    'star' => 0,
+                    'pokemon_id' => null,
+                    'quantity' => 1,
+                    'description' => '1 Pokémon 0★ (n\'importe lequel)'
                 ]
             ],
             1 => [
                 'main_requirement' => [
                     'star' => 0,
                     'pokemon_id' => $pokedexEntry->pokemon_id,
-                    'quantity' => 2,
+                    'quantity' => 3,
                     'description' => '2 Pokémon 0★ identiques'
                 ]
             ],

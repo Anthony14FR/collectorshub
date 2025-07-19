@@ -17,7 +17,7 @@ class ItemSeeder extends Seeder
                 'type' => 'ball',
                 'image' => "images/items/pokeball.png",
                 'effect' => ['opening'],
-                'price' => 100,
+                'price' => 5000,
                 'rarity' => 'normal',
             ],
             [
@@ -26,7 +26,7 @@ class ItemSeeder extends Seeder
                 'type' => 'ball',
                 'image' => "images/items/masterball.png",
                 'effect' => ['opening'],
-                'price' => 200,
+                'price' => 10000,
                 'rarity' => 'epic',
             ],
         ];
@@ -50,7 +50,7 @@ class ItemSeeder extends Seeder
                 'type' => 'avatar',
                 'image' => $relativePath,
                 'effect' => [],
-                'price' => 1000,
+                'price' => 50000,
                 'rarity' => 'normal',
             ]);
         });
@@ -60,37 +60,37 @@ class ItemSeeder extends Seeder
                 'name' => 'Bots City',
                 'description' => 'Une ville stylée',
                 'image' => '/images/background/1.gif',
-                'price' => 5000
+                'price' => 80000
             ],
             [
                 'name' => 'Sunset Love',
                 'description' => 'Un coucher de soleil romantique à l\'horizon',
                 'image' => '/images/background/2.gif',
-                'price' => 7500
+                'price' => 75000
             ],
             [
                 'name' => 'Ocean Stream',
                 'description' => 'Horizon de l\'océan',
                 'image' => '/images/background/3.gif',
-                'price' => 10000
+                'price' => 30000
             ],
             [
                 'name' => 'Simple Dark Room',
                 'description' => 'Une chambre la nuit',
                 'image' => '/images/background/4.gif',
-                'price' => 12500
+                'price' => 25000
             ],
             [
                 'name' => 'Pokemon Party',
                 'description' => 'Une chambre avec des pokémon',
                 'image' => '/images/background/5.gif',
-                'price' => 15000
+                'price' => 50000
             ],
             [
                 'name' => 'Witch Room',
                 'description' => 'La chambre mystérieuse d\'une sorcière',
                 'image' => '/images/background/6.gif',
-                'price' => 17500
+                'price' => 75000
             ],
         ];
 
