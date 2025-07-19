@@ -9,7 +9,7 @@ services:
     ports:
       - "8081:80"
     environment:
-      - APP_NAME=CollectorsHub
+      - APP_NAME="Collector's Hub"
       - APP_ENV=production
       - APP_KEY=${APP_KEY}
       - APP_DEBUG=false

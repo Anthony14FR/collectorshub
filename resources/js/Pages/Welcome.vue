@@ -8,23 +8,26 @@
           src="/images/background.png"
           alt="Background"
           class="w-full h-full object-cover object-center"
+          loading="lazy"
         />
       </div>
-
+      
       <div class="absolute inset-0 z-[10] -mb-20" data-speed="-0.1">
         <img
           src="/images/mountains.png"
           alt="Mountains"
           class="w-full h-full object-cover object-bottom"
+          loading="lazy"
         />
       </div>
 
       <div class="absolute inset-0 z-[5] flex items-center justify-center -mt-96" data-speed="-0.8">
-        <h1
-          class="text-base-100/80 text-4xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-[10rem] 2xl:text-[12rem] font-black drop-shadow-2xl text-center px-4"
-        >
-          COLLECTOR'S HUB
-        </h1>
+        <div class="text-center">
+          <h1 class="text-base-100/80 text-4xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-[10rem] 2xl:text-[12rem] font-black drop-shadow-2xl text-center px-4">
+            COLLECTOR'S HUB
+          </h1>
+          <h2 class="sr-only">CollectorsHub - La plateforme ultime pour les collectionneurs</h2>
+        </div>
       </div>
 
       <div class="absolute inset-0 z-[20] flex items-end justify-center" data-speed="0.6">
@@ -33,6 +36,7 @@
           alt="Foreground 1"
           class="w-full h-auto object-cover object-bottom"
           style="margin-bottom: -1px;"
+          loading="lazy"
         />
       </div>
 
@@ -45,6 +49,7 @@
           alt="Foreground 2" 
           class="w-full h-auto object-cover object-bottom" 
           style="margin-bottom: -1px;"
+          loading="lazy"
         />
         <div class="w-full h-screen bg-base-100 -mt-1"></div>
       </div>
@@ -56,6 +61,7 @@
           src="/images/section-2-background 1.jpg" 
           alt="Pokémon background" 
           class="w-full h-full object-cover object-center opacity-10"
+          loading="lazy"
         />
       </div>
 
@@ -96,10 +102,13 @@
           src="/images/Foreground1_old.png" 
           alt="Foreground decoration" 
           class="w-full h-auto object-cover object-bottom"
+          loading="lazy"
         />
       </div>
 
       <div class="text-center z-10 max-w-5xl mx-auto px-6">
+        <h1 class="sr-only">Collector's Hub - La plateforme de collection ultime</h1>
+        
         <Badge 
           variant="success" 
           size="lg" 
@@ -132,6 +141,10 @@
           L'AVENTURE ULTIME
         </h3>
         
+        <h2 class="text-lg text-base-content/60 mb-4 opacity-80" data-aos="fade-up" data-aos-delay="450">
+          Plateforme Collector's Hub - Collection et communauté
+        </h2>
+        
         <div class="flex items-center justify-center gap-4 mb-8 md:mb-12" data-aos="fade-up" data-aos-delay="450">
           <div class="h-px bg-gradient-to-r from-transparent via-primary/60 to-primary/20 w-16 md:w-24"></div>
           <div class="w-3 h-3 bg-gradient-to-br from-primary to-secondary rounded-full shadow-lg shadow-primary/50 animate-pulse"></div>
@@ -139,6 +152,8 @@
         </div>
         
         <div class="bg-gradient-to-br from-base-100/60 to-base-200/40 backdrop-blur-sm border-2 border-success/20 rounded-3xl p-8 mb-12 relative overflow-hidden shadow-2xl shadow-primary/10" data-aos="fade-up" data-aos-delay="500">
+          <h2 class="sr-only">Fonctionnalités Collector's Hub</h2>
+          
           <div class="absolute top-6 right-6 w-6 h-6 border-2 border-success/30 rounded-full animate-pulse"></div>
           <div class="absolute bottom-6 left-6 w-4 h-4 border-2 border-primary/40 rounded-full animate-pulse delay-500"></div>
           <div class="absolute top-8 left-8 w-2 h-2 bg-accent rounded-full blur-sm animate-pulse opacity-60 delay-1000"></div>
@@ -170,12 +185,45 @@
         </div>
         
         <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center" data-aos="fade-up" data-aos-delay="400">
-          <Button variant="primary" icon="lightning" size="md" @click="goToRegister">
+          <h2 class="sr-only">Commencer l'aventure Collector's Hub</h2>
+          <Button 
+            variant="primary" 
+            icon="lightning" 
+            size="md" 
+            @click="goToRegister"
+            aria-label="Commencer l'aventure Collector's Hub"
+          >
             Commencer Maintenant
           </Button>
         </div>
       </div>
     </section>
+
+    <div class="sr-only">
+      <h1>Collector's Hub - La plateforme de collection ultime</h1>
+      <p>Collector's Hub est la plateforme de référence pour tous les passionnés de collection. Rejoignez une communauté active de milliers de collectionneurs et commencez votre aventure dès aujourd'hui. Notre plateforme Collector's Hub vous offre une expérience unique de collection avec des fonctionnalités avancées et une interface moderne.</p>
+      
+      <h2>Pourquoi choisir Collector's Hub ?</h2>
+      <p>Collector's Hub se distingue par sa simplicité d'utilisation et ses fonctionnalités innovantes. Notre plateforme Collector's Hub propose un système de collection complet avec marketplace intégré, système de niveaux, expéditions et défis quotidiens. Collector's Hub est entièrement gratuit et sans publicité, offrant une expérience premium à tous les utilisateurs.</p>
+      
+      <h2>Fonctionnalités principales de Collector's Hub</h2>
+      <p>Collector's Hub propose un marketplace dynamique où vous pouvez acheter et vendre vos collections. Le système de niveaux de Collector's Hub vous permet de progresser et de débloquer de nouvelles fonctionnalités. Les expéditions de Collector's Hub vous offrent des défis quotidiens pour enrichir votre collection. Collector's Hub dispose également d'un système de succès et de récompenses pour motiver les collectionneurs.</p>
+      
+      <h2>Communauté Collector's Hub</h2>
+      <p>Rejoignez la communauté Collector's Hub et partagez votre passion avec d'autres collectionneurs. Collector's Hub favorise les échanges et les interactions entre utilisateurs. Notre plateforme Collector's Hub organise régulièrement des événements et des défis communautaires pour enrichir l'expérience de collection.</p>
+      
+      <h2>Démarrez votre aventure avec Collector's Hub</h2>
+      <p>Collector's Hub est accessible à tous, débutants comme experts. Inscrivez-vous gratuitement sur Collector's Hub et commencez votre collection dès maintenant. Collector's Hub vous accompagne dans votre progression avec des tutoriels et un support communautaire actif. Découvrez pourquoi Collector's Hub est la plateforme de collection préférée des passionnés.</p>
+
+      <h2>Avantages exclusifs de Collector's Hub</h2>
+      <p>Collector's Hub propose des fonctionnalités uniques que vous ne trouverez nulle part ailleurs. Notre plateforme Collector's Hub intègre un système de progression avancé avec des récompenses exclusives. Collector's Hub offre également un système de trading sécurisé et transparent. Les utilisateurs de Collector's Hub bénéficient d'un support prioritaire et d'événements exclusifs. Collector's Hub développe constamment de nouvelles fonctionnalités basées sur les retours de la communauté.</p>
+
+      <h2>Comment fonctionne Collector's Hub ?</h2>
+      <p>Collector's Hub utilise une technologie de pointe pour offrir une expérience fluide et sécurisée. La plateforme Collector's Hub garantit la protection de vos données et la sécurité de vos transactions. Collector's Hub propose une interface intuitive adaptée à tous les niveaux d'expérience. Notre équipe Collector's Hub travaille en permanence pour améliorer les performances et l'expérience utilisateur. Collector's Hub s'engage à maintenir une communauté bienveillante et respectueuse.</p>
+
+      <h2>Témoignages des utilisateurs Collector's Hub</h2>
+      <p>Les utilisateurs de Collector's Hub témoignent de leur satisfaction avec la plateforme. Collector's Hub a transformé l'expérience de collection pour des milliers de passionnés. La communauté Collector's Hub apprécie particulièrement la simplicité d'utilisation et la richesse des fonctionnalités. Collector's Hub reçoit régulièrement des retours positifs sur son système de récompenses et son marketplace. Les nouveaux utilisateurs de Collector's Hub sont rapidement conquis par l'ambiance conviviale de la plateforme.</p>
+    </div>
   </div>
 </template>
 
@@ -189,6 +237,7 @@ import Button from '@/Components/UI/Button.vue'
 import Badge from '@/Components/UI/Badge.vue'
 import { router } from '@inertiajs/vue3'
 import { useMatomoTracking } from '@/composables/useMatomoTracking'
+import { Head } from '@inertiajs/vue3'
 
 let lenis = null
 const { trackLandingPageAction, startTimer, trackTimeSpent, trackUserNavigation } = useMatomoTracking()

@@ -98,9 +98,9 @@ docker-prod-stop: ## Arrête les conteneurs Docker
 	docker compose -f docker-compose.prod.yml down
 
 docker-prod-rebuild: ## Rebuild l'environnement Docker
-	make docker-prod-down
-	docker compose build --no-cache
-	make docker-prod-up
+	docker compose -f docker-compose.prod.yml down
+	docker compose -f docker-compose.prod.yml build
+	docker compose -f docker-compose.prod.yml up -d
 
 docker-prod-logs: ## Affiche les logs des conteneurs Docker
 	docker compose -f docker-compose.prod.yml logs -f
