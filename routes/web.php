@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ClubController;
 use App\Http\Controllers\ExpeditionController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\InfernalTowerController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\LevelRewardController;
@@ -14,6 +17,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoCodeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SuccessController;
+use App\Http\Controllers\UserFriendGiftController;
 use App\Http\Controllers\UserProfileController;
 use App\Models\Pokedex;
 use Illuminate\Foundation\Application;
@@ -34,9 +38,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/me', [MeController::class, 'index'])->name('me');
 
     // Routes 2FA
-    Route::get('/profile/totp', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'setupTotp'])->name('totp.setup');
-    Route::post('/profile/totp/enable', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'enableTotp'])->name('totp.enable');
-    Route::post('/profile/totp/disable', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'disableTotp'])->name('totp.disable');
+    Route::get('/profile/totp', [AuthenticatedSessionController::class, 'setupTotp'])->name('totp.setup');
+    Route::post('/profile/totp/enable', [AuthenticatedSessionController::class, 'enableTotp'])->name('totp.enable');
+    Route::post('/profile/totp/disable', [AuthenticatedSessionController::class, 'disableTotp'])->name('totp.disable');
 
     // Route pour voir le profil d'un utilisateur
     Route::get('/profile/{user:username}', [UserProfileController::class, 'show'])->middleware(['verified'])->name('user.profile.show');
@@ -105,18 +109,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route pour la Tour Infernale
     Route::get('/tower', [InfernalTowerController::class, 'index'])->name('tower.index');
 
-    // Gestion des amis
-    Route::get('/friends', [\App\Http\Controllers\FriendController::class, 'index'])->name('friends.index');
-    Route::post('/friends/send-request', [\App\Http\Controllers\FriendController::class, 'sendRequest'])->name('friends.sendRequest');
-    Route::post('/friends/accept-request', [\App\Http\Controllers\FriendController::class, 'acceptRequest'])->name('friends.acceptRequest');
-    Route::post('/friends/remove', [\App\Http\Controllers\FriendController::class, 'remove'])->name('friends.remove');
-    Route::get('/friends/search', [\App\Http\Controllers\FriendController::class, 'search'])->name('friends.search');
+    // Routes pour les amis
+    Route::get('/friends', [FriendController::class, 'index'])->name('friends.index');
+    Route::post('/friends/send-request', [FriendController::class, 'sendRequest'])->name('friends.sendRequest');
+    Route::post('/friends/accept-request', [FriendController::class, 'acceptRequest'])->name('friends.acceptRequest');
+    Route::post('/friends/remove', [FriendController::class, 'remove'])->name('friends.remove');
+    Route::get('/friends/search', [FriendController::class, 'search'])->name('friends.search');
 
-    // Gestion des cadeaux d'amis
-    Route::post('/friend-gifts/send', [\App\Http\Controllers\UserFriendGiftController::class, 'send'])->name('friend-gifts.send');
-    Route::post('/friend-gifts/claim', [\App\Http\Controllers\UserFriendGiftController::class, 'claim'])->name('friend-gifts.claim');
-    Route::post('/friend-gifts/claim-all', [\App\Http\Controllers\UserFriendGiftController::class, 'claimAll'])->name('friend-gifts.claim-all');
-    Route::post('/friend-gifts/send-all', [\App\Http\Controllers\UserFriendGiftController::class, 'sendToAll'])->name('friend-gifts.send-all');
+    // Routes pour les cadeaux d'amis
+    Route::post('/friend-gifts/send', [UserFriendGiftController::class, 'send'])->name('friend-gifts.send');
+    Route::post('/friend-gifts/claim', [UserFriendGiftController::class, 'claim'])->name('friend-gifts.claim');
+    Route::post('/friend-gifts/claim-all', [UserFriendGiftController::class, 'claimAll'])->name('friend-gifts.claim-all');
+    Route::post('/friend-gifts/send-all', [UserFriendGiftController::class, 'sendToAll'])->name('friend-gifts.send-all');
+
+    // Routes pour les Clubs
+    Route::get('/clubs', [ClubController::class, 'index'])->name('club.index');
+    Route::get('/clubs/create', [ClubController::class, 'create'])->name('club.create');
+    Route::post('/clubs', [ClubController::class, 'store'])->name('club.store');
+    Route::get('/clubs/{club}', [ClubController::class, 'show'])->name('club.show');
+    Route::post('/clubs/{club}/join', [ClubController::class, 'join'])->name('club.join');
+    Route::post('/clubs/leave', [ClubController::class, 'leave'])->name('club.leave');
+    Route::post('/club-requests/{request}/accept', [ClubController::class, 'acceptRequest'])->name('club.accept-request');
+    Route::post('/club-requests/{request}/reject', [ClubController::class, 'rejectRequest'])->name('club.reject-request');
+    Route::post('/clubs/{club}/remove-member', [ClubController::class, 'removeMember'])->name('club.remove-member');
+    Route::post('/clubs/{club}/transfer-leadership', [ClubController::class, 'transferLeadership'])->name('club.transfer-leadership');
+    Route::delete('/clubs/{club}', [ClubController::class, 'destroyClub'])->name('club.destroy');
+
 });
 
 require __DIR__ . '/admin.php';

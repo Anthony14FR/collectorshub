@@ -104,7 +104,7 @@ class FriendService
         $friendIds = $user->friends()->pluck('users.id')->toArray();
         $friendIds[] = $user->id;
 
-        $pendingRequestIds = \App\Models\UserFriend::where(function ($q) use ($user) {
+        $pendingRequestIds = UserFriend::where(function ($q) use ($user) {
             $q->where('user_id', $user->id)->orWhere('friend_id', $user->id);
         })->where('status', 'pending')->get()->flatMap(function ($request) use ($user) {
             return [$request->user_id, $request->friend_id];
