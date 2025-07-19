@@ -176,7 +176,13 @@
         </div>
         
         <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center" data-aos="fade-up" data-aos-delay="400">
-          <Button variant="primary" icon="lightning" size="md" @click="goToRegister">
+          <Button 
+            variant="primary" 
+            icon="lightning" 
+            size="md" 
+            @click="goToRegister"
+            aria-label="Commencer l'aventure Collector's Hub"
+          >
             Commencer Maintenant
           </Button>
         </div>

@@ -43,7 +43,8 @@
         <link rel="preconnect" href="https://collectorshub.matomo.cloud" />
         <link rel="dns-prefetch" href="https://collectorshub.matomo.cloud" />
 
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preload" href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+        <noscript><link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" /></noscript>
 
         <script type="application/ld+json">
         @php
@@ -101,7 +102,7 @@
                 _paq.push(['setTrackerUrl', u+'matomo.php']);
                 _paq.push(['setSiteId', '1']);
                 var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-                g.async=true; g.src='https://cdn.matomo.cloud/collectorshub.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
+                g.async=true; g.defer=true; g.src='https://cdn.matomo.cloud/collectorshub.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
             })();
         </script>
     </head>
