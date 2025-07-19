@@ -4,209 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vérification de votre compte CollectorsHub</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            min-height: 100vh;
-        }
-        
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-top: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-            text-align: center;
-            padding: 40px 20px;
-            position: relative;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('{{ asset('images/background_colors.png') }}');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.1;
-        }
-        
-        .header-content {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .logo {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .header-subtitle {
-            font-size: 18px;
-            opacity: 0.9;
-        }
-        
-        .content {
-            padding: 40px 30px;
-            text-align: center;
-            background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-        }
-        
-        .greeting {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1e293b;
-            margin-bottom: 20px;
-        }
-        
-        .username {
-            color: #22c55e;
-        }
-        
-        .message {
-            font-size: 16px;
-            color: #475569;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-        
-        .verify-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white !important;
-            text-decoration: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
-            transition: all 0.3s ease;
-            margin: 20px 0;
-        }
-        
-        .verify-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(34, 197, 94, 0.4);
-        }
-        
-        .footer {
-            background: #1e293b;
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        
-        .footer-text {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-bottom: 15px;
-        }
-        
-        .security-notice {
-            background: #fef3c7;
-            border: 2px solid #f59e0b;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            color: #92400e;
-        }
-        
-        .security-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .app-url {
-            color: #6b7280;
-            font-size: 12px;
-            margin-top: 20px;
-            word-break: break-all;
-        }
-        
-        @media (max-width: 600px) {
-            .email-container {
-                margin: 20px;
-                border-radius: 10px;
-            }
-            
-            .content {
-                padding: 20px;
-            }
-            
-            .verify-button {
-                padding: 12px 30px;
-                font-size: 16px;
-            }
-        }
-    </style>
 </head>
-<body>
-    <div class="email-container">
-        <div class="header">
-            <div class="header-content">
-                <div class="logo">🎮 CollectorsHub</div>
-                <div class="header-subtitle">Votre aventure Pokémon vous attend !</div>
-            </div>
-        </div>
-        
-        <div class="content">
-            <div class="greeting">
-                Salut <span class="username">{{ $notifiable->username }}</span> ! 👋
-            </div>
-            
-            <div class="message">
-                Bienvenue dans l'univers de <strong>CollectorsHub</strong> !<br>
-                Pour commencer votre collection de Pokémon et accéder à toutes les fonctionnalités, 
-                vous devez vérifier votre adresse email.
-            </div>
-            
-            <a href="{{ $actionUrl }}" class="verify-button">
-                ✨ Vérifier mon compte
-            </a>
-            
-            <div class="security-notice">
-                <div class="security-title">
-                    🎯 Sécurité de votre compte
-                </div>
-                <div>
-                    Ce lien de vérification expirera dans <strong>60 minutes</strong>.<br>
-                    Si vous n'avez pas créé de compte, ignorez cet email.
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <div class="footer-text">
-                Vous recevez cet email car vous avez créé un compte sur CollectorsHub.
-            </div>
-            <div class="footer-text">
-                📧 Si vous avez des questions, contactez-nous à : 
-                <a href="mailto:contact@collectorshub.fr" style="color: #60a5fa;">contact@collectorshub.fr</a>
-            </div>
-            <div class="app-url">
-                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
-                {{ $actionUrl }}
-            </div>
-        </div>
-    </div>
+<body style="margin: 0; padding: 0; background-color: #001e29; font-family: Arial, sans-serif; color: #e2e8f0;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #001e29;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #001e29; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); border: 1px solid #3b82f6;">
+                    <tr>
+                        <td style="background-color: #3b82f6; color: white; text-align: center; padding: 40px 30px;">
+                            <div style="font-size: 28px; font-weight: bold; margin-bottom: 8px;">🎮 Collector's Hub</div>
+                            <div style="font-size: 16px; opacity: 0.9;">Votre aventure vous attend</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #001e29; padding: 40px 30px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold; color: #e2e8f0; margin-bottom: 20px;">
+                                Salut <span style="color: #3b82f6; font-weight: bold;">{{ $notifiable->username }}</span>
+                            </div>
+                            
+                            <div style="font-size: 16px; color: #94a3b8; line-height: 1.6; margin-bottom: 30px;">
+                                Bienvenue dans l'univers de <strong style="color: #e2e8f0;">Collector's Hub</strong><br>
+                                Pour commencer votre collection et accéder à toutes les fonctionnalités, 
+                                vous devez vérifier votre adresse email.
+                            </div>
+                            
+                            <table cellpadding="0" cellspacing="0" style="margin: 20px auto;">
+                                <tr>
+                                    <td style="background-color: #3b82f6; border-radius: 16px; padding: 16px 40px;">
+                                        <a href="{{ $actionUrl }}" style="color: white; text-decoration: none; font-weight: bold; font-size: 16px; display: block;">
+                                             Vérifier mon compte
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <div style="background-color: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; border-radius: 16px; padding: 20px; margin: 20px 0; color: #94a3b8;">
+                                <div>
+                                    Ce lien de vérification expirera dans <strong style="color: #e2e8f0;">60 minutes</strong><br>
+                                    Si vous n'avez pas créé de compte, ignorez cet email.
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #0f2937; color: #e2e8f0; padding: 30px; text-align: center; border-top: 1px solid rgba(59, 130, 246, 0.1);">
+                            <div style="font-size: 12px; margin-bottom: 15px; color: #64748b;">
+                                Vous recevez cet email car vous avez créé un compte sur Collector's Hub.
+                            </div>
+                            <div style="font-size: 12px; margin-bottom: 15px; color: #64748b;">
+                                📧 Si vous avez des questions, contactez-nous à : 
+                                <a href="mailto:contact@collectorshub.fr" style="color: #3b82f6; text-decoration: none;">contact@collectorshub.fr</a>
+                            </div>
+                            <div style="color: #64748b; font-size: 10px; margin-top: 20px; word-break: break-all; background-color: rgba(0, 0, 0, 0.2); padding: 8px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.05);">
+                                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+                                <span style="color: #3b82f6; font-size: 9px;">{{ $actionUrl }}</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
