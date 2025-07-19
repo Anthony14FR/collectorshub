@@ -36,6 +36,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Route pour Me
     Route::get('/me', [MeController::class, 'index'])->name('me');
+    Route::post('/me/dismiss-welcome-modal', [MeController::class, 'dismissWelcomeModal'])->name('me.dismiss-welcome-modal');
 
     // Routes 2FA
     Route::get('/profile/totp', [AuthenticatedSessionController::class, 'setupTotp'])->name('totp.setup');

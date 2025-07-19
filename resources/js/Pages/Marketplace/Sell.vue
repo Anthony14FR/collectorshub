@@ -53,9 +53,8 @@
                 <SelectedPokemonCard :pokemon="selectedPokemon" @close="resetForm" />
 
                 <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-warning/20 p-4">
-                  <Input v-model="form.price" type="number" label="Prix de vente"
-                         placeholder="Minimum 1 ₽" variant="bordered"
-                         size="sm"
+                  <Input v-model="form.price" type="number" label="Prix de vente" placeholder="Minimum 1 ₽"
+                         variant="bordered" size="sm"
                          :helper-text="($page.props as any).errors.price || 'Le prix minimum est de 1 ₽'"
                          :state="($page.props as any).errors.price ? 'error' : 'default'" />
                 </div>
@@ -271,7 +270,7 @@
               <Button @click="closeModals" variant="secondary" size="md">
                 Non, garder
               </Button>
-              <Button @click="confirmCancel" :disabled="processing" variant="error" size="md">
+              <Button @click="confirmCancel" :disabled="processing" variant="secondary" size="md">
                 {{ processing ? '🔄' : '✅' }} Oui, annuler
               </Button>
             </div>
@@ -283,55 +282,48 @@
 </template>
 
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import { computed } from 'vue';
-import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
-import Button from '@/Components/UI/Button.vue';
-import Input from '@/Components/UI/Input.vue';
-import Alert from '@/Components/UI/Alert.vue';
-import Modal from '@/Components/UI/Modal.vue';
 import SelectedPokemonCard from '@/Components/Cards/SelectedPokemonCard.vue';
 import MyListingsSection from '@/Components/Game/MyListingsSection.vue';
 import PokedexModalCard from '@/Components/Pokedex/PokedexModalCard.vue';
-import RarityBadge from '@/Components/UI/RarityBadge.vue';
+import Alert from '@/Components/UI/Alert.vue';
+import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import Button from '@/Components/UI/Button.vue';
+import Input from '@/Components/UI/Input.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
+import RarityBadge from '@/Components/UI/RarityBadge.vue';
+import { Head, router } from '@inertiajs/vue3';
 
-import { 
+import {
   formatPrice,
-  parseTypes,
-  getPokemonImageUrl,
-  getRarityStars,
+  parseTypes
 } from '@/utils/marketplace';
 
 import { useSelling } from '@/composables/useSelling';
 
-const props = defineProps<{ 
-  userPokemons: any[], 
-  myListings: any[] 
+const props = defineProps<{
+  userPokemons: any[],
+  myListings: any[]
 }>();
 
-const { 
-  userPokemons, 
-  myListings, 
-  selectedPokemon, 
-  showCreateModal, 
-  showPokemonModal, 
-  showCancelModal, 
-  listingToCancel, 
-  processing, 
-  form, 
-  availablePokemons, 
-  canSubmit, 
-  normalizePokedexEntry, 
-  initializeData, 
-  selectPokemon, 
-  resetForm, 
-  openCreateModal, 
-  showPokemonDetails, 
-  showCancelConfirm, 
-  closeModals, 
-  listPokemon, 
-  confirmCancel 
+const {
+  myListings,
+  selectedPokemon,
+  showCreateModal,
+  showPokemonModal,
+  showCancelModal,
+  listingToCancel,
+  processing,
+  form,
+  availablePokemons,
+  canSubmit,
+  initializeData,
+  selectPokemon,
+  resetForm,
+  showCancelConfirm,
+  closeModals,
+  listPokemon,
+  confirmCancel
 } = useSelling();
 
 initializeData(props);
