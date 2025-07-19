@@ -6,8 +6,10 @@ use App\Models\Pokedex;
 use App\Models\User;
 use App\Observers\PokedexObserver;
 use App\Observers\UserObserver;
+use App\Services\DailyQuestService;
 use App\Services\GameConfigurationService;
 use App\Services\SuccessService;
+use App\Services\WelcomeGiftsService;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -23,8 +25,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(SuccessService::class);
         $this->app->singleton(GameConfigurationService::class);
-        $this->app->singleton(\App\Services\DailyQuestService::class);
-        $this->app->singleton(\App\Services\WelcomeGiftsService::class);
+        $this->app->singleton(DailyQuestService::class);
+        $this->app->singleton(WelcomeGiftsService::class);
     }
 
     /**
