@@ -8,6 +8,7 @@ import PokedexModal from '@/Components/Pokedex/PokedexModal.vue';
 import BadgesModal from '@/Components/Profile/BadgesModal.vue';
 import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import Button from '@/Components/UI/Button.vue';
 import HelpModal from '@/Components/UI/HelpModal.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import type { PageProps } from '@/types';
@@ -197,14 +198,29 @@ const goToTower = () => {
 
 const dismissWelcomeModal = async () => {
   try {
-    await fetch('/me/dismiss-welcome-modal', {
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    if (!token) {
+      console.warn('Token CSRF non disponible, fermeture côté client uniquement');
+      showWelcomeModal.value = false;
+      return;
+    }
+
+    const response = await fetch('/me/dismiss-welcome-modal', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        'X-CSRF-TOKEN': token,
+        'Accept': 'application/json',
       },
     });
-    showWelcomeModal.value = false;
+
+    if (response.ok) {
+      showWelcomeModal.value = false;
+    } else {
+      console.error('Erreur lors de la fermeture de la modal:', response.status);
+      showWelcomeModal.value = false;
+    }
   } catch (error) {
     console.error('Erreur lors de la fermeture de la modal:', error);
     showWelcomeModal.value = false;
@@ -326,7 +342,7 @@ const dismissWelcomeModal = async () => {
               <div class="w-16 h-16 mx-auto mb-3 bg-info/10 rounded-full flex items-center justify-center">
                 <img src="/images/items/pokeball.png" alt="Pokeball" class="w-10 h-10 object-contain" />
               </div>
-              <h4 class="font-bold text-info">+10 Pokeball</h4>
+              <h4 class="font-bold text-info">+20 Pokeball</h4>
             </div>
 
             <div class="bg-base-100/60 rounded-xl p-4 text-center border border-warning/20">
@@ -346,9 +362,9 @@ const dismissWelcomeModal = async () => {
         </div>
 
         <div class="text-center pt-4">
-          <button @click="dismissWelcomeModal" class="btn btn-primary btn-lg min-w-48">
-            🚀 Commencer l'aventure !
-          </button>
+          <Button @click="dismissWelcomeModal" variant="primary" size="lg" class="min-w-48">
+            Commencer l'aventure !
+          </Button>
         </div>
       </div>
     </template>
