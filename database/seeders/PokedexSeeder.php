@@ -11,94 +11,176 @@ class PokedexSeeder extends Seeder
 {
     public function run()
     {
-        $pokemon = Pokemon::find(1);
         $admin = User::where('username', 'admin')->first();
 
-        if (!$pokemon) {
-            throw new \Exception('No Pokemon found. Run PokemonSeeder first.');
-        }
-
         if (!$admin) {
-            throw new \Exception('Admin user not found. Run UserSeeder first.');
+            throw new \Exception('Admin user not found');
         }
 
-        if (!Pokedex::where('user_id', $admin->id)->where('pokemon_id', $pokemon->id)->exists()) {
-            Pokedex::create([
-                'user_id' => $admin->id,
-                'pokemon_id' => $pokemon->id,
-                'is_in_team' => false,
-                'level' => 1,
-            ]);
+        if (Pokedex::where('user_id', $admin->id)->exists()) {
+            $this->command->info('Le Pokédex de l\'admin existe déjà. Skipping...');
+            return;
         }
 
-        $this->seedUpgradePokemon($admin);
+        $this->seedAdminPokedex($admin);
+        $this->seedOtherUsersPokedex();
     }
 
-    private function seedUpgradePokemon(User $admin)
+    private function seedAdminPokedex(User $admin)
+    {
+        $this->seedAdminPikachu($admin);
+        $this->seedAdminBulbizarre($admin);
+        $this->seedAdminPokemonByType($admin);
+    }
+
+    private function seedAdminPikachu(User $admin)
     {
         $pikachu = Pokemon::where('name', 'Pikachu')->first();
 
         if (!$pikachu) {
-            $pikachu = Pokemon::first();
+            throw new \Exception('Pikachu introuvable dans la base de données.');
         }
 
-        $existingPikachuCount = Pokedex::where('user_id', $admin->id)
-            ->where('pokemon_id', $pikachu->id)
-            ->where('star', 0)
-            ->count();
+        $pikachuStars = [
+            0 => 4,
+            1 => 4,
+            2 => 4,
+            3 => 4,
+            4 => 6,
+            5 => 6,
+        ];
 
-        $pikachuToCreate = 170 - $existingPikachuCount;
-
-        for ($i = 0; $i < $pikachuToCreate; $i++) {
-            Pokedex::create([
-                'user_id' => $admin->id,
-                'pokemon_id' => $pikachu->id,
-                'nickname' => null,
-                'level' => 1,
-                'star' => 0,
-                'hp_left' => $pikachu->hp,
-                'is_in_team' => false,
-                'is_favorite' => false,
-                'obtained_at' => now()
-            ]);
-        }
-
-        $randomPokemons = Pokemon::where('id', '!=', $pikachu->id)->take(5)->get();
-
-        foreach ($randomPokemons as $pokemon) {
-            $existingStar1PokemonCount = Pokedex::where('user_id', $admin->id)
-                ->where('pokemon_id', $pokemon->id)
-                ->where('star', 1)
+        foreach ($pikachuStars as $star => $count) {
+            $existingCount = Pokedex::where('user_id', $admin->id)
+                ->where('pokemon_id', $pikachu->id)
+                ->where('star', $star)
                 ->count();
-            $star1PokemonToCreate = 2 - $existingStar1PokemonCount;
 
-            for ($i = 0; $i < $star1PokemonToCreate; $i++) {
+            $toCreate = $count - $existingCount;
+
+            for ($i = 0; $i < $toCreate; $i++) {
                 Pokedex::create([
                     'user_id' => $admin->id,
-                    'pokemon_id' => $pokemon->id,
+                    'pokemon_id' => $pikachu->id,
                     'nickname' => null,
                     'level' => 1,
-                    'star' => 1,
-                    'hp_left' => $pokemon->hp,
+                    'star' => $star,
+                    'hp_left' => $pikachu->hp,
                     'is_in_team' => false,
                     'is_favorite' => false,
                     'obtained_at' => now()
                 ]);
             }
+        }
+    }
 
-            $existingStar3PokemonCount = Pokedex::where('user_id', $admin->id)
-                ->where('pokemon_id', $pokemon->id)
-                ->where('star', 3)
+    private function seedAdminBulbizarre(User $admin)
+    {
+        $bulbasaur = Pokemon::where('name', 'Bulbizarre')->first();
+
+        if (!$bulbasaur) {
+            throw new \Exception('Bulbizarre introuvable dans la base de données.');
+        }
+
+        $bulbasaurStars = [
+            0 => 4,
+            1 => 4,
+            2 => 4,
+            3 => 4,
+            4 => 6,
+            5 => 6,
+        ];
+
+        foreach ($bulbasaurStars as $star => $count) {
+            $existingCount = Pokedex::where('user_id', $admin->id)
+                ->where('pokemon_id', $bulbasaur->id)
+                ->where('star', $star)
                 ->count();
-            $star3PokemonToCreate = 6 - $existingStar3PokemonCount;
 
-            for ($i = 0; $i < $star3PokemonToCreate; $i++) {
+            $toCreate = $count - $existingCount;
+
+            for ($i = 0; $i < $toCreate; $i++) {
                 Pokedex::create([
                     'user_id' => $admin->id,
+                    'pokemon_id' => $bulbasaur->id,
+                    'nickname' => null,
+                    'level' => 1,
+                    'star' => $star,
+                    'hp_left' => $bulbasaur->hp,
+                    'is_in_team' => false,
+                    'is_favorite' => false,
+                    'obtained_at' => now()
+                ]);
+            }
+        }
+    }
+
+    private function seedAdminPokemonByType(User $admin)
+    {
+        $types = ['Normal', 'Feu', 'Eau', 'Électrique', 'Plante', 'Glace', 'Combat', 'Poison', 'Sol', 'Vol', 'Psy', 'Insecte', 'Roche', 'Spectre', 'Dragon', 'Ténèbres', 'Acier', 'Fée'];
+
+        foreach ($types as $type) {
+            $pokemonsOfType = Pokemon::where('type1', $type)
+                ->orWhere('type2', $type)
+                ->take(2)
+                ->get();
+
+            foreach ($pokemonsOfType as $pokemon) {
+                $existingCount = Pokedex::where('user_id', $admin->id)
+                    ->where('pokemon_id', $pokemon->id)
+                    ->where('star', 0)
+                    ->count();
+
+                if ($existingCount < 2) {
+                    $toCreate = 2 - $existingCount;
+
+                    for ($i = 0; $i < $toCreate; $i++) {
+                        Pokedex::create([
+                            'user_id' => $admin->id,
+                            'pokemon_id' => $pokemon->id,
+                            'nickname' => null,
+                            'level' => 1,
+                            'star' => 0,
+                            'hp_left' => $pokemon->hp,
+                            'is_in_team' => false,
+                            'is_favorite' => false,
+                            'obtained_at' => now()
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    private function seedOtherUsersPokedex()
+    {
+        $otherUsers = User::where('username', '!=', 'admin')->get();
+
+        foreach ($otherUsers as $user) {
+            if (!Pokedex::where('user_id', $user->id)->exists()) {
+                $this->seedRandomPokemonForUser($user);
+            }
+        }
+    }
+
+    private function seedRandomPokemonForUser(User $user)
+    {
+        $pokemonCount = rand(10, 30);
+        $randomPokemons = Pokemon::inRandomOrder()->take($pokemonCount)->get();
+
+        foreach ($randomPokemons as $pokemon) {
+            $existingCount = Pokedex::where('user_id', $user->id)
+                ->where('pokemon_id', $pokemon->id)
+                ->where('star', 0)
+                ->count();
+
+            if ($existingCount === 0) {
+                Pokedex::create([
+                    'user_id' => $user->id,
                     'pokemon_id' => $pokemon->id,
                     'nickname' => null,
                     'level' => 1,
-                    'star' => 3,
+                    'star' => 0,
                     'hp_left' => $pokemon->hp,
                     'is_in_team' => false,
                     'is_favorite' => false,

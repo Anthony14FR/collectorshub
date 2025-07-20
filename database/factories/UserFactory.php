@@ -33,6 +33,7 @@ class UserFactory extends Factory
             'role' => 'user',
             'avatar' => '/images/trainer/' . fake()->numberBetween(1, 10) . '.png',
             'status' => 'active',
+            'welcome_modal_dismissed' => true,
         ];
     }
 
