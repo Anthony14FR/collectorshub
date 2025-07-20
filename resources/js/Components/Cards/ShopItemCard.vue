@@ -1,6 +1,7 @@
 <script setup>
-import { computed } from 'vue';
 import Button from '@/Components/UI/Button.vue';
+import { Coins } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 const props = defineProps({
   item: {
@@ -96,7 +97,7 @@ const getItemImage = (item) => {
           </template>
         </div>
         <div class="flex items-center gap-1">
-          <span class="text-warning text-sm">₽</span>
+          <Coins :size="14" class="text-warning" />
           <span class="font-bold text-warning">{{ formatPrice(item.price) }}</span>
         </div>
       </div>
@@ -129,5 +130,6 @@ const getItemImage = (item) => {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-clamp: 2;
 }
 </style> 

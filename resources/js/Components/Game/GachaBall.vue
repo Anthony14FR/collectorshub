@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
+import { computed, ref } from 'vue';
 
 interface Props {
   ballType: string;
@@ -226,7 +226,7 @@ const handleClick = () => {
 
         <RarityBadge
           :rarity="pokemon.rarity"
-          size="xxs"
+          size="xs"
           class="mt-1 inline-block animate-slideUp font-bold"
           :style="{ animationDelay: '0.7s' }"
         />

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import Button from '@/Components/UI/Button.vue';
 import Avatar from '@/Components/UI/Avatar.vue';
+import Button from '@/Components/UI/Button.vue';
+import { Coins, Gift, PartyPopper, Sparkles } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface GiftReward {
   amount: number;
@@ -39,7 +40,7 @@ const handleClose = () => {
         
         <div class="relative z-10">
           <div class="w-20 h-20 bg-gradient-to-br from-success/30 to-success/50 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-            <span class="text-3xl">🎁</span>
+            <Gift :size="40" class="text-success" />
           </div>
           
           <h2 class="text-2xl font-bold text-success mb-2">
@@ -75,7 +76,7 @@ const handleClose = () => {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 bg-gradient-to-br from-warning/30 to-warning/50 rounded-full flex items-center justify-center">
-                <span class="text-warning text-xl font-bold">$</span>
+                <Coins :size="24" class="text-warning" />
               </div>
               
               <div>
@@ -94,8 +95,10 @@ const handleClose = () => {
         </div>
         
         <div class="text-center">
-          <p class="text-base-content/80 text-sm">
-            ✨ N'oubliez pas de rendre la pareille à vos amis ! ✨
+          <p class="text-base-content/80 text-sm flex items-center justify-center gap-2">
+            <Sparkles :size="16" class="text-warning" />
+            N'oubliez pas de rendre la pareille à vos amis !
+            <Sparkles :size="16" class="text-warning" />
           </p>
         </div>
         
@@ -106,7 +109,7 @@ const handleClose = () => {
           size="lg"
         >
           <span class="flex items-center justify-center gap-2">
-            <span>🎉</span>
+            <PartyPopper :size="20" />
             Merci !
           </span>
         </Button>

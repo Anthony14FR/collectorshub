@@ -2,14 +2,14 @@
   <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30">
     <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
       <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-        <span class="text-lg">🏪</span>
+        <Store :size="16" class="inline" />
         MES ANNONCES
       </h3>
     </div>
 
     <div class="flex-1 overflow-y-auto p-3 overflow-y-auto max-h-[500px]">
       <div v-if="listings.length === 0" class="text-center py-8">
-        <p class="text-2xl mb-2">📭</p>
+        <Inbox :size="32" class="mx-auto mb-2 text-base-content/30" />
         <p class="text-sm mb-1">Aucune annonce</p>
         <p class="opacity-70 text-xs">Créez votre première annonce !</p>
       </div>
@@ -29,7 +29,7 @@
                 style="image-rendering: pixelated;"
               />
               <div v-if="normalizePokemonData(listing).is_shiny" class="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-                <span class="text-yellow-400 text-xs">✨</span>
+                <Sparkles :size="12" class="text-yellow-400" />
               </div>
               <div class="absolute -top-1 -left-1">
                 <StarsBadge :stars="getStars(listing)" size="xs" />
@@ -54,7 +54,7 @@
               size="sm"
               class="!text-error hover:!bg-error/5"
             >
-              🗑️
+              <Trash2 :size="16" />
             </Button>
           </div>
         </div>
@@ -70,11 +70,17 @@
 </template>
 
 <script setup lang="ts">
-import type { MarketplaceListing } from '@/types/marketplace';
-import { formatPrice, normalizePokemonData, getPokemonImageUrl } from '@/utils/marketplace';
 import Button from '@/Components/UI/Button.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import type { MarketplaceListing } from '@/types/marketplace';
+import { formatPrice, getPokemonImageUrl, normalizePokemonData } from '@/utils/marketplace';
+import {
+  Inbox,
+  Sparkles,
+  Store,
+  Trash2
+} from 'lucide-vue-next';
 
 interface Props {
   listings: MarketplaceListing[];

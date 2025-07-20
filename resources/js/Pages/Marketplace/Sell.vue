@@ -10,7 +10,7 @@
         <div class="text-center">
           <h1
             class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            🏷️ VENDRE
+            VENDRE
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             METTRE EN VENTE
@@ -33,7 +33,7 @@
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
             <div class="p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">➕</span>
+                <span class="text-lg"><Plus :size="20" /></span>
                 NOUVELLE ANNONCE
               </h3>
             </div>
@@ -61,7 +61,8 @@
 
                 <Button @click="listPokemon" :disabled="!canSubmit || processing" variant="primary" size="md"
                         class="w-full bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 border-success/30 shadow-lg shadow-success/20">
-                  {{ processing ? '🔄' : '💰' }} Mettre en vente
+                  <RotateCcw v-if="processing" :size="16" class="inline" />
+                  <Coins v-else :size="16" class="inline" /> Mettre en vente
                 </Button>
               </div>
             </div>
@@ -74,7 +75,7 @@
               <div class="text-center mb-6">
                 <div
                   class="w-20 h-20 bg-gradient-to-br from-warning/30 to-warning/10 rounded-full flex items-center justify-center mb-3 mx-auto border-2 border-warning/40">
-                  <span class="text-4xl">💰</span>
+                  <span class="text-4xl"><Coins :size="20" /></span>
                 </div>
                 <h2 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
                   Centre de Vente
@@ -105,7 +106,7 @@
           <div class="flex items-center gap-3">
             <div
               class="w-8 h-8 bg-gradient-to-br from-success/20 to-success/40 rounded-lg flex items-center justify-center">
-              <span class="text-lg">📦</span>
+              <span class="text-lg"><Package :size="20" /></span>
             </div>
             <div class="flex flex-col">
               <h3 class="text-xl font-bold bg-gradient-to-r from-success to-success/80 bg-clip-text text-transparent">
@@ -120,7 +121,7 @@
 
         <template #default>
           <div v-if="availablePokemons.length === 0" class="text-center py-8">
-            <p class="text-2xl mb-2">😔</p>
+            <p class="text-2xl mb-2"><Frown :size="20" /></p>
             <p class="text-lg font-bold mb-2">Aucun Pokémon disponible</p>
             <p class="text-base-content/70 mb-4">Tous vos Pokémon sont dans votre équipe ou déjà en vente.</p>
             <Button @click="showCreateModal = false" variant="secondary" size="md">
@@ -131,7 +132,7 @@
           <div v-else>
             <div class="mb-6">
               <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
-                🎯 Choisir un Pokémon
+                Choisir un Pokémon
               </h3>
               <p class="text-base-content/70 text-sm mt-1">Sélectionnez un Pokémon de votre inventaire à mettre en vente
               </p>
@@ -165,7 +166,7 @@
           <div v-if="selectedPokemon" class="flex items-center gap-3">
             <div
               class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-              <span class="text-lg">📦</span>
+              <span class="text-lg"><Package :size="20" /></span>
             </div>
             <div class="flex flex-col">
               <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
@@ -246,7 +247,7 @@
           <div class="flex items-center gap-3">
             <div
               class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
-              <span class="text-lg">🚫</span>
+              <span class="text-lg"><Trash2 :size="20" /></span>
             </div>
             <div class="flex flex-col">
               <h3 class="text-xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent">
@@ -271,7 +272,8 @@
                 Non, garder
               </Button>
               <Button @click="confirmCancel" :disabled="processing" variant="secondary" size="md">
-                {{ processing ? '🔄' : '✅' }} Oui, annuler
+                <RotateCcw v-if="processing" :size="16" class="inline" />
+                <Check v-else :size="16" class="inline" /> Oui, annuler
               </Button>
             </div>
           </div>
@@ -292,12 +294,12 @@ import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
-import { Head, router } from '@inertiajs/vue3';
-
 import {
   formatPrice,
   parseTypes
 } from '@/utils/marketplace';
+import { Head, router } from '@inertiajs/vue3';
+import { Check, Coins, Package, Plus, RotateCcw, Trash2 } from 'lucide-vue-next';
 
 import { useSelling } from '@/composables/useSelling';
 

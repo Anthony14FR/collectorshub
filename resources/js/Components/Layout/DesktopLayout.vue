@@ -10,6 +10,7 @@ import Button from '@/Components/UI/Button.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { DailyQuest, DailyQuestStats } from '@/types/daily-quest';
 import { router } from '@inertiajs/vue3';
+import { Flame } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 import type { Inventory } from '@/types/inventory';
@@ -315,7 +316,7 @@ const handleBonusClaimed = (_data: any) => {
         </div>
         <div class="relative z-10">
           <h3 class="mb-1 text-lg font-bold text-white flex items-center">
-            <span class="text-xl mr-2">🔥</span>
+            <Flame :size="20" class="mr-2 text-warning" />
             Tour Infernale
           </h3>
           <p class="mb-3 text-xs text-white/80">

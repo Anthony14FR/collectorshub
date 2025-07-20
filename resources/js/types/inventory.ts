@@ -14,4 +14,5 @@ export type Item = {
     effect: any;
     price: number;
     rarity: string;
+    image?: string;
 }

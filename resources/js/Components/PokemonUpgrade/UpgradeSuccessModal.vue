@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import Modal from '@/Components/UI/Modal.vue';
 import Button from '@/Components/UI/Button.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { PokedexEntry } from '@/types/user';
+import { ArrowRight, Sparkles } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
 
 interface Props {
   pokemon: PokedexEntry;
@@ -68,7 +69,7 @@ const closeModal = () => {
               />
               
               <div v-if="pokemon.pokemon?.is_shiny" class="absolute top-1 sm:top-2 right-1 sm:right-2">
-                <span class="text-yellow-400 text-base sm:text-lg">✨</span>
+                <Sparkles :size="20" class="text-yellow-400" />
               </div>
             </div>
 
@@ -77,7 +78,7 @@ const closeModal = () => {
                 <div class="text-[10px] sm:text-xs text-base-content/70 mb-1">Avant</div>
                 <StarsBadge :stars="Math.max(0, pokemon.star - 1)" />
               </div>
-              <span class="text-primary font-bold text-lg sm:text-xl">→</span>
+              <ArrowRight :size="20" class="text-primary font-bold" />
               <div class="text-center">
                 <div class="text-[10px] sm:text-xs text-base-content/70 mb-1">Après</div>
                 <StarsBadge :stars="pokemon.star" />

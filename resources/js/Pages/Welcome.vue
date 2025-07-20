@@ -166,19 +166,19 @@
           
           <div class="flex flex-wrap justify-center gap-6 text-base-content/70 mb-8">
             <div class="flex items-center gap-2 group">
-              <span class="text-success text-lg group-hover:scale-110 transition-transform">✓</span>
+              <Check :size="18" class="text-success group-hover:scale-110 transition-transform" />
               <span>Gratuit</span>
             </div>
             <div class="flex items-center gap-2 group">
-              <span class="text-success text-lg group-hover:scale-110 transition-transform">✓</span>
+              <Check :size="18" class="text-success group-hover:scale-110 transition-transform" />
               <span>Pas de publicité</span>
             </div>
             <div class="flex items-center gap-2 group">
-              <span class="text-success text-lg group-hover:scale-110 transition-transform">✓</span>
+              <Check :size="18" class="text-success group-hover:scale-110 transition-transform" />
               <span>Mises à jour régulières</span>
             </div>
             <div class="flex items-center gap-2 group">
-              <span class="text-success text-lg group-hover:scale-110 transition-transform">✓</span>
+              <Check :size="18" class="text-success group-hover:scale-110 transition-transform" />
               <span>Communauté active</span>
             </div>
           </div>
@@ -228,16 +228,16 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
-import Lenis from 'lenis'
+import AppNavbar from '@/Components/UI/AppNavbar.vue'
+import Badge from '@/Components/UI/Badge.vue'
+import Button from '@/Components/UI/Button.vue'
+import { useMatomoTracking } from '@/composables/useMatomoTracking'
+import { router } from '@inertiajs/vue3'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-import AppNavbar from '@/Components/UI/AppNavbar.vue'
-import Button from '@/Components/UI/Button.vue'
-import Badge from '@/Components/UI/Badge.vue'
-import { router } from '@inertiajs/vue3'
-import { useMatomoTracking } from '@/composables/useMatomoTracking'
-import { Head } from '@inertiajs/vue3'
+import Lenis from 'lenis'
+import { Check } from 'lucide-vue-next'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 let lenis = null
 const { trackLandingPageAction, startTimer, trackTimeSpent, trackUserNavigation } = useMatomoTracking()

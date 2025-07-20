@@ -6,13 +6,22 @@ import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import type { PageProps } from '@/types';
-import type { User } from '@/types/user';
+import type { User as UserType } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  Coins,
+  Edit3,
+  Lock,
+  Palette,
+  Settings,
+  User
+} from 'lucide-vue-next';
 import { computed, reactive, ref } from 'vue';
 
 interface Props extends PageProps {
   auth: {
-    user: User;
+    user: UserType;
   };
   mustVerifyEmail?: boolean;
   status?: string;
@@ -268,7 +277,7 @@ const enableTotp = () => {
       <div
         class="lg:hidden flex items-center justify-between p-4 bg-base-100/60 backdrop-blur-sm border-b border-base-300/30">
         <Button @click="goToProfile" variant="outline" size="sm">
-          ← Retour
+          <ArrowLeft :size="16" class="inline" /> Retour
         </Button>
         <h1 class="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           Mon Profil
@@ -280,7 +289,7 @@ const enableTotp = () => {
         <div class="text-center">
           <h1
             class="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-2 tracking-wider">
-            ⚙️ PROFIL
+            <Settings :size="32" class="inline" /> PROFIL
           </h1>
           <p class="text-sm text-base-content/70 uppercase tracking-wider">
             MODIFIER VOS INFORMATIONS
@@ -319,12 +328,12 @@ const enableTotp = () => {
                       Niveau {{ auth.user.level || 1 }}
                     </span>
                     <span class="text-xs bg-gradient-to-r from-accent/20 to-success/20 px-3 py-1 rounded-full">
-                      {{ auth.user.cash || 0 }} 💰
+                      {{ auth.user.cash || 0 }} <Coins :size="12" class="inline" />
                     </span>
                   </div>
                 </div>
                 <Button @click="showBackgroundModal = true" variant="secondary">
-                  🎨 Changer le fond
+                  <Palette :size="16" class="inline" /> Changer le fond
                 </Button>
               </div>
             </div>
@@ -334,7 +343,7 @@ const enableTotp = () => {
                 <div class="space-y-4">
                   <div class="flex items-center justify-between">
                     <h3 class="text-lg font-semibold flex items-center gap-2">
-                      <span class="text-xl">👤</span>
+                      <User :size="20" />
                       Informations personnelles
                     </h3>
                     <Button @click="showProfileModal = true" variant="secondary" size="sm">
@@ -357,7 +366,7 @@ const enableTotp = () => {
                   <div class="flex items-center justify-between">
                     <div>
                       <h3 class="text-lg font-semibold flex items-center gap-2">
-                        <span class="text-xl">🔐</span>
+                        <Lock :size="20" />
                         Sécurité
                       </h3>
                       <p class="text-sm text-base-content/60 mt-1">
@@ -437,7 +446,7 @@ const enableTotp = () => {
 
           <div class="text-center">
             <Button @click="goToProfile" variant="secondary" size="lg" class="min-w-48">
-              ← Retour à la page d'accueil
+              <ArrowLeft :size="20" class="inline" /> Retour à la page d'accueil
             </Button>
           </div>
         </div>
@@ -449,7 +458,7 @@ const enableTotp = () => {
         <div class="flex items-center gap-3">
           <div
             class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
-            <span class="text-lg">👤</span>
+            <User :size="20" />
           </div>
           <h3 class="text-xl font-bold">Modifier le profil</h3>
         </div>
@@ -480,7 +489,7 @@ const enableTotp = () => {
         <div class="flex items-center gap-3">
           <div
             class="w-8 h-8 bg-gradient-to-br from-warning/20 to-error/20 rounded-lg flex items-center justify-center">
-            <span class="text-lg">🔐</span>
+            <Lock :size="20" />
           </div>
           <h3 class="text-xl font-bold">Changer le mot de passe</h3>
         </div>
@@ -516,7 +525,7 @@ const enableTotp = () => {
         <div class="flex items-center gap-3">
           <div
             class="w-8 h-8 bg-gradient-to-br from-accent/20 to-primary/20 rounded-lg flex items-center justify-center">
-            <span class="text-lg">🎭</span>
+            <Edit3 :size="20" />
           </div>
           <h3 class="text-xl font-bold">Choisir un avatar</h3>
         </div>
@@ -561,7 +570,7 @@ const enableTotp = () => {
       <template #default>
         <div class="p-4">
           <div v-if="allAvailableBackgrounds.length === 0" class="text-center py-8">
-            <p class="text-xl mb-2">🎨</p>
+            <Palette :size="48" class="mx-auto mb-2 text-base-content/30" />
             <p class="text-sm mb-4">Aucun background disponible</p>
             <Button @click="() => { showBackgroundModal = false; router.visit('/shop'); }" variant="primary">
               Aller au Shop

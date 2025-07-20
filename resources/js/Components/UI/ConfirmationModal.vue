@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { MarketplaceListing } from '@/types/marketplace';
-import { formatPrice, parseTypes, getPokemonImageUrl, normalizePokemonData } from '@/utils/marketplace';
-import Modal from '@/Components/UI/Modal.vue';
 import Button from '@/Components/UI/Button.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import type { MarketplaceListing } from '@/types/marketplace';
+import { formatPrice, getPokemonImageUrl, normalizePokemonData, parseTypes } from '@/utils/marketplace';
+import { AlertTriangle, Coins, FileText, Loader2, Sparkles, XCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface Props {
   show: boolean;
@@ -62,7 +63,7 @@ const getStars = () => {
     <template #header>
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-          <span class="text-lg">💰</span>
+          <Coins :size="20" class="text-warning" />
         </div>
         <div>
           <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
@@ -88,7 +89,7 @@ const getStars = () => {
               />
               <div v-if="normalizedPokemon.is_shiny" class="absolute -top-2 -right-2">
                 <div class="w-8 h-8 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-                  <span class="text-yellow-400 text-lg">✨</span>
+                  <Sparkles :size="20" class="text-yellow-400" />
                 </div>
               </div>
               <div class="absolute -top-2 -left-2">
@@ -124,7 +125,7 @@ const getStars = () => {
         </div>
 
         <div class="bg-base-100/40 rounded-xl p-4 space-y-3">
-          <h5 class="font-semibold text-base-content/80 text-sm">📋 Détails de la transaction</h5>
+          <h5 class="font-semibold text-base-content/80 text-sm"><FileText :size="20" class="text-warning" /> Détails de la transaction</h5>
           
           <div class="space-y-2 text-sm">
             <div class="flex justify-between items-center">
@@ -152,7 +153,7 @@ const getStars = () => {
 
         <div v-if="!canAfford" class="bg-error/10 border border-error/20 rounded-xl p-3 text-center">
           <div class="text-error text-sm font-medium">
-            ⚠️ Fonds insuffisants pour cet achat
+            <AlertTriangle :size="20" class="text-error" /> Fonds insuffisants pour cet achat
           </div>
         </div>
 
@@ -164,7 +165,7 @@ const getStars = () => {
             class="flex-1"
             :disabled="loading"
           >
-            ❌ Annuler
+            <XCircle :size="20" class="text-error" /> Annuler
           </Button>
 
           <Button
@@ -174,7 +175,9 @@ const getStars = () => {
             class="flex-1"
             :disabled="!canAfford || loading"
           >
-            {{ loading ? '🔄 En cours...' : '💰 Confirmer l\'achat' }}
+            <Loader2 v-if="loading" :size="20" class="text-warning" />
+            <Coins v-else :size="20" class="text-warning" />
+            {{ loading ? 'En cours...' : 'Confirmer l\'achat' }}
           </Button>
         </div>
       </div>

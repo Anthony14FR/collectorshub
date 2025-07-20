@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
+import RarityBadge from '@/Components/UI/RarityBadge.vue';
+import { computed, onMounted, ref } from 'vue';
 
 interface Props {
   pokemon: any;
@@ -26,7 +26,7 @@ const cardConfig = computed(() => {
       textColor: 'text-yellow-400',
       particleColor: 'bg-yellow-400',
       specialClass: 'animate-pulse',
-      effectEmoji: '✨'
+      effectIcon: 'Sparkles'
     };
   }
 
@@ -40,7 +40,7 @@ const cardConfig = computed(() => {
       textColor: 'text-warning',
       particleColor: 'bg-warning',
       specialClass: 'animate-pulse',
-      effectEmoji: '👑'
+      effectIcon: 'Crown'
     };
   case 'epic':
     return {
@@ -51,7 +51,7 @@ const cardConfig = computed(() => {
       textColor: 'text-secondary',
       particleColor: 'bg-secondary',
       specialClass: '',
-      effectEmoji: '💎'
+      effectIcon: 'Gem'
     };
   case 'rare':
     return {
@@ -62,7 +62,7 @@ const cardConfig = computed(() => {
       textColor: 'text-info',
       particleColor: 'bg-info',
       specialClass: '',
-      effectEmoji: '⭐'
+      effectIcon: 'Star'
     };
   default:
     return {
@@ -73,7 +73,7 @@ const cardConfig = computed(() => {
       textColor: 'text-base-content',
       particleColor: 'bg-base-300',
       specialClass: '',
-      effectEmoji: ''
+      effectIcon: null
     };
   }
 });
@@ -140,8 +140,13 @@ onMounted(() => {
         isSpecial ? 'shadow-xl ' + cardConfig.shadowColor : 'shadow-lg shadow-base-300/20'
       ]"
     >
-      <div class="absolute top-2 right-2 text-2xl z-10">
-        {{ cardConfig.effectEmoji }}
+      <div class="absolute top-2 right-2 z-10">
+        <component 
+          v-if="cardConfig.effectIcon" 
+          :is="cardConfig.effectIcon" 
+          :size="24" 
+          :class="cardConfig.textColor" 
+        />
       </div>
 
       <div class="relative mb-3">
@@ -157,7 +162,7 @@ onMounted(() => {
             :src="pokemonImageUrl"
             :alt="pokemon.name"
             class="w-14 h-14 object-contain transition-transform duration-300 group-hover:scale-110"
-            @error="$event.target.style.display = 'none'"
+            @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }"
           />
         </div>
 
@@ -175,7 +180,7 @@ onMounted(() => {
         ]"
       >
         {{ pokemon.name }}
-        <span v-if="pokemon.is_shiny" class="text-yellow-400 ml-1">✨</span>
+        <Sparkles v-if="pokemon.is_shiny" :size="18" class="text-yellow-400 ml-1 inline" />
       </h3>
 
       <div class="text-center mb-2">
@@ -222,15 +227,18 @@ onMounted(() => {
       >
         <div
           :class="[
-            'text-xs font-semibold px-2 py-1 rounded-full',
+            'text-xs font-semibold px-2 py-1 rounded-full flex items-center justify-center gap-1',
             pokemon.is_shiny ? 'bg-yellow-400/20 text-yellow-400' :
             pokemon.rarity === 'legendary' ? 'bg-warning/20 text-warning' :
             'bg-secondary/20 text-secondary'
           ]"
         >
-          {{ pokemon.is_shiny ? '✨ Shiny !' :
-            pokemon.rarity === 'legendary' ? '👑 Légendaire !' :
-            pokemon.rarity === 'epic' ? '💎 Épique !' : '' }}
+          <Sparkles v-if="pokemon.is_shiny" :size="12" />
+          <Crown v-if="pokemon.rarity === 'legendary'" :size="12" />
+          <Gem v-if="pokemon.rarity === 'epic'" :size="12" />
+          {{ pokemon.is_shiny ? 'Shiny !' :
+            pokemon.rarity === 'legendary' ? 'Légendaire !' :
+            pokemon.rarity === 'epic' ? 'Épique !' : '' }}
         </div>
       </div>
     </div>

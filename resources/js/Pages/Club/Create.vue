@@ -1,9 +1,21 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import Alert from '@/Components/UI/Alert.vue';
+import { Head, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  BarChart3,
+  Coins,
+  CreditCard,
+  Edit,
+  Eye,
+  Lightbulb,
+  Plus,
+  RotateCcw,
+  Trophy
+} from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 
 interface Props {
   typeImages: Record<string, string>;
@@ -21,16 +33,6 @@ const form = ref({
 
 const processing = ref(false);
 const selectedCategory = ref('all');
-
-const iconCategories = computed(() => {
-  const categories = ['all'];
-  Object.keys(props.typeImages).forEach(typeName => {
-    if (!categories.includes(typeName.toLowerCase())) {
-      categories.push(typeName.toLowerCase());
-    }
-  });
-  return categories;
-});
 
 const filteredIcons = computed(() => {
   if (selectedCategory.value === 'all') {
@@ -98,7 +100,7 @@ const formatPrice = (amount: number) => {
       <div class="flex justify-center pt-8 px-4">
         <div class="text-center">
           <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            🏗️ CRÉER UN CLUB
+            CRÉER UN CLUB
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             FONDEZ VOTRE COMMUNAUTÉ
@@ -114,13 +116,13 @@ const formatPrice = (amount: number) => {
             size="sm"
             class="w-full mb-4"
           >
-            ← Retour aux clubs
+            <ArrowLeft :size="16" class="inline" /> Retour aux clubs
           </Button>
 
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
             <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">💰</span>
+                <Coins :size="16" class="inline" />
                 COÛT
               </h3>
             </div>
@@ -131,7 +133,7 @@ const formatPrice = (amount: number) => {
                 variant="ghost"
               >
                 <template #icon>
-                  <span class="text-lg">💳</span>
+                  <CreditCard :size="16" class="inline" />
                 </template>
                 <div>
                   <div class="text-sm font-bold mb-1">100,000 Cash requis</div>
@@ -149,7 +151,7 @@ const formatPrice = (amount: number) => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">📊</span>
+                <BarChart3 :size="16" class="inline" />
                 PROGRESSION
               </h3>
             </div>
@@ -199,7 +201,7 @@ const formatPrice = (amount: number) => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">📝</span>
+                <Edit :size="16" class="inline" />
                 INFORMATIONS DU CLUB
               </h3>
             </div>
@@ -302,7 +304,7 @@ const formatPrice = (amount: number) => {
                   size="md"
                   class="flex-1"
                 >
-                  🔄 Réinitialiser
+                  <RotateCcw :size="16" class="inline" /> Réinitialiser
                 </Button>
                 <Button
                   type="submit"
@@ -316,7 +318,7 @@ const formatPrice = (amount: number) => {
                     Création...
                   </span>
                   <span v-else class="flex items-center gap-2">
-                    <span class="text-lg">🏗️</span>
+                    <Plus :size="16" class="inline" />
                     Créer le Club
                   </span>
                 </Button>
@@ -329,7 +331,7 @@ const formatPrice = (amount: number) => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
             <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">👀</span>
+                <Eye :size="16" class="inline" />
                 APERÇU
               </h3>
             </div>
@@ -344,7 +346,7 @@ const formatPrice = (amount: number) => {
                       alt="Icône du club"
                       class="w-8 h-8 object-contain"
                     />
-                    <span v-else class="text-lg text-base-content/40">🏆</span>
+                    <span v-else class="text-lg text-base-content/40"><Trophy :size="16" /></span>
                   </div>
                   <div class="flex-1 min-w-0">
                     <h4 class="font-bold text-sm truncate">
@@ -369,7 +371,7 @@ const formatPrice = (amount: number) => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-accent/10 to-accent/5 border-b border-accent/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">💡</span>
+                <Lightbulb :size="16" class="inline" />
                 CONSEILS
               </h3>
             </div>

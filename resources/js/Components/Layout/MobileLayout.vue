@@ -11,6 +11,7 @@ import type { Inventory } from '@/types/inventory';
 import type { Pokedex } from '@/types/pokedex';
 import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
 import { router } from '@inertiajs/vue3';
+import { BookOpen, Flame } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 interface Props {
@@ -234,7 +235,8 @@ const handleBonusClaimed = (_data: any) => {
           <div class="flex items-center gap-2">
             <div
               class="w-6 h-6 bg-gradient-to-br from-secondary/30 to-accent/30 rounded-lg flex items-center justify-center text-sm">
-              📚</div>
+              <BookOpen :size="16" class="text-secondary" />
+            </div>
             <h3 class="font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">Mon Pokédex
             </h3>
           </div>
@@ -301,7 +303,7 @@ const handleBonusClaimed = (_data: any) => {
           </div>
           <div class="relative p-4 flex flex-col h-32">
             <div class="flex items-center mb-2">
-              <span class="text-lg mr-2">🔥</span>
+              <Flame :size="20" class="mr-2 text-warning" />
               <h3 class="text-sm font-bold text-error">Tour Infernale</h3>
             </div>
             <p class="text-xs text-white/80 mb-auto">Défis épiques</p>

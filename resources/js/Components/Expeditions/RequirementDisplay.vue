@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getRequirementLabel, getRarityDotColor } from '@/utils/expedition';
 import type { ExpeditionRequirement } from '@/constants/expedition';
+import { getRarityDotColor, getRequirementLabel } from '@/utils/expedition';
 
 interface Props {
   requirements: ExpeditionRequirement[];
@@ -17,7 +17,7 @@ const getRequirementIcon = (requirement: ExpeditionRequirement) => {
   if (requirement.type === 'type') {
     return `/images/types/${requirement.value}.png`;
   }
-  return null;
+  return undefined;
 };
 
 const visibleRequirements = props.requirements.slice(0, props.maxVisible);

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
+import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import { Sparkles, X } from 'lucide-vue-next';
 
 interface Pokemon {
   id: number;
@@ -69,7 +70,7 @@ const getStars = () => {
       @click="$emit('close')"
       class="absolute top-3 right-3 w-8 h-8 bg-error/20 hover:bg-error/30 rounded-full flex items-center justify-center border border-error/30 hover:border-error/50 transition-all duration-200 z-10"
     >
-      <span class="text-error font-bold text-lg">×</span>
+      <X :size="20" class="text-error" />
     </button>
 
     <div class="text-center">
@@ -82,7 +83,7 @@ const getStars = () => {
             style="image-rendering: pixelated;"
           />
           <div v-if="pokemon.pokemon?.is_shiny" class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/40">
-            <span class="text-yellow-400 text-sm">✨</span>
+            <Sparkles :size="12" class="text-yellow-400" />
           </div>
           <div class="absolute -top-2 -left-2">
             <StarsBadge :stars="getStars()" size="sm" />

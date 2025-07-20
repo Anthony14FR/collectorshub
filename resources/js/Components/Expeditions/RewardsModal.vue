@@ -3,13 +3,12 @@
     <div class="bg-gradient-to-br from-base-100 to-base-200 rounded-xl border border-base-300/30 shadow-2xl max-w-md w-full mx-4 animate-in zoom-in-95 duration-200">
       <div class="p-6 text-center">
         <div class="w-16 h-16 bg-gradient-to-br from-success/20 to-success/30 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+          <CheckCircle :size="32" class="text-success" />
         </div>
         
-        <h2 class="text-xl font-bold text-base-content mb-2">
-          🎉 Expédition terminée !
+        <h2 class="text-xl font-bold text-base-content mb-2 flex items-center justify-center gap-2">
+          <PartyPopper :size="24" class="text-warning" />
+          Expédition terminée !
         </h2>
         
         <p class="text-base-content/70 mb-6">
@@ -22,23 +21,23 @@
             <div class="flex items-center gap-3">
               <div v-if="reward.type === 'cash'" 
                    class="w-8 h-8 bg-warning/20 rounded-full flex items-center justify-center">
-                <span class="text-warning text-sm font-bold">$</span>
+                <Coins :size="20" class="text-warning" />
               </div>
               <div v-else-if="reward.type === 'xp'" 
                    class="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
-                <span class="text-success text-xs font-bold">XP</span>
+                <Zap :size="20" class="text-success" />
               </div>
               <div v-else-if="reward.type === 'pokeball'" 
                    class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                <img src="/images/items/pokeball.png" alt="Pokeball" class="w-5 h-5 object-contain">
+                <Circle :size="20" class="text-primary" />
               </div>
               <div v-else-if="reward.type === 'masterball'" 
                    class="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center">
-                <img src="/images/items/masterball.png" alt="Masterball" class="w-5 h-5 object-contain">
+                <CircleDot :size="20" class="text-secondary" />
               </div>
               <div v-else 
                    class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                <span class="text-primary text-sm font-bold">🎁</span>
+                <Gift :size="20" class="text-primary" />
               </div>
               
               <span class="text-base-content font-medium">
@@ -66,6 +65,7 @@
 
 <script setup>
 import Button from '@/Components/UI/Button.vue'
+import { CheckCircle, Circle, CircleDot, Coins, Gift, PartyPopper, Zap } from 'lucide-vue-next'
 
 defineProps({
   show: {

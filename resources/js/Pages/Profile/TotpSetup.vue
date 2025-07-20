@@ -11,7 +11,7 @@
         <div class="text-center mb-8">
           <div
             class="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span class="text-2xl">🔐</span>
+            <Lock :size="32" />
           </div>
           <h1 class="text-3xl font-bold text-base-content mb-2">
             Authentification à deux facteurs
@@ -24,7 +24,7 @@
         <div v-if="!enabled" class="space-y-6">
           <div class="bg-info/10 border border-info/30 rounded-lg p-4">
             <div class="flex gap-3">
-              <span class="text-info text-xl">ℹ️</span>
+              <Info :size="20" class="text-info" />
               <div>
                 <h3 class="font-semibold text-info mb-1">Instructions</h3>
                 <ol class="text-sm text-info/80 space-y-1 list-decimal list-inside">
@@ -102,6 +102,7 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue'
 import Button from '@/Components/UI/Button.vue'
 import Input from '@/Components/UI/Input.vue'
 import { Head, router } from '@inertiajs/vue3'
+import { Info, Lock } from 'lucide-vue-next'
 import * as QRCode from 'qrcode'
 import { nextTick, onMounted, ref } from 'vue'
 

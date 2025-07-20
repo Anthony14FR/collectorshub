@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Star } from 'lucide-vue-next';
+
 interface Props {
   stars: number;
   size?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg';
@@ -40,15 +42,15 @@ const isMaxStars = displayStars === 6;
     <span v-if="!isMaxStars" class="text-yellow-400 font-bold">{{ displayStars }}</span>
     <span 
       v-if="isMaxStars" 
-      class="text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text font-bold ultimate-star relative z-10 text-xl"
+      class="text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text font-bold ultimate-star relative z-10 text-xl flex items-center justify-center"
     >
-      ★
+      <Star :size="16" class="fill-current" />
     </span>
     <span 
       v-else
-      class="text-yellow-400 ml-1"
+      class="text-yellow-400 ml-1 flex items-center justify-center"
     >
-      ⭐
+      <Star :size="12" class="fill-current" />
     </span>
   </div>
 </template>

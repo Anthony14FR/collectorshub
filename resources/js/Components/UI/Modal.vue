@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+import { X } from 'lucide-vue-next';
 interface Props {
   show: boolean;
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl';
@@ -62,7 +62,7 @@ const maxWidthClasses = {
               'w-10 h-10 text-2xl'
             ]"
           >
-            ×
+            <X :size="20" />
           </button>
 
           <div v-if="$slots.header" :class="[

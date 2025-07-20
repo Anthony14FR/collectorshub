@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { getRewardLabel } from '@/utils/expedition';
 import type { ExpeditionReward } from '@/constants/expedition';
+import { getRewardLabel } from '@/utils/expedition';
+import { Circle, CircleDot, Coins, Gift, HelpCircle, Zap } from 'lucide-vue-next';
 
 interface Props {
   rewards: ExpeditionReward[];
@@ -13,19 +14,19 @@ interface Props {
   maxVisible?: number;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const { rewards, items, showTooltip, maxVisible } = withDefaults(defineProps<Props>(), {
   showTooltip: true,
   maxVisible: 3
 });
 
 const getRewardIcon = (reward: ExpeditionReward) => {
   switch (reward.type) {
-  case 'cash': return '$';
-  case 'xp': return 'XP';
-  case 'pokeball': return '⚾';
-  case 'masterball': return '🏀';
-  case 'item': return '🎁';
-  default: return '?';
+  case 'cash': return Coins;
+  case 'xp': return Zap;
+  case 'pokeball': return Circle;
+  case 'masterball': return CircleDot;
+  case 'item': return Gift;
+  default: return HelpCircle;
   }
 };
 
@@ -33,14 +34,14 @@ const getRewardImage = (reward: ExpeditionReward) => {
   if (reward.type === 'pokeball') return '/images/items/pokeball.png';
   if (reward.type === 'masterball') return '/images/items/masterball.png';
   if (reward.type === 'item' && reward.item_id) {
-    const item = props.items?.find(i => i.id === reward.item_id);
+    const item = items?.find(i => i.id === reward.item_id);
     return item?.image || '/images/items/pokeball.png';
   }
-  return null;
+  return undefined;
 };
 
-const visibleRewards = props.rewards.slice(0, props.maxVisible);
-const hasMore = props.rewards.length > props.maxVisible;
+const visibleRewards = rewards.slice(0, maxVisible);
+const hasMore = rewards.length > maxVisible;
 </script>
 
 <template>
@@ -63,7 +64,12 @@ const hasMore = props.rewards.length > props.maxVisible;
               :alt="reward.type"
               class="w-4 h-4"
             />
-            <span v-else class="text-xs">{{ getRewardIcon(reward) }}</span>
+            <component 
+              v-else 
+              :is="getRewardIcon(reward)"
+              :size="16"
+              class="text-base-content/70"
+            />
             <span class="font-medium">
               {{ reward.type === 'item' ? reward.quantity : reward.amount }}
             </span>

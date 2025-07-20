@@ -1,15 +1,35 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import Avatar from '@/Components/UI/Avatar.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import Modal from '@/Components/UI/Modal.vue';
-import Avatar from '@/Components/UI/Avatar.vue';
 import CPBadge from '@/Components/UI/CPBadge.vue';
-import { getPokemonImageUrl } from '@/utils/marketplace';
+import Modal from '@/Components/UI/Modal.vue';
 import type { PageProps } from '@/types';
-import type { User } from '@/types/user';
 import type { Club, ClubRequest } from '@/types/club';
+import type { User } from '@/types/user';
+import { getPokemonImageUrl } from '@/utils/marketplace';
+import { Head, router } from '@inertiajs/vue3';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Crown,
+  DoorOpen,
+  Home,
+  Info,
+  Plus,
+  Send,
+  Settings,
+  Swords,
+  Trash2,
+  TrendingUp,
+  Trophy,
+  UserMinus,
+  Users,
+  X
+} from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 
 interface Props extends PageProps {
   club: Club & {
@@ -170,7 +190,7 @@ const formatNumber = (num: number) => {
       <div class="flex justify-center pt-8 px-4">
         <div class="text-center">
           <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            🏆 {{ club.name.toUpperCase() }}
+            <Trophy :size="20" class="inline" /> {{ club.name.toUpperCase() }}
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             CLUB POKÉMON
@@ -186,13 +206,13 @@ const formatNumber = (num: number) => {
             size="sm"
             class="w-full mb-4"
           >
-            ← Retour aux clubs
+            <ArrowLeft :size="16" class="inline" /> Retour aux clubs
           </Button>
 
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
             <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">ℹ️</span>
+                <Info :size="16" class="inline" />
                 INFORMATIONS
               </h3>
             </div>
@@ -208,7 +228,9 @@ const formatNumber = (num: number) => {
                     @error="(e) => { if (e.target) (e.target as HTMLElement).style.display = 'none' }"
                   />
                   <span v-else-if="club.icon && !club.icon.includes('/')">{{ club.icon }}</span>
-                  <span v-else class="text-2xl">🏆</span>
+                  <span v-else class="text-2xl">
+                    <Trophy :size="24" class="inline" />
+                  </span>
                 </div>
                 <div class="flex-1 min-w-0">
                   <h2 class="font-bold text-lg text-primary truncate">{{ club.name }}</h2>
@@ -238,7 +260,7 @@ const formatNumber = (num: number) => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">⚙️</span>
+                <Settings :size="16" class="inline" />
                 ACTIONS
               </h3>
             </div>
@@ -251,7 +273,7 @@ const formatNumber = (num: number) => {
                 size="sm"
                 class="w-full"
               >
-                ➕ Demander à Rejoindre
+                <Plus :size="16" class="inline" /> Demander à Rejoindre
               </Button>
 
               <Button
@@ -261,7 +283,7 @@ const formatNumber = (num: number) => {
                 class="w-full"
                 disabled
               >
-                📤 Demande Envoyée
+                <Send :size="16" class="inline" /> Demande Envoyée
               </Button>
 
               <Button
@@ -271,7 +293,7 @@ const formatNumber = (num: number) => {
                 size="sm"
                 class="w-full"
               >
-                🚪 Quitter le Club
+                <DoorOpen :size="16" class="inline" /> Quitter le Club
               </Button>
 
               <Button
@@ -281,7 +303,7 @@ const formatNumber = (num: number) => {
                 size="sm"
                 class="w-full"
               >
-                👑 Actions du Chef
+                <Crown :size="16" class="inline" /> Actions du Chef
               </Button>
 
               <Button
@@ -291,7 +313,7 @@ const formatNumber = (num: number) => {
                 size="sm"
                 class="w-full"
               >
-                📝 Demandes ({{ pendingRequestsCount }})
+                <Send :size="16" class="inline" /> Demandes ({{ pendingRequestsCount }})
               </Button>
             </div>
           </div>
@@ -301,7 +323,7 @@ const formatNumber = (num: number) => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">👥</span>
+                <Users :size="16" class="inline" />
                 MEMBRES DU CLUB
               </h3>
             </div>
@@ -325,7 +347,7 @@ const formatNumber = (num: number) => {
                       <div class="min-w-0">
                         <div class="font-bold text-base truncate flex items-center gap-2">
                           {{ member.username }}
-                          <span v-if="member.id === club.leader_id" class="text-warning">👑</span>
+                          <span v-if="member.id === club.leader_id" class="text-warning"><Crown :size="16" /></span>
                         </div>
                         <div class="text-sm text-base-content/70">
                           Niveau {{ member.level }}
@@ -334,7 +356,7 @@ const formatNumber = (num: number) => {
                     </div>
 
                     <div class="flex-1 flex justify-end items-center gap-2">
-                      <span class="text-sm font-medium text-base-content/70">⚔️ CP</span>
+                      <span class="text-sm font-medium text-base-content/70"><Swords :size="14" class="inline" /> CP</span>
                       <CPBadge :cp="(member.pokedex || []).filter(p => p.pokemon).reduce((total, p) => {
                         const cp = (p as any).cp || 0;
                         return total + cp;
@@ -356,7 +378,7 @@ const formatNumber = (num: number) => {
                         variant="outline"
                         size="sm"
                       >
-                        🚫 Expulser
+                        <UserMinus :size="16" class="inline" /> Expulser
                       </Button>
                     </div>
                   </div>
@@ -403,7 +425,9 @@ const formatNumber = (num: number) => {
               </div>
 
               <div v-else class="text-center py-12">
-                <div class="text-6xl mb-4">👥</div>
+                <div class="text-6xl mb-4">
+                  <Users :size="36" class="inline" />
+                </div>
                 <p class="text-base-content/70 text-lg mb-2">Aucun membre dans ce club</p>
                 <p class="text-base-content/50">Le club est vide pour le moment.</p>
               </div>
@@ -417,7 +441,7 @@ const formatNumber = (num: number) => {
                   variant="ghost"
                   size="sm"
                 >
-                  ←
+                  <ArrowLeft :size="16" class="inline" />
                 </Button>
 
                 <span v-for="page in totalPages" :key="page">
@@ -437,7 +461,7 @@ const formatNumber = (num: number) => {
                   variant="ghost"
                   size="sm"
                 >
-                  →
+                  <ArrowRight :size="16" class="inline" />
                 </Button>
               </div>
             </div>
@@ -455,7 +479,7 @@ const formatNumber = (num: number) => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">📈</span>
+                <TrendingUp :size="16" class="inline" />
                 STATISTIQUES
               </h3>
             </div>
@@ -488,7 +512,7 @@ const formatNumber = (num: number) => {
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-gradient-to-br from-info/20 to-info/40 rounded-lg flex items-center justify-center">
-            <span class="text-lg">📝</span>
+            <Send :size="16" class="inline" />
           </div>
           <div>
             <h3 class="text-xl font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent">
@@ -524,20 +548,22 @@ const formatNumber = (num: number) => {
               variant="success"
               size="sm"
             >
-              ✅ Accepter
+              <Check :size="16" class="inline" /> Accepter
             </Button>
             <Button
               @click="rejectRequest(request.id)"
               variant="outline"
               size="sm"
             >
-              ❌ Refuser
+              <X :size="16" class="inline" /> Refuser
             </Button>
           </div>
         </div>
 
         <div v-if="pendingRequests.length === 0" class="text-center py-8">
-          <div class="text-6xl mb-4">📭</div>
+          <div class="text-6xl mb-4">
+            <Send :size="36" class="inline" />
+          </div>
           <p class="text-base-content/70">Aucune demande en attente</p>
         </div>
       </div>
@@ -547,7 +573,7 @@ const formatNumber = (num: number) => {
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
-            <span class="text-lg">⚠️</span>
+            <AlertTriangle :size="16" class="inline" />
           </div>
           <div>
             <h3 class="text-xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent">
@@ -572,14 +598,14 @@ const formatNumber = (num: number) => {
             size="md"
             class="!border-error !text-error hover:!bg-error hover:!text-white"
           >
-            🚫 Confirmer l'Expulsion
+            <UserMinus :size="16" class="inline" /> Confirmer l'Expulsion
           </Button>
           <Button
             @click="showRemoveMemberModal = false"
             variant="outline"
             size="md"
           >
-            ❌ Annuler
+            <X :size="16" class="inline" /> Annuler
           </Button>
         </div>
       </div>
@@ -589,7 +615,7 @@ const formatNumber = (num: number) => {
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-            <span class="text-lg">👑</span>
+            <Crown :size="16" class="inline" />
           </div>
           <div>
             <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
@@ -629,7 +655,7 @@ const formatNumber = (num: number) => {
                 variant="primary"
                 size="sm"
               >
-                👑 Choisir comme Chef
+                <Crown :size="16" class="inline" /> Choisir comme Chef
               </Button>
             </div>
           </div>
@@ -646,12 +672,14 @@ const formatNumber = (num: number) => {
             size="md"
             class="!border-error !text-error hover:!bg-error hover:!text-white"
           >
-            🗑️ Détruire le Club
+            <Trash2 :size="16" class="inline" /> Détruire le Club
           </Button>
         </div>
 
         <div v-if="club.members && club.members.length === 1" class="text-center py-4">
-          <div class="text-6xl mb-4">🏚️</div>
+          <div class="text-6xl mb-4">
+            <Home :size="36" class="inline" />
+          </div>
           <p class="text-base-content/70">Vous êtes le seul membre du club</p>
         </div>
       </div>
@@ -661,7 +689,7 @@ const formatNumber = (num: number) => {
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
-            <span class="text-lg">🗑️</span>
+            <Trash2 :size="16" class="inline" />
           </div>
           <div>
             <h3 class="text-xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent">
@@ -673,7 +701,9 @@ const formatNumber = (num: number) => {
       </template>
 
       <div class="text-center">
-        <div class="text-6xl mb-4">⚠️</div>
+        <div class="text-6xl mb-4">
+          <AlertTriangle :size="36" class="inline" />
+        </div>
         <p class="text-lg mb-4">
           Êtes-vous sûr de vouloir détruire le club <strong class="text-primary">{{ club.name }}</strong> ?
         </p>
@@ -688,14 +718,14 @@ const formatNumber = (num: number) => {
             size="md"
             class="!border-error !text-error hover:!bg-error hover:!text-white"
           >
-            🗑️ Confirmer la Destruction
+            <Trash2 :size="16" class="inline" /> Confirmer la Destruction
           </Button>
           <Button
             @click="showDestroyClubModal = false"
             variant="primary"
             size="md"
           >
-            ❌ Annuler
+            <X :size="16" class="inline" /> Annuler
           </Button>
         </div>
       </div>

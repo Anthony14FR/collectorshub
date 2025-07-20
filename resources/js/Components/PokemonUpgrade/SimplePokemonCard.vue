@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { PokedexEntry } from '@/types/user';
+import { Heart, Sparkles } from 'lucide-vue-next';
 
 interface Props {
   entry: PokedexEntry;
@@ -31,10 +32,10 @@ const cardSizeClasses = {
   >
     <div class="absolute top-0.5 sm:top-1 right-0.5 sm:right-1 flex flex-col gap-0.5 sm:gap-1">
       <div v-if="entry.pokemon?.is_shiny" class="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-        <span class="text-yellow-400 text-[8px] sm:text-xs">✨</span>
+        <Sparkles :size="12" class="text-yellow-400" />
       </div>
       <div v-if="entry.is_favorite" class="w-3 h-3 sm:w-4 sm:h-4 bg-red-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-red-500/30">
-        <span class="text-red-400 text-[8px] sm:text-xs">❤️</span>
+        <Heart :size="12" class="text-red-400" />
       </div>
     </div>
 

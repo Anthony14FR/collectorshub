@@ -3,9 +3,17 @@ import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { useMatomoTracking } from '@/composables/useMatomoTracking';
+import { Head, Link, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  Gamepad2,
+  Key,
+  Lock,
+  Mail,
+  Unlock
+} from 'lucide-vue-next';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 
 interface Props {
   status?: string;
@@ -68,18 +76,18 @@ const submit = () => {
         <div class="text-center mb-8">
           <Link href="/"
                 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:from-secondary hover:to-primary transition-all duration-300 tracking-wider">
-            🎮 CollectorsHub
+            <Gamepad2 :size="32" class="inline" /> CollectorsHub
           </Link>
           <div class="mt-6">
             <div
               class="bg-secondary/20 border border-secondary/50 rounded-full p-4 w-20 h-20 mx-auto flex items-center justify-center mb-4">
-              <span class="text-4xl">🔑</span>
+              <Key :size="40" />
             </div>
             <h2 class="text-2xl font-bold text-base-content tracking-wider">
               MOT DE PASSE OUBLIÉ
             </h2>
             <p class="mt-2 text-sm text-base-content/70">
-              Pas de souci, nous allons vous aider ! 🔐
+              Pas de souci, nous allons vous aider ! <Lock :size="14" class="inline" />
             </p>
           </div>
         </div>
@@ -92,7 +100,7 @@ const submit = () => {
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
           <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🔓</span>
+              <Unlock :size="18" />
               RÉCUPÉRATION DE COMPTE
             </h3>
           </div>
@@ -128,7 +136,7 @@ const submit = () => {
                 Envoi en cours...
               </span>
               <span v-else class="flex items-center justify-center">
-                <span class="text-lg mr-2">📧</span>
+                <Mail :size="18" class="mr-2" />
                 Envoyer le lien de récupération
               </span>
             </Button>
@@ -136,7 +144,7 @@ const submit = () => {
             <div class="text-center pt-4 border-t border-base-300/50">
               <Link href="/login"
                     class="text-sm text-base-content/70 hover:text-base-content transition-colors inline-flex items-center">
-                <span class="text-lg mr-2">←</span>
+                <ArrowLeft :size="18" class="mr-2" />
                 Retour à la connexion
               </Link>
             </div>
@@ -144,7 +152,7 @@ const submit = () => {
 
           <div v-else class="p-6 text-center">
             <div class="space-y-4">
-              <div class="text-6xl">📧</div>
+              <Mail :size="64" class="mx-auto text-base-content/30" />
               <h4 class="text-lg font-semibold text-base-content">
                 Vérifiez votre boîte email
               </h4>
@@ -157,7 +165,7 @@ const submit = () => {
             <div class="mt-6 pt-4 border-t border-base-300/50 space-y-3">
               <Link href="/login"
                     class="inline-flex items-center text-sm text-base-content/70 hover:text-base-content transition-colors">
-                <span class="text-lg mr-2">←</span>
+                <ArrowLeft :size="18" class="mr-2" />
                 Retour à la connexion
               </Link>
               <br>
@@ -177,15 +185,16 @@ const submit = () => {
             </p>
             <a href="mailto:contact@collectorshub.fr"
                class="inline-flex items-center text-sm text-primary hover:text-secondary transition-colors">
-              <span class="text-lg mr-2">📧</span>
+              <Mail :size="18" class="mr-2" />
               contact@collectorshub.fr
             </a>
           </div>
         </div>
 
         <div class="text-center mt-4">
-          <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors">
-            ← Retour à l'accueil
+          <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors inline-flex items-center">
+            <ArrowLeft :size="16" class="mr-1" />
+            Retour à l'accueil
           </Link>
         </div>
       </div>

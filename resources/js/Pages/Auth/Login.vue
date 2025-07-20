@@ -4,9 +4,13 @@ import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { useMatomoTracking } from '@/composables/useMatomoTracking';
+import { Head, Link, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  Gamepad2, Lock, Rocket
+} from 'lucide-vue-next';
+import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 
 interface Props {
   canResetPassword?: boolean;
@@ -87,7 +91,7 @@ const submit = () => {
         <div class="text-center mb-8">
           <Link href="/"
                 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:from-secondary hover:to-primary transition-all duration-300 tracking-wider">
-            🎮 CollectorsHub
+            <Gamepad2 :size="32" class="inline" /> CollectorsHub
           </Link>
           <h2 class="mt-6 text-2xl font-bold text-base-content tracking-wider">
             CONNEXION
@@ -112,7 +116,7 @@ const submit = () => {
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
           <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🔐</span>
+              <Lock :size="18" />
               CONNEXION CLASSIQUE
             </h3>
           </div>
@@ -156,14 +160,18 @@ const submit = () => {
                 </svg>
                 Connexion...
               </span>
-              <span v-else>🚀 Se connecter</span>
+              <span v-else class="flex items-center justify-center">
+                <Rocket :size="18" class="mr-2" />
+                Se connecter
+              </span>
             </Button>
           </form>
         </div>
 
         <div class="text-center mt-6">
-          <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors">
-            ← Retour à l'accueil
+          <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors inline-flex items-center">
+            <ArrowLeft :size="16" class="mr-1" />
+            Retour à l'accueil
           </Link>
         </div>
       </div>

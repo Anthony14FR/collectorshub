@@ -1,11 +1,10 @@
 <script setup lang="ts">
 interface Props {
-  rarity: string;
+  rarity?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg';
-  variant?: 'filled' | 'outlined';
 }
 
-const { rarity, size = 'sm', variant = 'filled' } = defineProps<Props>();
+const { rarity, size = 'sm' } = defineProps<Props>();
 
 const sizeClasses = {
   xxs: 'h-3 px-1 text-[8px]',
@@ -55,7 +54,7 @@ const getRarityConfig = (rarity: string) => {
   }
 };
 
-const config = getRarityConfig(rarity);
+const config = getRarityConfig(rarity || 'normal');
 </script>
 
 <template>

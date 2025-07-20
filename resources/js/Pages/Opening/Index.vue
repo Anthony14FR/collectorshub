@@ -6,6 +6,12 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import { Head, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  Gamepad2,
+  PartyPopper,
+  Zap
+} from 'lucide-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
 import type { PageProps } from '@/types';
@@ -227,7 +233,7 @@ const goBack = () => {
         <div class="text-center sm:mt-0 mt-14">
           <h1
             class="sm:text-2xl text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-1 tracking-wider">
-            ⚡ INVOCATION
+            <Zap :size="24" class="inline" /> INVOCATION
           </h1>
           <p class="sm:text-xs text-[10px] text-base-content/70 uppercase tracking-wider">
             Choisissez votre type de ball et la quantité
@@ -237,7 +243,7 @@ const goBack = () => {
 
       <div class="absolute sm:left-8 left-4 sm:top-20 top-4">
         <Button @click="goBack" variant="ghost" size="sm" class="!bg-base-100/60 !backdrop-blur-sm">
-          ← Retour
+          <ArrowLeft :size="16" class="inline" /> Retour
         </Button>
       </div>
 
@@ -245,7 +251,7 @@ const goBack = () => {
         <div class="flex-1 w-full max-w-md px-4 md:px-0 mt-8 md:mt-0 block sm:hidden mb-16">
           <div
             class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
-            <div class="text-7xl mb-4 animate-pulse">🎰</div>
+            <Gamepad2 :size="80" class="mx-auto mb-4 animate-pulse text-accent" />
             <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">
               Machine à Invocation</h2>
             <p class="text-base-content/70 text-center mb-2">
@@ -310,7 +316,7 @@ const goBack = () => {
         <div class="flex-1 w-full max-w-md px-4 md:px-0 mt-8 md:mt-0 hidden sm:block">
           <div
             class="bg-base-100/70 backdrop-blur-md rounded-2xl border border-base-300/30 shadow-lg flex flex-col items-center justify-center py-12 px-6">
-            <div class="text-7xl mb-4 animate-pulse">🎰</div>
+            <Gamepad2 :size="80" class="mx-auto mb-4 animate-pulse text-accent" />
             <h2 class="text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-2">
               Machine à Invocation</h2>
             <p class="text-base-content/70 text-center mb-2">
@@ -434,7 +440,7 @@ const goBack = () => {
       <template #header>
         <div class="text-center">
           <h2 class="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-            🎉 Résumé de l'invocation
+            <PartyPopper :size="24" class="inline" /> Résumé de l'invocation
           </h2>
           <p class="text-base-content/70 mt-2">
             {{ transformedResults.length }} nouveau{{ transformedResults.length > 1 ? 'x' : '' }} Pokémon ajouté{{
@@ -452,7 +458,7 @@ const goBack = () => {
         </div>
         <div class="text-center mt-8">
           <Button @click="closeResults" variant="primary" size="lg" class="min-w-48">
-            🎉 Parfait !
+            <PartyPopper :size="20" class="inline" /> Parfait !
           </Button>
         </div>
       </template>

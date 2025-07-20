@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
-import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
-import Button from '@/Components/UI/Button.vue';
-import Input from '@/Components/UI/Input.vue';
-import Select from '@/Components/UI/Select.vue';
 import PokemonCard from '@/Components/Cards/PokemonCard.vue';
 import UpgradeModal from '@/Components/PokemonUpgrade/UpgradeModal.vue';
 import UpgradeSuccessModal from '@/Components/PokemonUpgrade/UpgradeSuccessModal.vue';
 import Alert from '@/Components/UI/Alert.vue';
+import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import Button from '@/Components/UI/Button.vue';
+import Input from '@/Components/UI/Input.vue';
+import Select from '@/Components/UI/Select.vue';
 import type { PokedexEntry } from '@/types/user';
+import { Head, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  RotateCcw,
+  Search,
+  Star
+} from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue';
 
 declare function route(name: string, params?: Record<string, any>): string;
 
@@ -205,10 +213,10 @@ onMounted(() => {
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 sm:pt-6 mb-4 sm:mb-6">
           <div class="flex items-center gap-2 sm:gap-4">
             <Button @click="goBack" variant="secondary" size="sm" class="shrink-0">
-              ← Retour
+              <ArrowLeft :size="16" class="inline" /> Retour
             </Button>
             <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              ⭐ Amélioration Pokémon
+              <Star :size="24" class="inline" /> Amélioration Pokémon
             </h1>
           </div>
         </div>
@@ -250,7 +258,7 @@ onMounted(() => {
               />
 
               <Button @click="resetFilters" variant="outline" class="w-full h-[42px]">
-                🔄
+                <RotateCcw :size="16" />
               </Button>
             </div>
           </div>
@@ -285,7 +293,7 @@ onMounted(() => {
             </div>
 
             <div v-else class="flex flex-col items-center justify-center py-12 sm:py-20 text-center px-4">
-              <div class="text-4xl sm:text-6xl mb-4">🔍</div>
+              <Search :size="64" class="mx-auto mb-4 text-base-content/30" />
               <h3 class="text-lg sm:text-xl font-bold mb-2">Aucun Pokémon trouvé</h3>
               <p class="text-sm sm:text-base text-base-content/70 mb-4 max-w-md">Essayez de modifier vos filtres de recherche.</p>
               <Button @click="resetFilters" variant="primary">
@@ -303,7 +311,7 @@ onMounted(() => {
                 size="sm"
                 class="px-2 sm:px-3"
               >
-                ←
+                <ChevronLeft :size="16" />
               </Button>
               
               <div class="flex gap-1 items-center">
@@ -319,7 +327,7 @@ onMounted(() => {
                 size="sm"
                 class="px-2 sm:px-3"
               >
-                →
+                <ChevronRight :size="16" />
               </Button>
             </div>
           </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
 import { useMusicPlayer } from '@/composables/useMusicPlayer'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const {
   isPlaying,
@@ -15,8 +15,6 @@ const {
   tracks,
   initAudio,
   toggle,
-  nextTrack,
-  prevTrack,
   setTrack,
   setVolume,
   toggleVisibility,

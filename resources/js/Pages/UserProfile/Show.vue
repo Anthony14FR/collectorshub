@@ -10,6 +10,14 @@ import type { Pokemon } from '@/types/pokemon';
 import type { Success, UserSuccess } from '@/types/success';
 import type { User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  BarChart3,
+  Home,
+  Medal,
+  Target,
+  Trophy
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 
 interface Props extends PageProps {
@@ -73,13 +81,13 @@ const goToMe = () => {
       <div
         class="lg:hidden flex items-center justify-between p-4 bg-base-100/60 backdrop-blur-sm border-b border-base-300/30 relative z-20">
         <Button @click="goBack" variant="outline" size="sm">
-          ← Retour
+          <ArrowLeft :size="16" class="inline" /> Retour
         </Button>
         <h1 class="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           {{ profile_user.username }}
         </h1>
         <Button @click="goToMe" variant="ghost" size="sm">
-          🏠
+          <Home :size="16" />
         </Button>
       </div>
 
@@ -133,16 +141,16 @@ const goToMe = () => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">🎯</span>
+                <Target :size="18" />
                 NAVIGATION
               </h3>
             </div>
             <div class="p-3 space-y-2">
               <Button @click="goBack" variant="outline" size="sm" class="w-full">
-                ← Retour
+                <ArrowLeft :size="16" class="inline" /> Retour
               </Button>
               <Button @click="goToMe" variant="ghost" size="sm" class="w-full">
-                🏠 Mon Profil
+                <Home :size="16" class="inline" /> Mon Profil
               </Button>
             </div>
           </div>
@@ -153,7 +161,7 @@ const goToMe = () => {
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
               <div class="p-3 bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/20">
                 <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                  <span class="text-lg">👤</span>
+                  <User :size="18" />
                   {{ profile_user.username }}
                 </h3>
               </div>
@@ -182,7 +190,7 @@ const goToMe = () => {
               <div class="p-3 bg-gradient-to-r from-accent/10 to-accent/5 border-b border-accent/20">
                 <div class="flex items-center justify-between">
                   <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                    <span class="text-lg">🏆</span>
+                    <Trophy :size="18" />
                     BADGES
                   </h3>
                 </div>
@@ -200,7 +208,7 @@ const goToMe = () => {
                   </div>
                 </div>
                 <div v-else class="text-center py-4">
-                  <div class="text-2xl mb-2">🎯</div>
+                  <Target :size="32" class="mx-auto mb-2 text-base-content/30" />
                   <p class="text-sm text-base-content/50">Aucun badge</p>
                 </div>
               </div>
@@ -213,7 +221,7 @@ const goToMe = () => {
             <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
               <div class="flex items-center justify-between">
                 <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                  <span class="text-lg">🥇</span>
+                  <Medal :size="18" />
                   CLASSEMENTS
                 </h3>
               </div>
@@ -247,7 +255,7 @@ const goToMe = () => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">📊</span>
+                <BarChart3 :size="18" />
                 COLLECTION
               </h3>
             </div>

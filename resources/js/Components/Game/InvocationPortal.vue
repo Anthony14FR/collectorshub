@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import Button from '@/Components/UI/Button.vue';
+import { Star, Target, Zap } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface Props {
   title: string;
@@ -24,7 +25,7 @@ const portalConfig = computed(() => {
       glowColor: 'shadow-warning/30',
       borderColor: 'border-warning/40',
       textColor: 'text-warning',
-      ballEmoji: '🏐',
+      ballComponent: 'Volleyball',
       ringGradient: 'from-warning to-error',
       particleColor: 'bg-warning/60'
     };
@@ -35,7 +36,7 @@ const portalConfig = computed(() => {
     glowColor: 'shadow-primary/30',
     borderColor: 'border-primary/40',
     textColor: 'text-primary',
-    ballEmoji: '⚾',
+    ballComponent: 'Circle',
     ringGradient: 'from-primary to-secondary',
     particleColor: 'bg-primary/60'
   };
@@ -113,8 +114,8 @@ const getRarityChances = () => {
       </div>
 
       <div class="text-center mb-8">
-        <div class="text-6xl mb-4 animate-bounce">
-          {{ portalConfig.ballEmoji }}
+        <div class="text-6xl mb-4 animate-bounce flex justify-center">
+          <component :is="portalConfig.ballComponent" :size="64" :class="portalConfig.textColor" />
         </div>
         <h2 :class="['text-2xl font-bold mb-2', portalConfig.textColor]">
           {{ title }}
@@ -149,7 +150,14 @@ const getRarityChances = () => {
           class="w-full relative overflow-hidden"
         >
           <span class="relative z-10 flex items-center justify-center gap-2">
-            <span>{{ isAnimating ? '⚡ Invocation...' : '🎯 Invoquer x1' }}</span>
+            <span v-if="isAnimating" class="flex items-center gap-2">
+              <Zap :size="16" />
+              Invocation...
+            </span>
+            <span v-else class="flex items-center gap-2">
+              <Target :size="16" />
+              Invoquer x1
+            </span>
             <span v-if="!canInvoke(1)" class="text-xs bg-error/20 text-error px-2 py-1 rounded-full">
               {{ quantity < 1 ? 'Aucune ball' : 'Indisponible' }}
             </span>
@@ -164,7 +172,14 @@ const getRarityChances = () => {
           class="w-full relative overflow-hidden"
         >
           <span class="relative z-10 flex items-center justify-center gap-2">
-            <span>{{ isAnimating ? '⚡ Invocation...' : '🌟 Invoquer x10' }}</span>
+            <span v-if="isAnimating" class="flex items-center gap-2">
+              <Zap :size="16" />
+              Invocation...
+            </span>
+            <span v-else class="flex items-center gap-2">
+              <Star :size="16" />
+              Invoquer x10
+            </span>
             <span v-if="canInvoke(10)" class="text-xs bg-success/20 text-success px-2 py-1 rounded-full">
               Meilleur !
             </span>

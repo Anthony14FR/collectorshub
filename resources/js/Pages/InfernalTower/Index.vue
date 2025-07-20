@@ -2,7 +2,13 @@
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue'
 import Button from '@/Components/UI/Button.vue'
 import { Head, router } from '@inertiajs/vue3'
+import {
+  ArrowLeft,
+  Flame,
+  Swords
+} from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
+
 
 import TeamManagementModal from '@/Components/Game/TeamManagementModal.vue'
 import TowerLevelCard from '@/Components/InfernalTower/TowerLevelCard.vue'
@@ -185,13 +191,13 @@ const attemptLevel = async () => {
     setTimeout(() => {
       if (data.success) {
         const rewardsText = [
-          data.rewards.pokeballs ? `🎾 ${data.rewards.pokeballs} Pokeballs` : '',
-          data.rewards.masterballs ? `🔮 ${data.rewards.masterballs} Masterballs` : '',
-          data.rewards.money ? `💰 ${data.rewards.money}💰` : '',
-          data.rewards.exp ? `⭐ ${data.rewards.exp} EXP` : ''
+          data.rewards.pokeballs ? `${data.rewards.pokeballs} Pokeballs` : '',
+          data.rewards.masterballs ? `${data.rewards.masterballs} Masterballs` : '',
+          data.rewards.money ? `${data.rewards.money} Cash` : '',
+          data.rewards.exp ? `${data.rewards.exp} EXP` : ''
         ].filter(Boolean).join(' • ');
 
-        showMessage(`🎉 VICTOIRE ! Niveau ${userCurrentLevel.value} vaincu !\n🎁 Récompenses: ${rewardsText}`, 'success');
+        showMessage(`VICTOIRE ! Niveau ${userCurrentLevel.value} vaincu !\nRécompenses: ${rewardsText}`, 'success');
 
         router.reload({
           only: ['user', 'pokedex', 'teamPokemons', 'currentLevel', 'levels', 'dailyDefeats', 'userTeamCp'],
@@ -207,7 +213,7 @@ const attemptLevel = async () => {
         });
       } else {
         userDailyDefeats.value = data.daily_defeats;
-        showMessage(`💥 DÉFAITE ! ${data.message}\n🔥 Défaites restantes: ${data.daily_defeats}/10`, 'error');
+        showMessage(`DÉFAITE ! ${data.message}\nDéfaites restantes: ${data.daily_defeats}/10`, 'error');
       }
 
       setTimeout(() => {
@@ -219,7 +225,7 @@ const attemptLevel = async () => {
 
   } catch (error) {
     console.error('Erreur lors du combat:', error);
-    showMessage('❌ Erreur lors du combat', 'error');
+    showMessage('Erreur lors du combat', 'error');
     battleResult.value = 'defeat';
     setTimeout(() => {
       isAttempting.value = false;
@@ -245,11 +251,11 @@ const goBack = () => {
       <div class="w-full max-w-7xl mx-auto px-4 lg:px-6 pb-16">
         <div class="flex items-center gap-4 pt-6 mb-6">
           <Button @click="goBack" variant="outline" size="sm" class="shrink-0">
-            ← Retour
+            <ArrowLeft :size="16" class="inline" /> Retour
           </Button>
           <div>
             <h1 class="text-2xl lg:text-3xl font-bold ">
-              🔥 Tour Infernale
+              <Flame :size="24" class="inline" /> Tour Infernale
             </h1>
             <p class="text-base-content/60 text-sm mt-1">Défiez les dresseurs les plus puissants</p>
           </div>
@@ -349,8 +355,8 @@ const goBack = () => {
 
                 <Button @click="attemptLevel" :disabled="userDailyDefeats <= 0 || isAttempting"
                         :variant="userDailyDefeats <= 0 ? 'outline' : 'primary'" size="lg" class="min-w-[200px]">
-                  <span v-if="isAttempting">⚔️ Combat en cours...</span>
-                  <span v-else-if="userDailyDefeats > 0">⚔️ Combattre</span>
+                  <span v-if="isAttempting"><Swords :size="16" class="inline" /> Combat en cours...</span>
+                  <span v-else-if="userDailyDefeats > 0"><Swords :size="16" class="inline" /> Combattre</span>
                   <span v-else>Plus de tentatives</span>
                 </Button>
                 <div v-if="userDailyDefeats <= 0" class="text-xs text-error mt-2">
@@ -392,7 +398,7 @@ const goBack = () => {
             <div class="flex items-center gap-2">
               <div
                 class="w-8 h-8 rounded-lg bg-gradient-to-br from-error/20 to-accent/20 flex items-center justify-center border border-error/20">
-                <span class="text-lg">⚔️</span>
+                <span class="text-lg"><Swords :size="20" /></span>
               </div>
               <h3 class="text-2xl font-bold">
                 Prochains défis

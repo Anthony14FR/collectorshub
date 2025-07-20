@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import type { Leaderboards } from '@/types/leaderboard';
+import { Award, BookOpen, Coins, Medal, Star, Trophy } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+
+type TabType = 'cash' | 'experience' | 'pokemon_count';
 
 interface Props {
   leaderboards: Leaderboards;
@@ -8,23 +11,34 @@ interface Props {
 
 const { leaderboards } = defineProps<Props>();
 
-const activeTab = ref<'cash' | 'experience' | 'pokemon_count'>('cash');
+const tabs: TabType[] = ['cash', 'experience', 'pokemon_count'];
+const activeTab = ref<TabType>('cash');
 
 const currentLeaderboard = computed(() => {
-  return leaderboards[activeTab.value];
+  return leaderboards[activeTab.value] || {
+    top: [],
+    current_user: {
+      rank: 0,
+      id: 0,
+      username: '',
+      level: 0,
+      value: 0
+    }
+  };
 });
 
-const formatValue = (value: number, type: string) => {
+const formatValue = (value: number | undefined, type: TabType) => {
+  const safeValue = value || 0;
   if (type === 'cash') {
-    return value.toLocaleString() + ' ₽';
+    return safeValue.toLocaleString() + ' ₽';
   } else if (type === 'experience') {
-    return value.toLocaleString() + ' XP';
+    return safeValue.toLocaleString() + ' XP';
   } else {
-    return value.toString();
+    return safeValue.toString();
   }
 };
 
-const getTabTitle = (tab: string) => {
+const getTabTitle = (tab: TabType) => {
   switch (tab) {
   case 'cash':
     return 'Argent';
@@ -37,16 +51,16 @@ const getTabTitle = (tab: string) => {
   }
 };
 
-const getTabIcon = (tab: string) => {
+const getTabIcon = (tab: TabType) => {
   switch (tab) {
   case 'cash':
-    return '💰';
+    return Coins;
   case 'experience':
-    return '⭐';
+    return Star;
   case 'pokemon_count':
-    return '📚';
+    return BookOpen;
   default:
-    return '';
+    return Trophy;
   }
 };
 </script>
@@ -55,15 +69,15 @@ const getTabIcon = (tab: string) => {
   <div class="bg-base-100/80 backdrop-blur-sm rounded-xl p-4 border border-base-300">
     <div class="tabs tabs-boxed mb-4">
       <button
-        v-for="tab in ['cash', 'experience', 'pokemon_count']"
+        v-for="tab in tabs"
         :key="tab"
         :class="[
           'tab flex items-center gap-2',
           activeTab === tab ? 'tab-active' : ''
         ]"
-        @click="activeTab = tab as any"
+        @click="activeTab = tab"
       >
-        <span>{{ getTabIcon(tab) }}</span>
+        <component :is="getTabIcon(tab)" :size="16" />
         <span class="hidden sm:inline">{{ getTabTitle(tab) }}</span>
       </button>
     </div>
@@ -100,7 +114,10 @@ const getTabIcon = (tab: string) => {
               entry.rank === 3 ? 'bg-orange-600 text-white' :
               'bg-base-300 text-base-content'
             ]">
-              {{ entry.rank }}
+              <Trophy v-if="entry.rank === 1" :size="12" />
+              <Medal v-else-if="entry.rank === 2" :size="12" />
+              <Award v-else-if="entry.rank === 3" :size="12" />
+              <span v-else>{{ entry.rank }}</span>
             </div>
             <div>
               <div class="text-sm font-medium">{{ entry.username }}</div>

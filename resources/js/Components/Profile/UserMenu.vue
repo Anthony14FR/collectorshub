@@ -3,6 +3,7 @@ import Button from '@/Components/UI/Button.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import type { User } from '@/types/user';
 import { Link, router } from '@inertiajs/vue3';
+import { Coins, Zap } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 interface Props {
@@ -28,7 +29,7 @@ const logout = () => {
         <div class="flex items-center gap-3">
           <div
             class="w-8 h-8 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-lg flex items-center justify-center">
-            <span class="text-lg">⚡</span>
+            <Zap :size="20" class="text-secondary" />
           </div>
           <h3 class="text-xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
             Menu Principal
@@ -55,8 +56,8 @@ const logout = () => {
                   <span class="text-xs bg-gradient-to-r from-primary/20 to-secondary/20 px-2 py-1 rounded-full">
                     Niveau {{ user.level || 1 }}
                   </span>
-                  <span class="text-xs bg-gradient-to-r from-accent/20 to-success/20 px-2 py-1 rounded-full">
-                    {{ user.cash || 0 }} 💰
+                  <span class="text-xs bg-gradient-to-r from-accent/20 to-success/20 px-2 py-1 rounded-full flex items-center gap-1">
+                    {{ user.cash || 0 }} <Coins :size="12" />
                   </span>
                 </div>
               </div>

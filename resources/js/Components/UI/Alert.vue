@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { AlertTriangle, CheckCircle, Info, XCircle } from 'lucide-vue-next';
+
 interface Props {
   type?: 'info' | 'success' | 'warning' | 'error';
   variant?: 'filled' | 'outlined' | 'ghost';
@@ -33,22 +35,22 @@ const typeConfig = {
   info: {
     color: 'info',
     icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-    emoji: 'ℹ️'
+    iconComponent: Info
   },
   success: {
     color: 'success',
     icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-    emoji: '✅'
+    iconComponent: CheckCircle
   },
   warning: {
     color: 'warning',
     icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z',
-    emoji: '⚠️'
+    iconComponent: AlertTriangle
   },
   error: {
     color: 'error',
     icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
-    emoji: '❌'
+    iconComponent: XCircle
   }
 };
 
@@ -93,7 +95,7 @@ const sizeClasses = {
         <div class="flex-shrink-0 mt-0.5">
           <div v-if="icon || !$slots.icon"
                :class="`w-6 h-6 rounded-lg bg-${typeConfig[type].color}/20 flex items-center justify-center`">
-            <span v-if="!icon" class="text-sm">{{ typeConfig[type].emoji }}</span>
+            <component v-if="!icon" :is="typeConfig[type].iconComponent" :size="16" />
             <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icon"/>
             </svg>

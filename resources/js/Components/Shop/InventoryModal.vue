@@ -1,6 +1,7 @@
 <script setup>
-import { computed } from 'vue';
 import Modal from '@/Components/UI/Modal.vue';
+import { Box } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 const props = defineProps({
   show: {
@@ -54,7 +55,7 @@ const sortedInventory = computed(() => {
     <template #header>
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-gradient-to-br from-success/20 to-success/40 rounded-lg flex items-center justify-center">
-          <span class="text-lg">📦</span>
+          <Box :size="20" class="text-success" />
         </div>
         <div class="flex flex-col">
           <h3 class="text-xl font-bold bg-gradient-to-r from-success to-success/80 bg-clip-text text-transparent">
@@ -97,7 +98,7 @@ const sortedInventory = computed(() => {
       </div>
 
       <div v-else class="text-center py-8">
-        <p class="text-2xl mb-2">📦</p>
+        <Box :size="20" class="text-success" />
         <p class="text-sm mb-1">Inventaire vide</p>
         <p class="opacity-70 text-xs">Achetez des items pour les voir ici</p>
       </div>
