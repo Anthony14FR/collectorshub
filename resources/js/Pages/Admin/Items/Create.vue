@@ -227,7 +227,6 @@ const submit = () => {
                   </div>
                 </div>
 
-                <!-- Effets -->
                 <div
                   v-if="effectFields.length > 0"
                   class="space-y-4"
@@ -289,7 +288,6 @@ const submit = () => {
                   </div>
                 </div>
 
-                <!-- Actions -->
                 <div
                   class="flex justify-end gap-3 pt-6 border-t border-base-300/30"
                 >
