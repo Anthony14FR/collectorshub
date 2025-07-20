@@ -83,10 +83,10 @@ const showTeamCP = computed(() => {
     </div>
 
     <div class="text-center">
-      <h2 class="text-3xl font-bold text-base-content mb-2">
+      <h2 class="text-3xl font-bold text-base-content mb-2 drop-shadow-sm">
         {{ user.username }}
       </h2>
-      <div class="text-lg text-base-content/70">Maître Dresseur</div>
+      <div class="text-lg text-base-content/80 font-semibold">Maître Dresseur</div>
       <Button
         v-if="onOpenPokedexModal"
         @click="onOpenPokedexModal"

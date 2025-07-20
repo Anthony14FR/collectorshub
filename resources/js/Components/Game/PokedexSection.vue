@@ -15,7 +15,7 @@ const { pokedex = [], onOpenModal } = defineProps<Props>();
     class="h-full flex flex-col rounded-xl overflow-hidden shadow-lg bg-cover bg-center relative"
     style="background-image: url('/images/background/pokedex.jpg');"
   >
-    <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-full border border-white/20">
+    <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm text-white text-sm font-semibold px-2.5 py-1 rounded-full border border-white/20">
       {{ pokedex.length }} Capturés
     </div>
     <div class="flex items-center p-3 bg-black/30 border-b-2 border-black/20">

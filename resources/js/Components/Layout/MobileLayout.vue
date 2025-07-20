@@ -143,7 +143,7 @@ const handleBonusClaimed = (_data: any) => {
               <img src="/images/items/pokeball.png" alt="pokeball" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-white">Invocation</h3>
             </div>
-            <p class="text-xs text-white/80 mb-auto">Nouveaux Pokémon</p>
+            <p class="text-sm text-white/90 mb-auto font-medium">Nouveaux Pokémon</p>
             <Button @click="goToInvocation" variant="invocation" size="sm" class="w-full text-xs py-1.5">
               Invoquer
             </Button>
@@ -159,7 +159,7 @@ const handleBonusClaimed = (_data: any) => {
               <img src="/images/icons/marketplace.png" alt="Marketplace" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-warning">Market</h3>
             </div>
-            <p class="text-xs text-white/80 mb-auto">Acheter & vendre</p>
+            <p class="text-sm text-white/90 mb-auto font-medium">Acheter & vendre</p>
             <Button v-if="onGoToMarketplace" @click="onGoToMarketplace" variant="invocation" size="sm"
                     class="w-full text-xs py-1.5">
               Explorer
@@ -183,7 +183,7 @@ const handleBonusClaimed = (_data: any) => {
               <img src="/images/icons/success.webp" alt="Badges" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-info">Badges</h3>
             </div>
-            <p class="text-xs text-white/80 mb-auto">Vos succès</p>
+            <p class="text-sm text-white/90 mb-auto font-medium">Vos succès</p>
             <Button v-if="onOpenBadgesModal" @click="onOpenBadgesModal" variant="secondary" size="sm"
                     class="w-full text-xs py-1.5">
               Voir
@@ -205,7 +205,7 @@ const handleBonusClaimed = (_data: any) => {
               <img src="/images/icons/friends.png" alt="Amis" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-secondary">Amis</h3>
             </div>
-            <p class="text-xs text-white/80 mb-auto">Gérer mes amis</p>
+            <p class="text-sm text-white/90 mb-auto font-medium">Gérer mes amis</p>
             <Button v-if="onOpenFriendsModal" @click="onOpenFriendsModal" variant="secondary" size="sm"
                     class="w-full text-xs py-1.5">
               Voir
@@ -221,7 +221,7 @@ const handleBonusClaimed = (_data: any) => {
               <StarsBadge :stars="6" class="scale-75" />
               <h3 class="text-sm font-bold text-white ml-1">Upgrade</h3>
             </div>
-            <p class="text-xs text-white/90 mb-auto">Améliorer Pokémon</p>
+            <p class="text-sm text-white/90 mb-auto font-medium">Améliorer Pokémon</p>
             <Button @click="goToPokemonUpgrade" variant="secondary" size="sm" class="w-full text-xs py-1.5">
               Améliorer
             </Button>
@@ -256,7 +256,7 @@ const handleBonusClaimed = (_data: any) => {
               <img src="/images/icons/classement.png" alt="Classement" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-primary">Ranking</h3>
             </div>
-            <p class="text-xs text-white/80 mb-auto">Top 100</p>
+            <p class="text-sm text-white/90 mb-auto font-medium">Top 100</p>
             <Button v-if="onGoToLeaderboard" @click="onGoToLeaderboard" variant="leaderboard" size="sm"
                     class="w-full text-xs py-1.5">
               Voir
@@ -279,7 +279,7 @@ const handleBonusClaimed = (_data: any) => {
               <img src="/images/icons/treasure-map.webp" alt="Expedition" class="w-5 h-5 mr-2">
               <h3 class="text-sm font-bold text-success">Expéditions</h3>
             </div>
-            <p class="text-xs text-white/80 mb-auto">Aventures</p>
+            <p class="text-sm text-white/90 mb-auto font-medium">Aventures</p>
             <Button v-if="onGoToExpeditions" @click="onGoToExpeditions" variant="secondary" size="sm"
                     class="w-full text-xs py-1.5">
               Partir
@@ -304,7 +304,7 @@ const handleBonusClaimed = (_data: any) => {
               <span class="text-lg mr-2">🔥</span>
               <h3 class="text-sm font-bold text-error">Tour Infernale</h3>
             </div>
-            <p class="text-xs text-white/80 mb-auto">Défis épiques</p>
+            <p class="text-sm text-white/90 mb-auto font-medium">Défis épiques</p>
             <Button v-if="onGoToTower" @click="onGoToTower" variant="secondary" size="sm" class="w-full text-xs py-1.5">
               Défier
             </Button>
