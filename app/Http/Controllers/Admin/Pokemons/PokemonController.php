@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Pokemons;
 use App\Http\Controllers\Controller;
 use App\Models\Pokemon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class PokemonController extends Controller
@@ -235,8 +236,17 @@ class PokemonController extends Controller
     public function destroy(Pokemon $pokemon)
     {
         try {
-            $pokemon->delete();
-
+            DB::transaction(function () use ($pokemon) {
+                $pokemon->pokedex()->each(function ($pokedex) {
+                    $pokedex->statBoost()?->delete();
+                    $pokedex->expeditionPokemons()->delete();
+                    $pokedex->delete();
+                });
+                $pokemon->marketplace()->delete();
+                Pokemon::where('evolution_id', $pokemon->id)->update(['evolution_id' => null]);
+                Pokemon::where('pre_evolution_id', $pokemon->id)->update(['pre_evolution_id' => null]);
+                $pokemon->delete();
+            });
             return redirect()->route('admin.pokemons.index')
                 ->with('success', 'Pokémon supprimé avec succès');
         } catch (\Exception $e) {
