@@ -25,7 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $table = 'users';
 
-    public const ROLES = ['user', 'premium', 'admin'];
+    public const ROLES = ['user', 'admin'];
     public const STATUSES = ['active', 'suspended', 'banned'];
 
     protected $fillable = [

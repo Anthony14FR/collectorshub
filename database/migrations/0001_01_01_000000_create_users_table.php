@@ -20,7 +20,7 @@ return new class () extends Migration {
             $table->integer('experience')->default(0);
             $table->integer('cash')->default(0);
             $table->timestamp('last_login')->nullable();
-            $table->enum('role', ['user', 'premium', 'admin'])->default('user');
+            $table->enum('role', ['user', 'admin'])->default('user');
             $table->enum('status', ['active', 'suspended', 'banned'])->default('active');
             $table->timestamps();
         });

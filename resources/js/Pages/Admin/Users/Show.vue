@@ -11,7 +11,6 @@ const { user } = defineProps<{
 const getRoleColor = (role: string) => {
   switch (role) {
   case 'admin': return 'text-error bg-error/10 border-error/20';
-  case 'premium': return 'text-warning bg-warning/10 border-warning/20';
   default: return 'text-info bg-info/10 border-info/20';
   }
 };
