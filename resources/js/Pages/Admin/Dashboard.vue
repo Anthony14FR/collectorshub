@@ -2,7 +2,8 @@
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import { Head, router } from '@inertiajs/vue3';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
+import { Users, Map, Store, BadgePercent, ShoppingBag, Trophy, Settings, BookUser, ListChecks } from 'lucide-vue-next';
 
 interface Props {
   auth: {
@@ -23,6 +24,8 @@ interface Props {
     pending_tickets: number;
     shop_items: number;
     clubsCount: number;
+    totalPromoCodes: number;
+    totalSuccess: number;
   };
 }
 
@@ -32,70 +35,61 @@ const adminSections = ref([
   {
     title: 'Utilisateurs',
     description: 'Gérer les comptes, rôles et permissions',
-    icon: '👥',
+    icon: Users,
     route: '/admin/users',
     color: 'info',
     stat: props.stats?.total_users || 0,
     statLabel: 'Total'
   },
   {
-    title: 'Expéditions',
-    description: 'Gérer les expéditions et leurs récompenses',
-    icon: '🗺️',
-    route: '/admin/expeditions',
-    color: 'primary',
-    stat: props.stats?.total_expeditions || 0,
-    statLabel: 'Total'
-  },
-  {
-    title: 'Marketplace',
-    description: 'Modérer les annonces et transactions',
-    icon: '🏪',
-    route: '/admin/marketplace',
-    color: 'warning',
-    stat: props.stats?.marketplace_listings || 0,
-    statLabel: 'Annonces'
-  },
-  {
     title: 'Pokémon',
     description: 'Base de données et statistiques',
-    icon: '⚡',
+    icon: BookUser,
     route: '/admin/pokemons',
     color: 'error',
     stat: props.stats?.total_pokemons || 0,
     statLabel: 'En base'
   },
   {
-    title: 'Support',
-    description: 'Tickets et demandes utilisateurs',
-    icon: '🎫',
-    route: '/admin/support',
-    color: 'secondary',
-    stat: props.stats?.pending_tickets || 7,
-    statLabel: 'En attente'
+    title: 'Expéditions',
+    description: 'Gérer les expéditions et leurs récompenses',
+    icon: Map,
+    route: '/admin/expeditions',
+    color: 'primary',
+    stat: props.stats?.total_expeditions || 0,
+    statLabel: 'Total'
   },
   {
-    title: 'Boutique',
+    title: 'Codes promo',
+    description: 'Gestion des codes promotionnels',
+    icon: BadgePercent,
+    route: '/admin/promocodes',
+    color: 'secondary',
+    stat: props.stats?.totalPromoCodes || 0,
+    statLabel: 'Codes'
+  },
+  {
+    title: 'Items',
     description: 'Items et configuration shop',
-    icon: '🛍️',
+    icon: ShoppingBag,
     route: '/admin/items',
     color: 'success',
-    stat: props.stats?.shop_items || 42,
+    stat: props.stats?.shop_items || 0,
     statLabel: 'Items'
   },
   {
-    title: 'Système',
-    description: 'Logs et maintenance serveur',
-    icon: '⚙️',
-    route: '/admin/system',
+    title: 'Succès',
+    description: 'Gestion des succès et badges',
+    icon: ListChecks,
+    route: '/admin/success',
     color: 'accent',
-    stat: props.stats?.active_users || 0,
-    statLabel: 'Actifs'
+    stat: props.stats?.totalSuccess || 0,
+    statLabel: 'Succès'
   },
   {
     title: 'Clubs',
     description: 'Gestion des clubs et modération',
-    icon: '🏆',
+    icon: Trophy,
     route: '/admin/clubs',
     color: 'info',
     stat: props.stats?.clubsCount || 0,
@@ -104,7 +98,7 @@ const adminSections = ref([
   {
     title: 'Configuration',
     description: 'Paramètres de récompenses et probabilités',
-    icon: '🎮',
+    icon: Settings,
     route: '/admin/game-configuration',
     color: 'success',
     stat: 3,
@@ -113,14 +107,9 @@ const adminSections = ref([
 ]);
 
 const quickTools = ref([
-  { icon: '🗑️', label: 'Cache', route: '/admin/cache/clear' },
-  { icon: '💾', label: 'Backup', route: '/admin/backup' },
+  { icon: Store, label: 'Cache', route: '/admin/cache/clear' },
+  { icon: ListChecks, label: 'Logs', route: '/admin/logs' },
 ]);
-
-const isMaintenanceMode = ref(false);
-const isLoadingMaintenance = ref(false);
-const showMaintenanceConfirm = ref(false);
-const maintenanceAction = ref<'enable' | 'disable'>('enable');
 
 const notifications = ref<Array<{
   id: string;
@@ -200,58 +189,6 @@ const clearCache = async () => {
     showNotification('error', 'Erreur lors du vidage du cache');
   }
 };
-
-const checkMaintenanceStatus = async () => {
-  try {
-    const response = await fetch('/admin/maintenance/status');
-    const data = await response.json();
-    isMaintenanceMode.value = data.is_maintenance;
-  } catch (error) {
-    console.error('Erreur lors de la vérification du statut de maintenance:', error);
-  }
-};
-
-const toggleMaintenance = () => {
-  maintenanceAction.value = isMaintenanceMode.value ? 'disable' : 'enable';
-  showMaintenanceConfirm.value = true;
-};
-
-const confirmMaintenanceAction = async () => {
-  isLoadingMaintenance.value = true;
-  showMaintenanceConfirm.value = false;
-
-  try {
-    const endpoint = maintenanceAction.value === 'enable' ? '/admin/maintenance/enable' : '/admin/maintenance/disable';
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': getCsrfToken(),
-      },
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      isMaintenanceMode.value = maintenanceAction.value === 'enable';
-      showNotification('success', data.message);
-    } else {
-      showNotification('error', data.message);
-    }
-  } catch (error) {
-    showNotification('error', 'Erreur lors de la modification du mode maintenance');
-  } finally {
-    isLoadingMaintenance.value = false;
-  }
-};
-
-const cancelMaintenanceAction = () => {
-  showMaintenanceConfirm.value = false;
-};
-
-onMounted(() => {
-  checkMaintenanceStatus();
-});
 </script>
 
 <template>
@@ -266,7 +203,7 @@ onMounted(() => {
         <div class="text-center">
           <h1
             class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider">
-            🔧 DASHBOARD ADMIN
+            <component :is="Settings" :size="28" class="inline align-middle mr-2" /> Dashboard Admin
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             Gestion de la plateforme
@@ -278,22 +215,13 @@ onMounted(() => {
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
           <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📊</span>
-              STATISTIQUES
+              <component :is="ListChecks" :size="18" class="inline align-middle mr-2" /> Statistiques
             </h3>
           </div>
           <div class="p-3 space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-xs text-base-content/70">Utilisateurs</span>
               <span class="text-sm font-bold text-info">{{ props.stats?.total_users || 0 }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-base-content/70">Actifs</span>
-              <span class="text-sm font-bold text-success">{{ props.stats?.active_users || 0 }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-base-content/70">Marketplace</span>
-              <span class="text-sm font-bold text-warning">{{ props.stats?.marketplace_listings || 0 }}</span>
             </div>
             <div class="flex justify-between items-center">
               <span class="text-xs text-base-content/70">Pokémon</span>
@@ -303,42 +231,36 @@ onMounted(() => {
               <span class="text-xs text-base-content/70">Expéditions</span>
               <span class="text-sm font-bold text-primary">{{ props.stats?.total_expeditions || 0 }}</span>
             </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-base-content/70">Items</span>
+              <span class="text-sm font-bold text-success">{{ props.stats?.shop_items || 0 }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-base-content/70">Clubs</span>
+              <span class="text-sm font-bold text-info">{{ props.stats?.clubsCount || 0 }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-base-content/70">Codes promo</span>
+              <span class="text-sm font-bold text-secondary">{{ props.stats?.totalPromoCodes || 0 }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-base-content/70">Succès</span>
+              <span class="text-sm font-bold text-accent">{{ props.stats?.totalSuccess || 0 }}</span>
+            </div>
           </div>
         </div>
 
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
           <div class="p-3 bg-gradient-to-r from-accent/10 to-accent/5 border-b border-accent/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🛠️</span>
-              OUTILS RAPIDES
+              <component :is="Store" :size="18" class="inline align-middle mr-2" /> Outils rapides
             </h3>
           </div>
           <div class="p-3 space-y-2">
             <Button v-for="tool in quickTools" :key="tool.route" @click="goToSection(tool.route)" variant="outline"
                     size="sm" class="w-full justify-start">
-              {{ tool.icon }} {{ tool.label }}
+              <component :is="tool.icon" :size="16" class="mr-2" /> {{ tool.label }}
             </Button>
-
-            <div class="pt-2 border-t border-base-300/30">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs text-base-content/70">Mode Maintenance</span>
-                <div class="flex items-center gap-2">
-                  <span :class="[
-                    'text-xs px-2 py-1 rounded-full',
-                    isMaintenanceMode ? 'bg-error/20 text-error' : 'bg-success/20 text-success'
-                  ]">
-                    {{ isMaintenanceMode ? 'ACTIF' : 'INACTIF' }}
-                  </span>
-                </div>
-              </div>
-
-              <Button @click="toggleMaintenance" :disabled="isLoadingMaintenance"
-                      :variant="isMaintenanceMode ? 'secondary' : 'outline'" size="sm" class="w-full justify-start">
-                <span v-if="isLoadingMaintenance">⏳</span>
-                <span v-else>🔧</span>
-                {{ isLoadingMaintenance ? 'Chargement...' : (isMaintenanceMode ? 'Désactiver' : 'Activer') }}
-              </Button>
-            </div>
           </div>
         </div>
       </div>
@@ -347,8 +269,7 @@ onMounted(() => {
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
           <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">👤</span>
-              ADMIN INFO
+              <component :is="Users" :size="18" class="inline align-middle mr-2" /> Admin info
             </h3>
           </div>
           <div class="p-3">
@@ -365,19 +286,15 @@ onMounted(() => {
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
           <div class="p-3 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🚨</span>
-              ACTIONS
+              <component :is="BadgePercent" :size="18" class="inline align-middle mr-2" /> Actions
             </h3>
           </div>
           <div class="p-3 space-y-2">
             <Button @click="goBack" variant="secondary" size="sm" class="w-full">
-              ← Retour au profil
-            </Button>
-            <Button @click="goToSection('/admin/logs')" variant="outline" size="sm" class="w-full">
-              📝 Voir les logs
+              <component :is="Map" :size="16" class="inline align-middle mr-2" /> Retour au profil
             </Button>
             <Button @click="router.visit('/admin/notifications/create')" variant="outline" size="sm" class="w-full">
-              📢 Créer une annonce
+              <component :is="BadgePercent" :size="16" class="inline align-middle mr-2" /> Créer une annonce
             </Button>
           </div>
         </div>
@@ -388,8 +305,7 @@ onMounted(() => {
           class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
           <div class="shrink-0 p-3 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🎛️</span>
-              MODULES ADMINISTRATION
+              <component :is="Settings" :size="18" class="inline align-middle mr-2" /> Modules administration
             </h3>
           </div>
 
@@ -398,7 +314,9 @@ onMounted(() => {
               <div v-for="section in adminSections" :key="section.route" @click="goToSection(section.route)"
                    class="group bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 cursor-pointer hover:scale-105">
                 <div class="flex items-start justify-between mb-3">
-                  <div class="text-2xl">{{ section.icon }}</div>
+                  <div class="text-2xl">
+                    <component :is="section.icon" :size="24" />
+                  </div>
                   <div class="text-right">
                     <div :class="[
                       'text-lg font-bold',
@@ -436,39 +354,6 @@ onMounted(() => {
             <div class="text-xs text-center text-base-content/70">
               {{ adminSections.length }} modules d'administration disponibles
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal de confirmation pour la maintenance -->
-    <div v-if="showMaintenanceConfirm" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div class="bg-base-100 rounded-xl p-6 max-w-md w-full mx-4 border border-base-300">
-        <div class="text-center">
-          <div class="text-4xl mb-4">⚠️</div>
-          <h3 class="text-lg font-bold mb-2">Confirmation requise</h3>
-          <p class="text-base-content/70 mb-6">
-            Êtes-vous sûr de vouloir
-            <span :class="maintenanceAction === 'enable' ? 'text-error font-bold' : 'text-success font-bold'">
-              {{ maintenanceAction === 'enable' ? 'ACTIVER' : 'DÉSACTIVER' }}
-            </span>
-            le mode maintenance ?
-          </p>
-
-          <div v-if="maintenanceAction === 'enable'" class="bg-error/10 border border-error/20 rounded-lg p-3 mb-4">
-            <p class="text-sm text-error">
-              ⚠️ Cela rendra le site inaccessible aux utilisateurs
-            </p>
-          </div>
-
-          <div class="flex gap-3">
-            <Button @click="cancelMaintenanceAction" variant="outline" class="flex-1">
-              Annuler
-            </Button>
-            <Button @click="confirmMaintenanceAction"
-                    :variant="maintenanceAction === 'enable' ? 'secondary' : 'primary'" class="flex-1">
-              Confirmer
-            </Button>
           </div>
         </div>
       </div>
