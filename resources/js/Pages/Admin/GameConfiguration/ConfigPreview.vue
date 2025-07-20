@@ -7,15 +7,15 @@
         </div>
         <div class="flex items-center gap-3 text-xs">
           <span v-if="reward.cash > 0" class="flex items-center gap-1">
-            <span class="text-success">💰</span>
+            <component :is="DollarSign" :size="12" class="text-success" />
             {{ reward.cash }}
           </span>
           <span v-if="reward.pokeballs > 0" class="flex items-center gap-1">
-            <span class="text-info">⚪</span>
+            <component :is="Circle" :size="12" class="text-info" />
             {{ reward.pokeballs }}
           </span>
           <span v-if="reward.masterballs > 0" class="flex items-center gap-1">
-            <span class="text-warning">🟣</span>
+            <component :is="Sparkles" :size="12" class="text-warning" />
             {{ reward.masterballs }}
           </span>
         </div>
@@ -28,7 +28,7 @@
         <div class="grid grid-cols-2 gap-2">
           <div v-for="(prob, rarity) in ball" :key="rarity" class="flex items-center justify-between p-1 bg-base-200/30 rounded">
             <span class="flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full" :class="getRarityColor(rarity)"></span>
+              <div class="w-2 h-2 rounded-full" :class="getRarityColor(rarity)"></div>
               {{ getRarityLabel(rarity) }}
             </span>
             <span class="font-mono">{{ prob }}%</span>
@@ -40,7 +40,7 @@
     <div v-else-if="config.category === 'xp_rewards'" class="space-y-2">
       <div v-for="(rewards, rarity) in config.value" :key="rarity" class="border border-base-300/30 rounded p-2">
         <div class="flex items-center gap-2 mb-2">
-          <span class="w-3 h-3 rounded-full" :class="getRarityColor(rarity)"></span>
+          <div class="w-3 h-3 rounded-full" :class="getRarityColor(rarity)"></div>
           <span class="font-bold text-primary">{{ getRarityLabel(rarity) }}</span>
         </div>
         <div class="grid grid-cols-3 gap-2 text-xs">
@@ -67,6 +67,8 @@
 </template>
 
 <script setup lang="ts">
+import { DollarSign, Circle, Sparkles } from 'lucide-vue-next'
+
 interface GameConfig {
   id: number
   category: string
@@ -111,4 +113,4 @@ const getRarityColor = (rarity: string): string => {
   }
   return colors[rarity] || 'bg-gray-400'
 }
-</script> 
+</script>

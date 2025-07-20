@@ -8,6 +8,7 @@ import Badge from '@/Components/UI/Badge.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import Pagination from '@/Components/UI/Pagination.vue';
+import { Ticket, Home, Plus, Eye, Edit, Trash2, AlertTriangle, Search, Filter, RotateCcw, ChevronUp, ChevronDown, Users, Gift } from 'lucide-vue-next';
 
 const props = defineProps({
   auth: Object,
@@ -73,7 +74,7 @@ const confirmDelete = (promoCode) => {
 
 const deletePromoCode = () => {
   if (!promocodeToDelete.value) return;
-  
+
   isLoading.value = true;
   router.delete(`/admin/promocodes/${promocodeToDelete.value.id}`, {
     onSuccess: () => {
@@ -115,7 +116,7 @@ const toggleStatus = (promoCode) => {
 
 const applyFilters = () => {
   const params = {};
-  
+
   if (search.value) params.search = search.value;
   if (isActiveFilter.value) params.is_active = isActiveFilter.value;
   if (isGlobalFilter.value) params.is_global = isGlobalFilter.value;
@@ -174,267 +175,260 @@ const getUsersLabel = (promoCode) => {
 <template>
   <Head title="Gestion des Codes Promo" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden flex flex-col">
-      <div class="shrink-0 p-4 bg-base-200/50 backdrop-blur-md border-b border-base-300/30">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div>
-            <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-wider">
-              🎟️ GESTION DES CODES PROMO
-            </h1>
-            <p class="text-xs text-base-content/70 uppercase tracking-wider">
-              Création et gestion des codes promotionnels
-            </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <Link href="/admin">
-              <Button variant="ghost" size="sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/admin/promocodes/create">
-              <Button variant="primary" size="sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Nouveau Code
-              </Button>
-            </Link>
-          </div>
+    <div class="relative z-10 min-h-screen w-full">
+      <div class="flex justify-center pt-6 mb-6">
+        <div class="text-center">
+          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider">
+            <component :is="Ticket" :size="28" class="inline align-middle mr-2" />
+            GESTION DES CODES PROMO
+          </h1>
+          <p class="text-xs text-base-content/70 uppercase tracking-wider">
+            Création et gestion des codes promotionnels
+          </p>
         </div>
       </div>
 
-      <Toast 
-        v-if="showToast"
-        :show="showToast"
-        type="success"
-        title="Succès"
-        :message="toastMessage"
-        @close="showToast = false"
-      />
-      
-      <Alert v-if="notification" :variant="notification.type" class="fixed top-4 right-4 z-50">
-        {{ notification.message }}
-      </Alert>
+      <div class="container mx-auto px-4 max-w-7xl">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-6">
 
-      <div class="p-4 border-b border-base-300/30 bg-base-200/30">
-        <div class="max-w-7xl mx-auto flex flex-wrap gap-4">
-          <div class="flex-1 min-w-[200px]">
-            <input 
-              type="text" 
-              placeholder="Rechercher un code..."
-              class="w-full px-4 py-2 bg-base-200/50 border border-base-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
-              v-model="search"
-              @keyup.enter="applyFilters"
-            />
-          </div>
-          <div>
-            <select 
-              v-model="isActiveFilter"
-              class="px-4 py-2 bg-base-200/50 border border-base-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
-            >
-              <option value="">Tous les statuts</option>
-              <option value="true">Actifs</option>
-              <option value="false">Inactifs</option>
-            </select>
-          </div>
-          <div>
-            <select 
-              v-model="isGlobalFilter"
-              class="px-4 py-2 bg-base-200/50 border border-base-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
-            >
-              <option value="">Tous les types</option>
-              <option value="true">Globaux</option>
-              <option value="false">Ciblés</option>
-            </select>
-          </div>
-          <div class="flex items-center gap-2">
-            <Button @click="applyFilters" variant="secondary" size="sm">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Filtrer
-            </Button>
-            <Button @click="resetFilters" variant="ghost" size="sm">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Réinitialiser
-            </Button>
-          </div>
-        </div>
-      </div>
+          <div class="xl:col-span-3 order-1 xl:order-1">
+            <div class="space-y-4">
 
-      <div class="flex-1 overflow-auto p-4">
-        <div class="max-w-7xl mx-auto bg-base-200/50 backdrop-blur-sm rounded-2xl border border-base-300/30 overflow-hidden h-full">
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead>
-                <tr class="border-b border-base-300/30">
-                  <th class="text-left py-3 px-4 text-xs font-semibold text-base-content/70 uppercase cursor-pointer" @click="toggleSort('code')">
-                    <div class="flex items-center">
-                      Code
-                      <svg v-if="sortBy === 'code'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'" />
-                      </svg>
-                    </div>
-                  </th>
-                  <th class="text-left py-3 px-4 text-xs font-semibold text-base-content/70 uppercase">Type</th>
-                  <th class="text-left py-3 px-4 text-xs font-semibold text-base-content/70 uppercase cursor-pointer" @click="toggleSort('cash')">
-                    <div class="flex items-center">
-                      Montant
-                      <svg v-if="sortBy === 'cash'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'" />
-                      </svg>
-                    </div>
-                  </th>
-                  <th class="text-left py-3 px-4 text-xs font-semibold text-base-content/70 uppercase">Récompenses</th>
-                  <th class="text-left py-3 px-4 text-xs font-semibold text-base-content/70 uppercase">Cible</th>
-                  <th class="text-left py-3 px-4 text-xs font-semibold text-base-content/70 uppercase cursor-pointer" @click="toggleSort('expires_at')">
-                    <div class="flex items-center">
-                      Expiration
-                      <svg v-if="sortBy === 'expires_at'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'" />
-                      </svg>
-                    </div>
-                  </th>
-                  <th class="text-left py-3 px-4 text-xs font-semibold text-base-content/70 uppercase">Statut</th>
-                  <th class="text-right py-3 px-4 text-xs font-semibold text-base-content/70 uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr 
-                  v-for="promocode in promocodesList" 
-                  :key="promocode.id"
-                  class="border-b border-base-300/20 hover:bg-base-300/10 transition-colors"
-                >
-                  <td class="py-3 px-4">
-                    <div class="font-mono font-bold text-primary">{{ promocode.code }}</div>
-                  </td>
-                  <td class="py-3 px-4">
-                    <Badge :variant="promocode.is_global ? 'info' : 'secondary'" size="sm">
-                      {{ promocode.is_global ? 'Global' : 'Ciblé' }}
-                    </Badge>
-                  </td>
-                  <td class="py-3 px-4 font-medium">
-                    {{ promocode.cash }} 💰
-                  </td>
-                  <td class="py-3 px-4">
-                    {{ getItemsLabel(promocode) }}
-                  </td>
-                  <td class="py-3 px-4">
-                    {{ getUsersLabel(promocode) }}
-                  </td>
-                  <td class="py-3 px-4">
-                    {{ formatDate(promocode.expires_at) }}
-                  </td>
-                  <td class="py-3 px-4">
-                    <Badge :variant="statusBadgeClass(promocode)" size="sm">
-                      {{ statusLabel(promocode) }}
-                    </Badge>
-                  </td>
-                  <td class="py-3 px-4 text-right">
-                    <div class="flex items-center justify-end gap-2">
-                      <Link :href="`/admin/promocodes/${promocode.id}`">
-                        <Button variant="ghost" size="xs">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Ticket" :size="18" />
+                    ACTIONS
+                  </h3>
+                </div>
+                <div class="p-3 space-y-2">
+                  <Link href="/admin/promocodes/create">
+                    <Button variant="secondary" size="sm" class="w-full justify-start mb-2">
+                      <component :is="Plus" :size="16" class="mr-2" /> Créer un code
+                    </Button>
+                  </Link>
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm" class="w-full justify-start">
+                      <component :is="Home" :size="16" class="mr-2" /> Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Ticket" :size="18" />
+                    STATISTIQUES
+                  </h3>
+                </div>
+                <div class="p-4 space-y-3">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-base-content/70">Total</span>
+                    <span class="text-sm font-bold text-info">{{ props.stats?.total || 0 }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-base-content/70">Actifs</span>
+                    <span class="text-sm font-bold text-success">{{ props.stats?.active || 0 }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-base-content/70">Globaux</span>
+                    <span class="text-sm font-bold text-warning">{{ props.stats?.global || 0 }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Filter" :size="18" />
+                    FILTRES
+                  </h3>
+                </div>
+                <div class="p-3 space-y-3">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Rechercher..."
+                      class="w-full px-3 py-2 bg-base-200/50 border border-base-300/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                      v-model="search"
+                      @keyup.enter="applyFilters"
+                    />
+                  </div>
+                  <div>
+                    <select
+                      v-model="isActiveFilter"
+                      class="w-full px-3 py-2 bg-base-200/50 border border-base-300/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                    >
+                      <option value="">Tous les statuts</option>
+                      <option value="true">Actifs</option>
+                      <option value="false">Inactifs</option>
+                    </select>
+                  </div>
+                  <div>
+                    <select
+                      v-model="isGlobalFilter"
+                      class="w-full px-3 py-2 bg-base-200/50 border border-base-300/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                    >
+                      <option value="">Tous les types</option>
+                      <option value="true">Globaux</option>
+                      <option value="false">Ciblés</option>
+                    </select>
+                  </div>
+                  <div class="flex gap-2">
+                    <Button @click="applyFilters" variant="primary" size="sm" class="flex-1">
+                      <component :is="Search" :size="14" class="mr-1" />
+                      Filtrer
+                    </Button>
+                    <Button @click="resetFilters" variant="ghost" size="sm">
+                      <component :is="RotateCcw" :size="14" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="xl:col-span-9 order-2 xl:order-2">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[650px] sm:h-[700px] md:h-[750px] xl:h-[800px] flex flex-col">
+
+              <div class="shrink-0 p-4 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium text-base-content/70">Codes promo:</span>
+                    <span class="text-sm font-bold">{{ promocodesList.length }}</span>
+                    <span class="text-xs text-base-content/50">sur {{ props.promoCodes?.total || 0 }}</span>
+                  </div>
+                  <Link href="/admin/promocodes/create">
+                    <Button variant="primary" size="sm">
+                      <component :is="Plus" :size="16" class="mr-2" />
+                      Créer
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              <div class="flex-1 overflow-y-auto p-6">
+                <Alert v-if="notification" :type="notification.type" :message="notification.message" />
+
+                <div v-if="hasNoPromocodes" class="text-center py-12">
+                  <h3 class="text-xl font-semibold mb-2">Aucun code promo trouvé</h3>
+                  <p class="text-base-content/70 mb-6">Commencez par créer votre premier code promo</p>
+                  <Link href="/admin/promocodes/create">
+                    <Button variant="primary">
+                      <component :is="Plus" :size="20" class="mr-2" />
+                      Créer un code promo
+                    </Button>
+                  </Link>
+                </div>
+
+                <div v-else class="space-y-4">
+                  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div
+                      v-for="promocode in promocodesList"
+                      :key="promocode.id"
+                      class="bg-base-200/30 backdrop-blur-sm rounded-xl border border-base-300/20 p-4 hover:border-primary/40 transition-all duration-200 flex flex-col justify-between min-h-[280px] group hover:scale-105"
+                    >
+                      <div>
+                        <div class="flex items-start justify-between mb-3">
+                          <div class="flex-1">
+                            <h3 class="font-mono font-bold text-lg text-primary group-hover:text-primary-focus transition-colors">
+                              {{ promocode.code }}
+                            </h3>
+                            <div class="flex items-center gap-2 mt-1">
+                              <Badge :variant="promocode.is_global ? 'info' : 'secondary'" size="sm">
+                                {{ promocode.is_global ? 'Global' : 'Ciblé' }}
+                              </Badge>
+                              <Badge :variant="statusBadgeClass(promocode)" size="sm">
+                                {{ statusLabel(promocode) }}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                          <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium">Montant:</span>
+                            <span class="text-sm font-bold text-success">{{ promocode.cash }}</span>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium">Récompenses:</span>
+                            <span class="text-xs text-base-content/70">{{ getItemsLabel(promocode) }}</span>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium">Cible:</span>
+                            <span class="text-xs text-base-content/70">{{ getUsersLabel(promocode) }}</span>
+                          </div>
+                          <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium">Expiration:</span>
+                            <span class="text-xs text-base-content/70">{{ formatDate(promocode.expires_at) }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 pt-2">
+                        <Link :href="`/admin/promocodes/${promocode.id}`" class="flex-1">
+                          <Button variant="ghost" size="sm" class="w-full" title="Voir le code">
+                            <component :is="Eye" :size="16" />
+                          </Button>
+                        </Link>
+                        <Link :href="`/admin/promocodes/${promocode.id}/edit`" class="flex-1">
+                          <Button variant="secondary" size="sm" class="w-full" title="Modifier le code">
+                            <component :is="Edit" :size="16" />
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="error"
+                          size="sm"
+                          @click="confirmDelete(promocode)"
+                          class="flex-1"
+                          title="Supprimer le code"
+                        >
+                          <component :is="Trash2" :size="16" />
                         </Button>
-                      </Link>
-                      <Link :href="`/admin/promocodes/${promocode.id}/edit`">
-                        <Button variant="secondary" size="xs">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </Button>
-                      </Link>
-                      <Button 
-                        @click="confirmDelete(promocode)" 
-                        variant="ghost" 
-                        size="xs"
-                        :disabled="isLoading"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </Button>
+                      </div>
                     </div>
-                  </td>
-                </tr>
-                <tr v-if="hasNoPromocodes">
-                  <td colspan="8" class="py-8 text-center text-base-content/70">
-                    <div class="flex flex-col items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <p>Aucun code promo trouvé</p>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+
+                  <div v-if="props.promoCodes?.links" class="mt-6 flex justify-center">
+                    <Pagination :links="props.promoCodes.links" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div v-if="props.promoCodes?.links" class="shrink-0 p-4 border-t border-base-300/30 flex justify-center">
-        <Pagination :links="props.promoCodes.links" />
       </div>
     </div>
+
+    <Modal :show="showDeleteModal" @close="showDeleteModal = false">
+      <div class="p-6">
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0">
+            <component :is="AlertTriangle" :size="24" class="text-error" />
+          </div>
+          <div class="ml-3">
+            <h3 class="text-lg font-medium text-base-content">Confirmer la suppression</h3>
+          </div>
+        </div>
+        <div class="mt-2">
+          <p class="text-sm text-base-content/70">
+            Êtes-vous sûr de vouloir supprimer le code promo
+            <strong class="font-mono text-primary">{{ promocodeToDelete?.code }}</strong>
+            ? Cette action est irréversible.
+          </p>
+        </div>
+        <div class="mt-6 flex justify-end gap-3">
+          <Button variant="ghost" @click="showDeleteModal = false">Annuler</Button>
+          <Button variant="error" @click="deletePromoCode" :loading="isLoading">
+            <component :is="Trash2" :size="16" class="mr-2" />
+            Supprimer
+          </Button>
+        </div>
+      </div>
+    </Modal>
+
+    <Toast v-if="showToast" :message="toastMessage" @close="showToast = false" />
   </div>
-
-  <Modal :show="showDeleteModal" @close="showDeleteModal = false" max-width="md">
-    <template #header>
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
-          <span class="text-lg">🗑️</span>
-        </div>
-        <div>
-          <h3 class="text-xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent">
-            Confirmer la suppression
-          </h3>
-        </div>
-      </div>
-    </template>
-    
-    <template #default>
-      <div class="space-y-4">
-        <p>
-          Êtes-vous sûr de vouloir supprimer le code promo <span class="font-mono font-bold text-primary">{{ promocodeToDelete?.code }}</span> ?
-        </p>
-        <p class="text-sm text-base-content/70">
-          Cette action est irréversible.
-        </p>
-        
-        <div class="flex gap-3 pt-2">
-          <Button
-            @click="showDeleteModal = false"
-            variant="outline"
-            size="lg"
-            class="flex-1"
-            :disabled="isLoading"
-          >
-            Annuler
-          </Button>
-
-          <Button
-            @click="deletePromoCode"
-            variant="error"
-            size="lg"
-            class="flex-1"
-            :disabled="isLoading"
-          >
-            {{ isLoading ? '🔄 En cours...' : 'Supprimer' }}
-          </Button>
-        </div>
-      </div>
-    </template>
-  </Modal>
 </template>

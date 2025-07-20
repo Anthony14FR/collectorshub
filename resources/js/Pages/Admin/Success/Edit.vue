@@ -6,6 +6,7 @@ import Input from "@/Components/UI/Input.vue";
 import Select from "@/Components/UI/Select.vue";
 import Alert from "@/Components/UI/Alert.vue";
 import BackgroundEffects from "@/Components/UI/BackgroundEffects.vue";
+import { Trophy, ArrowLeft, Plus, X, FileImage, Save, Loader2 } from 'lucide-vue-next';
 
 const props = defineProps({
   success: Object,
@@ -119,11 +120,9 @@ const addRequirement = () => {
   }
   newRequirementValue.value = "";
 };
-
 const removeRequirement = (key) => {
   requirements.value = requirements.value.filter((r) => r.key !== key);
 };
-
 watch(
   requirements,
   (val) => {
@@ -149,35 +148,19 @@ const handleImageChange = (e) => {
   }
 };
 
-watch(
-  () => props.success.image_url,
-  (newVal) => {
-    if (!form.image) {
-      imagePreview.value = newVal || null;
-    }
-  }
-);
-
 const submit = () => {
   isLoading.value = true;
   const formData = new FormData();
   formData.append("title", form.title);
   formData.append("description", form.description);
   formData.append("type", form.type);
+  formData.append("cash_reward", form.cash_reward ?? 0);
+  formData.append("xp_reward", form.xp_reward ?? 0);
+  formData.append("requirements", form.requirements ?? "{}");
   if (form.image) {
     formData.append("image", form.image);
   }
-  try {
-    formData.append(
-      "requirements",
-      JSON.stringify(JSON.parse(form.requirements))
-    );
-  } catch (e) {
-    formData.append("requirements", form.requirements);
-  }
-  formData.append("cash_reward", form.cash_reward);
-  formData.append("xp_reward", form.xp_reward);
-  formData.append("_method", "put");
+  formData.append("_method", "PUT");
   router.post(`/admin/success/${props.success.id}`, formData, {
     onSuccess: () => {
       isLoading.value = false;
@@ -190,399 +173,256 @@ const submit = () => {
 </script>
 
 <template>
-  <Head title="Modifier le Succès" />
-  <div
-    class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative"
-  >
+  <Head title="Modifier un Succès" />
+
+  <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
-    <div
-      class="relative z-10 h-screen w-screen overflow-hidden flex flex-col"
-    >
-      <div
-        class="shrink-0 p-4 bg-base-200/50 backdrop-blur-md border-b border-base-300/30"
-      >
-        <div
-          class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4"
-        >
-          <div>
-            <h1
-              class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-wider"
-            >
-              MODIFIER LE SUCCÈS
-            </h1>
-            <p
-              class="text-xs text-base-content/70 uppercase tracking-wider"
-            >
-              Modifier un succès/badge
-            </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <Link href="/admin/success">
-              <Button variant="ghost" size="sm">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-                Retour
-              </Button>
-            </Link>
-          </div>
+
+    <div class="relative z-10 min-h-screen w-full">
+      <div class="flex justify-center pt-6 mb-6">
+        <div class="text-center">
+          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider">
+            <component :is="Trophy" :size="28" class="inline align-middle mr-2" />
+            MODIFIER UN SUCCÈS
+          </h1>
+          <p class="text-xs text-base-content/70 uppercase tracking-wider">
+            Édition de {{ props.success.title }}
+          </p>
         </div>
       </div>
-      <div class="flex-1 overflow-hidden">
-        <div class="h-full overflow-y-auto p-4">
-          <div class="max-w-2xl mx-auto">
-            <div
-              class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-6"
-            >
-              <form @submit.prevent="submit" class="space-y-6">
-                <div class="space-y-4">
-                  <h3
-                    class="text-lg font-semibold text-base-content"
-                  >
-                    Informations de base
+
+      <div class="container mx-auto px-4 max-w-7xl">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-6">
+
+          <div class="xl:col-span-3 order-1 xl:order-1">
+            <div class="space-y-4">
+
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Trophy" :size="18" />
+                    ACTIONS
                   </h3>
-                  <Input
-                    :model-value="form.title"
-                    @update:model-value="
-                      (val) => (form.title = val)
-                    "
-                    label="Nom du badge/succès"
-                    placeholder="Ex: Collectionneur d'avatars"
-                    :error="props.errors?.title"
-                    required
-                    maxlength="100"
-                  />
-                  <Input
-                    :model-value="form.description"
-                    @update:model-value="
-                      (val) => (form.description = val)
-                    "
-                    label="Description"
-                    placeholder="Ex: Débloque ce badge en collectionnant 10 avatars."
-                    :error="props.errors?.description"
-                    maxlength="250"
-                    type="textarea"
-                  />
-                  <Select
-                    :model-value="form.type"
-                    @update:model-value="
-                      (val) => (form.type = val)
-                    "
-                    label="Type de badge/succès"
-                    :options="typeOptions"
-                    :error="props.errors?.type"
-                    required
-                  />
-                  <Input
-                    :model-value="form.cash_reward"
-                    @update:model-value="
-                      (val) => (form.cash_reward = val)
-                    "
-                    label="Récompense Cash (₽)"
-                    type="number"
-                    min="0"
-                    :error="props.errors?.cash_reward"
-                  />
-                  <Input
-                    :model-value="form.xp_reward"
-                    @update:model-value="
-                      (val) => (form.xp_reward = val)
-                    "
-                    label="Récompense XP"
-                    type="number"
-                    min="0"
-                    :error="props.errors?.xp_reward"
-                  />
-                  <div class="space-y-2">
-                    <label
-                      class="block text-xs font-bold tracking-wider text-base-content/80 uppercase"
-                    >
-                      Image
-                    </label>
-                    <div
-                      v-if="props.success.image_url"
-                      class="mb-2"
-                    >
-                      <img
-                        :src="props.success.image_url"
-                        alt="Image actuelle"
-                        class="w-24 h-24 object-cover rounded-lg border border-base-300/30"
-                      />
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      @change="handleImageChange"
-                      class="w-full px-4 py-3 text-base bg-base-200/50 border border-base-300 focus:border-primary focus:bg-base-200/80 backdrop-blur-sm rounded-lg transition-all duration-200 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-content hover:file:bg-primary-focus"
+                </div>
+                <div class="p-3 space-y-2">
+                  <Link href="/admin/success">
+                    <Button variant="outline" size="sm" class="w-full justify-start">
+                      <component :is="ArrowLeft" :size="16" class="mr-2" /> Retour
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="xl:col-span-9 order-2 xl:order-2">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[650px] sm:h-[700px] md:h-[750px] xl:h-[800px] flex flex-col">
+
+              <div class="shrink-0 p-4 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
+                <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                  <component :is="Trophy" :size="18" />
+                  FORMULAIRE DE MODIFICATION
+                </h3>
+              </div>
+
+              <div class="flex-1 overflow-y-auto p-6">
+                <form @submit.prevent="submit" class="space-y-6">
+                  <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-base-content">Informations de base</h3>
+                    <Input
+                      v-model="form.title"
+                      label="Nom du badge/succès"
+                      placeholder="Ex: Collectionneur débutant"
+                      :error="props.errors?.title"
+                      required
+                      maxlength="100"
                     />
-                    <p
-                      v-if="props.errors?.image"
-                      class="text-xs text-error"
-                    >
-                      {{ props.errors.image }}
-                    </p>
-                  </div>
-                  <div class="space-y-2">
-                    <label
-                      class="block text-xs font-bold tracking-wider text-base-content/80 uppercase mb-1"
-                    >
-                      Conditions de déblocage
-                    </label>
-                    <div
-                      class="flex flex-col w-full gap-3 bg-base-200/60 rounded-lg p-4 border border-base-300/30"
-                    >
-                      <div class="w-full">
-                        <Select
-                          :model-value="
-                            newRequirementKey
-                          "
-                          @update:model-value="
-                            (val) =>
-                              (newRequirementKey =
-                                val)
-                          "
-                          :options="
-                            requirementOptions
-                          "
-                          size="sm"
-                          label="Type de condition"
-                          class="w-full"
-                        />
-                      </div>
-                      <div
-                        v-if="
-                          newRequirementKey ===
-                            'count' ||
-                            newRequirementKey ===
-                            'level' ||
-                            newRequirementKey ===
-                            'pokemon_id'
-                        "
-                        class="w-full"
-                      >
-                        <Input
-                          :model-value="
-                            newRequirementValue
-                          "
-                          @update:model-value="
-                            (val) =>
-                              (newRequirementValue =
-                                val)
-                          "
-                          type="number"
-                          label="Valeur"
-                          size="sm"
-                          class="w-full"
-                        />
-                      </div>
-                      <div
-                        v-else-if="
-                          newRequirementKey ===
-                            'rarity'
-                        "
-                        class="w-full"
-                      >
-                        <Select
-                          :model-value="
-                            newRequirementValue
-                          "
-                          @update:model-value="
-                            (val) =>
-                              (newRequirementValue =
-                                val)
-                          "
-                          :options="rarityOptions"
-                          size="sm"
-                          label="Rareté"
-                          class="w-full"
-                        />
-                      </div>
-                      <div
-                        v-else-if="
-                          newRequirementKey ===
-                            'shiny'
-                        "
-                        class="w-full"
-                      >
-                        <Select
-                          :model-value="
-                            newRequirementValue
-                          "
-                          @update:model-value="
-                            (val) =>
-                              (newRequirementValue =
-                                val)
-                          "
-                          :options="shinyOptions"
-                          size="sm"
-                          label="Shiny ?"
-                          class="w-full"
-                        />
-                      </div>
-                      <div
-                        v-else-if="
-                          newRequirementKey ===
-                            'types'
-                        "
-                        class="flex flex-col w-full gap-2"
-                      >
-                        <Input
-                          :model-value="typeKey"
-                          @update:model-value="
-                            (val) => (typeKey = val)
-                          "
-                          placeholder="Type (ex: Feu)"
-                          size="sm"
-                          class="w-40"
-                          maxlength="20"
-                        />
-                        <Input
-                          :model-value="typeValue"
-                          @update:model-value="
-                            (val) =>
-                              (typeValue = val)
-                          "
-                          type="number"
-                          placeholder="Quantité"
-                          size="sm"
-                          class="w-32"
-                          min="1"
-                        />
-                        <Button
-                          type="button"
-                          size="sm"
-                          class="w-fit"
-                          :disabled="
-                            !typeKey ||
-                              !typeValue ||
-                              typesList.some(
-                                (t) =>
-                                  t.key ===
-                                  typeKey
-                              )
-                          "
-                          @click="addTypeToTypes"
-                        >
-                          <span
-                            class="text-lg leading-none"
-                          >+</span
-                          >
-                        </Button>
+                    <Input
+                      v-model="form.description"
+                      label="Description"
+                      placeholder="Ex: Ajouter 25 Pokémon différents au Pokédex."
+                      :error="props.errors?.description"
+                      maxlength="250"
+                      type="textarea"
+                    />
+                    <Select
+                      v-model="form.type"
+                      label="Type de badge/succès"
+                      :options="typeOptions"
+                      :error="props.errors?.type"
+                      required
+                      placeholder="Choisir un type"
+                    />
+                    <Input
+                      v-model="form.cash_reward"
+                      label="Récompense Cash (₽)"
+                      type="number"
+                      min="0"
+                      :error="props.errors?.cash_reward"
+                      placeholder="Ex: 1000"
+                    />
+                    <Input
+                      v-model="form.xp_reward"
+                      label="Récompense XP"
+                      type="number"
+                      min="0"
+                      :error="props.errors?.xp_reward"
+                      placeholder="Ex: 500"
+                    />
+                    <div class="space-y-2">
+                      <label class="block text-xs font-bold tracking-wider text-base-content/80 uppercase mb-1">
+                        Conditions de déblocage
+                      </label>
+                      <div class="flex flex-col w-full gap-3 bg-base-200/60 rounded-lg p-4 border border-base-300/30">
+                        <div class="w-full">
+                          <Select
+                            v-model="newRequirementKey"
+                            :options="requirementOptions"
+                            size="sm"
+                            label="Type de condition"
+                            class="w-full"
+                          />
+                        </div>
                         <div
-                          v-if="typesList.length"
-                          class="flex flex-wrap gap-2 mt-2"
+                          v-if="newRequirementKey === 'count' || newRequirementKey === 'level' || newRequirementKey === 'pokemon_id'"
+                          class="w-full"
                         >
-                          <span
-                            v-for="t in typesList"
-                            :key="t.key"
-                            class="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 py-1 rounded-full text-xs font-mono hover:bg-primary/20 transition"
+                          <Input
+                            v-model="newRequirementValue"
+                            type="number"
+                            label="Valeur"
+                            size="sm"
+                            class="w-full"
+                          />
+                        </div>
+                        <div v-else-if="newRequirementKey === 'rarity'" class="w-full">
+                          <Select
+                            v-model="newRequirementValue"
+                            :options="rarityOptions"
+                            size="sm"
+                            label="Rareté"
+                            class="w-full"
+                          />
+                        </div>
+                        <div v-else-if="newRequirementKey === 'shiny'" class="w-full">
+                          <Select
+                            v-model="newRequirementValue"
+                            :options="shinyOptions"
+                            size="sm"
+                            label="Shiny ?"
+                            class="w-full"
+                          />
+                        </div>
+                        <div v-else-if="newRequirementKey === 'types'" class="flex flex-col w-full gap-2">
+                          <Input
+                            v-model="typeKey"
+                            placeholder="Type (ex: Feu)"
+                            size="sm"
+                            class="w-40"
+                            maxlength="20"
+                          />
+                          <Input
+                            v-model="typeValue"
+                            type="number"
+                            placeholder="Quantité"
+                            size="sm"
+                            class="w-32"
+                            min="1"
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            class="w-fit"
+                            :disabled="!typeKey || !typeValue || typesList.some((t) => t.key === typeKey)"
+                            @click="addTypeToTypes"
                           >
-                            {{ t.key }}:
-                            {{ t.value }}
+                            <component :is="Plus" :size="16" />
+                          </Button>
+                          <div v-if="typesList.length" class="flex flex-wrap gap-2 mt-2">
+                            <span
+                              v-for="t in typesList"
+                              :key="t.key"
+                              class="flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 py-1 rounded-full text-xs font-mono hover:bg-primary/20 transition"
+                            >
+                              {{ t.key }}: {{ t.value }}
+                              <Button
+                                type="button"
+                                size="2xs"
+                                variant="error"
+                                @click="removeTypeFromTypes(t.key)"
+                              >
+                                <component :is="X" :size="12" />
+                              </Button>
+                            </span>
+                          </div>
+                        </div>
+                        <div class="w-full">
+                          <Button type="button" size="sm" class="w-full" @click="addRequirement">
+                            <component :is="Plus" :size="16" class="mr-2" />
+                            Ajouter la condition
+                          </Button>
+                        </div>
+                        <div v-if="requirements.length" class="flex flex-wrap gap-2 mt-2 w-full">
+                          <span
+                            v-for="req in requirements"
+                            :key="req.key"
+                            class="flex items-center gap-1 bg-primary/10 border border-primary/30 px-3 py-1 rounded-full text-xs font-mono hover:bg-primary/20 transition"
+                          >
+                            <span class="font-bold">
+                              {{ requirementOptions.find((o) => o.value === req.key)?.label || req.key }}
+                            </span>
+                            <span v-if="req.key !== 'types'">: {{ req.value }}</span>
+                            <span v-else>
+                              <span v-for="(v, k) in req.value" :key="k" class="ml-1">
+                                {{ k }}:{{ v }}
+                              </span>
+                            </span>
                             <Button
                               type="button"
                               size="2xs"
                               variant="error"
-                              @click="
-                                removeTypeFromTypes(
-                                  t.key
-                                )
-                              "
-                            >✕</Button
+                              @click="removeRequirement(req.key)"
                             >
+                              <component :is="X" :size="12" />
+                            </Button>
                           </span>
                         </div>
                       </div>
-                      <div class="w-full">
-                        <Button
-                          type="button"
-                          size="sm"
-                          class="w-full"
-                          @click="addRequirement"
-                        >Ajouter la
-                          condition</Button
-                        >
-                      </div>
-                      <div
-                        v-if="requirements.length"
-                        class="flex flex-wrap gap-2 mt-2 w-full"
-                      >
-                        <span
-                          v-for="req in requirements"
-                          :key="req.key"
-                          class="flex items-center gap-1 bg-primary/10 border border-primary/30 px-3 py-1 rounded-full text-xs font-mono hover:bg-primary/20 transition"
-                        >
-                          <span class="font-bold">{{
-                            requirementOptions.find(
-                              (o) =>
-                                o.value ===
-                                req.key
-                            )?.label || req.key
-                          }}</span>
-                          <span
-                            v-if="
-                              req.key !== 'types'
-                            "
-                          >: {{ req.value }}</span
-                          >
-                          <span v-else>
-                            <span
-                              v-for="(
-                                v, k
-                              ) in req.value"
-                              :key="k"
-                              class="ml-1"
-                            >{{ k }}:{{
-                              v
-                            }}</span
-                            >
-                          </span>
-                          <Button
-                            type="button"
-                            size="2xs"
-                            variant="error"
-                            @click="
-                              removeRequirement(
-                                req.key
-                              )
-                            "
-                          >✕</Button
-                          >
-                        </span>
+                    </div>
+                    <div class="space-y-2">
+                      <label class="block text-xs font-bold tracking-wider text-base-content/80 uppercase flex items-center gap-1">
+                        <component :is="FileImage" :size="14" />
+                        Image
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        @change="handleImageChange"
+                        class="w-full px-4 py-3 text-base bg-base-200/50 border border-base-300 focus:border-primary focus:bg-base-200/80 backdrop-blur-sm rounded-lg transition-all duration-200 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-content hover:file:bg-primary-focus"
+                      />
+                      <p v-if="props.errors?.image" class="text-xs text-error">
+                        {{ props.errors.image }}
+                      </p>
+                      <div v-if="imagePreview" class="mt-2">
+                        <img
+                          :src="imagePreview"
+                          alt="Preview"
+                          class="w-24 h-24 object-cover rounded-lg border border-base-300/30"
+                        />
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="flex justify-end gap-3 mt-8">
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    @click="
-                      $inertia.visit('/admin/success')
-                    "
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    :loading="isLoading"
-                  >
-                    Enregistrer
-                  </Button>
-                </div>
-              </form>
+                  <div class="flex justify-end gap-3 mt-8">
+                    <Button variant="ghost" type="button" @click="$inertia.visit('/admin/success')">
+                      Annuler
+                    </Button>
+                    <Button variant="primary" type="submit" :loading="isLoading">
+                      <component :is="isLoading ? Loader2 : Save" :size="16" class="mr-2" :class="{ 'animate-spin': isLoading }" />
+                      {{ isLoading ? 'Mise à jour...' : 'Sauvegarder les modifications' }}
+                    </Button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
