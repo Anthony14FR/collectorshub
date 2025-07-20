@@ -22,12 +22,14 @@ class LeaderboardController extends Controller
         $cpLeaderboard = $this->leaderboardService->getTeamCPLeaderboard($user, 100);
         $pokemonLeaderboard = $this->leaderboardService->getPokemonCountLeaderboard($user, 100);
         $clubLeaderboard = $this->leaderboardService->getClubLeaderboard($user, 100);
+        $infernalTowerLeaderboard = $this->leaderboardService->getInfernalTowerLeaderboard($user, 100);
 
         return Inertia::render('Leaderboard/Index', [
             'levelLeaderboard' => $levelLeaderboard,
             'cpLeaderboard' => $cpLeaderboard,
             'pokemonLeaderboard' => $pokemonLeaderboard,
             'clubLeaderboard' => $clubLeaderboard,
+            'infernalTowerLeaderboard' => $infernalTowerLeaderboard,
         ]);
     }
 }

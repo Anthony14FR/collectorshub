@@ -315,4 +315,65 @@ class LeaderboardService
             'current_user' => $userRank
         ];
     }
+
+    public function getInfernalTowerLeaderboard(User $currentUser, $limit = 100): array
+    {
+        $query = User::where('status', 'active')
+            ->orderBy('infernal_tower_current_level', 'desc');
+
+        if ($limit !== 'all') {
+            $query->limit($limit);
+        }
+
+        $topUsers = $query->get(['id', 'username', 'level', 'avatar', 'background', 'infernal_tower_current_level'])
+            ->map(function ($user, $index) {
+                $towerLevel = \App\Models\InfernalTowerLevel::where('level', $user->infernal_tower_current_level)->first();
+
+                return [
+                    'rank' => $index + 1,
+                    'id' => $user->id,
+                    'username' => $user->username,
+                    'value' => $user->infernal_tower_current_level,
+                    'level' => $user->level,
+                    'avatar' => $user->avatar,
+                    'background' => $user->background,
+                    'tower_level' => $user->infernal_tower_current_level,
+                    'enemy_team' => $towerLevel ? $towerLevel->team : [],
+                    'enemy_team_cp' => $towerLevel ? $towerLevel->team_cp : 0,
+                ];
+            });
+
+        if ($limit === 'all') {
+            return ['top' => $topUsers];
+        }
+
+        $userRank = $this->getUserRankByInfernalTowerLevel($currentUser);
+
+        return [
+            'top' => $topUsers,
+            'current_user' => $userRank
+        ];
+    }
+
+    private function getUserRankByInfernalTowerLevel(User $user): array
+    {
+        $rank = User::where('status', 'active')
+            ->where('infernal_tower_current_level', '>', $user->infernal_tower_current_level)
+            ->count() + 1;
+
+        $towerLevel = \App\Models\InfernalTowerLevel::where('level', $user->infernal_tower_current_level)->first();
+
+        return [
+            'rank' => $rank,
+            'id' => $user->id,
+            'username' => $user->username,
+            'value' => $user->infernal_tower_current_level,
+            'level' => $user->level,
+            'avatar' => $user->avatar,
+            'background' => $user->background,
+            'tower_level' => $user->infernal_tower_current_level,
+            'enemy_team' => $towerLevel ? $towerLevel->team : [],
+            'enemy_team_cp' => $towerLevel ? $towerLevel->team_cp : 0,
+        ];
+    }
 }

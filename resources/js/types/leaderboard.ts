@@ -12,6 +12,9 @@ export interface LeaderboardUser {
     total_cp?: number;
     leader_id?: number;
     icon?: string;
+    tower_level?: number;
+    enemy_team?: any[];
+    enemy_team_cp?: number;
 }
 
 export interface LeaderboardData {
