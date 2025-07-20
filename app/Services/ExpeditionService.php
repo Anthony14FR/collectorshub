@@ -368,4 +368,69 @@ class ExpeditionService
             'pokemons' => $expeditionPokemons->toArray()
         ];
     }
+
+    public function rerollExpeditions(User $user): array
+    {
+        $today = now()->toDateString();
+
+        $lastReroll = $user->last_expedition_reroll;
+
+        if ($lastReroll && $lastReroll->toDateString() === $today) {
+            return [
+                'success' => false,
+                'message' => 'Vous avez déjà utilisé votre reroll aujourd\'hui. Revenez demain !'
+            ];
+        }
+
+        $activeExpeditions = UserExpedition::where('user_id', $user->id)
+            ->whereNotIn('status', ['completed'])
+            ->get();
+
+        $availableExpeditions = $activeExpeditions->where('status', 'available');
+        $inProgressExpeditions = $activeExpeditions->where('status', 'in_progress');
+
+        if ($availableExpeditions->isEmpty()) {
+            return [
+                'success' => false,
+                'message' => 'Aucune expédition disponible à reroll'
+            ];
+        }
+
+        $excludedIds = $inProgressExpeditions->pluck('expedition_id')->toArray();
+
+        $completedExpeditionIds = UserExpedition::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->pluck('expedition_id')
+            ->toArray();
+
+        $excludedIds = array_merge($excludedIds, $completedExpeditionIds);
+
+        $newExpeditions = $this->selectExpeditionsByRarity($excludedIds, $availableExpeditions->count());
+
+        if (count($newExpeditions) !== $availableExpeditions->count()) {
+            return [
+                'success' => false,
+                'message' => 'Impossible de générer de nouvelles expéditions. Réessayez plus tard.'
+            ];
+        }
+
+        DB::transaction(function () use ($user, $availableExpeditions, $newExpeditions, $today) {
+            foreach ($availableExpeditions as $index => $userExpedition) {
+                $userExpedition->update([
+                    'expedition_id' => $newExpeditions[$index]->id,
+                    'date' => $today
+                ]);
+            }
+
+            $user->update([
+                'last_expedition_reroll' => now()
+            ]);
+        });
+
+        return [
+            'success' => true,
+            'message' => 'Expéditions rerollées avec succès !',
+            'rerolled_count' => $availableExpeditions->count()
+        ];
+    }
 }

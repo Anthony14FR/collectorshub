@@ -273,6 +273,45 @@ const getRewardLabel = (type) => {
   default: return type
   }
 }
+
+const canReroll = computed(() => {
+  const user = page.props.auth?.user
+  if (!user) return false
+  
+  const lastReroll = user.last_expedition_reroll
+  if (!lastReroll) return true
+  
+  const today = new Date().toDateString()
+  const lastRerollDate = new Date(lastReroll).toDateString()
+  
+  return today !== lastRerollDate
+})
+
+const rerollExpeditions = async () => {
+  try {
+    const response = await fetch('/expeditions/reroll', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': page.props.csrf_token,
+        'Accept': 'application/json'
+      }
+    })
+    
+    const data = await response.json()
+    
+    if (response.ok && data.success) {
+      showToastMessage(data.message, 'success')
+      refreshExpeditions()
+    } else {
+      const errorMessage = data.message || `Erreur ${response.status}: ${response.statusText}`
+      showToastMessage(errorMessage, 'error')
+    }
+  } catch (error) {
+    console.error('Erreur:', error)
+    showToastMessage('Erreur de connexion lors du reroll', 'error')
+  }
+}
 </script>
 
 <template>
@@ -285,7 +324,7 @@ const getRewardLabel = (type) => {
           <Button @click="goBack" variant="outline" size="sm" class="shrink-0">
             ← Retour
           </Button>
-          <div>
+          <div class="flex-1">
             <h1 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-warning via-warning/90 to-accent bg-clip-text text-transparent">
               🗺️ Expéditions
             </h1>
@@ -430,6 +469,20 @@ const getRewardLabel = (type) => {
           </div>
           <h3 class="text-base font-semibold text-base-content/60 mb-2">Aucune expédition {{ activeTab }}</h3>
           <p class="text-sm text-base-content/40">Revenez plus tard pour de nouvelles aventures !</p>
+        </div>
+
+        <div v-if="canReroll && stats.available > 0" class="mt-8 text-center">
+          <Button 
+            @click="rerollExpeditions"
+            variant="secondary" 
+            size="md" 
+            class="bg-gradient-to-r from-info/20 to-info/10 hover:from-info/30 hover:to-info/20 text-info border-info/30 px-8 py-3"
+          >
+            🔄 {{ stats.inProgress === 0 ? 'Reroll tout' : 'Reroll les expéditions en attente' }}
+          </Button>
+          <p class="text-xs text-base-content/50 mt-2">
+            {{ stats.available }} expédition{{ stats.available > 1 ? 's' : '' }} disponible{{ stats.available > 1 ? 's' : '' }} à reroll
+          </p>
         </div>
       </div>
     </div>
