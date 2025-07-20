@@ -3,6 +3,7 @@ import DurationDisplay from '@/Components/Expeditions/DurationDisplay.vue';
 import RarityBadge from '@/Components/Expeditions/RarityBadge.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import type { ExpeditionRarity } from '@/constants/expedition';
 import {
   getRarityDotColor,
@@ -12,6 +13,7 @@ import {
 } from '@/utils/expedition';
 import { Head, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { Zap, ArrowLeft, Plus, Eye, Edit, Trash2, AlertTriangle, BarChart3, Map, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Filter, RotateCcw, Users, CheckCircle, XCircle, Copy, Home, User } from 'lucide-vue-next';
 
 interface Expedition {
   id: number;
@@ -70,6 +72,8 @@ const sortDirection = ref<'asc' | 'desc'>('asc');
 const rarityFilter = ref<string>(props.filters?.rarity || '');
 const statusFilter = ref<string>(props.filters?.is_active !== undefined ? props.filters.is_active.toString() : '');
 const searchFilter = ref<string>(props.filters?.search || '');
+const showDeleteModal = ref(false);
+const expeditionToDelete = ref<Expedition | null>(null);
 
 const sortedExpeditions = computed(() => {
   if (!sortField.value) return props.expeditions.data;
@@ -99,11 +103,18 @@ const sortedExpeditions = computed(() => {
   return sorted;
 });
 
-const deleteExpedition = (expeditionId: number) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette expédition ?')) {
-    router.delete(`/admin/expeditions/${expeditionId}`, {
+const deleteExpedition = (expedition: Expedition) => {
+  expeditionToDelete.value = expedition;
+  showDeleteModal.value = true;
+};
+
+const confirmDelete = () => {
+  if (expeditionToDelete.value) {
+    router.delete(`/admin/expeditions/${expeditionToDelete.value.id}`, {
       preserveScroll: true
     });
+    showDeleteModal.value = false;
+    expeditionToDelete.value = null;
   }
 };
 
@@ -170,259 +181,210 @@ const clearFilters = () => {
 </script>
 
 <template>
-
   <Head title="Gestion des expéditions" />
 
-  <div class="h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative overflow-hidden">
+  <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-full w-full flex flex-col">
-      <div class="flex justify-center pt-4 mb-4 flex-shrink-0">
+    <div class="relative z-10 min-h-screen w-full">
+      <div class="flex justify-center pt-6 mb-6">
         <div class="text-center">
-          <h1
-            class="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-1 tracking-wider flex items-center gap-2">
-            <svg class="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 20l-5.447-2.724A1 1 0 113 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
-              </path>
-            </svg>
+          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider flex items-center gap-2">
+            <component :is="Map" :size="28" class="inline align-middle mr-2" />
             GESTION EXPÉDITIONS
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
-            {{ expeditions.total }} expédition{{ expeditions.total > 1 ? 's' : '' }} configurée{{ expeditions.total > 1
-              ? 's' : '' }}
+            {{ expeditions.total }} expédition{{ expeditions.total > 1 ? 's' : '' }} configurée{{ expeditions.total > 1 ? 's' : '' }}
           </p>
         </div>
       </div>
 
-      <div class="flex-1 flex flex-col lg:flex-row gap-4 px-2 md:px-4 lg:px-8 min-h-0 pb-4">
-        <div class="flex-1 lg:mr-4 flex flex-col min-h-0" style="max-height: 85vh;">
-          <div
-            class="bg-base-100/60 backdrop-blur-sm rounded-t-xl border border-b-0 border-base-300/30 p-4 flex-shrink-0">
-            <div class="flex flex-wrap gap-4 items-center">
-              <div class="flex items-center gap-2">
-                <label class="text-sm font-medium text-base-content/70">Rareté:</label>
-                <select v-model="rarityFilter" @change="applyFilters"
-                        class="select select-sm select-bordered bg-base-100/80 border-base-300/50 text-sm min-w-[120px]">
-                  <option value="">Toutes</option>
-                  <option v-for="rarity in rarities" :key="rarity" :value="rarity">
-                    {{ getRarityLabel(rarity) }}
-                  </option>
-                </select>
+      <div class="container mx-auto px-4 max-w-7xl">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-6">
+
+          <div class="xl:col-span-3 order-1 xl:order-1">
+            <div class="space-y-4">
+
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Zap" :size="18" />
+                    ACTIONS
+                  </h3>
+                </div>
+                <div class="p-3 space-y-2">
+                  <Button @click="router.visit('/admin/expeditions/create')" variant="primary" size="sm" class="w-full justify-start">
+                    <component :is="Plus" :size="16" class="mr-2" /> Nouvelle expédition
+                  </Button>
+                  <Button @click="router.visit('/admin/')" variant="outline" size="sm" class="w-full justify-start">
+                    <component :is="ArrowLeft" :size="16" class="mr-2" /> Dashboard
+                  </Button>
+                  <Button @click="router.visit('/me')" variant="ghost" size="sm" class="w-full justify-start">
+                    <component :is="User" :size="16" class="mr-2" /> Profil
+                  </Button>
+                </div>
               </div>
 
-              <div class="flex items-center gap-2">
-                <label class="text-sm font-medium text-base-content/70">Statut:</label>
-                <select v-model="statusFilter" @change="applyFilters"
-                        class="select select-sm select-bordered bg-base-100/80 border-base-300/50 text-sm min-w-[100px]">
-                  <option value="">Tous</option>
-                  <option value="true">Active</option>
-                  <option value="false">Inactive</option>
-                </select>
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="BarChart3" :size="18" />
+                    STATISTIQUES
+                  </h3>
+                </div>
+                <div class="p-4 space-y-3">
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-base-200/40 rounded-lg p-2">
+                      <div class="text-base-content/70">Total</div>
+                      <div class="font-bold text-lg">{{ stats.total }}</div>
+                    </div>
+                    <div class="bg-success/10 rounded-lg p-2">
+                      <div class="text-success/70">Actives</div>
+                      <div class="font-bold text-lg text-success">{{ stats.active }}</div>
+                    </div>
+                    <div class="bg-error/10 rounded-lg p-2">
+                      <div class="text-error/70">Inactives</div>
+                      <div class="font-bold text-lg text-error">{{ stats.inactive }}</div>
+                    </div>
+                  </div>
+
+                  <div class="border-t border-base-300/30 pt-3">
+                    <div class="text-xs text-base-content/70 mb-2 font-medium">Par rareté</div>
+                    <div class="space-y-1">
+                      <div v-for="(count, rarity) in stats.by_rarity" :key="rarity"
+                           class="flex justify-between items-center text-xs">
+                        <div class="flex items-center gap-2">
+                          <div class="w-2 h-2 rounded-full" :class="getRarityDotColor(rarity)"></div>
+                          <span>{{ getRarityLabel(rarity) }}</span>
+                        </div>
+                        <span class="font-bold">{{ count }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div class="flex items-center gap-2">
-                <label class="text-sm font-medium text-base-content/70">Recherche:</label>
-                <input v-model="searchFilter" @keyup.enter="applyFilters" type="text"
-                       placeholder="Nom ou description..."
-                       class="input input-sm input-bordered bg-base-100/80 border-base-300/50 text-sm min-w-[200px]" />
-                <Button @click="applyFilters" variant="ghost" size="sm" class="text-primary hover:text-primary">
-                  🔍
-                </Button>
-              </div>
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Filter" :size="18" />
+                    FILTRES
+                  </h3>
+                </div>
+                <div class="p-4 space-y-3">
+                  <div>
+                    <label class="block text-xs font-medium text-base-content/70 mb-1">Rareté</label>
+                    <select v-model="rarityFilter" @change="applyFilters"
+                            class="w-full px-3 py-2 text-sm bg-base-100/50 border border-base-300/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200">
+                      <option value="">Toutes</option>
+                      <option v-for="rarity in rarities" :key="rarity" :value="rarity">
+                        {{ getRarityLabel(rarity) }}
+                      </option>
+                    </select>
+                  </div>
 
-              <Button @click="clearFilters" variant="ghost" size="sm"
-                      class="text-base-content/70 hover:text-base-content">
-                🗑️ Réinitialiser
-              </Button>
+                  <div>
+                    <label class="block text-xs font-medium text-base-content/70 mb-1">Statut</label>
+                    <select v-model="statusFilter" @change="applyFilters"
+                            class="w-full px-3 py-2 text-sm bg-base-100/50 border border-base-300/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200">
+                      <option value="">Tous</option>
+                      <option value="true">Active</option>
+                      <option value="false">Inactive</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-base-content/70 mb-1">Recherche</label>
+                    <input v-model="searchFilter" @keyup.enter="applyFilters" type="text"
+                           placeholder="Nom ou description..."
+                           class="w-full px-3 py-2 text-sm bg-base-100/50 border border-base-300/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200 placeholder:text-base-content/50" />
+                  </div>
+
+                  <div class="flex gap-2">
+                    <Button @click="applyFilters" variant="primary" size="sm" class="flex-1">
+                      <component :is="Filter" :size="14" class="mr-1" /> Filtrer
+                    </Button>
+                    <Button @click="clearFilters" variant="ghost" size="sm">
+                      <component :is="RotateCcw" :size="14" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div
-            class="bg-base-100/60 backdrop-blur-sm rounded-b-xl border border-base-300/30 overflow-hidden flex flex-col flex-1">
-            <div class="flex-shrink-0 p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
-              <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">📋</span>
-                LISTE DES EXPÉDITIONS
-              </h3>
-            </div>
+          <div class="xl:col-span-9 order-2 xl:order-2">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Map" :size="18" />
+                    LISTE DES EXPÉDITIONS
+                  </h3>
+                  <div class="text-xs text-base-content/70">
+                    {{ expeditions.total }} expédition{{ expeditions.total > 1 ? 's' : '' }}
+                  </div>
+                </div>
+              </div>
 
-            <div class="flex-1 overflow-auto min-h-0">
-              <table class="w-full min-w-[1200px]">
-                <thead class="sticky top-0 bg-base-200/90 backdrop-blur-md border-b border-base-300/30 z-[60]">
-                  <tr>
-                    <th
-                      class="px-2 md:px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      <button @click="sortBy('name')"
-                              class="flex items-center gap-1 hover:text-base-content transition-colors">
-                        Expédition
-                        <span class="text-base-content/50">{{ getSortIcon('name') }}</span>
-                      </button>
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      <button @click="sortBy('rarity')"
-                              class="flex items-center gap-1 hover:text-base-content transition-colors">
-                        Rareté
-                        <span class="text-base-content/50">{{ getSortIcon('rarity') }}</span>
-                      </button>
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      <button @click="sortBy('duration_minutes')"
-                              class="flex items-center gap-1 hover:text-base-content transition-colors">
-                        Durée
-                        <span class="text-base-content/50">{{ getSortIcon('duration_minutes') }}</span>
-                      </button>
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      <button @click="sortBy('is_active')"
-                              class="flex items-center gap-1 hover:text-base-content transition-colors mx-auto">
-                        Statut
-                        <span class="text-base-content/50">{{ getSortIcon('is_active') }}</span>
-                      </button>
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      Récompenses
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      Prérequis
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      Participants
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-base-300/20">
-                  <tr v-for="expedition in sortedExpeditions" :key="expedition.id"
-                      class="hover:bg-base-200/30 transition-colors">
-                    <td class="px-2 md:px-4 py-4">
-                      <div class="min-w-0 flex-1">
-                        <div class="font-semibold text-base-content truncate">{{ expedition.name }}</div>
-                        <div class="text-xs text-base-content/60 truncate max-w-[200px]">{{ expedition.description }}
+              <div class="p-6 max-h-[850px] overflow-y-scroll">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div v-for="expedition in sortedExpeditions" :key="expedition.id"
+                       class="bg-base-200/30 backdrop-blur-sm rounded-xl border border-base-300/20 overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
+
+                    <div class="p-4">
+                      <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                          <h4 class="font-bold text-base-content text-sm mb-1">{{ expedition.name }}</h4>
+                          <p class="text-xs text-base-content/70 line-clamp-2">{{ expedition.description }}</p>
                         </div>
+                        <RarityBadge :rarity="expedition.rarity as ExpeditionRarity" size="sm" />
                       </div>
-                    </td>
 
-                    <td class="px-2 md:px-4 py-4">
-                      <RarityBadge :rarity="expedition.rarity as ExpeditionRarity" size="sm" />
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4">
-                      <DurationDisplay :minutes="expedition.duration_minutes" size="sm" />
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4 text-center">
-                      <span :class="[
-                        'inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border',
-                        getStatusColor(expedition.is_active)
-                      ]">
-                        <div class="w-1.5 h-1.5 rounded-full" :class="expedition.is_active ? 'bg-success' : 'bg-error'">
+                      <div class="space-y-2 mb-4">
+                        <div class="flex items-center justify-between text-xs">
+                          <span class="text-base-content/70">Durée:</span>
+                          <DurationDisplay :minutes="expedition.duration_minutes" size="sm" />
                         </div>
-                        {{ getStatusLabel(expedition.is_active) }}
-                      </span>
-                    </td>
 
-                    <td class="px-2 md:px-4 py-4 text-center">
-                      <div class="relative group">
-                        <div class="flex items-center justify-center gap-1 text-sm font-medium cursor-pointer">
-                          <svg class="w-3 h-3 text-base-content/60" fill="none" stroke="currentColor"
-                               viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
-                            </path>
-                          </svg>
-                          {{ expedition.rewards?.length || 0 }}
+                        <div class="flex items-center justify-between text-xs">
+                          <span class="text-base-content/70">Statut:</span>
+                          <span :class="[
+                            'inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border',
+                            getStatusColor(expedition.is_active)
+                          ]">
+                            <component :is="expedition.is_active ? CheckCircle : XCircle" :size="12" />
+                            {{ getStatusLabel(expedition.is_active) }}
+                          </span>
                         </div>
-                        <div
-                          class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 bg-gray-800 text-white rounded-lg shadow-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[10000]">
-                          <div v-if="expedition.rewards?.length" class="space-y-2">
-                            <div v-for="reward in expedition.rewards" :key="reward.type"
-                                 class="flex items-center justify-between gap-2 text-sm">
-                              <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 flex items-center justify-center">
-                                  <span v-if="reward.type === 'cash'" class="text-green-400">💰</span>
-                                  <span v-else-if="reward.type === 'xp'" class="text-blue-400">⭐</span>
-                                  <img v-else-if="reward.type === 'pokeball'" src="/images/items/pokeball.png"
-                                       alt="Pokéball" class="w-5 h-5">
-                                  <img v-else-if="reward.type === 'masterball'" src="/images/items/masterball.png"
-                                       alt="Masterball" class="w-5 h-5">
-                                  <span v-else class="text-purple-400">🎁</span>
-                                </div>
-                                <span class="text-gray-200">{{ reward.type === 'cash' ? 'Cash' : reward.type === 'xp' ?
-                                  'XP' : reward.type === 'pokeball' ? 'Pokéball' : reward.type === 'masterball' ?
-                                    'Masterball' : 'Item' }}</span>
-                              </div>
-                              <span class="font-bold text-blue-300">{{ reward.amount || reward.quantity }}</span>
-                            </div>
+
+                        <div class="flex items-center justify-between text-xs">
+                          <span class="text-base-content/70">Participants:</span>
+                          <div class="flex items-center gap-1">
+                            <component :is="Users" :size="12" />
+                            {{ expedition.user_expeditions_count || 0 }}
                           </div>
-                          <div v-else class="text-center text-sm text-gray-400">Aucune récompense</div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs">
+                          <span class="text-base-content/70">Récompenses:</span>
+                          <span class="font-medium">{{ expedition.rewards?.length || 0 }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs">
+                          <span class="text-base-content/70">Prérequis:</span>
+                          <span class="font-medium">{{ expedition.requirements?.length || 0 }}</span>
                         </div>
                       </div>
-                    </td>
 
-                    <td class="px-2 md:px-4 py-4 text-center">
-                      <div class="relative group">
-                        <div class="flex items-center justify-center gap-1 text-sm font-medium cursor-pointer">
-                          <svg class="w-3 h-3 text-base-content/60" fill="none" stroke="currentColor"
-                               viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                          {{ expedition.requirements?.length || 0 }}
-                        </div>
-                        <div
-                          class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 bg-gray-800 text-white rounded-lg shadow-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[10000]">
-                          <div v-if="expedition.requirements?.length" class="space-y-1.5">
-                            <div v-for="req in expedition.requirements" :key="req.type + req.value"
-                                 class="flex items-center justify-between gap-2 text-xs">
-                              <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 flex items-center justify-center">
-                                  <div v-if="req.type === 'rarity'" class="w-2 h-2 rounded-full"
-                                       :class="getRarityDotColor(req.value)"></div>
-                                  <img v-else-if="req.type === 'type'" :src="`/images/types/${req.value}.png`"
-                                       :alt="req.value" class="w-5 h-5 object-contain">
-                                  <span v-else class="text-blue-400">📝</span>
-                                </div>
-                                <span class="text-gray-200">{{ req.type === 'rarity' ? 'Rareté' : 'Type' }} {{ req.value
-                                }}</span>
-                              </div>
-                              <span class="font-bold text-blue-300">{{ req.quantity }}</span>
-                            </div>
-                          </div>
-                          <div v-else class="text-center text-xs text-gray-400">Aucun prérequis</div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4 text-center">
-                      <div class="flex items-center justify-center gap-1 text-sm font-medium">
-                        <svg class="w-3 h-3 text-base-content/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                          </path>
-                        </svg>
-                        {{ expedition.user_expeditions_count || 0 }}
-                      </div>
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4">
-                      <div class="flex justify-center gap-1 flex-wrap">
+                      <div class="flex gap-1 flex-wrap">
                         <Button @click="router.visit(`/admin/expeditions/${expedition.id}`)" variant="ghost" size="sm"
                                 class="text-info hover:text-info hover:bg-info/10" title="Voir">
-                          👁️
+                          <component :is="Eye" :size="14" />
                         </Button>
                         <Button @click="router.visit(`/admin/expeditions/${expedition.id}/edit`)" variant="ghost"
                                 size="sm" class="text-warning hover:text-warning hover:bg-warning/10" title="Modifier">
-                          ✏️
+                          <component :is="Edit" :size="14" />
                         </Button>
                         <Button @click="toggleExpedition(expedition.id)"
                                 :variant="expedition.is_active ? 'outline' : 'secondary'" size="sm"
@@ -432,93 +394,32 @@ const clearFilters = () => {
                         </Button>
                         <Button @click="duplicateExpedition(expedition.id)" variant="outline" size="sm"
                                 class="text-secondary border-secondary hover:bg-secondary/10" title="Dupliquer">
-                          Dupliquer
+                          <component :is="Copy" :size="14" />
                         </Button>
-                        <Button @click="deleteExpedition(expedition.id)" variant="outline" size="sm"
+                        <Button @click="deleteExpedition(expedition)" variant="outline" size="sm"
                                 class="text-error border-error hover:bg-error/10" title="Supprimer">
-                          🗑️
+                          <component :is="Trash2" :size="14" />
                         </Button>
                       </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div v-if="expeditions.links && expeditions.links.length > 3"
-                 class="flex justify-center p-4 border-t border-base-300/30">
-              <div class="join">
-                <template v-for="link in expeditions.links" :key="link.label">
-                  <button v-if="link.url" @click="router.visit(link.url)" :class="[
-                    'join-item btn btn-sm',
-                    link.active ? 'btn-primary' : 'btn-outline'
-                  ]" v-html="link.label" />
-                  <span v-else :class="[
-                    'join-item btn btn-sm btn-disabled',
-                    link.active ? 'btn-primary' : 'btn-outline'
-                  ]" v-html="link.label" />
-                </template>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="lg:w-64 lg:flex-shrink-0">
-          <div class="space-y-4">
-            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-              <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
-                <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                  <span class="text-lg">⚙️</span>
-                  ACTIONS
-                </h3>
-              </div>
-              <div class="p-3 space-y-2">
-                <Button @click="router.visit('/admin/expeditions/create')" variant="secondary" size="sm" class="w-full">
-                  ➕ Nouvelle expédition
-                </Button>
-                <Button @click="router.visit('/admin/')" variant="outline" size="sm" class="w-full">
-                  ← Dashboard
-                </Button>
-                <Button @click="router.visit('/me')" variant="ghost" size="sm" class="w-full">
-                  🏠 Profil
-                </Button>
-              </div>
-            </div>
-
-            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-              <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
-                <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                  <span class="text-lg">📊</span>
-                  STATISTIQUES
-                </h3>
-              </div>
-              <div class="p-3 space-y-3">
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                  <div class="bg-base-200/40 rounded-lg p-2">
-                    <div class="text-base-content/70">Total</div>
-                    <div class="font-bold text-lg">{{ stats.total }}</div>
-                  </div>
-                  <div class="bg-success/10 rounded-lg p-2">
-                    <div class="text-success/70">Actives</div>
-                    <div class="font-bold text-lg text-success">{{ stats.active }}</div>
-                  </div>
-                  <div class="bg-error/10 rounded-lg p-2">
-                    <div class="text-error/70">Inactives</div>
-                    <div class="font-bold text-lg text-error">{{ stats.inactive }}</div>
+                    </div>
                   </div>
                 </div>
 
-                <div class="border-t border-base-300/30 pt-3">
-                  <div class="text-xs text-base-content/70 mb-2 font-medium">Par rareté</div>
-                  <div class="space-y-1">
-                    <div v-for="(count, rarity) in stats.by_rarity" :key="rarity"
-                         class="flex justify-between items-center text-xs">
-                      <div class="flex items-center gap-2">
-                        <div class="w-2 h-2 rounded-full" :class="getRarityDotColor(rarity)"></div>
-                        <span>{{ getRarityLabel(rarity) }}</span>
-                      </div>
-                      <span class="font-bold">{{ count }}</span>
-                    </div>
+                <div v-if="expeditions.links && expeditions.links.length > 3"
+                     class="flex justify-center mt-6 pt-4 border-t border-base-300/30">
+                  <div class="flex gap-1">
+                    <template v-for="link in expeditions.links" :key="link.label">
+                      <button v-if="link.url" @click="router.visit(link.url)" :class="[
+                        'px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+                        link.active
+                          ? 'bg-primary text-primary-content shadow-lg shadow-primary/20'
+                          : 'bg-base-200/50 text-base-content/70 hover:bg-base-200 hover:text-base-content border border-base-300/30'
+                      ]" v-html="link.label" />
+                      <span v-else :class="[
+                        'px-3 py-2 text-sm font-medium rounded-lg bg-base-200/30 text-base-content/50 cursor-not-allowed',
+                        link.active ? 'bg-primary/20 text-primary/50' : ''
+                      ]" v-html="link.label" />
+                    </template>
                   </div>
                 </div>
               </div>
@@ -527,5 +428,38 @@ const clearFilters = () => {
         </div>
       </div>
     </div>
+
+    <Modal :show="showDeleteModal" @close="showDeleteModal = false" max-width="md">
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-error/10 rounded-lg">
+            <component :is="AlertTriangle" :size="24" class="text-error" />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-base-content">Supprimer l'expédition</h3>
+            <p class="text-sm text-base-content/70">Cette action est irréversible</p>
+          </div>
+        </div>
+
+        <div v-if="expeditionToDelete" class="bg-base-200/30 rounded-lg p-4 mb-6">
+          <h4 class="font-bold text-base-content mb-2">{{ expeditionToDelete.name }}</h4>
+          <p class="text-sm text-base-content/70">{{ expeditionToDelete.description }}</p>
+          <div class="flex items-center gap-2 mt-2">
+            <RarityBadge :rarity="expeditionToDelete.rarity as ExpeditionRarity" size="sm" />
+            <DurationDisplay :minutes="expeditionToDelete.duration_minutes" size="sm" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <Button @click="showDeleteModal = false" variant="outline">
+            Annuler
+          </Button>
+          <Button @click="confirmDelete" variant="error">
+            <component :is="Trash2" :size="16" class="mr-2" />
+            Supprimer
+          </Button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>

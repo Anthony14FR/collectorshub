@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import { getRarityColor } from '@/utils/pokemon';
 import { Head, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { Zap, ArrowLeft, Edit, Trash2, AlertTriangle, Home, BarChart3, Hash, Sparkles, Shield, ArrowRight, Users, Info } from 'lucide-vue-next';
 
 interface Pokemon {
   id: number;
@@ -33,6 +36,8 @@ const { pokemon, evolutions, preEvolutions } = defineProps<{
   evolutions: Pokemon[];
   preEvolutions: Pokemon[];
 }>();
+
+const showDeleteModal = ref(false);
 
 const getRarityLabel = (rarity: string) => {
   const labels: Record<string, string> = {
@@ -98,25 +103,26 @@ const getRarityMultiplier = (rarity: string) => {
 };
 
 const deletePokemon = () => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer ce Pokémon ?')) {
-    router.delete(`/admin/pokemons/${pokemon.id}`);
-  }
+  showDeleteModal.value = true;
+};
+
+const confirmDelete = () => {
+  router.delete(`/admin/pokemons/${pokemon.id}`);
 };
 </script>
 
 <template>
-
   <Head :title="`${pokemon.name} - Détails`" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden">
-      <div class="flex justify-center pt-4 mb-4">
+    <div class="relative z-10 min-h-screen w-full">
+      <div class="flex justify-center pt-6 mb-6">
         <div class="text-center">
-          <h1
-            class="text-2xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            👁️ DÉTAILS POKÉMON
+          <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider">
+            <component :is="Zap" :size="28" class="inline align-middle mr-2" />
+            DÉTAILS POKÉMON
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             Informations complètes
@@ -124,296 +130,258 @@ const deletePokemon = () => {
         </div>
       </div>
 
-      <div class="absolute left-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-          <div class="p-3 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📊</span>
-              STATISTIQUES
-            </h3>
-          </div>
-          <div class="p-3 space-y-3">
-            <div class="text-center">
-              <div class="text-2xl font-bold text-success">{{ getTotalStats(pokemon) }}</div>
-              <div class="text-xs text-base-content/70">Total des stats</div>
-            </div>
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between">
-                <span class="text-base-content/70">PV:</span>
-                <span class="font-semibold">{{ pokemon.hp }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Attaque:</span>
-                <span class="font-semibold">{{ pokemon.attack }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Défense:</span>
-                <span class="font-semibold">{{ pokemon.defense }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Vitesse:</span>
-                <span class="font-semibold">{{ pokemon.speed }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Att. Spé:</span>
-                <span class="font-semibold">{{ pokemon.special_attack }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Déf. Spé:</span>
-                <span class="font-semibold">{{ pokemon.special_defense }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="container mx-auto px-4 max-w-7xl">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-6">
 
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">⚡</span>
-              ACTIONS
-            </h3>
-          </div>
-          <div class="p-3 space-y-2">
-            <Button @click="router.visit(`/admin/pokemons/${pokemon.id}/edit`)" variant="primary" size="sm"
-                    class="w-full">
-              ✏️ Modifier
-            </Button>
-            <Button @click="deletePokemon" variant="secondary" size="sm" class="w-full">
-              🗑️ Supprimer
-            </Button>
-            <div class="border-t border-base-300/30 pt-2">
-              <Button @click="router.visit('/admin/pokemons')" variant="ghost" size="sm" class="w-full">
-                ← Liste Pokémon
-              </Button>
-              <Button @click="router.visit('/admin')" variant="ghost" size="sm" class="w-full mt-1">
-                🏠 Dashboard
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+          <div class="xl:col-span-3 order-1 xl:order-1">
+            <div class="space-y-4">
 
-      <div class="absolute right-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🔗</span>
-              ÉVOLUTIONS
-            </h3>
-          </div>
-          <div class="p-3 space-y-3">
-            <div v-if="preEvolutions.length > 0" class="text-center">
-              <div class="text-xs text-base-content/70 mb-1">Pré-évolutions</div>
-              <div class="space-y-2">
-                <div v-for="preEvo in preEvolutions" :key="preEvo.id" class="text-center">
-                  <div class="relative w-12 h-12 mx-auto mb-1">
-                    <img :src="`/images/pokemon-gifs/${preEvo.pokedex_id}.gif`" :alt="preEvo.name"
-                         class="w-full h-full object-contain"
-                         @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }" />
-                  </div>
-                  <div class="text-sm font-semibold">{{ preEvo.name }}</div>
-                  <div class="text-xs text-base-content/60">#{{ preEvo.pokedex_id }}</div>
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Zap" :size="18" />
+                    ACTIONS
+                  </h3>
+                </div>
+                <div class="p-3 space-y-2">
+                  <Button @click="router.visit(`/admin/pokemons/${pokemon.id}/edit`)" variant="primary" size="sm" class="w-full justify-start">
+                    <component :is="Edit" :size="16" class="mr-2" /> Modifier
+                  </Button>
+                  <Button @click="deletePokemon" variant="error" size="sm" class="w-full justify-start">
+                    <component :is="Trash2" :size="16" class="mr-2" /> Supprimer
+                  </Button>
+                  <Button @click="router.visit('/admin/pokemons')" variant="outline" size="sm" class="w-full justify-start">
+                    <component :is="ArrowLeft" :size="16" class="mr-2" /> Retour
+                  </Button>
+                  <Button @click="router.visit('/admin')" variant="ghost" size="sm" class="w-full justify-start">
+                    <component :is="Home" :size="16" class="mr-2" /> Dashboard
+                  </Button>
                 </div>
               </div>
-            </div>
-            <div v-else class="text-center">
-              <div class="text-xs text-base-content/70 mb-1">Pré-évolutions</div>
-              <div class="text-sm text-base-content/50">Aucune</div>
-            </div>
 
-            <div class="border-t border-base-300/30 pt-3">
-              <div v-if="evolutions.length > 0" class="text-center">
-                <div class="text-xs text-base-content/70 mb-1">Évolutions</div>
-                <div class="space-y-2">
-                  <div v-for="evo in evolutions" :key="evo.id" class="text-center">
-                    <div class="relative w-12 h-12 mx-auto mb-1">
-                      <img :src="`/images/pokemon-gifs/${evo.pokedex_id}.gif`" :alt="evo.name"
-                           class="w-full h-full object-contain"
-                           @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }" />
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="BarChart3" :size="18" />
+                    STATISTIQUES
+                  </h3>
+                </div>
+                <div class="p-3 space-y-3">
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-success">{{ getTotalStats(pokemon) }}</div>
+                    <div class="text-xs text-base-content/70">Total des stats</div>
+                  </div>
+                  <div class="space-y-2 text-xs">
+                    <div class="flex justify-between">
+                      <span class="text-base-content/70">PV:</span>
+                      <span class="font-semibold">{{ pokemon.hp }}</span>
                     </div>
-                    <div class="text-sm font-semibold">{{ evo.name }}</div>
-                    <div class="text-xs text-base-content/60">#{{ evo.pokedex_id }}</div>
+                    <div class="flex justify-between">
+                      <span class="text-base-content/70">Attaque:</span>
+                      <span class="font-semibold">{{ pokemon.attack }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-base-content/70">Défense:</span>
+                      <span class="font-semibold">{{ pokemon.defense }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-base-content/70">Vitesse:</span>
+                      <span class="font-semibold">{{ pokemon.speed }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-base-content/70">Att. Spé:</span>
+                      <span class="font-semibold">{{ pokemon.special_attack }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-base-content/70">Déf. Spé:</span>
+                      <span class="font-semibold">{{ pokemon.special_defense }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div v-else class="text-center">
-                <div class="text-xs text-base-content/70 mb-1">Évolutions</div>
-                <div class="text-sm text-base-content/50">Aucune</div>
+
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
+                  <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                    <component :is="Users" :size="18" />
+                    ÉVOLUTIONS
+                  </h3>
+                </div>
+                <div class="p-3 space-y-3">
+                  <div v-if="preEvolutions.length > 0" class="text-center">
+                    <div class="text-xs text-base-content/70 mb-1">Pré-évolutions</div>
+                    <div class="space-y-2">
+                      <div v-for="preEvo in preEvolutions" :key="preEvo.id" class="text-center">
+                        <div class="relative w-12 h-12 mx-auto mb-1">
+                          <img :src="`/images/pokemon-gifs/${preEvo.pokedex_id}.gif`" :alt="preEvo.name"
+                               class="w-full h-full object-contain"
+                               @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }" />
+                        </div>
+                        <div class="text-sm font-semibold">{{ preEvo.name }}</div>
+                        <div class="text-xs text-base-content/60">#{{ preEvo.pokedex_id }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center">
+                    <div class="text-xs text-base-content/70 mb-1">Pré-évolutions</div>
+                    <div class="text-sm text-base-content/50">Aucune</div>
+                  </div>
+
+                  <div class="border-t border-base-300/30 pt-3">
+                    <div v-if="evolutions.length > 0" class="text-center">
+                      <div class="text-xs text-base-content/70 mb-1">Évolutions</div>
+                      <div class="space-y-2">
+                        <div v-for="evo in evolutions" :key="evo.id" class="text-center">
+                          <div class="relative w-12 h-12 mx-auto mb-1">
+                            <img :src="`/images/pokemon-gifs/${evo.pokedex_id}.gif`" :alt="evo.name"
+                                 class="w-full h-full object-contain"
+                                 @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }" />
+                          </div>
+                          <div class="text-sm font-semibold">{{ evo.name }}</div>
+                          <div class="text-xs text-base-content/60">#{{ evo.pokedex_id }}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else class="text-center">
+                      <div class="text-xs text-base-content/70 mb-1">Évolutions</div>
+                      <div class="text-sm text-base-content/50">Aucune</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px]">
-        <div
-          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
-          <div class="shrink-0 p-3 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📋</span>
-              INFORMATIONS DÉTAILLÉES
-            </h3>
-          </div>
+          <div class="xl:col-span-9 order-2 xl:order-2">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[650px] sm:h-[700px] md:h-[750px] xl:h-[800px] flex flex-col">
 
-          <div class="flex-1 overflow-y-auto p-6">
-            <!-- En-tête du Pokémon -->
-            <div class="text-center mb-6">
-              <div class="relative w-32 h-32 mx-auto mb-3">
-                <img :src="getPokemonImage(pokemon)" :alt="pokemon.name" class="w-full h-full object-contain"
-                     @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }" />
-                <div v-if="pokemon.is_shiny" class="absolute -top-2 -right-2 text-2xl">✨</div>
-              </div>
-              <h2 class="text-2xl font-bold mb-1">{{ pokemon.name }}</h2>
-              <div class="text-sm text-base-content/60 mb-3">#{{ pokemon.pokedex_id.toString().padStart(3, '0') }}</div>
-
-              <div class="flex justify-center gap-2 mb-3">
-                <div v-for="type in pokemon.types" :key="type.name"
-                     class="flex items-center gap-1 bg-base-200/50 rounded-lg px-3 py-1 border border-base-300/30">
-                  <img :src="getTypeImage(type.name)" :alt="type.name" class="w-4 h-4 object-contain" />
-                  <span class="text-sm font-semibold">{{ type.name }}</span>
-                </div>
+              <div class="shrink-0 p-4 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
+                <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
+                  <component :is="Zap" :size="18" />
+                  INFORMATIONS DÉTAILLÉES
+                </h3>
               </div>
 
-              <div class="flex justify-center gap-3 mb-3">
-                <span :class="`badge badge-lg bg-gradient-to-r ${getRarityColor(pokemon.rarity)} text-white border-0`">
-                  {{ getRarityLabel(pokemon.rarity) }}
-                </span>
-                <span class="badge badge-lg bg-gradient-to-r from-warning to-warning/80 text-white border-0">
-                  CP: {{ calculateCP(pokemon).toLocaleString() }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Description -->
-            <div class="bg-base-200/30 rounded-lg p-4 mb-6">
-              <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-2">Description</h4>
-              <p class="text-base-content/80">{{ pokemon.description }}</p>
-            </div>
-
-            <!-- Informations physiques -->
-            <div class="grid grid-cols-2 gap-6 mb-6">
-              <div class="bg-base-200/30 rounded-lg p-4">
-                <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-3">Caractéristiques</h4>
-                <div class="space-y-2 text-sm">
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Taille:</span>
-                    <span class="font-semibold">{{ pokemon.height }} cm</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Poids:</span>
-                    <span class="font-semibold">{{ pokemon.weight }} kg</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Génération:</span>
-                    <span class="font-semibold">{{ pokemon.generation || 'Non définie' }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Shiny:</span>
-                    <span class="font-semibold">{{ pokemon.is_shiny ? '✨ Oui' : 'Non' }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="bg-base-200/30 rounded-lg p-4">
-                <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-3">Statistiques</h4>
-                <div class="space-y-2 text-sm">
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">PV:</span>
-                    <span class="font-semibold">{{ pokemon.hp }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Attaque:</span>
-                    <span class="font-semibold">{{ pokemon.attack }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Défense:</span>
-                    <span class="font-semibold">{{ pokemon.defense }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Vitesse:</span>
-                    <span class="font-semibold">{{ pokemon.speed }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Att. Spé:</span>
-                    <span class="font-semibold">{{ pokemon.special_attack }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-base-content/70">Déf. Spé:</span>
-                    <span class="font-semibold">{{ pokemon.special_defense }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Résistances -->
-            <div class="bg-base-200/30 rounded-lg p-4 mb-6">
-              <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-3">Résistances</h4>
-              <div v-if="pokemon.resistances.length > 0" class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <div v-for="resistance in pokemon.resistances" :key="resistance.name"
-                     class="bg-base-100/50 rounded-lg p-3 text-center border border-base-300/30">
-                  <div class="flex items-center justify-center gap-2 mb-2">
-                    <img :src="getTypeImage(resistance.name)" :alt="resistance.name" class="w-6 h-6 object-contain" />
-                    <div class="text-sm font-semibold">{{ resistance.name }}</div>
-                  </div>
-                  <div class="text-lg font-bold" :class="{
-                    'text-success': resistance.damage_relation === 'resistant' || resistance.damage_relation === 'twice_resistant',
-                    'text-error': resistance.damage_relation === 'vulnerable',
-                    'text-base-content': resistance.damage_relation === 'neutral'
-                  }">
-                    {{ resistance.damage_multiplier }}x
-                  </div>
-                  <div class="text-xs text-base-content/70">{{ getDamageRelationLabel(resistance.damage_relation) }}
-                  </div>
-                </div>
-              </div>
-              <div v-else class="text-center text-base-content/50">
-                Aucune résistance définie
-              </div>
-            </div>
-
-            <!-- Évolutions -->
-            <div class="bg-base-200/30 rounded-lg p-4">
-              <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-3">Ligne d'évolution</h4>
-              <div class="flex items-center justify-center gap-4">
-                <div v-if="pokemon.preEvolution" class="text-center">
-                  <div class="relative w-20 h-20 mx-auto mb-2">
-                    <img :src="`/images/pokemon-gifs/${pokemon.preEvolution.pokedex_id}.gif`"
-                         :alt="pokemon.preEvolution.name" class="w-full h-full object-contain"
-                         @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }" />
-                  </div>
-                  <div class="text-sm font-semibold">{{ pokemon.preEvolution.name }}</div>
-                  <div class="text-xs text-base-content/60">#{{ pokemon.preEvolution.pokedex_id }}</div>
-                </div>
-
-                <div class="text-2xl text-base-content/50">→</div>
-
-                <div class="text-center">
-                  <div class="relative w-20 h-20 mx-auto mb-2">
+              <div class="flex-1 overflow-y-auto p-6">
+                <div class="text-center mb-6">
+                  <div class="relative w-32 h-32 mx-auto mb-3">
                     <img :src="getPokemonImage(pokemon)" :alt="pokemon.name" class="w-full h-full object-contain"
                          @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }" />
-                    <div v-if="pokemon.is_shiny" class="absolute -top-1 -right-1 text-lg">✨</div>
+                    <div v-if="pokemon.is_shiny" class="absolute -top-2 -right-2">
+                      <component :is="Sparkles" :size="24" class="text-yellow-500" />
+                    </div>
                   </div>
-                  <div class="text-sm font-semibold">{{ pokemon.name }}</div>
-                  <div class="text-xs text-base-content/60">#{{ pokemon.pokedex_id }}</div>
+                  <h2 class="text-2xl font-bold mb-1">{{ pokemon.name }}</h2>
+                  <div class="text-sm text-base-content/60 mb-3 flex items-center justify-center gap-1">
+                    <component :is="Hash" :size="14" />
+                    #{{ pokemon.pokedex_id.toString().padStart(3, '0') }}
+                  </div>
+
+                  <div class="flex justify-center gap-2 mb-3">
+                    <div v-for="type in pokemon.types" :key="type.name"
+                         class="flex items-center gap-1 bg-base-200/50 rounded-lg px-3 py-1 border border-base-300/30">
+                      <img :src="getTypeImage(type.name)" :alt="type.name" class="w-4 h-4 object-contain" />
+                      <span class="text-sm font-semibold">{{ type.name }}</span>
+                    </div>
+                  </div>
+
+                  <div class="flex justify-center gap-3 mb-3">
+                    <span :class="`badge badge-lg bg-gradient-to-r ${getRarityColor(pokemon.rarity)} text-white border-0`">
+                      {{ getRarityLabel(pokemon.rarity) }}
+                    </span>
+                    <span class="badge badge-lg bg-gradient-to-r from-warning to-warning/80 text-white border-0">
+                      CP: {{ calculateCP(pokemon).toLocaleString() }}
+                    </span>
+                  </div>
                 </div>
 
-                <div class="text-2xl text-base-content/50">→</div>
-
-                <div v-if="pokemon.evolution" class="text-center">
-                  <div class="relative w-20 h-20 mx-auto mb-2">
-                    <img :src="`/images/pokemon-gifs/${pokemon.evolution.pokedex_id}.gif`" :alt="pokemon.evolution.name"
-                         class="w-full h-full object-contain"
-                         @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }" />
-                  </div>
-                  <div class="text-sm font-semibold">{{ pokemon.evolution.name }}</div>
-                  <div class="text-xs text-base-content/60">#{{ pokemon.evolution.pokedex_id }}</div>
+                <div class="bg-base-200/30 rounded-lg p-4 mb-6">
+                  <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-2 flex items-center gap-2">
+                    <component :is="Info" :size="16" />
+                    Description
+                  </h4>
+                  <p class="text-base-content/80">{{ pokemon.description }}</p>
                 </div>
-                <div v-else class="text-center">
-                  <div
-                    class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-base-300/20 to-base-300/10 flex items-center justify-center text-lg text-base-content/30 mb-2">
-                    ?
+
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                  <div class="bg-base-200/30 rounded-lg p-4">
+                    <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-3">Caractéristiques</h4>
+                    <div class="space-y-2 text-sm">
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Taille:</span>
+                        <span class="font-semibold">{{ pokemon.height }} cm</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Poids:</span>
+                        <span class="font-semibold">{{ pokemon.weight }} kg</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Génération:</span>
+                        <span class="font-semibold">{{ pokemon.generation || 'Non définie' }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Shiny:</span>
+                        <span class="font-semibold">{{ pokemon.is_shiny ? 'Oui' : 'Non' }}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div class="text-sm text-base-content/50">Aucune</div>
+
+                  <div class="bg-base-200/30 rounded-lg p-4">
+                    <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-3">Statistiques</h4>
+                    <div class="space-y-2 text-sm">
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">PV:</span>
+                        <span class="font-semibold">{{ pokemon.hp }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Attaque:</span>
+                        <span class="font-semibold">{{ pokemon.attack }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Défense:</span>
+                        <span class="font-semibold">{{ pokemon.defense }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Vitesse:</span>
+                        <span class="font-semibold">{{ pokemon.speed }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Att. Spé:</span>
+                        <span class="font-semibold">{{ pokemon.special_attack }}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-base-content/70">Déf. Spé:</span>
+                        <span class="font-semibold">{{ pokemon.special_defense }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-base-200/30 rounded-lg p-4 mb-6">
+                  <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-3 flex items-center gap-2">
+                    <component :is="Shield" :size="16" />
+                    Résistances
+                  </h4>
+                  <div v-if="pokemon.resistances.length > 0" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div v-for="resistance in pokemon.resistances" :key="resistance.name"
+                         class="bg-base-100/50 rounded-lg p-3 text-center border border-base-300/30">
+                      <div class="flex items-center justify-center gap-2 mb-2">
+                        <img :src="getTypeImage(resistance.name)" :alt="resistance.name" class="w-6 h-6 object-contain" />
+                        <div class="text-sm font-semibold">{{ resistance.name }}</div>
+                      </div>
+                      <div class="text-lg font-bold" :class="{
+                        'text-success': resistance.damage_relation === 'resistant' || resistance.damage_relation === 'twice_resistant',
+                        'text-error': resistance.damage_relation === 'vulnerable',
+                        'text-base-content': resistance.damage_relation === 'neutral'
+                      }">
+                        {{ resistance.damage_multiplier }}x
+                      </div>
+                      <div class="text-xs text-base-content/70">{{ getDamageRelationLabel(resistance.damage_relation) }}</div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center text-base-content/50">
+                    Aucune résistance définie
+                  </div>
                 </div>
               </div>
             </div>
@@ -421,5 +389,32 @@ const deletePokemon = () => {
         </div>
       </div>
     </div>
+
+    <Modal :show="showDeleteModal" @close="showDeleteModal = false">
+      <div class="p-6">
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0">
+            <component :is="AlertTriangle" :size="24" class="text-error" />
+          </div>
+          <div class="ml-3">
+            <h3 class="text-lg font-medium text-base-content">Confirmer la suppression</h3>
+          </div>
+        </div>
+        <div class="mt-2">
+          <p class="text-sm text-base-content/70">
+            Êtes-vous sûr de vouloir supprimer le Pokémon
+            <strong>{{ pokemon.name }}</strong>
+            ? Cette action est irréversible.
+          </p>
+        </div>
+        <div class="mt-6 flex justify-end gap-3">
+          <Button variant="ghost" @click="showDeleteModal = false">Annuler</Button>
+          <Button variant="error" @click="confirmDelete">
+            <component :is="Trash2" :size="16" class="mr-2" />
+            Supprimer
+          </Button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
