@@ -93,6 +93,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Routes pour Expeditions
     Route::get('/expeditions', [ExpeditionController::class, 'index'])->name('expeditions.index');
     Route::get('/expeditions/{expedition}', [ExpeditionController::class, 'show'])->name('expeditions.show');
+    Route::post('/expeditions/reroll', [ExpeditionController::class, 'reroll'])->name('expeditions.reroll');
 
     // Routes pour Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');

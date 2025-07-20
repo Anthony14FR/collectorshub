@@ -114,4 +114,31 @@ class ExpeditionController extends Controller
             ], 500);
         }
     }
+
+    public function reroll()
+    {
+        $user = Auth::user();
+
+        try {
+            $result = $this->expeditionService->rerollExpeditions($user);
+
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $result['message'],
+                    'rerolled_count' => $result['rerolled_count']
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $result['message']
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du reroll : ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
