@@ -3,403 +3,398 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Select from '@/Components/UI/Select.vue';
-import type { User } from '@/types/user';
-import { Head, router } from '@inertiajs/vue3';
-import { computed, reactive } from 'vue';
+import Modal from '@/Components/UI/Modal.vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
-const props = defineProps<{
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  level: number;
+  experience: number;
+  cash: number;
+  role: string;
+  status: string;
+  created_at: string;
+}
+
+interface Props {
   user: User;
   roles: string[];
   statuses: string[];
-}>();
+  errors?: Record<string, string>;
+}
 
-const form = reactive({
+const props = defineProps<Props>();
+
+const form = useForm({
   username: props.user.username,
   email: props.user.email,
-  password: '',
   level: props.user.level,
   experience: props.user.experience,
   cash: props.user.cash,
   role: props.user.role,
   status: props.user.status,
-  processing: false,
-  errors: {} as Record<string, string>,
+  password: ''
 });
 
-const hasChanges = computed(() => {
-  return form.username !== props.user.username ||
-    form.email !== props.user.email ||
-    form.password !== '' ||
-    form.level !== props.user.level ||
-    form.experience !== props.user.experience ||
-    form.cash !== props.user.cash ||
-    form.role !== props.user.role ||
-    form.status !== props.user.status;
+const isSubmitting = ref(false);
+const showDeleteModal = ref(false);
+
+const roleOptions = computed(() => {
+  return props.roles.map(role => ({
+    value: role,
+    label: getRoleLabel(role)
+  }));
+});
+
+const statusOptions = computed(() => {
+  return props.statuses.map(status => ({
+    value: status,
+    label: getStatusLabel(status)
+  }));
 });
 
 const submit = () => {
-  form.processing = true;
-  form.errors = {};
-
-  router.put(`/admin/users/${props.user.id}`, {
-    username: form.username,
-    email: form.email,
-    password: form.password,
-    level: form.level,
-    experience: form.experience,
-    cash: form.cash,
-    role: form.role,
-    status: form.status,
-  }, {
+  isSubmitting.value = true;
+  form.put(`/admin/users/${props.user.id}`, {
     onSuccess: () => {
-      form.processing = false;
+      router.visit('/admin/users');
     },
-    onError: (errors: Record<string, string>) => {
-      form.processing = false;
-      form.errors = errors;
-    },
+    onFinish: () => {
+      isSubmitting.value = false;
+    }
   });
 };
 
-const resetForm = () => {
-  form.username = props.user.username;
-  form.email = props.user.email;
-  form.password = '';
-  form.level = props.user.level;
-  form.experience = props.user.experience;
-  form.cash = props.user.cash;
-  form.role = props.user.role;
-  form.status = props.user.status;
-  form.errors = {};
-};
-
-const getRoleColor = (role: string) => {
-  switch (role) {
-  case 'admin': return 'text-error bg-error/10 border-error/20';
-  case 'premium': return 'text-warning bg-warning/10 border-warning/20';
-  default: return 'text-info bg-info/10 border-info/20';
-  }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-  case 'active': return 'text-success bg-success/10 border-success/20';
-  case 'suspended': return 'text-warning bg-warning/10 border-warning/20';
-  case 'banned': return 'text-error bg-error/10 border-error/20';
-  default: return 'text-base-content/70 bg-base-200/50 border-base-300/20';
-  }
-};
-
 const deleteUser = () => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-    router.delete(`/admin/users/${props.user.id}`, {
-      onSuccess: () => router.visit('/admin/users')
-    });
+  showDeleteModal.value = true;
+};
+
+const confirmDelete = () => {
+  router.delete(`/admin/users/${props.user.id}`, {
+    onSuccess: () => router.visit('/admin/users'),
+    onFinish: () => {
+      showDeleteModal.value = false;
+    }
+  });
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+};
+
+const goBack = () => {
+  router.visit('/admin/users');
+};
+
+const getRoleLabel = (role: string) => {
+  switch (role) {
+  case 'admin': return 'Administrateur';
+  case 'user': return 'Joueur';
+  default: return role;
   }
+};
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+  case 'active': return 'Actif';
+  case 'banned': return 'Banni';
+  default: return status;
+  }
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 };
 </script>
 
 <template>
-
   <Head title="Modifier l'utilisateur" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative overflow-x-hidden">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden">
-      <div class="flex justify-center pt-4 mb-4">
-        <div class="text-center">
-          <h1
-            class="text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
+    <div class="relative z-10 min-h-screen">
+      <div class="container mx-auto px-4 py-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-2 tracking-wider">
             ✏️ MODIFIER UTILISATEUR
           </h1>
-          <p class="text-xs text-base-content/70 uppercase tracking-wider">
-            Édition de {{ user.username }}
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
+            Édition de {{ props.user.username }}
           </p>
         </div>
-      </div>
 
-      <div class="absolute left-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-          <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">👤</span>
-              UTILISATEUR ACTUEL
-            </h3>
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          <div class="xl:col-span-8">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-6 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                <h3 class="text-xl font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-2xl">👤</span>
+                  INFORMATIONS UTILISATEUR
+                </h3>
+              </div>
+
+              <form @submit.prevent="submit" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Nom d'utilisateur *
+                    </label>
+                    <Input
+                      v-model="form.username"
+                      placeholder="Entrer le nom d'utilisateur"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.username" class="text-xs text-error mt-1">
+                      {{ props.errors.username }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Adresse email *
+                    </label>
+                    <Input
+                      v-model="form.email"
+                      type="email"
+                      placeholder="exemple@email.com"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.email" class="text-xs text-error mt-1">
+                      {{ props.errors.email }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-bold text-base-content/80 mb-2">
+                    Nouveau mot de passe
+                  </label>
+                  <Input
+                    v-model="form.password"
+                    type="password"
+                    placeholder="••••••••"
+                    class="w-full"
+                  />
+                  <p v-if="props.errors?.password" class="text-xs text-error mt-1">
+                    {{ props.errors.password }}
+                  </p>
+                  <p class="text-xs text-base-content/60">
+                    Laisser vide pour conserver le mot de passe actuel
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Niveau *
+                    </label>
+                    <Input
+                      v-model="form.level"
+                      type="number"
+                      min="1"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.level" class="text-xs text-error mt-1">
+                      {{ props.errors.level }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Expérience *
+                    </label>
+                    <Input
+                      v-model="form.experience"
+                      type="number"
+                      min="0"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.experience" class="text-xs text-error mt-1">
+                      {{ props.errors.experience }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Cash 💰 *
+                    </label>
+                    <Input
+                      v-model="form.cash"
+                      type="number"
+                      min="0"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.cash" class="text-xs text-error mt-1">
+                      {{ props.errors.cash }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Rôle *
+                    </label>
+                    <Select
+                      v-model="form.role"
+                      :options="roleOptions"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.role" class="text-xs text-error mt-1">
+                      {{ props.errors.role }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Statut *
+                    </label>
+                    <Select
+                      v-model="form.status"
+                      :options="statusOptions"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.status" class="text-xs text-error mt-1">
+                      {{ props.errors.status }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-base-300/30">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    :disabled="isSubmitting || form.processing"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    <span v-if="isSubmitting || form.processing">⏳</span>
+                    <span v-else>💾</span>
+                    {{ isSubmitting || form.processing ? 'Mise à jour...' : 'Mettre à jour' }}
+                  </Button>
+
+                  <Button
+                    @click="goBack"
+                    variant="secondary"
+                    size="lg"
+                    :disabled="isSubmitting || form.processing"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    ← Retour à la liste
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
-          <div class="p-3">
-            <div class="flex items-center gap-3 mb-3">
-              <div
-                class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-lg font-bold">
-                {{ user.username.charAt(0).toUpperCase() }}
+
+          <div class="xl:col-span-4 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">👤</span>
+                  UTILISATEUR ACTUEL
+                </h3>
               </div>
-              <div>
-                <div class="font-semibold text-sm">{{ user.username }}</div>
-                <div class="text-xs text-base-content/60">ID: #{{ user.id }}</div>
+              <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-xl font-bold">
+                    {{ props.user.username.charAt(0).toUpperCase() }}
+                  </div>
+                  <div>
+                    <div class="font-semibold text-lg">{{ props.user.username }}</div>
+                    <div class="text-sm text-base-content/70">{{ props.user.email }}</div>
+                  </div>
+                </div>
+
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">ID:</span>
+                    <span class="font-medium">#{{ props.user.id }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Inscription:</span>
+                    <span class="font-medium">{{ formatDate(props.user.created_at) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Niveau:</span>
+                    <span class="font-medium text-primary">{{ props.user.level }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Cash:</span>
+                    <span class="font-medium text-warning">{{ props.user.cash.toLocaleString() }} 💰</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="space-y-2">
-              <span :class="[
-                'inline-flex px-2 py-1 text-xs font-semibold rounded-full border w-full justify-center',
-                getRoleColor(user.role)
-              ]">
-                {{ user.role }}
-              </span>
-              <span :class="[
-                'inline-flex px-2 py-1 text-xs font-semibold rounded-full border w-full justify-center',
-                getStatusColor(user.status)
-              ]">
-                {{ user.status }}
-              </span>
-            </div>
-            <div class="mt-3 pt-3 border-t border-base-300/30 text-xs text-base-content/70">
-              <div class="flex justify-between">
-                <span>Niveau:</span>
-                <span class="font-semibold">{{ user.level }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Cash:</span>
-                <span class="font-semibold text-success">{{ (user.cash || 0).toLocaleString() }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🔧</span>
-              ACTIONS
-            </h3>
-          </div>
-          <div class="p-3 space-y-2">
-            <Button @click="resetForm" variant="outline" size="sm" class="w-full"
-                    :disabled="form.processing || !hasChanges">
-              🔄 Annuler les modifications
-            </Button>
-            <Button @click="router.visit(`/admin/users/${user.id}`)" variant="outline" size="sm" class="w-full">
-              👁️ Voir le profil
-            </Button>
-            <Button @click="deleteUser" variant="outline" size="sm"
-                    class="w-full text-error hover:text-error hover:bg-error/10">
-              🗑️ Supprimer
-            </Button>
-            <div class="border-t border-base-300/30 pt-2">
-              <Button @click="router.visit('/admin/users')" variant="ghost" size="sm" class="w-full">
-                ← Liste utilisateurs
-              </Button>
-              <Button @click="router.visit('/admin')" variant="ghost" size="sm" class="w-full mt-1">
-                🏠 Dashboard
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute right-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📋</span>
-              APERÇU DES MODIFICATIONS
-            </h3>
-          </div>
-          <div class="p-3 space-y-3">
-            <div class="text-center">
-              <div
-                class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-xl font-bold mb-2">
-                {{ form.username ? form.username.charAt(0).toUpperCase() : '?' }}
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">⚠️</span>
+                  ZONE DANGER
+                </h3>
               </div>
-              <div class="text-sm font-semibold">{{ form.username }}</div>
-              <div class="text-xs text-base-content/60">{{ form.email }}</div>
-            </div>
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between items-center">
-                <span class="text-base-content/70">Rôle:</span>
-                <span :class="[
-                  'px-2 py-1 rounded text-xs font-semibold',
-                  form.role !== user.role ? 'bg-warning/20 text-warning' : ''
-                ]">
-                  {{ form.role }}
-                </span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-base-content/70">Statut:</span>
-                <span :class="[
-                  'px-2 py-1 rounded text-xs font-semibold',
-                  form.status !== user.status ? 'bg-warning/20 text-warning' : ''
-                ]">
-                  {{ form.status }}
-                </span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-base-content/70">Niveau:</span>
-                <span :class="[
-                  'font-semibold',
-                  form.level !== user.level ? 'text-warning' : ''
-                ]">
-                  {{ form.level }}
-                </span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-base-content/70">Cash:</span>
-                <span :class="[
-                  'font-semibold',
-                  form.cash !== user.cash ? 'text-warning' : 'text-success'
-                ]">
-                  {{ form.cash }} 💰
-                </span>
-              </div>
-              <div v-if="form.password" class="flex justify-between items-center">
-                <span class="text-base-content/70">Mot de passe:</span>
-                <span class="text-warning font-semibold">Sera modifié</span>
-              </div>
-            </div>
-            <div v-if="hasChanges" class="text-xs text-warning bg-warning/10 p-2 rounded border border-warning/20">
-              ⚠️ Modifications en attente
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px]">
-        <div
-          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
-          <div class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📝</span>
-              FORMULAIRE DE MODIFICATION
-            </h3>
-          </div>
-
-          <form @submit.prevent="submit" class="flex-1 overflow-y-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              <div>
-                <label for="username"
-                       class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Nom d'utilisateur <span class="text-error">*</span>
-                </label>
-                <Input id="username" v-model="form.username" type="text" required :class="{
-                  'border-error': form.errors.username,
-                  'border-warning': form.username !== user.username
-                }" />
-                <p v-if="form.errors.username" class="mt-1 text-sm text-error">
-                  {{ form.errors.username }}
+              <div class="p-6 space-y-4">
+                <p class="text-sm text-base-content/70">
+                  La suppression d'un utilisateur est définitive et supprimera toutes ses données.
                 </p>
-              </div>
-
-              <div>
-                <label for="email" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Email <span class="text-error">*</span>
-                </label>
-                <Input id="email" v-model="form.email" type="email" required :class="{
-                  'border-error': form.errors.email,
-                  'border-warning': form.email !== user.email
-                }" />
-                <p v-if="form.errors.email" class="mt-1 text-sm text-error">
-                  {{ form.errors.email }}
-                </p>
-              </div>
-
-              <div class="md:col-span-2">
-                <label for="password"
-                       class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Nouveau mot de passe
-                  <span class="text-xs text-base-content/50 normal-case">(laisser vide pour ne pas changer)</span>
-                </label>
-                <Input id="password" v-model="form.password" type="password"
-                       placeholder="Nouveau mot de passe (optionnel)" :class="{
-                         'border-error': form.errors.password,
-                         'border-warning': form.password !== ''
-                       }" />
-                <p v-if="form.errors.password" class="mt-1 text-sm text-error">
-                  {{ form.errors.password }}
-                </p>
-              </div>
-
-              <div>
-                <label for="role" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Rôle <span class="text-error">*</span>
-                </label>
-                <Select id="role" v-model="form.role" :options="roles.map(role => ({ value: role, label: role }))"
-                        :class="{
-                          'border-error': form.errors.role,
-                          'border-warning': form.role !== user.role
-                        }" />
-                <p v-if="form.errors.role" class="mt-1 text-sm text-error">
-                  {{ form.errors.role }}
-                </p>
-              </div>
-
-              <div>
-                <label for="status" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Statut <span class="text-error">*</span>
-                </label>
-                <Select id="status" v-model="form.status"
-                        :options="statuses.map(status => ({ value: status, label: status }))" :class="{
-                          'border-error': form.errors.status,
-                          'border-warning': form.status !== user.status
-                        }" />
-                <p v-if="form.errors.status" class="mt-1 text-sm text-error">
-                  {{ form.errors.status }}
-                </p>
-              </div>
-
-              <div>
-                <label for="level" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Niveau
-                </label>
-                <Input id="level" v-model.number="form.level" type="number" min="1" max="100" :class="{
-                  'border-error': form.errors.level,
-                  'border-warning': form.level !== user.level
-                }" />
-                <p v-if="form.errors.level" class="mt-1 text-sm text-error">
-                  {{ form.errors.level }}
-                </p>
-              </div>
-
-              <div>
-                <label for="experience"
-                       class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Expérience
-                </label>
-                <Input id="experience" v-model.number="form.experience" type="number" min="0" :class="{
-                  'border-error': form.errors.experience,
-                  'border-warning': form.experience !== user.experience
-                }" />
-                <p v-if="form.errors.experience" class="mt-1 text-sm text-error">
-                  {{ form.errors.experience }}
-                </p>
-              </div>
-
-              <div>
-                <label for="cash" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Cash 💰
-                </label>
-                <Input id="cash" v-model.number="form.cash" type="number" min="0" :class="{
-                  'border-error': form.errors.cash,
-                  'border-warning': form.cash !== user.cash
-                }" />
-                <p v-if="form.errors.cash" class="mt-1 text-sm text-error">
-                  {{ form.errors.cash }}
-                </p>
-              </div>
-            </div>
-          </form>
-
-          <div class="shrink-0 bg-gradient-to-r from-warning/10 to-warning/5 px-6 py-4 border-t border-warning/20">
-            <div class="flex items-center justify-between">
-              <div class="text-xs text-base-content/70">
-                <span v-if="hasChanges" class="text-warning">⚠️ Modifications non sauvegardées</span>
-                <span v-else>Aucune modification</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <Button @click="router.visit('/admin/users')" variant="ghost" size="md" :disabled="form.processing">
-                  Annuler
+                <Button
+                  @click="deleteUser"
+                  variant="outline"
+                  size="sm"
+                  class="w-full border-error text-error hover:bg-error hover:text-error-content"
+                >
+                  🗑️ Supprimer l'utilisateur
                 </Button>
-                <Button @click="submit" variant="primary" size="md" :disabled="form.processing || !hasChanges">
-                  {{ form.processing ? '🔄 Mise à jour...' : '💾 Sauvegarder les modifications' }}
+              </div>
+            </div>
+
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">🔗</span>
+                  NAVIGATION
+                </h3>
+              </div>
+              <div class="p-6 space-y-3">
+                <Button
+                  @click="router.visit(`/admin/users/${props.user.id}`)"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  👁️ Voir l'utilisateur
+                </Button>
+                <Button
+                  @click="router.visit('/admin/users')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  📋 Liste utilisateurs
+                </Button>
+                <Button
+                  @click="router.visit('/admin')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  🏠 Dashboard
                 </Button>
               </div>
             </div>
@@ -407,5 +402,35 @@ const deleteUser = () => {
         </div>
       </div>
     </div>
+
+    <Modal :show="showDeleteModal" @close="cancelDelete" max-width="md">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-error/20 rounded-lg flex items-center justify-center">
+            <span class="text-xl">⚠️</span>
+          </div>
+          <h3 class="text-xl font-bold text-base-content">Supprimer l'utilisateur</h3>
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-base-content/80">
+          Êtes-vous sûr de vouloir supprimer l'utilisateur
+          <span class="font-bold text-error">{{ props.user.username }}</span> ?
+        </p>
+        <p class="text-sm text-base-content/60">
+          Cette action est irréversible et supprimera toutes les données associées.
+        </p>
+
+        <div class="flex gap-3 pt-4">
+          <Button @click="confirmDelete" variant="outline" class="flex-1 border-error text-error hover:bg-error hover:text-error-content">
+            🗑️ Supprimer
+          </Button>
+          <Button @click="cancelDelete" variant="secondary" class="flex-1">
+            Annuler
+          </Button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>

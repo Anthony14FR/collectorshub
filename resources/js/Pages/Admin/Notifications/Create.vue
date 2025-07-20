@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import MultipleSelect from '@/Components/UI/MultipleSelect.vue';
+import Input from '@/Components/UI/Input.vue';
+import Select from '@/Components/UI/Select.vue';
 import { Head, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 interface User {
   id: number;
@@ -16,6 +17,7 @@ interface User {
 
 interface Props {
   users: User[];
+  errors?: Record<string, string>;
 }
 
 const props = defineProps<Props>();
@@ -28,27 +30,45 @@ const form = ref({
 });
 
 const isSubmitting = ref(false);
+const selectedUsers = ref<number[]>([]);
 
-const resetForm = () => {
-  form.value = {
-    title: '',
-    message: '',
-    target_type: 'all',
-    user_ids: []
-  };
+const targetTypeOptions = [
+  { value: 'all', label: 'Tous les utilisateurs' },
+  { value: 'specific', label: 'Utilisateurs spécifiques' }
+];
+
+const userOptions = computed(() => {
+  return props.users.map(user => ({
+    value: user.id,
+    label: `${user.username || user.name} (${user.email})`
+  }));
+});
+
+const addUser = () => {
+  const userId = parseInt((document.getElementById('user-select') as HTMLSelectElement)?.value);
+  if (userId && !selectedUsers.value.includes(userId)) {
+    selectedUsers.value.push(userId);
+    form.value.user_ids = selectedUsers.value;
+  }
 };
 
-const submit = async () => {
-  if (isSubmitting.value) return;
+const removeUser = (userId: number) => {
+  selectedUsers.value = selectedUsers.value.filter(id => id !== userId);
+  form.value.user_ids = selectedUsers.value;
+};
 
+const getUserById = (id: number) => {
+  return props.users.find(user => user.id === id);
+};
+
+const submit = () => {
   isSubmitting.value = true;
 
   router.post('/admin/notifications', form.value, {
     onSuccess: () => {
-      resetForm();
-      isSubmitting.value = false;
+      router.visit('/admin');
     },
-    onError: () => {
+    onFinish: () => {
       isSubmitting.value = false;
     }
   });
@@ -58,209 +78,248 @@ const goBack = () => {
   router.visit('/admin');
 };
 
-const userOptions = props.users.map(user => ({
-  id: user.id,
-  name: user.username || user.name,
-  email: user.email,
-  description: `Niveau ${user.level} • ${user.role}`,
-  avatar: user.username?.charAt(0).toUpperCase() || user.name?.charAt(0).toUpperCase()
-}));
+const resetForm = () => {
+  form.value = {
+    title: '',
+    message: '',
+    target_type: 'all',
+    user_ids: []
+  };
+  selectedUsers.value = [];
+};
 </script>
 
 <template>
+  <Head title="Créer une annonce" />
 
-  <Head title="Créer une annonce - Admin" />
-
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative overflow-x-hidden">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden">
-      <div class="flex justify-center pt-4 mb-4">
-        <div class="text-center">
-          <h1
-            class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider">
-            📢 CRÉER UNE ANNONCE
+    <div class="relative z-10 min-h-screen">
+      <div class="container mx-auto px-4 py-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-2 tracking-wider">
+            📢 CRÉER ANNONCE
           </h1>
-          <p class="text-xs text-base-content/70 uppercase tracking-wider">
-            Diffusion de messages administratifs
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
+            Diffuser un message à la communauté
           </p>
         </div>
-      </div>
 
-      <div class="absolute left-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-          <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🎯</span>
-              TYPE D'ANNONCE
-            </h3>
-          </div>
-          <div class="p-4 space-y-3">
-            <label class="flex items-center gap-3 cursor-pointer group">
-              <input v-model="form.target_type" type="radio" value="all"
-                     class="radio radio-primary radio-sm" />
-              <div class="flex items-center gap-2">
-                <span class="text-lg">📢</span>
-                <div>
-                  <div class="text-sm font-medium group-hover:text-primary transition-colors">
-                    Tous les utilisateurs
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          <div class="xl:col-span-8">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-6 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
+                <h3 class="text-xl font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-2xl">📨</span>
+                  INFORMATIONS ANNONCE
+                </h3>
+              </div>
+
+              <form @submit.prevent="submit" class="p-8 space-y-6">
+                <div class="space-y-2">
+                  <label class="block text-sm font-bold text-base-content/80 mb-2">
+                    Titre de l'annonce *
+                  </label>
+                  <Input
+                    v-model="form.title"
+                    placeholder="Titre de votre annonce"
+                    class="w-full"
+                    required
+                  />
+                  <p v-if="props.errors?.title" class="text-xs text-error mt-1">
+                    {{ props.errors.title }}
+                  </p>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-bold text-base-content/80 mb-2">
+                    Message *
+                  </label>
+                  <textarea
+                    v-model="form.message"
+                    placeholder="Contenu de votre message..."
+                    class="textarea textarea-bordered w-full bg-base-100/80 border-base-300/50 min-h-[120px]"
+                    required
+                  ></textarea>
+                  <p v-if="props.errors?.message" class="text-xs text-error mt-1">
+                    {{ props.errors.message }}
+                  </p>
+                  <p class="text-xs text-base-content/60">
+                    Rédigez un message clair et concis pour vos utilisateurs
+                  </p>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-bold text-base-content/80 mb-2">
+                    Type de diffusion *
+                  </label>
+                  <Select
+                    v-model="form.target_type"
+                    :options="targetTypeOptions"
+                    class="w-full"
+                    required
+                  />
+                  <p v-if="props.errors?.target_type" class="text-xs text-error mt-1">
+                    {{ props.errors.target_type }}
+                  </p>
+                </div>
+
+                <div v-if="form.target_type === 'specific'" class="space-y-4">
+                  <h4 class="text-lg font-bold text-base-content border-b border-base-300/30 pb-2">
+                    👥 Utilisateurs ciblés
+                  </h4>
+
+                  <div class="flex gap-3">
+                    <select id="user-select" class="flex-1 bg-base-200/50 border border-base-300 rounded-lg px-3 py-2 text-sm">
+                      <option value="">Sélectionner un utilisateur...</option>
+                      <option v-for="user in props.users" :key="user.id" :value="user.id">
+                        {{ user.username || user.name }} ({{ user.email }})
+                      </option>
+                    </select>
+                    <Button @click="addUser" type="button" variant="outline" size="sm">
+                      Ajouter
+                    </Button>
                   </div>
-                  <div class="text-xs text-base-content/60">
-                    Diffusion globale
+
+                  <div v-if="selectedUsers.length > 0" class="space-y-2">
+                    <div v-for="userId in selectedUsers" :key="userId" class="flex items-center justify-between p-3 bg-base-200/30 rounded-lg">
+                      <div>
+                        <span class="font-medium">{{ getUserById(userId)?.username || getUserById(userId)?.name }}</span>
+                        <span class="text-sm text-base-content/70 ml-2">({{ getUserById(userId)?.email }})</span>
+                      </div>
+                      <Button @click="removeUser(userId)" variant="ghost" size="sm" class="text-error">
+                        ✕
+                      </Button>
+                    </div>
+                  </div>
+
+                  <p v-if="props.errors?.user_ids" class="text-xs text-error mt-1">
+                    {{ props.errors.user_ids }}
+                  </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-base-300/30">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    :disabled="isSubmitting"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    <span v-if="isSubmitting">⏳</span>
+                    <span v-else>📤</span>
+                    {{ isSubmitting ? 'Envoi...' : 'Envoyer l\'annonce' }}
+                  </Button>
+
+                  <Button
+                    @click="goBack"
+                    variant="secondary"
+                    size="lg"
+                    :disabled="isSubmitting"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    ← Retour au dashboard
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="xl:col-span-4 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">💡</span>
+                  CONSEILS
+                </h3>
+              </div>
+              <div class="p-6 space-y-4">
+                <div class="text-sm space-y-3">
+                  <div>
+                    <h4 class="font-semibold text-base-content mb-1">Titre efficace :</h4>
+                    <ul class="text-base-content/70 space-y-1 text-xs">
+                      <li>• Soyez concis et explicite</li>
+                      <li>• Utilisez des mots-clés importants</li>
+                      <li>• Évitez les majuscules excessives</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 class="font-semibold text-base-content mb-1">Message clair :</h4>
+                    <ul class="text-base-content/70 space-y-1 text-xs">
+                      <li>• Structure en paragraphes courts</li>
+                      <li>• Informations essentielles en premier</li>
+                      <li>• Ton professionnel mais accessible</li>
+                    </ul>
+                  </div>
+
+                  <div class="pt-3 border-t border-base-300/30">
+                    <p class="text-xs text-base-content/60">
+                      💬 Les utilisateurs recevront une notification immédiate
+                    </p>
                   </div>
                 </div>
               </div>
-            </label>
+            </div>
 
-            <label class="flex items-center gap-3 cursor-pointer group">
-              <input v-model="form.target_type" type="radio" value="specific"
-                     class="radio radio-primary radio-sm" />
-              <div class="flex items-center gap-2">
-                <span class="text-lg">👥</span>
-                <div>
-                  <div class="text-sm font-medium group-hover:text-primary transition-colors">
-                    Utilisateurs spécifiques
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">📊</span>
+                  STATISTIQUES
+                </h3>
+              </div>
+              <div class="p-6 space-y-4">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-primary">{{ props.users.length }}</div>
+                  <div class="text-sm text-base-content/70">Utilisateurs totaux</div>
+                </div>
+
+                <div v-if="form.target_type === 'specific'" class="text-center">
+                  <div class="text-2xl font-bold text-secondary">{{ selectedUsers.length }}</div>
+                  <div class="text-sm text-base-content/70">Utilisateurs sélectionnés</div>
+                </div>
+
+                <div v-if="form.target_type === 'all'" class="pt-4 border-t border-base-300/30 text-center">
+                  <div class="text-sm font-medium text-base-content mb-1">Diffusion globale</div>
+                  <div class="text-lg font-bold text-success">
+                    📢
                   </div>
                   <div class="text-xs text-base-content/60">
-                    Sélection ciblée
+                    Tous les utilisateurs recevront l'annonce
                   </div>
                 </div>
               </div>
-            </label>
-          </div>
-        </div>
-
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📊</span>
-              DESTINATAIRES
-            </h3>
-          </div>
-          <div class="p-4">
-            <div class="text-center">
-              <div class="text-2xl font-bold text-secondary mb-1">
-                {{ form.target_type === 'all' ? props.users.length : form.user_ids.length }}
-              </div>
-              <div class="text-xs text-base-content/60">
-                {{ form.target_type === 'all' ? 'Tous les utilisateurs' : 'Utilisateurs sélectionnés' }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute right-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-          <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">⚡</span>
-              ACTIONS RAPIDES
-            </h3>
-          </div>
-          <div class="p-4 space-y-3">
-            <Button @click="goBack" variant="secondary" size="sm" class="w-full justify-start">
-              ← Dashboard Admin
-            </Button>
-            <Button @click="resetForm" variant="outline" size="sm" class="w-full justify-start">
-              🔄 Réinitialiser
-            </Button>
-          </div>
-        </div>
-
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">👁️</span>
-              APERÇU
-            </h3>
-          </div>
-          <div class="p-4">
-            <div class="bg-base-200/50 rounded-lg p-3 space-y-2">
-              <div class="font-bold text-sm text-warning line-clamp-2">
-                {{ form.title || 'Titre de l\'annonce...' }}
-              </div>
-              <div class="text-xs text-base-content/70 line-clamp-3">
-                {{ form.message || 'Votre message apparaîtra ici...' }}
-              </div>
-              <div class="text-xs text-base-content/50 border-t border-base-300/30 pt-2">
-                Annonce • Admin
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[500px] h-[calc(100vh-120px)]">
-        <div
-          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
-          <div
-            class="shrink-0 p-3 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
-            <h3 class="text-base font-bold tracking-wider flex items-center gap-2">
-              <span class="text-xl">✍️</span>
-              RÉDIGER L'ANNONCE
-            </h3>
-          </div>
-
-          <form @submit.prevent="submit" class="flex-1 flex flex-col">
-            <div class="flex-1 p-4 space-y-4 min-h-0">
-              <div>
-                <label class="block text-xs font-bold text-base-content mb-1">
-                  Titre de l'annonce
-                </label>
-                <input v-model="form.title" type="text" required
-                       placeholder="Titre accrocheur pour votre annonce..."
-                       class="w-full px-3 py-2 bg-base-200/50 border-2 border-base-300/30 rounded-lg text-sm focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-all" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-base-content mb-1">
-                  Message
-                </label>
-                <textarea v-model="form.message" rows="4" required
-                          placeholder="Rédigez votre message ici. Soyez clair et informatif..."
-                          class="w-full px-3 py-2 bg-base-200/50 border-2 border-base-300/30 rounded-lg text-sm focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-all resize-none"></textarea>
-              </div>
-
-              <div v-if="form.target_type === 'specific'" class="flex-1 min-h-0">
-                <label class="block text-xs font-bold text-base-content mb-1">
-                  Sélectionner les utilisateurs
-                </label>
-                <MultipleSelect v-model="form.user_ids" :options="userOptions"
-                                placeholder="Rechercher et sélectionner des utilisateurs..."
-                                searchPlaceholder="Rechercher par nom, email ou niveau..."
-                                emptyText="Aucun utilisateur trouvé" max-height="max-h-24" :max-display-items="1"
-                                show-field="email" />
-              </div>
             </div>
 
-            <div
-              class="shrink-0 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border-t border-primary/20">
-              <div class="flex gap-2">
-                <Button type="button" @click="resetForm" variant="outline" size="sm" class="flex-1"
-                        :disabled="isSubmitting">
-                  🔄 Réinitialiser
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">🔧</span>
+                  ACTIONS
+                </h3>
+              </div>
+              <div class="p-6 space-y-3">
+                <Button
+                  @click="resetForm"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  🔄 Réinitialiser le formulaire
                 </Button>
-                <Button type="submit" variant="primary" size="sm" class="flex-1"
-                        :disabled="isSubmitting || !form.title.trim() || !form.message.trim() || (form.target_type === 'specific' && form.user_ids.length === 0)">
-                  <span v-if="isSubmitting">⏳ Envoi...</span>
-                  <span v-else>📤 Envoyer</span>
+                <Button
+                  @click="router.visit('/admin')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  🏠 Dashboard Admin
                 </Button>
               </div>
-
-              <div class="mt-2 text-xs text-center text-base-content/60">
-                <span v-if="form.target_type === 'all'">
-                  {{ props.users.length }} utilisateurs
-                </span>
-                <span v-else-if="form.user_ids.length > 0">
-                  {{ form.user_ids.length }} sélectionné(s)
-                </span>
-                <span v-else class="text-warning">
-                  Sélectionnez des utilisateurs
-                </span>
-              </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>

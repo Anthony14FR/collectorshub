@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import { reactive } from 'vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Select from '@/Components/UI/Select.vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
-defineProps<{
+interface Props {
   roles: string[];
   statuses: string[];
-}>();
+  errors?: Record<string, string>;
+}
 
-const form = reactive({
+const props = defineProps<Props>();
+
+const form = useForm({
   username: '',
   email: '',
   password: '',
@@ -19,328 +22,302 @@ const form = reactive({
   experience: 0,
   cash: 0,
   role: 'user',
-  status: 'active',
-  processing: false,
-  errors: {} as Record<string, string>,
+  status: 'active'
+});
+
+const isSubmitting = ref(false);
+
+const roleOptions = computed(() => {
+  return props.roles.map(role => ({
+    value: role,
+    label: getRoleLabel(role)
+  }));
+});
+
+const statusOptions = computed(() => {
+  return props.statuses.map(status => ({
+    value: status,
+    label: getStatusLabel(status)
+  }));
 });
 
 const submit = () => {
-  form.processing = true;
-  form.errors = {};
-
-  router.post('/admin/users', {
-    username: form.username,
-    email: form.email,
-    password: form.password,
-    level: form.level,
-    experience: form.experience,
-    cash: form.cash,
-    role: form.role,
-    status: form.status,
-  }, {
+  isSubmitting.value = true;
+  form.post('/admin/users', {
     onSuccess: () => {
-      form.processing = false;
+      router.visit('/admin/users');
     },
-    onError: (errors: Record<string, string>) => {
-      form.processing = false;
-      form.errors = errors;
-    },
+    onFinish: () => {
+      isSubmitting.value = false;
+    }
   });
 };
 
-const resetForm = () => {
-  form.username = '';
-  form.email = '';
-  form.password = '';
-  form.level = 1;
-  form.experience = 0;
-  form.cash = 0;
-  form.role = 'user';
-  form.status = 'active';
-  form.errors = {};
+const goBack = () => {
+  router.visit('/admin/users');
+};
+
+const getRoleLabel = (role: string) => {
+  switch (role) {
+  case 'admin': return 'Administrateur';
+  case 'user': return 'Joueur';
+  default: return role;
+  }
+};
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+  case 'active': return 'Actif';
+  case 'banned': return 'Banni';
+  default: return status;
+  }
 };
 </script>
 
 <template>
   <Head title="Créer un utilisateur" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative overflow-x-hidden">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden">
-      <div class="flex justify-center pt-4 mb-4">
-        <div class="text-center">
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-success to-success/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            ➕ CRÉER UN UTILISATEUR
+    <div class="relative z-10 min-h-screen">
+      <div class="container mx-auto px-4 py-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-success to-success/80 bg-clip-text text-transparent mb-2 tracking-wider">
+            ➕ CRÉER UTILISATEUR
           </h1>
-          <p class="text-xs text-base-content/70 uppercase tracking-wider">
-            Nouvel utilisateur de la plateforme
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
+            Ajouter un nouvel utilisateur à la plateforme
           </p>
         </div>
-      </div>
 
-      <div class="absolute left-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-          <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">ℹ️</span>
-              AIDE
-            </h3>
-          </div>
-          <div class="p-3 text-xs text-base-content/70 space-y-2">
-            <p>• Username : unique, 3-20 caractères</p>
-            <p>• Email : format valide requis</p>
-            <p>• Password : minimum 8 caractères</p>
-            <p>• Level : défaut 1, max 100</p>
-            <p>• Cash : montant initial en jeu</p>
-          </div>
-        </div>
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          <div class="xl:col-span-8 xl:col-start-3">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-6 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
+                <h3 class="text-xl font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-2xl">👤</span>
+                  INFORMATIONS UTILISATEUR
+                </h3>
+              </div>
 
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🔄</span>
-              ACTIONS
-            </h3>
-          </div>
-          <div class="p-3 space-y-2">
-            <Button
-              @click="resetForm"
-              variant="outline"
-              size="sm"
-              class="w-full"
-              :disabled="form.processing"
-            >
-              🗑️ Vider le formulaire
-            </Button>
-            <div class="border-t border-base-300/30 pt-2">
-              <Button
-                @click="router.visit('/admin/users')"
-                variant="ghost"
-                size="sm"
-                class="w-full"
-              >
-                ← Liste utilisateurs
-              </Button>
-              <Button
-                @click="router.visit('/admin')"
-                variant="ghost"
-                size="sm"
-                class="w-full mt-1"
-              >
-                🏠 Dashboard
-              </Button>
+              <form @submit.prevent="submit" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Nom d'utilisateur *
+                    </label>
+                    <Input
+                      v-model="form.username"
+                      placeholder="Entrer le nom d'utilisateur"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.username" class="text-xs text-error mt-1">
+                      {{ props.errors.username }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Adresse email *
+                    </label>
+                    <Input
+                      v-model="form.email"
+                      type="email"
+                      placeholder="exemple@email.com"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.email" class="text-xs text-error mt-1">
+                      {{ props.errors.email }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-bold text-base-content/80 mb-2">
+                    Mot de passe *
+                  </label>
+                  <Input
+                    v-model="form.password"
+                    type="password"
+                    placeholder="••••••••"
+                    class="w-full"
+                    required
+                  />
+                  <p v-if="props.errors?.password" class="text-xs text-error mt-1">
+                    {{ props.errors.password }}
+                  </p>
+                  <p class="text-xs text-base-content/60">
+                    Minimum 8 caractères requis
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Niveau
+                    </label>
+                    <Input
+                      v-model="form.level"
+                      type="number"
+                      min="1"
+                      class="w-full"
+                    />
+                    <p v-if="props.errors?.level" class="text-xs text-error mt-1">
+                      {{ props.errors.level }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Expérience
+                    </label>
+                    <Input
+                      v-model="form.experience"
+                      type="number"
+                      min="0"
+                      class="w-full"
+                    />
+                    <p v-if="props.errors?.experience" class="text-xs text-error mt-1">
+                      {{ props.errors.experience }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Cash 💰
+                    </label>
+                    <Input
+                      v-model="form.cash"
+                      type="number"
+                      min="0"
+                      class="w-full"
+                    />
+                    <p v-if="props.errors?.cash" class="text-xs text-error mt-1">
+                      {{ props.errors.cash }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Rôle *
+                    </label>
+                    <Select
+                      v-model="form.role"
+                      :options="roleOptions"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.role" class="text-xs text-error mt-1">
+                      {{ props.errors.role }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Statut *
+                    </label>
+                    <Select
+                      v-model="form.status"
+                      :options="statusOptions"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.status" class="text-xs text-error mt-1">
+                      {{ props.errors.status }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-base-300/30">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    :disabled="isSubmitting || form.processing"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    <span v-if="isSubmitting || form.processing">⏳</span>
+                    <span v-else>💾</span>
+                    {{ isSubmitting || form.processing ? 'Création...' : 'Créer l\'utilisateur' }}
+                  </Button>
+
+                  <Button
+                    @click="goBack"
+                    variant="secondary"
+                    size="lg"
+                    :disabled="isSubmitting || form.processing"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    ← Retour à la liste
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="absolute right-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📋</span>
-              APERÇU
-            </h3>
-          </div>
-          <div class="p-3 space-y-3">
-            <div class="text-center">
-              <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-xl font-bold mb-2">
-                {{ form.username ? form.username.charAt(0).toUpperCase() : '?' }}
+          <div class="xl:col-span-3 xl:col-start-11">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">💡</span>
+                  AIDE
+                </h3>
               </div>
-              <div class="text-sm font-semibold">{{ form.username || 'Nouveau utilisateur' }}</div>
-              <div class="text-xs text-base-content/60">{{ form.email || 'email@example.com' }}</div>
-            </div>
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Rôle:</span>
-                <span class="font-semibold">{{ form.role }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Statut:</span>
-                <span class="font-semibold">{{ form.status }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Niveau:</span>
-                <span class="font-semibold">{{ form.level }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Cash:</span>
-                <span class="font-semibold text-success">{{ form.cash }} 💰</span>
+              <div class="p-6 space-y-4">
+                <div class="text-sm space-y-3">
+                  <div>
+                    <h4 class="font-semibold text-base-content mb-1">Rôles disponibles :</h4>
+                    <ul class="text-base-content/70 space-y-1 text-xs">
+                      <li>• <span class="text-error font-medium">Admin</span> : Accès complet</li>
+                      <li>• <span class="text-info font-medium">Joueur</span> : Accès limité</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 class="font-semibold text-base-content mb-1">Statuts disponibles :</h4>
+                    <ul class="text-base-content/70 space-y-1 text-xs">
+                      <li>• <span class="text-success font-medium">Actif</span> : Peut se connecter</li>
+                      <li>• <span class="text-error font-medium">Banni</span> : Accès refusé</li>
+                    </ul>
+                  </div>
+
+                  <div class="pt-3 border-t border-base-300/30">
+                    <p class="text-xs text-base-content/60">
+                      ⚠️ Les champs marqués d'un * sont obligatoires
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px]">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
-          <div class="shrink-0 p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📝</span>
-              FORMULAIRE DE CRÉATION
-            </h3>
-          </div>
-
-          <form @submit.prevent="submit" class="flex-1 overflow-y-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              <div>
-                <label for="username" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Nom d'utilisateur <span class="text-error">*</span>
-                </label>
-                <Input
-                  id="username"
-                  v-model="form.username"
-                  type="text"
-                  required
-                  placeholder="johndoe"
-                  :class="{ 'border-error': form.errors.username }"
-                />
-                <p v-if="form.errors.username" class="mt-1 text-sm text-error">
-                  {{ form.errors.username }}
-                </p>
+            <div class="mt-6 bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">🔗</span>
+                  NAVIGATION
+                </h3>
               </div>
-
-              <div>
-                <label for="email" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Email <span class="text-error">*</span>
-                </label>
-                <Input
-                  id="email"
-                  v-model="form.email"
-                  type="email"
-                  required
-                  placeholder="john@example.com"
-                  :class="{ 'border-error': form.errors.email }"
-                />
-                <p v-if="form.errors.email" class="mt-1 text-sm text-error">
-                  {{ form.errors.email }}
-                </p>
-              </div>
-
-              <div class="md:col-span-2">
-                <label for="password" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Mot de passe <span class="text-error">*</span>
-                </label>
-                <Input
-                  id="password"
-                  v-model="form.password"
-                  type="password"
-                  required
-                  placeholder="Mot de passe sécurisé (min. 8 caractères)"
-                  :class="{ 'border-error': form.errors.password }"
-                />
-                <p v-if="form.errors.password" class="mt-1 text-sm text-error">
-                  {{ form.errors.password }}
-                </p>
-              </div>
-
-              <div>
-                <label for="role" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Rôle <span class="text-error">*</span>
-                </label>
-                <Select
-                  id="role"
-                  v-model="form.role"
-                  :options="roles.map(role => ({ value: role, label: role }))"
-                  :class="{ 'border-error': form.errors.role }"
-                />
-                <p v-if="form.errors.role" class="mt-1 text-sm text-error">
-                  {{ form.errors.role }}
-                </p>
-              </div>
-
-              <div>
-                <label for="status" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Statut <span class="text-error">*</span>
-                </label>
-                <Select
-                  id="status"
-                  v-model="form.status"
-                  :options="statuses.map(status => ({ value: status, label: status }))"
-                  :class="{ 'border-error': form.errors.status }"
-                />
-                <p v-if="form.errors.status" class="mt-1 text-sm text-error">
-                  {{ form.errors.status }}
-                </p>
-              </div>
-
-              <div>
-                <label for="level" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Niveau initial
-                </label>
-                <Input
-                  id="level"
-                  v-model.number="form.level"
-                  type="number"
-                  min="1"
-                  max="100"
-                  placeholder="1"
-                  :class="{ 'border-error': form.errors.level }"
-                />
-                <p v-if="form.errors.level" class="mt-1 text-sm text-error">
-                  {{ form.errors.level }}
-                </p>
-              </div>
-
-              <div>
-                <label for="experience" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Expérience initiale
-                </label>
-                <Input
-                  id="experience"
-                  v-model.number="form.experience"
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  :class="{ 'border-error': form.errors.experience }"
-                />
-                <p v-if="form.errors.experience" class="mt-1 text-sm text-error">
-                  {{ form.errors.experience }}
-                </p>
-              </div>
-
-              <div>
-                <label for="cash" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                  Cash initial 💰
-                </label>
-                <Input
-                  id="cash"
-                  v-model.number="form.cash"
-                  type="number"
-                  min="0"
-                  placeholder="1000"
-                  :class="{ 'border-error': form.errors.cash }"
-                />
-                <p v-if="form.errors.cash" class="mt-1 text-sm text-error">
-                  {{ form.errors.cash }}
-                </p>
-              </div>
-            </div>
-          </form>
-
-          <div class="shrink-0 bg-gradient-to-r from-success/10 to-success/5 px-6 py-4 border-t border-success/20">
-            <div class="flex items-center justify-between">
-              <div class="text-xs text-base-content/70">
-                Les champs marqués d'un <span class="text-error">*</span> sont obligatoires
-              </div>
-              <div class="flex items-center gap-3">
+              <div class="p-6 space-y-3">
                 <Button
                   @click="router.visit('/admin/users')"
-                  variant="ghost"
-                  size="md"
-                  :disabled="form.processing"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
                 >
-                  Annuler
+                  📋 Liste utilisateurs
                 </Button>
                 <Button
-                  @click="submit"
-                  variant="primary"
-                  size="md"
-                  :disabled="form.processing || !form.username || !form.email || !form.password"
+                  @click="router.visit('/admin')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
                 >
-                  {{ form.processing ? '🔄 Création...' : '✅ Créer l\'utilisateur' }}
+                  🏠 Dashboard
                 </Button>
               </div>
             </div>

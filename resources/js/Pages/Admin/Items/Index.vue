@@ -1,695 +1,409 @@
-<script setup>
-import { ref, computed } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
-import Button from "@/Components/UI/Button.vue";
-import Alert from "@/Components/UI/Alert.vue";
-import Toast from "@/Components/UI/Toast.vue";
-import Badge from "@/Components/UI/Badge.vue";
-import RarityBadge from "@/Components/UI/RarityBadge.vue";
-import BackgroundEffects from "@/Components/UI/BackgroundEffects.vue";
-import Modal from "@/Components/UI/Modal.vue";
+<script setup lang="ts">
+import { Head, router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
+import Button from '@/Components/UI/Button.vue';
+import Input from '@/Components/UI/Input.vue';
+import Select from '@/Components/UI/Select.vue';
+import Modal from '@/Components/UI/Modal.vue';
 
-const props = defineProps({
-  auth: Object,
-  items: Object,
-  stats: Object,
-  filters: Object,
-  flash: Object,
-});
-
-const showDeleteModal = ref(false);
-const itemToDelete = ref(null);
-const notification = ref(null);
-const showToast = ref(false);
-const toastMessage = ref("");
-const isLoading = ref(false);
-const activeTab = ref(props.filters?.type || "all");
-const perPage = ref(props.filters?.per_page || 16);
-
-if (props.flash?.success) {
-  toastMessage.value = props.flash.success;
-  showToast.value = true;
+interface Item {
+  id: number;
+  name: string;
+  description: string | null;
+  type: string;
+  price: number;
+  rarity: string;
+  image: string | null;
+  effect: object;
+  created_at: string;
 }
 
-if (props.flash?.error) {
-  notification.value = {
-    type: "error",
-    message: props.flash.error,
+interface PaginatedItems {
+  data: Item[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  links: Array<{
+    url: string | null;
+    label: string;
+    active: boolean;
+  }>;
+}
+
+interface Props {
+  items: PaginatedItems;
+  stats: {
+    total: number;
+    ball: number;
+    avatar: number;
+    background: number;
   };
-  setTimeout(() => {
-    notification.value = null;
-  }, 5000);
+  filters?: {
+    type?: string;
+  };
 }
 
-const itemsList = computed(() => {
-  return props.items?.data || [];
+const props = defineProps<Props>();
+
+const typeFilter = ref(props.filters?.type || '');
+const searchTerm = ref('');
+const showDeleteModal = ref(false);
+const itemToDelete = ref<Item | null>(null);
+
+const typeOptions = [
+  { value: '', label: 'Tous types' },
+  { value: 'ball', label: 'Balls' },
+  { value: 'avatar', label: 'Avatars' },
+  { value: 'background', label: 'Backgrounds' }
+];
+
+const filteredItems = computed(() => {
+  return props.items.data.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+      (item.description && item.description.toLowerCase().includes(searchTerm.value.toLowerCase()));
+    return matchesSearch;
+  });
 });
 
-const hasNoItems = computed(() => {
-  return !itemsList.value || itemsList.value.length === 0;
-});
-
-const tabs = computed(() => [
-  { id: "all", label: "Tous", count: props.stats?.total || 0 },
-  { id: "ball", label: "Balls", count: props.stats?.ball || 0 },
-  { id: "avatar", label: "Avatars", count: props.stats?.avatar || 0 },
-  {
-    id: "background",
-    label: "Backgrounds",
-    count: props.stats?.background || 0,
-  },
-]);
-
-const confirmDelete = (item) => {
+const deleteItem = (item: Item) => {
   itemToDelete.value = item;
   showDeleteModal.value = true;
 };
 
-const deleteItem = () => {
-  if (!itemToDelete.value) return;
-
-  isLoading.value = true;
-
-  const params = {};
-  if (activeTab.value !== "all") {
-    params.type = activeTab.value;
-  }
-  if (perPage.value !== 16) {
-    params.per_page = perPage.value;
-  }
-
-  const url = new URL(
-    `/admin/items/${itemToDelete.value.id}`,
-    window.location.origin
-  );
-  Object.keys(params).forEach((key) => {
-    url.searchParams.append(key, params[key]);
-  });
-
-  router.delete(url.pathname + url.search, {
-    onSuccess: (page) => {
-      showDeleteModal.value = false;
-      toastMessage.value = "L'item a été supprimé avec succès";
-      showToast.value = true;
-
-      if (page.props.flash?.stats) {
+const confirmDelete = () => {
+  if (itemToDelete.value) {
+    router.delete(`/admin/items/${itemToDelete.value.id}`, {
+      preserveScroll: true,
+      onFinish: () => {
+        showDeleteModal.value = false;
+        itemToDelete.value = null;
       }
-    },
-    onError: () => {
-      notification.value = {
-        type: "error",
-        message: "Une erreur est survenue lors de la suppression",
-      };
-    },
-    onFinish: () => {
-      isLoading.value = false;
-    },
-  });
-};
-
-const getTypeLabel = (type) => {
-  const types = {
-    ball: "Ball",
-    avatar: "Avatar",
-    background: "Background",
-  };
-  return types[type] || type;
-};
-
-const changeTab = (tabId) => {
-  activeTab.value = tabId;
-  const params = tabId === "all" ? {} : { type: tabId };
-  if (perPage.value !== 16) {
-    params.per_page = perPage.value;
+    });
   }
-  router.get("/admin/items", params, {
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  itemToDelete.value = null;
+};
+
+const applyFilters = () => {
+  const params = new URLSearchParams();
+
+  if (typeFilter.value) {
+    params.append('type', typeFilter.value);
+  }
+
+  router.get(`/admin/items?${params.toString()}`, {}, {
     preserveState: true,
-    replace: true,
+    preserveScroll: true,
   });
 };
 
-const changePerPage = (newPerPage) => {
-  perPage.value = newPerPage;
-  const params = activeTab.value === "all" ? {} : { type: activeTab.value };
-  if (newPerPage !== 16) {
-    params.per_page = newPerPage;
-  }
-  router.get("/admin/items", params, {
+const clearFilters = () => {
+  typeFilter.value = '';
+  searchTerm.value = '';
+  router.get('/admin/items', {}, {
     preserveState: true,
-    replace: true,
+    preserveScroll: true,
   });
 };
 
-const getVisiblePages = () => {
-  const current = props.items.current_page;
-  const last = props.items.last_page;
-  const maxVisible = 5;
-
-  if (last <= maxVisible) {
-    return Array.from({ length: last }, (_, i) => i + 1);
+const getTypeLabel = (type: string) => {
+  switch (type) {
+  case 'ball': return 'Ball';
+  case 'avatar': return 'Avatar';
+  case 'background': return 'Background';
+  default: return type;
   }
-
-  let start = Math.max(current - 2, 1);
-  let end = Math.min(start + maxVisible - 1, last);
-
-  if (end - start + 1 < maxVisible) {
-    start = Math.max(end - maxVisible + 1, 1);
-  }
-
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 };
 
-const getPageUrl = (page) => {
-  const url = new URL(window.location.href);
-  url.searchParams.set("page", page);
-  return url.pathname + url.search;
+const getTypeColor = (type: string) => {
+  switch (type) {
+  case 'ball': return 'text-info bg-info/10 border-info/30';
+  case 'avatar': return 'text-warning bg-warning/10 border-warning/30';
+  case 'background': return 'text-secondary bg-secondary/10 border-secondary/30';
+  default: return 'text-base-content bg-base-200/50 border-base-300/30';
+  }
+};
+
+const getRarityLabel = (rarity: string) => {
+  switch (rarity) {
+  case 'normal': return 'Normal';
+  case 'rare': return 'Rare';
+  case 'epic': return 'Épique';
+  case 'legendary': return 'Légendaire';
+  default: return rarity;
+  }
+};
+
+const getRarityColor = (rarity: string) => {
+  switch (rarity) {
+  case 'normal': return 'text-base-content bg-base-200/50 border-base-300/30';
+  case 'rare': return 'text-info bg-info/10 border-info/30';
+  case 'epic': return 'text-warning bg-warning/10 border-warning/30';
+  case 'legendary': return 'text-error bg-error/10 border-error/30';
+  default: return 'text-base-content bg-base-200/50 border-base-300/30';
+  }
+};
+
+const formatPrice = (price: number) => {
+  return price.toLocaleString();
 };
 </script>
 
 <template>
   <Head title="Gestion des Items" />
 
-  <div
-    class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative"
-  >
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative overflow-x-hidden">
     <BackgroundEffects />
 
-    <div
-      class="relative z-10 h-screen w-screen overflow-hidden flex flex-col"
-    >
-      <div
-        class="shrink-0 p-4 bg-base-200/50 backdrop-blur-md border-b border-base-300/30"
-      >
-        <div
-          class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4"
-        >
-          <div>
-            <h1
-              class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-wider"
-            >
-              GESTION DES ITEMS
-            </h1>
-            <p
-              class="text-xs text-base-content/70 uppercase tracking-wider"
-            >
-              Création et gestion des items du shop
-            </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <Link href="/admin">
-              <Button variant="ghost" size="sm">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
-                </svg>
-                Dashboard
-              </Button>
-            </Link>
-          </div>
+    <div class="relative z-10 min-h-screen">
+      <div class="container mx-auto px-4 py-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-success to-success/80 bg-clip-text text-transparent mb-2 tracking-wider">
+            🛍️ GESTION ITEMS
+          </h1>
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
+            {{ props.items.total }} item{{ props.items.total > 1 ? 's' : '' }} en boutique
+          </p>
         </div>
-      </div>
 
-      <div class="flex-1 overflow-hidden">
-        <div class="h-full overflow-y-auto p-4">
-          <div class="max-w-7xl mx-auto">
-            <Alert
-              v-if="notification"
-              :type="notification.type"
-              :message="notification.message"
-            />
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          <div class="xl:col-span-9 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                  <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                    <span class="text-2xl">📋</span>
+                    LISTE DES ITEMS
+                  </h3>
 
-            <div
-              class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"
-            >
-              <div
-                class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
-              >
-                <div
-                  class="text-sm font-medium text-base-content/70"
-                >
-                  Total
-                </div>
-                <div class="text-lg font-bold text-primary">
-                  {{ props.stats?.total || 0 }}
-                </div>
-              </div>
-              <div
-                class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
-              >
-                <div
-                  class="text-sm font-medium text-base-content/70"
-                >
-                  Balls
-                </div>
-                <div class="text-lg font-bold text-primary">
-                  {{ props.stats?.ball || 0 }}
-                </div>
-              </div>
-              <div
-                class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
-              >
-                <div
-                  class="text-sm font-medium text-base-content/70"
-                >
-                  Avatars
-                </div>
-                <div class="text-lg font-bold text-primary">
-                  {{ props.stats?.avatar || 0 }}
-                </div>
-              </div>
-              <div
-                class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
-              >
-                <div
-                  class="text-sm font-medium text-base-content/70"
-                >
-                  Backgrounds
-                </div>
-                <div class="text-lg font-bold text-primary">
-                  {{ props.stats?.background || 0 }}
-                </div>
-              </div>
-            </div>
-
-            <div class="space-y-4">
-              <div
-                class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-              >
-                <div class="flex items-center gap-2">
-                  <span
-                    class="text-sm font-medium text-base-content/70"
-                  >Afficher :</span
-                  >
-                  <select
-                    :value="perPage"
-                    @change="
-                      changePerPage(
-                        parseInt($event.target.value)
-                      )
-                    "
-                    class="bg-base-200/50 border border-base-300/30 rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="16">16</option>
-                    <option value="32">32</option>
-                    <option value="64">64</option>
-                    <option value="100">100</option>
-                  </select>
-                  <span class="text-xs text-base-content/50">
-                    sur {{ items.total }} items
-                  </span>
-                </div>
-
-                <div class="text-sm text-base-content/70">
-                  Page {{ items.current_page }} sur
-                  {{ items.last_page }}
-                </div>
-              </div>
-
-              <div
-                class="bg-base-100/30 backdrop-blur-md rounded-lg border border-base-300/30 p-2"
-              >
-                <div
-                  class="flex flex-wrap items-center justify-between gap-2"
-                >
-                  <div class="flex flex-wrap gap-2">
-                    <button
-                      v-for="tab in tabs"
-                      :key="tab.id"
-                      @click="changeTab(tab.id)"
-                      :class="[
-                        'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-                        activeTab === tab.id
-                          ? 'bg-primary text-primary-content shadow-lg'
-                          : 'bg-base-200/50 text-base-content/70 hover:bg-base-200 hover:text-base-content',
-                      ]"
-                    >
-                      <span>{{ tab.label }}</span>
-                      <span
-                        class="bg-base-content/20 text-xs px-2 py-1 rounded-full"
-                      >
-                        {{ tab.count }}
-                      </span>
-                    </button>
-                  </div>
-
-                  <Link href="/admin/items/create">
-                    <Button variant="primary" size="sm">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      Créer
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-
-              <div v-if="hasNoItems" class="text-center py-12">
-                <h3 class="text-xl font-semibold mb-2">
-                  Aucun item trouvé
-                </h3>
-                <p class="text-base-content/70 mb-6">
-                  Commencez par créer votre premier item
-                </p>
-                <Link href="/admin/items/create">
-                  <Button variant="primary">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    Créer un item
-                  </Button>
-                </Link>
-              </div>
-
-              <div v-else class="space-y-4">
-                <div
-                  class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                >
-                  <div
-                    v-for="item in itemsList"
-                    :key="item.id"
-                    class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-4 hover:shadow-lg transition-all duration-200"
-                  >
-                    <div
-                      class="flex justify-between items-start mb-3"
-                    >
-                      <div class="flex-1">
-                        <div
-                          class="flex items-start gap-3"
-                        >
-                          <div
-                            v-if="item.image"
-                            class="flex-shrink-0"
-                          >
-                            <div
-                              class="w-16 h-16 bg-base-200 rounded-lg border border-base-300/30 flex items-center justify-center overflow-hidden"
-                            >
-                              <img
-                                :src="
-                                  item.image.startsWith(
-                                    '/'
-                                  )
-                                    ? item.image
-                                    : '/' +
-                                      item.image
-                                "
-                                :alt="item.name"
-                                class="w-full h-full object-cover"
-                              />
-                            </div>
-                          </div>
-                          <div class="flex-1">
-                            <h3
-                              class="font-semibold text-lg mb-1"
-                            >
-                              {{ item.name }}
-                            </h3>
-                            <p
-                              v-if="
-                                item.description
-                              "
-                              class="text-sm text-base-content/70 mb-2"
-                            >
-                              {{
-                                item.description
-                              }}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        class="flex items-center gap-1"
-                      >
-                        <Badge
-                          :variant="
-                            item.type ===
-                              'avatar' ||
-                              item.type ===
-                              'background'
-                              ? 'primary'
-                              : 'secondary'
-                          "
-                        >
-                          {{
-                            getTypeLabel(item.type)
-                          }}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <div class="space-y-2 mb-4">
-                      <div
-                        class="flex justify-between items-center"
-                      >
-                        <span
-                          class="text-sm font-medium"
-                        >Prix:</span
-                        >
-                        <span
-                          class="text-sm font-bold text-primary"
-                        >{{ item.price }} ₽</span
-                        >
-                      </div>
-                      <div
-                        class="flex justify-between items-center"
-                      >
-                        <span
-                          class="text-sm font-medium"
-                        >Rareté:</span
-                        >
-                        <RarityBadge
-                          :rarity="item.rarity"
-                        />
-                      </div>
-                    </div>
+                  <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    <Input
+                      v-model="searchTerm"
+                      placeholder="🔍 Rechercher..."
+                      class="w-full sm:w-64"
+                      size="sm"
+                    />
 
                     <div class="flex gap-2">
-                      <Link
-                        :href="`/admin/items/${item.id}`"
-                        class="flex-1"
-                      >
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          class="w-full"
-                          title="Voir les détails"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            />
-                          </svg>
-                        </Button>
-                      </Link>
-                      <Link
-                        :href="`/admin/items/${item.id}/edit`"
-                        class="flex-1"
-                      >
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          class="w-full"
-                          title="Modifier l'item"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                            />
-                          </svg>
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="error"
-                        size="sm"
-                        @click="confirmDelete(item)"
-                        class="flex-1"
-                        title="Supprimer l'item"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
+                      <Select
+                        v-model="typeFilter"
+                        @change="applyFilters"
+                        :options="typeOptions"
+                        class="w-32"
+                      />
+
+                      <Button @click="clearFilters" variant="outline" size="sm">
+                        ✨ Reset
                       </Button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div
-                v-if="items.last_page > 1"
-                class="mt-6 flex justify-center"
-              >
-                <div class="flex items-center gap-2">
-                  <Link
-                    v-if="items.current_page > 1"
-                    :href="getPageUrl(1)"
-                    class="p-2 bg-base-200/50 hover:bg-base-200 text-base-content/70 hover:text-base-content rounded-lg transition-all duration-200"
-                    title="Première page"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-gradient-to-r from-base-200/50 to-base-300/30 border-b border-base-300/30">
+                    <tr>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Item
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Rareté
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Prix
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th class="px-6 py-4 text-center text-sm font-bold text-base-content uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-base-300/30">
+                    <tr
+                      v-for="item in filteredItems"
+                      :key="item.id"
+                      class="hover:bg-base-200/30 transition-colors duration-200"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-                      />
-                    </svg>
-                  </Link>
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-success/20 to-success/10 flex items-center justify-center overflow-hidden">
+                            <img
+                              v-if="item.image"
+                              :src="item.image"
+                              :alt="item.name"
+                              class="w-full h-full object-contain"
+                              @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }"
+                            />
+                            <span v-else class="text-lg">🛍️</span>
+                          </div>
+                          <div>
+                            <div class="font-semibold text-base-content">{{ item.name }}</div>
+                            <div class="text-sm text-base-content/70">ID: #{{ item.id }}</div>
+                          </div>
+                        </div>
+                      </td>
 
-                  <Link
-                    v-if="items.prev_page_url"
-                    :href="items.prev_page_url"
-                    class="p-2 bg-base-200/50 hover:bg-base-200 text-base-content/70 hover:text-base-content rounded-lg transition-all duration-200"
-                    title="Page précédente"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                  </Link>
+                      <td class="px-6 py-4">
+                        <span :class="[
+                          'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                          getTypeColor(item.type)
+                        ]">
+                          {{ getTypeLabel(item.type) }}
+                        </span>
+                      </td>
 
-                  <div class="flex items-center gap-1">
-                    <Link
-                      v-for="page in getVisiblePages()"
-                      :key="page"
-                      :href="getPageUrl(page)"
-                      :class="[
-                        'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 min-w-[2.5rem] text-center',
-                        page === items.current_page
-                          ? 'bg-primary text-primary-content shadow-lg'
-                          : 'bg-base-200/50 hover:bg-base-200 text-base-content/70 hover:text-base-content',
-                      ]"
-                    >
-                      {{ page }}
-                    </Link>
+                      <td class="px-6 py-4">
+                        <span :class="[
+                          'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                          getRarityColor(item.rarity)
+                        ]">
+                          {{ getRarityLabel(item.rarity) }}
+                        </span>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <div class="font-semibold text-warning">
+                          {{ formatPrice(item.price) }} 💰
+                        </div>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <div class="text-sm text-base-content/70 max-w-xs truncate">
+                          {{ item.description || 'Aucune description' }}
+                        </div>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <div class="flex justify-center gap-1">
+                          <Button
+                            @click="router.visit(`/admin/items/${item.id}`)"
+                            variant="ghost"
+                            size="sm"
+                            class="text-info hover:text-info hover:bg-info/20 transition-colors"
+                            title="Voir"
+                          >
+                            👁️
+                          </Button>
+                          <Button
+                            @click="router.visit(`/admin/items/${item.id}/edit`)"
+                            variant="ghost"
+                            size="sm"
+                            class="text-warning hover:text-warning hover:bg-warning/20 transition-colors"
+                            title="Modifier"
+                          >
+                            ✏️
+                          </Button>
+                          <Button
+                            @click="deleteItem(item)"
+                            variant="ghost"
+                            size="sm"
+                            class="text-error hover:text-error hover:bg-error/20 transition-colors"
+                            title="Supprimer"
+                          >
+                            🗑️
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div v-if="props.items.last_page > 1" class="p-4 bg-gradient-to-r from-success/5 to-success/10 border-t border-success/20">
+                <div class="flex justify-center items-center gap-2 flex-wrap">
+                  <template v-for="link in props.items.links" :key="link.label">
+                    <Button
+                      v-if="link.url"
+                      @click="router.visit(link.url)"
+                      :variant="link.active ? 'primary' : 'ghost'"
+                      size="sm"
+                      class="min-w-[2.5rem]"
+                      v-html="link.label"
+                    />
+                    <span v-else class="px-3 py-2 text-base-content/50 text-sm" v-html="link.label" />
+                  </template>
+                </div>
+                <div class="text-xs text-center text-base-content/70 mt-2">
+                  Affichage de {{ (props.items.current_page - 1) * props.items.per_page + 1 }}
+                  à {{ Math.min(props.items.current_page * props.items.per_page, props.items.total) }}
+                  sur {{ props.items.total }} résultats
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="xl:col-span-3 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">⚙️</span>
+                  ACTIONS
+                </h3>
+              </div>
+              <div class="p-6 space-y-3">
+                <Button
+                  @click="router.visit('/admin/items/create')"
+                  variant="secondary"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  ➕ Nouvel item
+                </Button>
+                <Button
+                  @click="router.visit('/admin/')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  ← Dashboard
+                </Button>
+                <Button
+                  @click="router.visit('/me')"
+                  variant="ghost"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  🏠 Profil
+                </Button>
+              </div>
+            </div>
+
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">📊</span>
+                  STATISTIQUES
+                </h3>
+              </div>
+              <div class="p-6 space-y-4">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-success">{{ props.stats.total }}</div>
+                  <div class="text-sm text-base-content/70">Total items</div>
+                </div>
+                <div class="grid grid-cols-1 gap-3 text-center">
+                  <div>
+                    <div class="text-lg font-bold text-info">{{ props.stats.ball }}</div>
+                    <div class="text-xs text-base-content/70">Balls</div>
                   </div>
-
-                  <Link
-                    v-if="items.next_page_url"
-                    :href="items.next_page_url"
-                    class="p-2 bg-base-200/50 hover:bg-base-200 text-base-content/70 hover:text-base-content rounded-lg transition-all duration-200"
-                    title="Page suivante"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </Link>
-
-                  <Link
-                    v-if="
-                      items.current_page < items.last_page
-                    "
-                    :href="getPageUrl(items.last_page)"
-                    class="p-2 bg-base-200/50 hover:bg-base-200 text-base-content/70 hover:text-base-content rounded-lg transition-all duration-200"
-                    title="Dernière page"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M13 5l7 7-7 7m-8 0l7-7-7-7"
-                      />
-                    </svg>
-                  </Link>
+                  <div>
+                    <div class="text-lg font-bold text-warning">{{ props.stats.avatar }}</div>
+                    <div class="text-xs text-base-content/70">Avatars</div>
+                  </div>
+                  <div>
+                    <div class="text-lg font-bold text-secondary">{{ props.stats.background }}</div>
+                    <div class="text-xs text-base-content/70">Backgrounds</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -698,56 +412,34 @@ const getPageUrl = (page) => {
       </div>
     </div>
 
-    <Modal :show="showDeleteModal" @close="showDeleteModal = false">
-      <div class="p-6">
-        <div class="flex items-center mb-4">
-          <div class="flex-shrink-0">
-            <svg
-              class="h-6 w-6 text-error"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
+    <Modal :show="showDeleteModal" @close="cancelDelete" max-width="md">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-error/20 rounded-lg flex items-center justify-center">
+            <span class="text-xl">⚠️</span>
           </div>
-          <div class="ml-3">
-            <h3 class="text-lg font-medium text-base-content">
-              Confirmer la suppression
-            </h3>
-          </div>
+          <h3 class="text-xl font-bold text-base-content">Supprimer l'item</h3>
         </div>
-        <div class="mt-2">
-          <p class="text-sm text-base-content/70">
-            Êtes-vous sûr de vouloir supprimer l'item
-            <strong>{{ itemToDelete?.name }}</strong> ? Cette action
-            est irréversible.
-          </p>
-        </div>
-        <div class="mt-6 flex justify-end gap-3">
-          <Button variant="ghost" @click="showDeleteModal = false">
-            Annuler
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-base-content/80">
+          Êtes-vous sûr de vouloir supprimer l'item
+          <span class="font-bold text-error">{{ itemToDelete?.name }}</span> ?
+        </p>
+        <p class="text-sm text-base-content/60">
+          Cette action est irréversible et supprimera toutes les données associées.
+        </p>
+
+        <div class="flex gap-3 pt-4">
+          <Button @click="confirmDelete" variant="outline" class="flex-1 border-error text-error hover:bg-error hover:text-error-content">
+            🗑️ Supprimer
           </Button>
-          <Button
-            variant="error"
-            @click="deleteItem"
-            :loading="isLoading"
-          >
-            Supprimer
+          <Button @click="cancelDelete" variant="secondary" class="flex-1">
+            Annuler
           </Button>
         </div>
       </div>
     </Modal>
-
-    <Toast
-      v-if="showToast"
-      :message="toastMessage"
-      @close="showToast = false"
-    />
   </div>
 </template>

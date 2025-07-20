@@ -48,15 +48,6 @@ const adminSections = ref([
     statLabel: 'Total'
   },
   {
-    title: 'Marketplace',
-    description: 'Modérer les annonces et transactions',
-    icon: '🏪',
-    route: '/admin/marketplace',
-    color: 'warning',
-    stat: props.stats?.marketplace_listings || 0,
-    statLabel: 'Annonces'
-  },
-  {
     title: 'Pokémon',
     description: 'Base de données et statistiques',
     icon: '⚡',
@@ -66,15 +57,6 @@ const adminSections = ref([
     statLabel: 'En base'
   },
   {
-    title: 'Support',
-    description: 'Tickets et demandes utilisateurs',
-    icon: '🎫',
-    route: '/admin/support',
-    color: 'secondary',
-    stat: props.stats?.pending_tickets || 7,
-    statLabel: 'En attente'
-  },
-  {
     title: 'Boutique',
     description: 'Items et configuration shop',
     icon: '🛍️',
@@ -82,6 +64,15 @@ const adminSections = ref([
     color: 'success',
     stat: props.stats?.shop_items || 42,
     statLabel: 'Items'
+  },
+  {
+    title: 'Codes Promo',
+    description: 'Créer et gérer les codes promotionnels',
+    icon: '🎟️',
+    route: '/admin/promocodes',
+    color: 'warning',
+    stat: props.stats?.total_promocodes || 0,
+    statLabel: 'Codes'
   },
   {
     title: 'Système',
@@ -106,7 +97,7 @@ const adminSections = ref([
     description: 'Paramètres de récompenses et probabilités',
     icon: '🎮',
     route: '/admin/game-configuration',
-    color: 'success',
+    color: 'secondary',
     stat: 3,
     statLabel: 'Catégories'
   }
@@ -149,34 +140,18 @@ const getCsrfToken = () => {
 
 const showNotification = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
   const id = Date.now().toString();
-  const notification = {
-    id,
-    type,
-    message,
-    show: true
-  };
-
+  const notification = { id, type, message, show: true };
   notifications.value.push(notification);
 
   setTimeout(() => {
-    const index = notifications.value.findIndex(n => n.id === id);
-    if (index > -1) {
-      notifications.value[index].show = false;
-      setTimeout(() => {
-        notifications.value.splice(index, 1);
-      }, 300);
-    }
-  }, 4000);
-};
-
-const removeNotification = (id: string) => {
-  const index = notifications.value.findIndex(n => n.id === id);
-  if (index > -1) {
-    notifications.value[index].show = false;
+    notification.show = false;
     setTimeout(() => {
-      notifications.value.splice(index, 1);
+      const index = notifications.value.findIndex(n => n.id === id);
+      if (index > -1) {
+        notifications.value.splice(index, 1);
+      }
     }, 300);
-  }
+  }, 5000);
 };
 
 const clearCache = async () => {
@@ -192,9 +167,9 @@ const clearCache = async () => {
     const data = await response.json();
 
     if (data.success) {
-      showNotification('success', data.message);
+      showNotification('success', 'Cache vidé avec succès !');
     } else {
-      showNotification('error', data.message);
+      showNotification('error', 'Erreur lors du vidage du cache');
     }
   } catch (error) {
     showNotification('error', 'Erreur lors du vidage du cache');
@@ -205,9 +180,9 @@ const checkMaintenanceStatus = async () => {
   try {
     const response = await fetch('/admin/maintenance/status');
     const data = await response.json();
-    isMaintenanceMode.value = data.is_maintenance;
+    isMaintenanceMode.value = data.maintenance;
   } catch (error) {
-    console.error('Erreur lors de la vérification du statut de maintenance:', error);
+    console.error('Erreur lors de la vérification du mode maintenance');
   }
 };
 
@@ -255,262 +230,233 @@ onMounted(() => {
 </script>
 
 <template>
-
   <Head title="Dashboard Admin" />
 
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative overflow-x-hidden">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden">
-      <div class="flex justify-center pt-4 mb-4">
-        <div class="text-center">
-          <h1
-            class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-1 tracking-wider">
+    <div class="relative z-10 min-h-screen">
+      <div class="container mx-auto px-4 py-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2 tracking-wider">
             🔧 DASHBOARD ADMIN
           </h1>
-          <p class="text-xs text-base-content/70 uppercase tracking-wider">
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
             Gestion de la plateforme
           </p>
         </div>
-      </div>
 
-      <div class="absolute left-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-          <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📊</span>
-              STATISTIQUES
-            </h3>
-          </div>
-          <div class="p-3 space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-base-content/70">Utilisateurs</span>
-              <span class="text-sm font-bold text-info">{{ props.stats?.total_users || 0 }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-base-content/70">Actifs</span>
-              <span class="text-sm font-bold text-success">{{ props.stats?.active_users || 0 }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-base-content/70">Marketplace</span>
-              <span class="text-sm font-bold text-warning">{{ props.stats?.marketplace_listings || 0 }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-base-content/70">Pokémon</span>
-              <span class="text-sm font-bold text-error">{{ props.stats?.total_pokemons || 0 }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-base-content/70">Expéditions</span>
-              <span class="text-sm font-bold text-primary">{{ props.stats?.total_expeditions || 0 }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-accent/10 to-accent/5 border-b border-accent/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🛠️</span>
-              OUTILS RAPIDES
-            </h3>
-          </div>
-          <div class="p-3 space-y-2">
-            <Button v-for="tool in quickTools" :key="tool.route" @click="goToSection(tool.route)" variant="outline"
-                    size="sm" class="w-full justify-start">
-              {{ tool.icon }} {{ tool.label }}
-            </Button>
-
-            <div class="pt-2 border-t border-base-300/30">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs text-base-content/70">Mode Maintenance</span>
-                <div class="flex items-center gap-2">
-                  <span :class="[
-                    'text-xs px-2 py-1 rounded-full',
-                    isMaintenanceMode ? 'bg-error/20 text-error' : 'bg-success/20 text-success'
-                  ]">
-                    {{ isMaintenanceMode ? 'ACTIF' : 'INACTIF' }}
-                  </span>
-                </div>
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          <div class="xl:col-span-8 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-2xl">🎛️</span>
+                  MODULES ADMINISTRATION
+                </h3>
               </div>
 
-              <Button @click="toggleMaintenance" :disabled="isLoadingMaintenance"
-                      :variant="isMaintenanceMode ? 'secondary' : 'outline'" size="sm" class="w-full justify-start">
-                <span v-if="isLoadingMaintenance">⏳</span>
-                <span v-else>🔧</span>
-                {{ isLoadingMaintenance ? 'Chargement...' : (isMaintenanceMode ? 'Désactiver' : 'Activer') }}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute right-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-          <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">👤</span>
-              ADMIN INFO
-            </h3>
-          </div>
-          <div class="p-3">
-            <div class="text-center">
-              <div class="text-sm font-bold">{{ props.auth.user.username }}</div>
-              <div class="text-xs text-base-content/70 mb-2">Niveau {{ props.auth.user.level }}</div>
-              <div class="text-xs bg-gradient-to-r from-primary/20 to-secondary/20 px-2 py-1 rounded-full">
-                {{ props.auth.user.role }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🚨</span>
-              ACTIONS
-            </h3>
-          </div>
-          <div class="p-3 space-y-2">
-            <Button @click="goBack" variant="secondary" size="sm" class="w-full">
-              ← Retour au profil
-            </Button>
-            <Button @click="goToSection('/admin/logs')" variant="outline" size="sm" class="w-full">
-              📝 Voir les logs
-            </Button>
-            <Button @click="router.visit('/admin/notifications/create')" variant="outline" size="sm" class="w-full">
-              📢 Créer une annonce
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[700px]">
-        <div
-          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
-          <div class="shrink-0 p-3 bg-gradient-to-r from-primary/10 to-secondary/5 border-b border-primary/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🎛️</span>
-              MODULES ADMINISTRATION
-            </h3>
-          </div>
-
-          <div class="flex-1 overflow-y-auto p-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div v-for="section in adminSections" :key="section.route" @click="goToSection(section.route)"
-                   class="group bg-base-200/30 backdrop-blur-sm rounded-xl p-4 border border-base-300/20 hover:border-primary/40 transition-all duration-200 cursor-pointer hover:scale-105">
-                <div class="flex items-start justify-between mb-3">
-                  <div class="text-2xl">{{ section.icon }}</div>
-                  <div class="text-right">
-                    <div :class="[
-                      'text-lg font-bold',
-                      section.color === 'info' ? 'text-info' :
-                      section.color === 'primary' ? 'text-primary' :
-                      section.color === 'warning' ? 'text-warning' :
-                      section.color === 'error' ? 'text-error' :
-                      section.color === 'success' ? 'text-success' :
-                      section.color === 'secondary' ? 'text-secondary' :
-                      'text-accent'
-                    ]">
-                      {{ section.stat.toLocaleString() }}
+              <div class="p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div
+                    v-for="section in adminSections"
+                    :key="section.route"
+                    @click="goToSection(section.route)"
+                    class="group bg-gradient-to-br from-base-200/50 to-base-300/30 backdrop-blur-sm rounded-xl p-5 border border-base-300/30 hover:border-primary/50 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg"
+                  >
+                    <div class="flex items-start justify-between mb-4">
+                      <div class="text-3xl transform group-hover:scale-110 transition-transform duration-200">
+                        {{ section.icon }}
+                      </div>
+                      <div class="text-right">
+                        <div :class="[
+                          'text-xl font-bold transition-colors duration-200',
+                          section.color === 'info' ? 'text-info group-hover:text-info/80' :
+                          section.color === 'primary' ? 'text-primary group-hover:text-primary/80' :
+                          section.color === 'warning' ? 'text-warning group-hover:text-warning/80' :
+                          section.color === 'error' ? 'text-error group-hover:text-error/80' :
+                          section.color === 'success' ? 'text-success group-hover:text-success/80' :
+                          section.color === 'secondary' ? 'text-secondary group-hover:text-secondary/80' :
+                          'text-accent group-hover:text-accent/80'
+                        ]">
+                          {{ section.stat.toLocaleString() }}
+                        </div>
+                        <div class="text-xs text-base-content/60 uppercase tracking-wide">
+                          {{ section.statLabel }}
+                        </div>
+                      </div>
                     </div>
-                    <div class="text-xs text-base-content/60">{{ section.statLabel }}</div>
+
+                    <div class="space-y-2">
+                      <h4 class="font-bold text-base-content group-hover:text-base-content/80 transition-colors">
+                        {{ section.title }}
+                      </h4>
+                      <p class="text-sm text-base-content/70 leading-relaxed">
+                        {{ section.description }}
+                      </p>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <h4 class="font-bold text-base-content mb-1 group-hover:text-primary transition-colors">
-                  {{ section.title }}
-                </h4>
-                <p class="text-xs text-base-content/70 leading-relaxed">
-                  {{ section.description }}
-                </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-4 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                  <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                    <span class="text-xl">🚨</span>
+                    MODE MAINTENANCE
+                  </h3>
+                </div>
 
-                <div class="flex items-center justify-end mt-3 opacity-70 group-hover:opacity-100 transition-opacity">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
+                <div class="p-6">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <div class="text-sm font-medium text-base-content/80 mb-1">
+                        État actuel
+                      </div>
+                      <span :class="[
+                        'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide',
+                        isMaintenanceMode ? 'bg-error/20 text-error' : 'bg-success/20 text-success'
+                      ]">
+                        {{ isMaintenanceMode ? 'ACTIF' : 'INACTIF' }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <Button
+                    @click="toggleMaintenance"
+                    :disabled="isLoadingMaintenance"
+                    :variant="isMaintenanceMode ? 'secondary' : 'outline'"
+                    size="sm"
+                    class="w-full"
+                  >
+                    <span v-if="isLoadingMaintenance">⏳</span>
+                    <span v-else>🔧</span>
+                    {{ isLoadingMaintenance ? 'Chargement...' : (isMaintenanceMode ? 'Désactiver' : 'Activer') }}
+                  </Button>
+                </div>
+              </div>
+
+              <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+                <div class="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                  <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                    <span class="text-xl">⚡</span>
+                    ACTIONS RAPIDES
+                  </h3>
+                </div>
+
+                <div class="p-6 space-y-3">
+                  <Button
+                    v-for="tool in quickTools"
+                    :key="tool.route"
+                    @click="goToSection(tool.route)"
+                    variant="outline"
+                    size="sm"
+                    class="w-full justify-start"
+                  >
+                    <span>{{ tool.icon }}</span>
+                    {{ tool.label }}
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="shrink-0 bg-gradient-to-r from-primary/10 to-secondary/5 px-3 py-2 border-t border-primary/20">
-            <div class="text-xs text-center text-base-content/70">
-              {{ adminSections.length }} modules d'administration disponibles
+          <div class="xl:col-span-4 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">👤</span>
+                  ADMIN INFO
+                </h3>
+              </div>
+
+              <div class="p-6">
+                <div class="text-center space-y-4">
+                  <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-3xl">
+                    🛡️
+                  </div>
+
+                  <div>
+                    <div class="text-lg font-bold text-base-content">
+                      {{ props.auth.user.username }}
+                    </div>
+                    <div class="text-sm text-base-content/70 mb-2">
+                      Niveau {{ props.auth.user.level }}
+                    </div>
+                    <div class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full">
+                      <span class="text-sm font-medium">{{ props.auth.user.role }}</span>
+                    </div>
+                  </div>
+
+                  <div class="pt-4 border-t border-base-300/30">
+                    <div class="text-sm text-base-content/70 mb-1">Solde</div>
+                    <div class="text-xl font-bold text-warning">
+                      {{ props.auth.user.cash.toLocaleString() }} 💰
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">🔗</span>
+                  NAVIGATION
+                </h3>
+              </div>
+
+              <div class="p-6 space-y-3">
+                <Button @click="goBack" variant="secondary" size="sm" class="w-full justify-start">
+                  ← Retour au profil
+                </Button>
+                <Button @click="goToSection('/admin/logs')" variant="outline" size="sm" class="w-full justify-start">
+                  📝 Voir les logs
+                </Button>
+                <Button @click="router.visit('/admin/notifications/create')" variant="outline" size="sm" class="w-full justify-start">
+                  📢 Créer une annonce
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal de confirmation pour la maintenance -->
-    <div v-if="showMaintenanceConfirm" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div class="bg-base-100 rounded-xl p-6 max-w-md w-full mx-4 border border-base-300">
-        <div class="text-center">
-          <div class="text-4xl mb-4">⚠️</div>
-          <h3 class="text-lg font-bold mb-2">Confirmation requise</h3>
-          <p class="text-base-content/70 mb-6">
-            Êtes-vous sûr de vouloir
-            <span :class="maintenanceAction === 'enable' ? 'text-error font-bold' : 'text-success font-bold'">
-              {{ maintenanceAction === 'enable' ? 'ACTIVER' : 'DÉSACTIVER' }}
-            </span>
-            le mode maintenance ?
-          </p>
-
-          <div v-if="maintenanceAction === 'enable'" class="bg-error/10 border border-error/20 rounded-lg p-3 mb-4">
-            <p class="text-sm text-error">
-              ⚠️ Cela rendra le site inaccessible aux utilisateurs
-            </p>
-          </div>
-
-          <div class="flex gap-3">
-            <Button @click="cancelMaintenanceAction" variant="outline" class="flex-1">
-              Annuler
-            </Button>
-            <Button @click="confirmMaintenanceAction"
-                    :variant="maintenanceAction === 'enable' ? 'secondary' : 'primary'" class="flex-1">
-              Confirmer
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div
+      v-for="notification in notifications.filter(n => n.show)"
+      :key="notification.id"
+      :class="[
+        'fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-all duration-300 max-w-sm',
+        notification.type === 'success' ? 'bg-success text-success-content' :
+        notification.type === 'error' ? 'bg-error text-error-content' :
+        notification.type === 'warning' ? 'bg-warning text-warning-content' :
+        'bg-info text-info-content'
+      ]"
+    >
+      {{ notification.message }}
     </div>
 
-    <!-- Système de notifications -->
-    <div class="fixed top-4 right-4 z-50 space-y-2">
-      <div v-for="notification in notifications" :key="notification.id" :class="[
-        'alert transition-all duration-300 transform max-w-md',
-        notification.show ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0',
-        notification.type === 'success' ? 'bg-green-100 border-green-500 text-green-800' :
-        notification.type === 'error' ? 'bg-red-100 border-red-500 text-red-800' :
-        notification.type === 'warning' ? 'alert-warning' :
-        'alert-info'
-      ]">
-        <div class="flex items-center justify-between w-full">
-          <div class="flex items-center gap-2">
-            <svg v-if="notification.type === 'success'" class="w-5 h-5" fill="none" stroke="currentColor"
-                 viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            <svg v-else-if="notification.type === 'error'" class="w-5 h-5" fill="none" stroke="currentColor"
-                 viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-            <svg v-else-if="notification.type === 'warning'" class="w-5 h-5" fill="none" stroke="currentColor"
-                 viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z">
-              </path>
-            </svg>
-            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span class="text-sm font-medium">{{ notification.message }}</span>
-          </div>
-          <button @click="removeNotification(notification.id)" class="btn btn-ghost btn-xs ml-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
+    <div v-if="showMaintenanceConfirm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-base-100 rounded-xl p-6 max-w-md w-full border border-base-300">
+        <h3 class="text-lg font-bold mb-4">
+          {{ maintenanceAction === 'enable' ? 'Activer' : 'Désactiver' }} le mode maintenance
+        </h3>
+        <p class="text-base-content/70 mb-6">
+          {{ maintenanceAction === 'enable'
+            ? 'Le site sera inaccessible aux utilisateurs pendant la maintenance.'
+            : 'Le site redeviendra accessible aux utilisateurs.'
+          }}
+        </p>
+        <div class="flex gap-3">
+          <Button @click="confirmMaintenanceAction" variant="primary" class="flex-1">
+            Confirmer
+          </Button>
+          <Button @click="cancelMaintenanceAction" variant="secondary" class="flex-1">
+            Annuler
+          </Button>
         </div>
       </div>
     </div>

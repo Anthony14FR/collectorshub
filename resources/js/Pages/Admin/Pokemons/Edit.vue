@@ -2,9 +2,11 @@
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
-import { getRarityColor, getTypeColor } from '@/utils/pokemon';
+import Select from '@/Components/UI/Select.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import { Head, router } from '@inertiajs/vue3';
-import { reactive } from 'vue';
+import { ref, computed, reactive, onMounted } from 'vue';
+import { getRarityColor, getTypeColor } from '@/utils/pokemon';
 
 interface Pokemon {
   id: number;
@@ -26,6 +28,7 @@ interface Pokemon {
   special_attack: number;
   special_defense: number;
   generation: number | null;
+  created_at: string;
 }
 
 interface AvailablePokemon {
@@ -34,14 +37,17 @@ interface AvailablePokemon {
   pokedex_id: number;
 }
 
-const props = defineProps<{
+interface Props {
   pokemon: Pokemon;
   rarities: string[];
   generations: number[];
   types: string[];
   damageRelations: string[];
   availablePokemons: AvailablePokemon[];
-}>();
+  errors?: Record<string, string>;
+}
+
+const props = defineProps<Props>();
 
 const form = reactive({
   pokedex_id: '',
@@ -67,6 +73,48 @@ const form = reactive({
   errors: {} as Record<string, string>,
 });
 
+const isSubmitting = ref(false);
+const showDeleteModal = ref(false);
+
+const rarityOptions = computed(() => {
+  return props.rarities.map(rarity => ({
+    value: rarity,
+    label: getRarityLabel(rarity)
+  }));
+});
+
+const generationOptions = computed(() => {
+  return props.generations.map(gen => ({
+    value: gen.toString(),
+    label: `Génération ${gen}`
+  }));
+});
+
+const typeOptions = computed(() => {
+  return props.types.map(type => ({
+    value: type,
+    label: type
+  }));
+});
+
+const pokemonOptions = computed(() => {
+  return props.availablePokemons.map(pokemon => ({
+    value: pokemon.id.toString(),
+    label: `#${pokemon.pokedex_id} - ${pokemon.name}`
+  }));
+});
+
+const damageRelationOptions = [
+  { value: 'resistant', label: 'Résistant' },
+  { value: 'vulnerable', label: 'Vulnérable' },
+  { value: 'neutral', label: 'Neutre' }
+];
+
+const shinyOptions = [
+  { value: true, label: 'Shiny' },
+  { value: false, label: 'Normal' }
+];
+
 const initializeForm = () => {
   const pokemon = props.pokemon;
   form.pokedex_id = pokemon.pokedex_id.toString();
@@ -90,7 +138,9 @@ const initializeForm = () => {
 };
 
 const addType = () => {
-  form.types.push({ name: '', image: '' });
+  if (form.types.length < 2) {
+    form.types.push({ name: '', image: '' });
+  }
 };
 
 const removeType = (index: number) => {
@@ -109,50 +159,19 @@ const removeResistance = (index: number) => {
   }
 };
 
-const getTypeImage = (typeName: string) => {
-  return `/images/types/${typeName}.png`;
+const updateTypeImage = (index: number, typeName: string) => {
+  form.types[index].image = `/images/types/${typeName}.png`;
 };
 
-const updateTypeImage = (index: number) => {
-  const type = form.types[index];
-  if (type.name) {
-    type.image = getTypeImage(type.name);
+const handleImageChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files[0]) {
+    form.image = target.files[0];
   }
 };
 
-const getRarityLabel = (rarity: string) => {
-  const labels: Record<string, string> = {
-    normal: 'Normal',
-    rare: 'Rare',
-    epic: 'Épique',
-    legendary: 'Légendaire'
-  };
-  return labels[rarity] || rarity;
-};
-
-const getDamageRelationLabel = (relation: string) => {
-  const labels: Record<string, string> = {
-    neutral: 'Neutre',
-    resistant: 'Résistant',
-    vulnerable: 'Vulnérable',
-    twice_resistant: 'Double Résistant'
-  };
-  return labels[relation] || relation;
-};
-
-const getTotalStats = () => {
-  const stats = [
-    parseInt(form.hp) || 0,
-    parseInt(form.attack) || 0,
-    parseInt(form.defense) || 0,
-    parseInt(form.speed) || 0,
-    parseInt(form.special_attack) || 0,
-    parseInt(form.special_defense) || 0
-  ];
-  return stats.reduce((sum, stat) => sum + stat, 0);
-};
-
 const submit = () => {
+  isSubmitting.value = true;
   form.processing = true;
   form.errors = {};
 
@@ -164,8 +183,8 @@ const submit = () => {
     evolution_id: form.evolution_id ? parseInt(form.evolution_id) : null,
     pre_evolution_id: form.pre_evolution_id ? parseInt(form.pre_evolution_id) : null,
     description: form.description,
-    height: parseInt(form.height),
-    weight: parseInt(form.weight),
+    height: parseFloat(form.height),
+    weight: parseFloat(form.weight),
     rarity: form.rarity,
     is_shiny: form.is_shiny,
     hp: parseInt(form.hp),
@@ -179,475 +198,642 @@ const submit = () => {
 
   router.put(`/admin/pokemons/${props.pokemon.id}`, data, {
     onSuccess: () => {
-      form.processing = false;
+      router.visit('/admin/pokemons');
     },
     onError: (errors: Record<string, string>) => {
       form.processing = false;
       form.errors = errors;
+      isSubmitting.value = false;
+    },
+    onFinish: () => {
+      isSubmitting.value = false;
+      form.processing = false;
     },
     preserveScroll: true,
   });
 };
 
-const resetForm = () => {
-  initializeForm();
-  form.errors = {};
+const deletePokemon = () => {
+  showDeleteModal.value = true;
 };
 
-initializeForm();
+const confirmDelete = () => {
+  router.delete(`/admin/pokemons/${props.pokemon.id}`, {
+    onSuccess: () => router.visit('/admin/pokemons'),
+    onFinish: () => {
+      showDeleteModal.value = false;
+    }
+  });
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+};
+
+const goBack = () => {
+  router.visit('/admin/pokemons');
+};
+
+const getRarityLabel = (rarity: string) => {
+  switch (rarity) {
+  case 'normal': return 'Normal';
+  case 'rare': return 'Rare';
+  case 'epic': return 'Épique';
+  case 'legendary': return 'Légendaire';
+  default: return rarity;
+  }
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+const getPokemonImage = (pokemon: Pokemon) => {
+  const suffix = pokemon.is_shiny ? '_S' : '';
+  return `/images/pokemon-gifs/${pokemon.pokedex_id}${suffix}.gif`;
+};
+
+onMounted(() => {
+  initializeForm();
+});
 </script>
 
 <template>
+  <Head title="Modifier le Pokémon" />
 
-  <Head title="Modifier un Pokémon" />
-
-  <div class="h-screen w-screen overflow-hidden bg-gradient-to-br from-base-200 to-base-300 relative">
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative overflow-x-hidden">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-screen w-screen overflow-hidden">
-      <div class="flex justify-center pt-4 mb-4">
-        <div class="text-center">
-          <h1
-            class="text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            ✏️ MODIFIER UN POKÉMON
+    <div class="relative z-10 min-h-screen">
+      <div class="container mx-auto px-4 py-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-2 tracking-wider">
+            ✏️ MODIFIER POKÉMON
           </h1>
-          <p class="text-xs text-base-content/70 uppercase tracking-wider">
-            Édition des données Pokémon
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
+            Édition de {{ props.pokemon.name }}
           </p>
         </div>
-      </div>
 
-      <div v-if="form.errors.error" class="mx-auto max-w-4xl mb-4">
-        <div class="alert alert-error">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-               viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{{ form.errors.error }}</span>
-        </div>
-      </div>
-
-      <div class="absolute left-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
-          <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">ℹ️</span>
-              AIDE
-            </h3>
-          </div>
-          <div class="p-3 text-xs text-base-content/70 space-y-2">
-            <p>• ID : ne peut pas être modifié</p>
-            <p>• Pokédex ID : numéro officiel</p>
-            <p>• Nom : 3-50 caractères</p>
-            <p>• Types : au moins 1 requis</p>
-            <p>• Stats : 1-255 chacune</p>
-            <p>• Rareté : normal, rare, épique, légendaire</p>
-          </div>
-        </div>
-
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">🔄</span>
-              ACTIONS
-            </h3>
-          </div>
-          <div class="p-3 space-y-2">
-            <Button @click="resetForm" variant="outline" size="sm" class="w-full" :disabled="form.processing">
-              🔄 Réinitialiser
-            </Button>
-            <div class="border-t border-base-300/30 pt-2">
-              <Button @click="router.visit(`/admin/pokemons/${pokemon.id}`)" variant="ghost" size="sm" class="w-full">
-                👁️ Voir détails
-              </Button>
-              <Button @click="router.visit('/admin/pokemons')" variant="ghost" size="sm" class="w-full mt-1">
-                ← Liste Pokémon
-              </Button>
-              <Button @click="router.visit('/admin')" variant="ghost" size="sm" class="w-full mt-1">
-                🏠 Dashboard
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute right-8 top-20 w-64">
-        <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-          <div class="p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📋</span>
-              APERÇU
-            </h3>
-          </div>
-          <div class="p-3 space-y-3">
-            <div class="text-center">
-              <div
-                class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-warning/20 to-warning/10 flex items-center justify-center text-xl font-bold mb-2">
-                {{ form.name ? form.name.charAt(0).toUpperCase() : '?' }}
-                <span v-if="form.is_shiny" class="text-yellow-500 ml-1">✨</span>
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          <div class="xl:col-span-8">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-6 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                <h3 class="text-xl font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-2xl">⚡</span>
+                  INFORMATIONS POKÉMON
+                </h3>
               </div>
-              <div class="text-sm font-semibold">{{ form.name || 'Pokémon' }}</div>
-              <div class="text-xs text-base-content/60">#{{ form.pokedex_id || '000' }}</div>
-            </div>
 
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Rareté:</span>
-                <span :class="`badge badge-xs bg-gradient-to-r ${getRarityColor(form.rarity)} text-white border-0`">
-                  {{ getRarityLabel(form.rarity) }}
-                </span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Génération:</span>
-                <span class="font-semibold">{{ form.generation || '-' }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Stats Total:</span>
-                <span class="font-semibold text-success">{{ getTotalStats() }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/70">Shiny:</span>
-                <span class="font-semibold">{{ form.is_shiny ? '✨ Oui' : 'Non' }}</span>
-              </div>
-            </div>
-
-            <div v-if="form.types.some(t => t.name)" class="space-y-1">
-              <div class="text-xs text-base-content/70">Types:</div>
-              <div class="flex flex-wrap gap-1">
-                <span v-for="type in form.types.filter(t => t.name)" :key="type.name"
-                      :class="`badge badge-xs bg-gradient-to-r ${getTypeColor(type.name)} text-white border-0`">
-                  {{ type.name }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[700px]">
-        <div
-          class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-full flex flex-col">
-          <div class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
-            <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">📝</span>
-              FORMULAIRE DE MODIFICATION
-            </h3>
-          </div>
-
-          <form @submit.prevent="submit" class="flex-1 overflow-y-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              <!-- Informations de base -->
-              <div class="space-y-4">
-                <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm">Informations de base</h4>
-
-
-
-                <div>
-                  <label for="pokedex_id"
-                         class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                    Pokédex ID <span class="text-error">*</span>
-                  </label>
-                  <Input id="pokedex_id" v-model="form.pokedex_id" type="number" required placeholder="1"
-                         :class="{ 'border-error': form.errors.pokedex_id }" />
-                  <p v-if="form.errors.pokedex_id" class="mt-1 text-sm text-error">{{ form.errors.pokedex_id }}</p>
-                </div>
-
-                <div>
-                  <label for="name" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                    Nom <span class="text-error">*</span>
-                  </label>
-                  <Input id="name" v-model="form.name" type="text" required placeholder="Bulbizarre"
-                         :class="{ 'border-error': form.errors.name }" />
-                  <p v-if="form.errors.name" class="mt-1 text-sm text-error">{{ form.errors.name }}</p>
-                </div>
-
-                <div>
-                  <label for="description"
-                         class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                    Description <span class="text-error">*</span>
-                  </label>
-                  <textarea id="description" v-model="form.description" required placeholder="Description du Pokémon..."
-                            class="textarea textarea-bordered w-full bg-base-100/80 border-base-300/50"
-                            :class="{ 'border-error': form.errors.description }" rows="3"></textarea>
-                  <p v-if="form.errors.description" class="mt-1 text-sm text-error">{{ form.errors.description }}</p>
-                </div>
-
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text font-semibold">Image (GIF uniquement)</span>
-                  </label>
-                  <input type="file" @change="(e) => form.image = (e.target as HTMLInputElement).files?.[0] || null"
-                         accept=".gif" :class="{ 'border-error': form.errors.image }"
-                         class="file-input file-input-bordered w-full" />
-                  <p v-if="form.errors.image" class="mt-1 text-sm text-error">{{ form.errors.image }}</p>
-                  <p class="mt-1 text-xs text-base-content/70">Laissez vide pour conserver l'image actuelle</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label for="height"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      Taille <span class="text-error">*</span>
+              <form @submit.prevent="submit" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Pokédex ID *
                     </label>
-                    <Input id="height" v-model="form.height" type="number" required placeholder="70"
-                           :class="{ 'border-error': form.errors.height }" />
-                    <p v-if="form.errors.height" class="mt-1 text-sm text-error">{{ form.errors.height }}</p>
+                    <Input
+                      v-model="form.pokedex_id"
+                      type="number"
+                      placeholder="1"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.pokedex_id" class="text-xs text-error mt-1">
+                      {{ props.errors.pokedex_id }}
+                    </p>
                   </div>
 
-                  <div>
-                    <label for="weight"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      Poids <span class="text-error">*</span>
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Nom du Pokémon *
                     </label>
-                    <Input id="weight" v-model="form.weight" type="number" required placeholder="69"
-                           :class="{ 'border-error': form.errors.weight }" />
-                    <p v-if="form.errors.weight" class="mt-1 text-sm text-error">{{ form.errors.weight }}</p>
+                    <Input
+                      v-model="form.name"
+                      placeholder="Pikachu"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.name" class="text-xs text-error mt-1">
+                      {{ props.errors.name }}
+                    </p>
                   </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label for="rarity"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      Rareté <span class="text-error">*</span>
+                <div class="space-y-2">
+                  <label class="block text-sm font-bold text-base-content/80 mb-2">
+                    Nouvelle image du Pokémon
+                  </label>
+                  <Input
+                    @change="handleImageChange"
+                    type="file"
+                    accept="image/*"
+                    class="w-full"
+                  />
+                  <p v-if="props.errors?.image" class="text-xs text-error mt-1">
+                    {{ props.errors.image }}
+                  </p>
+                  <p class="text-xs text-base-content/60">
+                    Laisser vide pour conserver l'image actuelle
+                  </p>
+                </div>
+
+                <div class="space-y-4">
+                  <h4 class="text-lg font-bold text-base-content border-b border-base-300/30 pb-2">
+                    🎯 Types
+                  </h4>
+
+                  <div v-for="(type, index) in form.types" :key="index" class="flex gap-3 items-end">
+                    <div class="flex-1">
+                      <Select
+                        v-model="type.name"
+                        @update:model-value="updateTypeImage(index, $event)"
+                        :options="typeOptions"
+                        placeholder="Sélectionner un type"
+                        class="w-full"
+                      />
+                    </div>
+                    <div class="flex gap-2">
+                      <Button
+                        v-if="form.types.length < 2"
+                        @click="addType"
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                      >
+                        ➕
+                      </Button>
+                      <Button
+                        v-if="form.types.length > 1"
+                        @click="removeType(index)"
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        class="text-error"
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Taille (m) *
                     </label>
-                    <select id="rarity" v-model="form.rarity" required
-                            class="select select-bordered w-full bg-base-100/80 border-base-300/50"
-                            :class="{ 'border-error': form.errors.rarity }">
-                      <option v-for="rarity in rarities" :key="rarity" :value="rarity">
-                        {{ getRarityLabel(rarity) }}
-                      </option>
-                    </select>
-                    <p v-if="form.errors.rarity" class="mt-1 text-sm text-error">{{ form.errors.rarity }}</p>
+                    <Input
+                      v-model="form.height"
+                      type="number"
+                      step="0.1"
+                      placeholder="0.4"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.height" class="text-xs text-error mt-1">
+                      {{ props.errors.height }}
+                    </p>
                   </div>
 
-                  <div>
-                    <label for="generation"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Poids (kg) *
+                    </label>
+                    <Input
+                      v-model="form.weight"
+                      type="number"
+                      step="0.1"
+                      placeholder="6.0"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.weight" class="text-xs text-error mt-1">
+                      {{ props.errors.weight }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Rareté *
+                    </label>
+                    <Select
+                      v-model="form.rarity"
+                      :options="rarityOptions"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.rarity" class="text-xs text-error mt-1">
+                      {{ props.errors.rarity }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
                       Génération
                     </label>
-                    <select id="generation" v-model="form.generation"
-                            class="select select-bordered w-full bg-base-100/80 border-base-300/50"
-                            :class="{ 'border-error': form.errors.generation }">
-                      <option value="">Aucune</option>
-                      <option v-for="gen in generations" :key="gen" :value="gen">
-                        {{ gen }}
-                      </option>
-                    </select>
-                    <p v-if="form.errors.generation" class="mt-1 text-sm text-error">{{ form.errors.generation }}</p>
+                    <Select
+                      v-model="form.generation"
+                      :options="generationOptions"
+                      class="w-full"
+                    />
+                    <p v-if="props.errors?.generation" class="text-xs text-error mt-1">
+                      {{ props.errors.generation }}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Type *
+                    </label>
+                    <Select
+                      v-model="form.is_shiny"
+                      :options="shinyOptions"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.is_shiny" class="text-xs text-error mt-1">
+                      {{ props.errors.is_shiny }}
+                    </p>
                   </div>
                 </div>
 
-                <div class="flex items-center gap-2">
-                  <input id="is_shiny" v-model="form.is_shiny" type="checkbox" class="checkbox checkbox-sm" />
-                  <label for="is_shiny" class="text-sm font-bold text-base-content/70 uppercase tracking-wider">
-                    Pokémon Shiny
+                <div class="space-y-4">
+                  <h4 class="text-lg font-bold text-base-content border-b border-base-300/30 pb-2">
+                    📊 Statistiques
+                  </h4>
+
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="space-y-2">
+                      <label class="block text-sm font-bold text-base-content/80 mb-2">
+                        PV *
+                      </label>
+                      <Input
+                        v-model="form.hp"
+                        type="number"
+                        min="1"
+                        placeholder="35"
+                        class="w-full"
+                        required
+                      />
+                      <p v-if="props.errors?.hp" class="text-xs text-error mt-1">
+                        {{ props.errors.hp }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="block text-sm font-bold text-base-content/80 mb-2">
+                        Attaque *
+                      </label>
+                      <Input
+                        v-model="form.attack"
+                        type="number"
+                        min="1"
+                        placeholder="55"
+                        class="w-full"
+                        required
+                      />
+                      <p v-if="props.errors?.attack" class="text-xs text-error mt-1">
+                        {{ props.errors.attack }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="block text-sm font-bold text-base-content/80 mb-2">
+                        Défense *
+                      </label>
+                      <Input
+                        v-model="form.defense"
+                        type="number"
+                        min="1"
+                        placeholder="40"
+                        class="w-full"
+                        required
+                      />
+                      <p v-if="props.errors?.defense" class="text-xs text-error mt-1">
+                        {{ props.errors.defense }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="block text-sm font-bold text-base-content/80 mb-2">
+                        Vitesse *
+                      </label>
+                      <Input
+                        v-model="form.speed"
+                        type="number"
+                        min="1"
+                        placeholder="90"
+                        class="w-full"
+                        required
+                      />
+                      <p v-if="props.errors?.speed" class="text-xs text-error mt-1">
+                        {{ props.errors.speed }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="block text-sm font-bold text-base-content/80 mb-2">
+                        Att. Spé *
+                      </label>
+                      <Input
+                        v-model="form.special_attack"
+                        type="number"
+                        min="1"
+                        placeholder="50"
+                        class="w-full"
+                        required
+                      />
+                      <p v-if="props.errors?.special_attack" class="text-xs text-error mt-1">
+                        {{ props.errors.special_attack }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="block text-sm font-bold text-base-content/80 mb-2">
+                        Déf. Spé *
+                      </label>
+                      <Input
+                        v-model="form.special_defense"
+                        type="number"
+                        min="1"
+                        placeholder="50"
+                        class="w-full"
+                        required
+                      />
+                      <p v-if="props.errors?.special_defense" class="text-xs text-error mt-1">
+                        {{ props.errors.special_defense }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-sm font-bold text-base-content/80 mb-2">
+                    Description
                   </label>
+                  <textarea
+                    v-model="form.description"
+                    placeholder="Description du Pokémon..."
+                    class="textarea textarea-bordered w-full bg-base-100/80 border-base-300/50"
+                    rows="3"
+                  ></textarea>
+                  <p v-if="props.errors?.description" class="text-xs text-error mt-1">
+                    {{ props.errors.description }}
+                  </p>
                 </div>
-              </div>
 
-              <!-- Statistiques -->
-              <div class="space-y-4">
-                <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm">Statistiques</h4>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label for="hp" class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      PV <span class="text-error">*</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Évolution
                     </label>
-                    <Input id="hp" v-model="form.hp" type="number" min="1" max="255" required placeholder="45"
-                           :class="{ 'border-error': form.errors.hp }" />
-                    <p v-if="form.errors.hp" class="mt-1 text-sm text-error">{{ form.errors.hp }}</p>
+                    <Select
+                      v-model="form.evolution_id"
+                      :options="pokemonOptions"
+                      class="w-full"
+                      placeholder="Sélectionner une évolution"
+                    />
+                    <p v-if="props.errors?.evolution_id" class="text-xs text-error mt-1">
+                      {{ props.errors.evolution_id }}
+                    </p>
                   </div>
 
-                  <div>
-                    <label for="attack"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      Attaque <span class="text-error">*</span>
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Pré-évolution
                     </label>
-                    <Input id="attack" v-model="form.attack" type="number" min="1" max="255" required placeholder="49"
-                           :class="{ 'border-error': form.errors.attack }" />
-                    <p v-if="form.errors.attack" class="mt-1 text-sm text-error">{{ form.errors.attack }}</p>
-                  </div>
-
-                  <div>
-                    <label for="defense"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      Défense <span class="text-error">*</span>
-                    </label>
-                    <Input id="defense" v-model="form.defense" type="number" min="1" max="255" required placeholder="49"
-                           :class="{ 'border-error': form.errors.defense }" />
-                    <p v-if="form.errors.defense" class="mt-1 text-sm text-error">{{ form.errors.defense }}</p>
-                  </div>
-
-                  <div>
-                    <label for="speed"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      Vitesse <span class="text-error">*</span>
-                    </label>
-                    <Input id="speed" v-model="form.speed" type="number" min="1" max="255" required placeholder="45"
-                           :class="{ 'border-error': form.errors.speed }" />
-                    <p v-if="form.errors.speed" class="mt-1 text-sm text-error">{{ form.errors.speed }}</p>
-                  </div>
-
-                  <div>
-                    <label for="special_attack"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      Att. Spé. <span class="text-error">*</span>
-                    </label>
-                    <Input id="special_attack" v-model="form.special_attack" type="number" min="1" max="255" required
-                           placeholder="65" :class="{ 'border-error': form.errors.special_attack }" />
-                    <p v-if="form.errors.special_attack" class="mt-1 text-sm text-error">{{ form.errors.special_attack
-                    }}</p>
-                  </div>
-
-                  <div>
-                    <label for="special_defense"
-                           class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                      Déf. Spé. <span class="text-error">*</span>
-                    </label>
-                    <Input id="special_defense" v-model="form.special_defense" type="number" min="1" max="255" required
-                           placeholder="65" :class="{ 'border-error': form.errors.special_defense }" />
-                    <p v-if="form.errors.special_defense" class="mt-1 text-sm text-error">{{ form.errors.special_defense
-                    }}</p>
+                    <Select
+                      v-model="form.pre_evolution_id"
+                      :options="pokemonOptions"
+                      class="w-full"
+                      placeholder="Sélectionner une pré-évolution"
+                    />
+                    <p v-if="props.errors?.pre_evolution_id" class="text-xs text-error mt-1">
+                      {{ props.errors.pre_evolution_id }}
+                    </p>
                   </div>
                 </div>
 
-                <div class="bg-base-200/30 rounded-lg p-3">
-                  <div class="text-center">
-                    <div class="text-sm text-base-content/70">Total des statistiques</div>
-                    <div class="text-2xl font-bold text-success">{{ getTotalStats() }}</div>
+                <div class="space-y-4">
+                  <h4 class="text-lg font-bold text-base-content border-b border-base-300/30 pb-2">
+                    ⚔️ Résistances/Faiblesses
+                  </h4>
+
+                  <div v-for="(resistance, index) in form.resistances" :key="index" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                    <div>
+                      <Select
+                        v-model="resistance.name"
+                        :options="typeOptions"
+                        placeholder="Type"
+                        class="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Input
+                        v-model="resistance.damage_multiplier"
+                        type="number"
+                        step="0.1"
+                        placeholder="1.0"
+                        class="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Select
+                        v-model="resistance.damage_relation"
+                        :options="damageRelationOptions"
+                        class="w-full"
+                      />
+                    </div>
+                    <div class="flex gap-2">
+                      <Button
+                        @click="addResistance"
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                      >
+                        ➕
+                      </Button>
+                      <Button
+                        v-if="form.resistances.length > 1"
+                        @click="removeResistance(index)"
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        class="text-error"
+                      >
+                        ✕
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- Types -->
-            <div class="mt-8">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm">Types</h4>
-                <Button @click="addType" type="button" size="sm" variant="outline">
-                  ➕ Ajouter un type
-                </Button>
-              </div>
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-base-300/30">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    :disabled="isSubmitting || form.processing"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    <span v-if="isSubmitting || form.processing">⏳</span>
+                    <span v-else>💾</span>
+                    {{ isSubmitting || form.processing ? 'Mise à jour...' : 'Mettre à jour' }}
+                  </Button>
 
-              <div class="space-y-3">
-                <div v-for="(type, index) in form.types" :key="index" class="flex items-center gap-3">
-                  <select v-model="type.name" @change="updateTypeImage(index)"
-                          class="select select-bordered flex-1 bg-base-100/80 border-base-300/50"
-                          :class="{ 'border-error': form.errors[`types.${index}.name`] }">
-                    <option value="">Sélectionner un type</option>
-                    <option v-for="typeOption in types" :key="typeOption" :value="typeOption">
-                      {{ typeOption }}
-                    </option>
-                  </select>
-
-                  <Button @click="removeType(index)" type="button" size="sm" variant="ghost" class="text-error"
-                          :disabled="form.types.length === 1">
-                    🗑️
+                  <Button
+                    @click="goBack"
+                    variant="secondary"
+                    size="lg"
+                    :disabled="isSubmitting || form.processing"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    ← Retour à la liste
                   </Button>
                 </div>
-              </div>
+              </form>
             </div>
+          </div>
 
-            <!-- Résistances -->
-            <div class="mt-8">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm">Résistances</h4>
-                <Button @click="addResistance" type="button" size="sm" variant="outline">
-                  ➕ Ajouter une résistance
-                </Button>
+          <div class="xl:col-span-4 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">⚡</span>
+                  POKÉMON ACTUEL
+                </h3>
               </div>
+              <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                  <div class="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
+                    <img
+                      :src="getPokemonImage(props.pokemon)"
+                      :alt="props.pokemon.name"
+                      class="w-full h-full object-contain"
+                      @error="(event) => { const target = event.target as HTMLImageElement; if (target) target.style.display = 'none'; }"
+                    />
+                    <div v-if="props.pokemon.is_shiny" class="absolute -top-1 -right-1 text-lg">✨</div>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-lg">{{ props.pokemon.name }}</div>
+                    <div class="text-sm text-base-content/70">#{{ props.pokemon.pokedex_id }}</div>
+                  </div>
+                </div>
 
-              <div class="space-y-3">
-                <div v-for="(resistance, index) in form.resistances" :key="index" class="grid grid-cols-3 gap-3">
-                  <select v-model="resistance.name" class="select select-bordered bg-base-100/80 border-base-300/50"
-                          :class="{ 'border-error': form.errors[`resistances.${index}.name`] }">
-                    <option value="">Sélectionner un type</option>
-                    <option v-for="typeOption in types" :key="typeOption" :value="typeOption">
-                      {{ typeOption }}
-                    </option>
-                  </select>
-
-                  <Input v-model.number="resistance.damage_multiplier" type="number" step="0.1" placeholder="1.0"
-                         class="text-center"
-                         :class="{ 'border-error': form.errors[`resistances.${index}.damage_multiplier`] }" />
-
-                  <div class="flex gap-2">
-                    <select v-model="resistance.damage_relation"
-                            class="select select-bordered flex-1 bg-base-100/80 border-base-300/50"
-                            :class="{ 'border-error': form.errors[`resistances.${index}.damage_relation`] }">
-                      <option v-for="relation in damageRelations" :key="relation" :value="relation">
-                        {{ getDamageRelationLabel(relation) }}
-                      </option>
-                    </select>
-
-                    <Button @click="removeResistance(index)" type="button" size="sm" variant="ghost" class="text-error"
-                            :disabled="form.resistances.length === 1">
-                      🗑️
-                    </Button>
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">ID:</span>
+                    <span class="font-medium">#{{ props.pokemon.id }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Créé le:</span>
+                    <span class="font-medium">{{ formatDate(props.pokemon.created_at) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Rareté:</span>
+                    <span class="font-medium text-primary">{{ getRarityLabel(props.pokemon.rarity) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Types:</span>
+                    <span class="font-medium text-warning">{{ props.pokemon.types.map(t => t.name).join(', ') }}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Évolutions -->
-            <div class="mt-8">
-              <h4 class="font-bold text-base-content/70 uppercase tracking-wider text-sm mb-4">Évolutions</h4>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label for="evolution_id"
-                         class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                    Évolution
-                  </label>
-                  <select id="evolution_id" v-model="form.evolution_id"
-                          class="select select-bordered w-full bg-base-100/80 border-base-300/50"
-                          :class="{ 'border-error': form.errors.evolution_id }">
-                    <option value="">Aucune évolution</option>
-                    <option v-for="pokemon in availablePokemons" :key="pokemon.id" :value="pokemon.id">
-                      #{{ pokemon.pokedex_id }} - {{ pokemon.name }}
-                    </option>
-                  </select>
-                  <p v-if="form.errors.evolution_id" class="mt-1 text-sm text-error">{{ form.errors.evolution_id }}</p>
-                </div>
-
-                <div>
-                  <label for="pre_evolution_id"
-                         class="block text-sm font-bold text-base-content/70 mb-2 uppercase tracking-wider">
-                    Pré-évolution
-                  </label>
-                  <select id="pre_evolution_id" v-model="form.pre_evolution_id"
-                          class="select select-bordered w-full bg-base-100/80 border-base-300/50"
-                          :class="{ 'border-error': form.errors.pre_evolution_id }">
-                    <option value="">Aucune pré-évolution</option>
-                    <option v-for="pokemon in availablePokemons" :key="pokemon.id" :value="pokemon.id">
-                      #{{ pokemon.pokedex_id }} - {{ pokemon.name }}
-                    </option>
-                  </select>
-                  <p v-if="form.errors.pre_evolution_id" class="mt-1 text-sm text-error">{{ form.errors.pre_evolution_id
-                  }}</p>
-                </div>
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">⚠️</span>
+                  ZONE DANGER
+                </h3>
+              </div>
+              <div class="p-6 space-y-4">
+                <p class="text-sm text-base-content/70">
+                  La suppression d'un Pokémon est définitive et supprimera toutes ses données.
+                </p>
+                <Button
+                  @click="deletePokemon"
+                  variant="outline"
+                  size="sm"
+                  class="w-full border-error text-error hover:bg-error hover:text-error-content"
+                >
+                  🗑️ Supprimer le Pokémon
+                </Button>
               </div>
             </div>
 
-            <!-- Submit -->
-            <div class="mt-8 flex justify-end gap-3">
-              <Button @click="router.visit(`/admin/pokemons/${pokemon.id}`)" type="button" variant="ghost"
-                      :disabled="form.processing">
-                Annuler
-              </Button>
-              <Button type="submit" variant="primary" :disabled="form.processing">
-                <span v-if="form.processing">⏳</span>
-                <span v-else>💾</span>
-                {{ form.processing ? 'Modification...' : 'Modifier le Pokémon' }}
-              </Button>
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">🔗</span>
+                  NAVIGATION
+                </h3>
+              </div>
+              <div class="p-6 space-y-3">
+                <Button
+                  @click="router.visit(`/admin/pokemons/${props.pokemon.id}`)"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  👁️ Voir le Pokémon
+                </Button>
+                <Button
+                  @click="router.visit('/admin/pokemons')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  📋 Liste Pokémon
+                </Button>
+                <Button
+                  @click="router.visit('/admin')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  🏠 Dashboard
+                </Button>
+              </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
+
+    <Modal :show="showDeleteModal" @close="cancelDelete" max-width="md">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-error/20 rounded-lg flex items-center justify-center">
+            <span class="text-xl">⚠️</span>
+          </div>
+          <h3 class="text-xl font-bold text-base-content">Supprimer le Pokémon</h3>
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-base-content/80">
+          Êtes-vous sûr de vouloir supprimer le Pokémon
+          <span class="font-bold text-error">{{ props.pokemon.name }}</span> ?
+        </p>
+        <p class="text-sm text-base-content/60">
+          Cette action est irréversible et supprimera toutes les données associées.
+        </p>
+
+        <div class="flex gap-3 pt-4">
+          <Button @click="confirmDelete" variant="outline" class="flex-1 border-error text-error hover:bg-error hover:text-error-content">
+            🗑️ Supprimer
+          </Button>
+          <Button @click="cancelDelete" variant="secondary" class="flex-1">
+            Annuler
+          </Button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>

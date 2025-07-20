@@ -1,524 +1,458 @@
 <script setup lang="ts">
-import DurationDisplay from '@/Components/Expeditions/DurationDisplay.vue';
-import RarityBadge from '@/Components/Expeditions/RarityBadge.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import type { ExpeditionRarity } from '@/constants/expedition';
-import {
-  getRarityDotColor,
-  getRarityLabel,
-  getStatusColor,
-  getStatusLabel
-} from '@/utils/expedition';
+import Input from '@/Components/UI/Input.vue';
+import Select from '@/Components/UI/Select.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import { Head, router } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { ref, computed } from 'vue';
+
+interface ExpeditionReward {
+  type: string;
+  amount?: number;
+  item_id?: number;
+  quantity?: number;
+}
+
+interface ExpeditionRequirement {
+  id: number;
+  type: string;
+  value: string;
+  quantity: number;
+}
 
 interface Expedition {
   id: number;
   name: string;
   description: string;
-  rarity: 'normal' | 'rare' | 'epic' | 'legendary';
+  rarity: string;
   duration_minutes: number;
+  rewards: ExpeditionReward[];
   is_active: boolean;
-  rewards: Array<{
-    type: string;
-    amount?: number;
-    item_id?: number;
-    quantity?: number;
-  }>;
-  requirements: Array<{
-    type: string;
-    value: string;
-    quantity: number;
-  }>;
-  user_expeditions_count?: number;
+  requirements: ExpeditionRequirement[];
   created_at: string;
   updated_at: string;
 }
 
-interface PaginatedExpeditions {
-  data: Expedition[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
-  links: Array<{
-    url: string | null;
-    label: string;
-    active: boolean;
-  }>;
-}
-
-const props = defineProps<{
-  expeditions: PaginatedExpeditions;
-  stats: {
+interface Props {
+  expeditions: {
+    data: Expedition[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
     total: number;
-    active: number;
-    inactive: number;
-    by_rarity: Record<string, number>;
+    links: Array<{
+      url: string | null;
+      label: string;
+      active: boolean;
+    }>;
   };
   filters?: {
     rarity?: string;
-    is_active?: boolean;
+    is_active?: string;
     search?: string;
   };
   rarities: string[];
-}>();
+}
 
-const sortField = ref<string>('');
-const sortDirection = ref<'asc' | 'desc'>('asc');
-const rarityFilter = ref<string>(props.filters?.rarity || '');
-const statusFilter = ref<string>(props.filters?.is_active !== undefined ? props.filters.is_active.toString() : '');
-const searchFilter = ref<string>(props.filters?.search || '');
+const props = defineProps<Props>();
 
-const sortedExpeditions = computed(() => {
-  if (!sortField.value) return props.expeditions.data;
+const rarityFilter = ref(props.filters?.rarity || '');
+const statusFilter = ref(props.filters?.is_active || '');
+const searchTerm = ref(props.filters?.search || '');
+const showDeleteModal = ref(false);
+const expeditionToDelete = ref<Expedition | null>(null);
 
-  const sorted = [...props.expeditions.data].sort((a, b) => {
-    let aValue = a[sortField.value as keyof Expedition];
-    let bValue = b[sortField.value as keyof Expedition];
-
-    if (aValue === null || aValue === undefined) aValue = '';
-    if (bValue === null || bValue === undefined) bValue = '';
-
-    if (sortField.value === 'is_active') {
-      aValue = aValue ? 1 : 0;
-      bValue = bValue ? 1 : 0;
-    }
-
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-
-    if (aValue < bValue) return sortDirection.value === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortDirection.value === 'asc' ? 1 : -1;
-    return 0;
+const filteredExpeditions = computed(() => {
+  return props.expeditions.data.filter(expedition => {
+    const matchesSearch = expedition.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+      expedition.description.toLowerCase().includes(searchTerm.value.toLowerCase());
+    return matchesSearch;
   });
-
-  return sorted;
 });
 
-const deleteExpedition = (expeditionId: number) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette expédition ?')) {
-    router.delete(`/admin/expeditions/${expeditionId}`, {
-      preserveScroll: true
+const deleteExpedition = (expedition: Expedition) => {
+  expeditionToDelete.value = expedition;
+  showDeleteModal.value = true;
+};
+
+const confirmDelete = () => {
+  if (expeditionToDelete.value) {
+    router.delete(`/admin/expeditions/${expeditionToDelete.value.id}`, {
+      preserveScroll: true,
+      onFinish: () => {
+        showDeleteModal.value = false;
+        expeditionToDelete.value = null;
+      }
     });
   }
 };
 
-const toggleExpedition = (expeditionId: number) => {
-  router.post(`/admin/expeditions/${expeditionId}/toggle`, {}, {
-    preserveScroll: true
-  });
-};
-
-const duplicateExpedition = (expeditionId: number) => {
-  router.post(`/admin/expeditions/${expeditionId}/duplicate`, {}, {
-    preserveScroll: true
-  });
-};
-
-const sortBy = (field: string) => {
-  if (sortField.value === field) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-  } else {
-    sortField.value = field;
-    sortDirection.value = 'asc';
-  }
-};
-
-const getSortIcon = (field: string) => {
-  if (sortField.value !== field) return '↕️';
-  return sortDirection.value === 'asc' ? '↑' : '↓';
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  expeditionToDelete.value = null;
 };
 
 const applyFilters = () => {
-  const params: Record<string, string> = {};
+  const params = new URLSearchParams();
 
   if (rarityFilter.value) {
-    params.rarity = rarityFilter.value;
+    params.append('rarity', rarityFilter.value);
   }
 
   if (statusFilter.value) {
-    params.is_active = statusFilter.value;
+    params.append('is_active', statusFilter.value);
   }
 
-  if (searchFilter.value) {
-    params.search = searchFilter.value;
+  if (searchTerm.value) {
+    params.append('search', searchTerm.value);
   }
 
-  router.get('/admin/expeditions', params, {
-    preserveState: false,
+  router.get(`/admin/expeditions?${params.toString()}`, {}, {
+    preserveState: true,
     preserveScroll: true,
-    replace: true
   });
 };
 
 const clearFilters = () => {
-  sortField.value = '';
-  sortDirection.value = 'asc';
   rarityFilter.value = '';
   statusFilter.value = '';
-  searchFilter.value = '';
+  searchTerm.value = '';
   router.get('/admin/expeditions', {}, {
-    preserveState: false,
+    preserveState: true,
     preserveScroll: true,
-    replace: true
   });
+};
+
+const getRarityLabel = (rarity: string) => {
+  switch (rarity) {
+  case 'normal': return 'Normal';
+  case 'rare': return 'Rare';
+  case 'epic': return 'Épique';
+  case 'legendary': return 'Légendaire';
+  default: return rarity;
+  }
+};
+
+const getRarityColor = (rarity: string) => {
+  switch (rarity) {
+  case 'normal': return 'text-base-content bg-base-200/50 border-base-300/30';
+  case 'rare': return 'text-info bg-info/10 border-info/30';
+  case 'epic': return 'text-warning bg-warning/10 border-warning/30';
+  case 'legendary': return 'text-error bg-error/10 border-error/30';
+  default: return 'text-base-content bg-base-200/50 border-base-300/30';
+  }
+};
+
+const getStatusColor = (isActive: boolean) => {
+  return isActive ? 'text-success bg-success/10 border-success/30' : 'text-error bg-error/10 border-error/30';
+};
+
+const getStatusLabel = (isActive: boolean) => {
+  return isActive ? 'Active' : 'Inactive';
+};
+
+const formatDuration = (minutes: number) => {
+  if (minutes < 60) {
+    return `${minutes}min`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
+};
+
+const getRewardSummary = (rewards: ExpeditionReward[]) => {
+  const summary = rewards.slice(0, 2).map(reward => {
+    switch (reward.type) {
+    case 'cash': return `💰 ${reward.amount?.toLocaleString()}`;
+    case 'xp': return `⭐ ${reward.amount?.toLocaleString()} XP`;
+    case 'pokeball': return `⚪ ${reward.amount} Pokéballs`;
+    case 'masterball': return `🟣 ${reward.amount} Masterballs`;
+    case 'item': return `🎁 ${reward.quantity} Item(s)`;
+    default: return `${reward.type}`;
+    }
+  }).join(', ');
+
+  return rewards.length > 2 ? `${summary}...` : summary;
+};
+
+const getRequirementSummary = (requirements: ExpeditionRequirement[]) => {
+  if (requirements.length === 0) return 'Aucune';
+  const first = requirements[0];
+  const text = `${first.quantity} ${first.type === 'rarity' ? getRarityLabel(first.value) : first.value}`;
+  return requirements.length > 1 ? `${text}...` : text;
 };
 </script>
 
 <template>
-
   <Head title="Gestion des expéditions" />
 
-  <div class="h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative overflow-hidden">
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative overflow-x-hidden">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-full w-full flex flex-col">
-      <div class="flex justify-center pt-4 mb-4 flex-shrink-0">
-        <div class="text-center">
-          <h1
-            class="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-1 tracking-wider flex items-center gap-2">
-            <svg class="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 20l-5.447-2.724A1 1 0 113 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
-              </path>
-            </svg>
-            GESTION EXPÉDITIONS
+    <div class="relative z-10 min-h-screen">
+      <div class="container mx-auto px-4 py-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-2 tracking-wider">
+            🗺️ GESTION EXPÉDITIONS
           </h1>
-          <p class="text-xs text-base-content/70 uppercase tracking-wider">
-            {{ expeditions.total }} expédition{{ expeditions.total > 1 ? 's' : '' }} configurée{{ expeditions.total > 1
-              ? 's' : '' }}
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
+            {{ props.expeditions.total }} expédition{{ props.expeditions.total > 1 ? 's' : '' }} configurée{{ props.expeditions.total > 1 ? 's' : '' }}
           </p>
         </div>
-      </div>
 
-      <div class="flex-1 flex flex-col lg:flex-row gap-4 px-2 md:px-4 lg:px-8 min-h-0 pb-4">
-        <div class="flex-1 lg:mr-4 flex flex-col min-h-0" style="max-height: 85vh;">
-          <div
-            class="bg-base-100/60 backdrop-blur-sm rounded-t-xl border border-b-0 border-base-300/30 p-4 flex-shrink-0">
-            <div class="flex flex-wrap gap-4 items-center">
-              <div class="flex items-center gap-2">
-                <label class="text-sm font-medium text-base-content/70">Rareté:</label>
-                <select v-model="rarityFilter" @change="applyFilters"
-                        class="select select-sm select-bordered bg-base-100/80 border-base-300/50 text-sm min-w-[120px]">
-                  <option value="">Toutes</option>
-                  <option v-for="rarity in rarities" :key="rarity" :value="rarity">
-                    {{ getRarityLabel(rarity) }}
-                  </option>
-                </select>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <label class="text-sm font-medium text-base-content/70">Statut:</label>
-                <select v-model="statusFilter" @change="applyFilters"
-                        class="select select-sm select-bordered bg-base-100/80 border-base-300/50 text-sm min-w-[100px]">
-                  <option value="">Tous</option>
-                  <option value="true">Active</option>
-                  <option value="false">Inactive</option>
-                </select>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <label class="text-sm font-medium text-base-content/70">Recherche:</label>
-                <input v-model="searchFilter" @keyup.enter="applyFilters" type="text"
-                       placeholder="Nom ou description..."
-                       class="input input-sm input-bordered bg-base-100/80 border-base-300/50 text-sm min-w-[200px]" />
-                <Button @click="applyFilters" variant="ghost" size="sm" class="text-primary hover:text-primary">
-                  🔍
-                </Button>
-              </div>
-
-              <Button @click="clearFilters" variant="ghost" size="sm"
-                      class="text-base-content/70 hover:text-base-content">
-                🗑️ Réinitialiser
-              </Button>
-            </div>
-          </div>
-
-          <div
-            class="bg-base-100/60 backdrop-blur-sm rounded-b-xl border border-base-300/30 overflow-hidden flex flex-col flex-1">
-            <div class="flex-shrink-0 p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
-              <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">📋</span>
-                LISTE DES EXPÉDITIONS
-              </h3>
-            </div>
-
-            <div class="flex-1 overflow-auto min-h-0">
-              <table class="w-full min-w-[1200px]">
-                <thead class="sticky top-0 bg-base-200/90 backdrop-blur-md border-b border-base-300/30 z-[60]">
-                  <tr>
-                    <th
-                      class="px-2 md:px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      <button @click="sortBy('name')"
-                              class="flex items-center gap-1 hover:text-base-content transition-colors">
-                        Expédition
-                        <span class="text-base-content/50">{{ getSortIcon('name') }}</span>
-                      </button>
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      <button @click="sortBy('rarity')"
-                              class="flex items-center gap-1 hover:text-base-content transition-colors">
-                        Rareté
-                        <span class="text-base-content/50">{{ getSortIcon('rarity') }}</span>
-                      </button>
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-left text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      <button @click="sortBy('duration_minutes')"
-                              class="flex items-center gap-1 hover:text-base-content transition-colors">
-                        Durée
-                        <span class="text-base-content/50">{{ getSortIcon('duration_minutes') }}</span>
-                      </button>
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      <button @click="sortBy('is_active')"
-                              class="flex items-center gap-1 hover:text-base-content transition-colors mx-auto">
-                        Statut
-                        <span class="text-base-content/50">{{ getSortIcon('is_active') }}</span>
-                      </button>
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      Récompenses
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      Prérequis
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      Participants
-                    </th>
-                    <th
-                      class="px-2 md:px-4 py-3 text-center text-xs font-bold text-base-content/70 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-base-300/20">
-                  <tr v-for="expedition in sortedExpeditions" :key="expedition.id"
-                      class="hover:bg-base-200/30 transition-colors">
-                    <td class="px-2 md:px-4 py-4">
-                      <div class="min-w-0 flex-1">
-                        <div class="font-semibold text-base-content truncate">{{ expedition.name }}</div>
-                        <div class="text-xs text-base-content/60 truncate max-w-[200px]">{{ expedition.description }}
-                        </div>
-                      </div>
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4">
-                      <RarityBadge :rarity="expedition.rarity as ExpeditionRarity" size="sm" />
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4">
-                      <DurationDisplay :minutes="expedition.duration_minutes" size="sm" />
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4 text-center">
-                      <span :class="[
-                        'inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border',
-                        getStatusColor(expedition.is_active)
-                      ]">
-                        <div class="w-1.5 h-1.5 rounded-full" :class="expedition.is_active ? 'bg-success' : 'bg-error'">
-                        </div>
-                        {{ getStatusLabel(expedition.is_active) }}
-                      </span>
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4 text-center">
-                      <div class="relative group">
-                        <div class="flex items-center justify-center gap-1 text-sm font-medium cursor-pointer">
-                          <svg class="w-3 h-3 text-base-content/60" fill="none" stroke="currentColor"
-                               viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
-                            </path>
-                          </svg>
-                          {{ expedition.rewards?.length || 0 }}
-                        </div>
-                        <div
-                          class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 bg-gray-800 text-white rounded-lg shadow-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[10000]">
-                          <div v-if="expedition.rewards?.length" class="space-y-2">
-                            <div v-for="reward in expedition.rewards" :key="reward.type"
-                                 class="flex items-center justify-between gap-2 text-sm">
-                              <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 flex items-center justify-center">
-                                  <span v-if="reward.type === 'cash'" class="text-green-400">💰</span>
-                                  <span v-else-if="reward.type === 'xp'" class="text-blue-400">⭐</span>
-                                  <img v-else-if="reward.type === 'pokeball'" src="/images/items/pokeball.png"
-                                       alt="Pokéball" class="w-5 h-5">
-                                  <img v-else-if="reward.type === 'masterball'" src="/images/items/masterball.png"
-                                       alt="Masterball" class="w-5 h-5">
-                                  <span v-else class="text-purple-400">🎁</span>
-                                </div>
-                                <span class="text-gray-200">{{ reward.type === 'cash' ? 'Cash' : reward.type === 'xp' ?
-                                  'XP' : reward.type === 'pokeball' ? 'Pokéball' : reward.type === 'masterball' ?
-                                    'Masterball' : 'Item' }}</span>
-                              </div>
-                              <span class="font-bold text-blue-300">{{ reward.amount || reward.quantity }}</span>
-                            </div>
-                          </div>
-                          <div v-else class="text-center text-sm text-gray-400">Aucune récompense</div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4 text-center">
-                      <div class="relative group">
-                        <div class="flex items-center justify-center gap-1 text-sm font-medium cursor-pointer">
-                          <svg class="w-3 h-3 text-base-content/60" fill="none" stroke="currentColor"
-                               viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                          {{ expedition.requirements?.length || 0 }}
-                        </div>
-                        <div
-                          class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 bg-gray-800 text-white rounded-lg shadow-lg p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[10000]">
-                          <div v-if="expedition.requirements?.length" class="space-y-1.5">
-                            <div v-for="req in expedition.requirements" :key="req.type + req.value"
-                                 class="flex items-center justify-between gap-2 text-xs">
-                              <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 flex items-center justify-center">
-                                  <div v-if="req.type === 'rarity'" class="w-2 h-2 rounded-full"
-                                       :class="getRarityDotColor(req.value)"></div>
-                                  <img v-else-if="req.type === 'type'" :src="`/images/types/${req.value}.png`"
-                                       :alt="req.value" class="w-5 h-5 object-contain">
-                                  <span v-else class="text-blue-400">📝</span>
-                                </div>
-                                <span class="text-gray-200">{{ req.type === 'rarity' ? 'Rareté' : 'Type' }} {{ req.value
-                                }}</span>
-                              </div>
-                              <span class="font-bold text-blue-300">{{ req.quantity }}</span>
-                            </div>
-                          </div>
-                          <div v-else class="text-center text-xs text-gray-400">Aucun prérequis</div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4 text-center">
-                      <div class="flex items-center justify-center gap-1 text-sm font-medium">
-                        <svg class="w-3 h-3 text-base-content/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                          </path>
-                        </svg>
-                        {{ expedition.user_expeditions_count || 0 }}
-                      </div>
-                    </td>
-
-                    <td class="px-2 md:px-4 py-4">
-                      <div class="flex justify-center gap-1 flex-wrap">
-                        <Button @click="router.visit(`/admin/expeditions/${expedition.id}`)" variant="ghost" size="sm"
-                                class="text-info hover:text-info hover:bg-info/10" title="Voir">
-                          👁️
-                        </Button>
-                        <Button @click="router.visit(`/admin/expeditions/${expedition.id}/edit`)" variant="ghost"
-                                size="sm" class="text-warning hover:text-warning hover:bg-warning/10" title="Modifier">
-                          ✏️
-                        </Button>
-                        <Button @click="toggleExpedition(expedition.id)"
-                                :variant="expedition.is_active ? 'outline' : 'secondary'" size="sm"
-                                :class="expedition.is_active ? 'text-error border-error hover:bg-error/10' : 'text-success border-success hover:bg-success/10'"
-                                :title="expedition.is_active ? 'Désactiver' : 'Activer'">
-                          {{ expedition.is_active ? 'Désactiver' : 'Activer' }}
-                        </Button>
-                        <Button @click="duplicateExpedition(expedition.id)" variant="outline" size="sm"
-                                class="text-secondary border-secondary hover:bg-secondary/10" title="Dupliquer">
-                          Dupliquer
-                        </Button>
-                        <Button @click="deleteExpedition(expedition.id)" variant="outline" size="sm"
-                                class="text-error border-error hover:bg-error/10" title="Supprimer">
-                          🗑️
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div v-if="expeditions.links && expeditions.links.length > 3"
-                 class="flex justify-center p-4 border-t border-base-300/30">
-              <div class="join">
-                <template v-for="link in expeditions.links" :key="link.label">
-                  <button v-if="link.url" @click="router.visit(link.url)" :class="[
-                    'join-item btn btn-sm',
-                    link.active ? 'btn-primary' : 'btn-outline'
-                  ]" v-html="link.label" />
-                  <span v-else :class="[
-                    'join-item btn btn-sm btn-disabled',
-                    link.active ? 'btn-primary' : 'btn-outline'
-                  ]" v-html="link.label" />
-                </template>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="lg:w-64 lg:flex-shrink-0">
-          <div class="space-y-4">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          <div class="xl:col-span-9 space-y-6">
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-              <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
-                <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                  <span class="text-lg">⚙️</span>
+              <div class="p-4 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                  <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                    <span class="text-2xl">📋</span>
+                    LISTE DES EXPÉDITIONS
+                  </h3>
+
+                  <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    <Input
+                      v-model="searchTerm"
+                      placeholder="🔍 Rechercher une expédition..."
+                      class="w-full sm:w-64"
+                      size="sm"
+                    />
+
+                    <div class="flex gap-2">
+                      <Select
+                        v-model="rarityFilter"
+                        @change="applyFilters"
+                        :options="[
+                          { value: '', label: 'Toutes raretés' },
+                          ...props.rarities.map(rarity => ({ value: rarity, label: getRarityLabel(rarity) }))
+                        ]"
+                        class="w-32"
+                      />
+
+                      <Select
+                        v-model="statusFilter"
+                        @change="applyFilters"
+                        :options="[
+                          { value: '', label: 'Tous statuts' },
+                          { value: 'true', label: 'Actives' },
+                          { value: 'false', label: 'Inactives' }
+                        ]"
+                        class="w-32"
+                      />
+
+                      <Button @click="clearFilters" variant="outline" size="sm">
+                        ✨ Reset
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-gradient-to-r from-base-200/50 to-base-300/30 border-b border-base-300/30">
+                    <tr>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Expédition
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Rareté
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Durée
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Récompenses
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Prérequis
+                      </th>
+                      <th class="px-6 py-4 text-left text-sm font-bold text-base-content uppercase tracking-wider">
+                        Statut
+                      </th>
+                      <th class="px-6 py-4 text-center text-sm font-bold text-base-content uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-base-300/30">
+                    <tr
+                      v-for="expedition in filteredExpeditions"
+                      :key="expedition.id"
+                      class="hover:bg-base-200/30 transition-colors duration-200"
+                    >
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-sm font-bold">
+                            🗺️
+                          </div>
+                          <div>
+                            <div class="font-semibold text-base-content">{{ expedition.name }}</div>
+                            <div class="text-sm text-base-content/70 truncate max-w-xs">{{ expedition.description }}</div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <span :class="[
+                          'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                          getRarityColor(expedition.rarity)
+                        ]">
+                          {{ getRarityLabel(expedition.rarity) }}
+                        </span>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <div class="text-sm">
+                          <div class="font-semibold text-info">{{ formatDuration(expedition.duration_minutes) }}</div>
+                          <div class="text-base-content/70">Durée</div>
+                        </div>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <div class="text-sm text-base-content/70 max-w-xs">
+                          {{ getRewardSummary(expedition.rewards) }}
+                        </div>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <div class="text-sm text-base-content/70">
+                          {{ getRequirementSummary(expedition.requirements) }}
+                        </div>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <span :class="[
+                          'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+                          getStatusColor(expedition.is_active)
+                        ]">
+                          {{ getStatusLabel(expedition.is_active) }}
+                        </span>
+                      </td>
+
+                      <td class="px-6 py-4">
+                        <div class="flex justify-center gap-1">
+                          <Button
+                            @click="router.visit(`/admin/expeditions/${expedition.id}`)"
+                            variant="ghost"
+                            size="sm"
+                            class="text-info hover:text-info hover:bg-info/20 transition-colors"
+                            title="Voir"
+                          >
+                            👁️
+                          </Button>
+                          <Button
+                            @click="router.visit(`/admin/expeditions/${expedition.id}/edit`)"
+                            variant="ghost"
+                            size="sm"
+                            class="text-warning hover:text-warning hover:bg-warning/20 transition-colors"
+                            title="Modifier"
+                          >
+                            ✏️
+                          </Button>
+                          <Button
+                            @click="deleteExpedition(expedition)"
+                            variant="ghost"
+                            size="sm"
+                            class="text-error hover:text-error hover:bg-error/20 transition-colors"
+                            title="Supprimer"
+                          >
+                            🗑️
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div v-if="props.expeditions.last_page > 1" class="p-4 bg-gradient-to-r from-primary/5 to-primary/10 border-t border-primary/20">
+                <div class="flex justify-center items-center gap-2 flex-wrap">
+                  <template v-for="link in props.expeditions.links" :key="link.label">
+                    <Button
+                      v-if="link.url"
+                      @click="router.visit(link.url)"
+                      :variant="link.active ? 'primary' : 'ghost'"
+                      size="sm"
+                      class="min-w-[2.5rem]"
+                      v-html="link.label"
+                    />
+                    <span v-else class="px-3 py-2 text-base-content/50 text-sm" v-html="link.label" />
+                  </template>
+                </div>
+                <div class="text-xs text-center text-base-content/70 mt-2">
+                  Affichage de {{ (props.expeditions.current_page - 1) * props.expeditions.per_page + 1 }}
+                  à {{ Math.min(props.expeditions.current_page * props.expeditions.per_page, props.expeditions.total) }}
+                  sur {{ props.expeditions.total }} résultats
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="xl:col-span-3 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">⚙️</span>
                   ACTIONS
                 </h3>
               </div>
-              <div class="p-3 space-y-2">
-                <Button @click="router.visit('/admin/expeditions/create')" variant="secondary" size="sm" class="w-full">
+              <div class="p-6 space-y-3">
+                <Button
+                  @click="router.visit('/admin/expeditions/create')"
+                  variant="secondary"
+                  size="sm"
+                  class="w-full justify-start"
+                >
                   ➕ Nouvelle expédition
                 </Button>
-                <Button @click="router.visit('/admin/')" variant="outline" size="sm" class="w-full">
+                <Button
+                  @click="router.visit('/admin/')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
                   ← Dashboard
                 </Button>
-                <Button @click="router.visit('/me')" variant="ghost" size="sm" class="w-full">
+                <Button
+                  @click="router.visit('/me')"
+                  variant="ghost"
+                  size="sm"
+                  class="w-full justify-start"
+                >
                   🏠 Profil
                 </Button>
               </div>
             </div>
 
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
-              <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
-                <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                  <span class="text-lg">📊</span>
+              <div class="p-4 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">📊</span>
                   STATISTIQUES
                 </h3>
               </div>
-              <div class="p-3 space-y-3">
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                  <div class="bg-base-200/40 rounded-lg p-2">
-                    <div class="text-base-content/70">Total</div>
-                    <div class="font-bold text-lg">{{ stats.total }}</div>
+              <div class="p-6 space-y-4">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-primary">{{ props.expeditions.total }}</div>
+                  <div class="text-sm text-base-content/70">Total expéditions</div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-center">
+                  <div>
+                    <div class="text-lg font-bold text-success">{{ props.expeditions.data.filter(e => e.is_active).length }}</div>
+                    <div class="text-xs text-base-content/70">Actives</div>
                   </div>
-                  <div class="bg-success/10 rounded-lg p-2">
-                    <div class="text-success/70">Actives</div>
-                    <div class="font-bold text-lg text-success">{{ stats.active }}</div>
-                  </div>
-                  <div class="bg-error/10 rounded-lg p-2">
-                    <div class="text-error/70">Inactives</div>
-                    <div class="font-bold text-lg text-error">{{ stats.inactive }}</div>
+                  <div>
+                    <div class="text-lg font-bold text-warning">{{ props.expeditions.data.filter(e => e.rarity === 'legendary').length }}</div>
+                    <div class="text-xs text-base-content/70">Légendaires</div>
                   </div>
                 </div>
-
-                <div class="border-t border-base-300/30 pt-3">
-                  <div class="text-xs text-base-content/70 mb-2 font-medium">Par rareté</div>
-                  <div class="space-y-1">
-                    <div v-for="(count, rarity) in stats.by_rarity" :key="rarity"
-                         class="flex justify-between items-center text-xs">
-                      <div class="flex items-center gap-2">
-                        <div class="w-2 h-2 rounded-full" :class="getRarityDotColor(rarity)"></div>
-                        <span>{{ getRarityLabel(rarity) }}</span>
-                      </div>
-                      <span class="font-bold">{{ count }}</span>
-                    </div>
+                <div class="space-y-2 pt-2 border-t border-base-300/30">
+                  <div class="text-xs text-base-content/70 mb-2">Par rareté:</div>
+                  <div v-for="rarity in props.rarities" :key="rarity" class="flex justify-between items-center">
+                    <span class="text-xs text-base-content/70">{{ getRarityLabel(rarity) }}</span>
+                    <span class="text-sm font-bold">{{ props.expeditions.data.filter(e => e.rarity === rarity).length }}</span>
                   </div>
                 </div>
               </div>
@@ -527,5 +461,35 @@ const clearFilters = () => {
         </div>
       </div>
     </div>
+
+    <Modal :show="showDeleteModal" @close="cancelDelete" max-width="md">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-error/20 rounded-lg flex items-center justify-center">
+            <span class="text-xl">⚠️</span>
+          </div>
+          <h3 class="text-xl font-bold text-base-content">Supprimer l'expédition</h3>
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-base-content/80">
+          Êtes-vous sûr de vouloir supprimer l'expédition
+          <span class="font-bold text-error">{{ expeditionToDelete?.name }}</span> ?
+        </p>
+        <p class="text-sm text-base-content/60">
+          Cette action est irréversible et supprimera toutes les données associées.
+        </p>
+
+        <div class="flex gap-3 pt-4">
+          <Button @click="confirmDelete" variant="outline" class="flex-1 border-error text-error hover:bg-error hover:text-error-content">
+            🗑️ Supprimer
+          </Button>
+          <Button @click="cancelDelete" variant="secondary" class="flex-1">
+            Annuler
+          </Button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>

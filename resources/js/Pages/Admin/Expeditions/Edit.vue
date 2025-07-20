@@ -1,9 +1,31 @@
 <script setup lang="ts">
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import { getRarityDotColor, getRarityLabel, getRequirementLabel, getRewardLabel } from '@/utils/expedition';
-import { Head, router } from '@inertiajs/vue3';
-import { computed, ref, watch } from 'vue';
+import Input from '@/Components/UI/Input.vue';
+import Select from '@/Components/UI/Select.vue';
+import Modal from '@/Components/UI/Modal.vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { ref, computed, onMounted } from 'vue';
+
+interface ExpeditionReward {
+  type: string;
+  amount?: number;
+  item_id?: number;
+  quantity?: number;
+  item?: {
+    id: number;
+    name: string;
+    type: string;
+    rarity: string;
+  };
+}
+
+interface ExpeditionRequirement {
+  id: number;
+  type: string;
+  value: string;
+  quantity: number;
+}
 
 interface Expedition {
   id: number;
@@ -11,468 +33,682 @@ interface Expedition {
   description: string;
   rarity: string;
   duration_minutes: number;
-  rewards: Array<{
-    type: string;
-    amount?: number;
-    item_id?: number;
-    quantity?: number;
-  }>;
-  requirements: Array<{
-    type: string;
-    value: string;
-    quantity: number;
-  }>;
+  rewards: ExpeditionReward[];
   is_active: boolean;
+  requirements: ExpeditionRequirement[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface Item {
+  id: number;
+  name: string;
+  type: string;
+  rarity: string;
 }
 
 interface Props {
   expedition: Expedition;
-  items: Array<{
-    id: number;
-    name: string;
-    image?: string;
-  }>;
-  availableTypes: string[];
   rarities: string[];
+  types: string[];
+  items: Item[];
+  errors?: Record<string, string>;
 }
 
 const props = defineProps<Props>();
 
-const form = ref({
+const form = useForm({
   name: props.expedition.name,
   description: props.expedition.description,
   rarity: props.expedition.rarity,
   duration_minutes: props.expedition.duration_minutes,
-  rewards: [...props.expedition.rewards],
-  requirements: [...props.expedition.requirements],
   is_active: props.expedition.is_active,
-  processing: false,
-  errors: {} as Record<string, string>
+  rewards: [...props.expedition.rewards],
+  requirements: [...props.expedition.requirements]
 });
 
-const newReward = ref({
-  type: 'cash',
-  amount: 100,
-  item_id: undefined as number | undefined,
-  quantity: 1
+const isSubmitting = ref(false);
+const showDeleteModal = ref(false);
+const selectedRewards = ref<ExpeditionReward[]>([...props.expedition.rewards]);
+const selectedRequirements = ref<ExpeditionRequirement[]>([...props.expedition.requirements]);
+
+const rarityOptions = computed(() => {
+  return props.rarities.map(rarity => ({
+    value: rarity,
+    label: getRarityLabel(rarity)
+  }));
 });
 
-const newRequirement = ref({
-  type: 'rarity',
-  value: 'normal',
-  quantity: 1
+const typeOptions = computed(() => {
+  return props.types.map(type => ({
+    value: type,
+    label: type
+  }));
 });
 
-const rewardTypes = [
-  { value: 'cash', label: 'Cash', icon: '$' },
-  { value: 'xp', label: 'XP', icon: 'XP' },
-  { value: 'pokeball', label: 'Pokéball', icon: '⚾' },
-  { value: 'masterball', label: 'Masterball', icon: '🏀' },
-  { value: 'item', label: 'Item', icon: '🎁' }
+const itemOptions = computed(() => {
+  return props.items.map(item => ({
+    value: item.id.toString(),
+    label: `${item.name} (${item.type})`
+  }));
+});
+
+const rewardTypeOptions = [
+  { value: 'cash', label: 'Cash 💰' },
+  { value: 'xp', label: 'XP ⭐' },
+  { value: 'pokeball', label: 'Pokéballs ⚪' },
+  { value: 'masterball', label: 'Masterballs 🟣' },
+  { value: 'item', label: 'Item 🎁' }
 ];
 
-const requirementTypes = [
-  { value: 'rarity', label: 'Rareté' },
-  { value: 'type', label: 'Type' }
+const requirementTypeOptions = [
+  { value: 'rarity', label: 'Rareté de Pokémon' },
+  { value: 'type', label: 'Type de Pokémon' }
 ];
 
-
-
-const formattedDuration = computed(() => {
-  const minutes = form.value.duration_minutes;
-  if (minutes < 1) {
-    const seconds = Math.round(minutes * 60);
-    return seconds + 's';
-  } else if (minutes < 60) {
-    const wholeMinutes = Math.floor(minutes);
-    const remainingSeconds = Math.round((minutes - wholeMinutes) * 60);
-    if (remainingSeconds === 0) {
-      return wholeMinutes + 'min';
-    }
-    return wholeMinutes + 'min ' + remainingSeconds + 's';
-  } else {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = Math.floor(minutes % 60);
-
-    let result = hours + 'h';
-    if (remainingMinutes > 0) {
-      result += ' ' + remainingMinutes + 'min';
-    }
-    return result;
-  }
-});
-
-const mergeRewards = (rewards: Array<any>) => {
-  const merged: Array<any> = [];
-
-  rewards.forEach(reward => {
-    const existingIndex = merged.findIndex(r =>
-      r.type === reward.type &&
-      (reward.type !== 'item' || r.item_id === reward.item_id)
-    );
-
-    if (existingIndex >= 0) {
-      if (reward.type === 'item') {
-        merged[existingIndex].quantity += reward.quantity;
-      } else {
-        merged[existingIndex].amount += reward.amount;
-      }
-    } else {
-      merged.push({ ...reward });
-    }
-  });
-
-  return merged;
-};
-
-const mergeRequirements = (requirements: Array<any>) => {
-  const merged: Array<any> = [];
-
-  requirements.forEach(req => {
-    const existingIndex = merged.findIndex(r =>
-      r.type === req.type && r.value === req.value
-    );
-
-    if (existingIndex >= 0) {
-      merged[existingIndex].quantity += req.quantity;
-    } else {
-      merged.push({ ...req });
-    }
-  });
-
-  return merged;
-};
+const statusOptions = [
+  { value: true, label: 'Active' },
+  { value: false, label: 'Inactive' }
+];
 
 const addReward = () => {
-  const newRewardData = {
-    type: newReward.value.type,
-    ...(newReward.value.type === 'item'
-      ? { item_id: newReward.value.item_id, quantity: newReward.value.quantity }
-      : { amount: newReward.value.amount })
-  };
+  const rewardType = (document.getElementById('reward-type') as HTMLSelectElement)?.value;
+  if (!rewardType) return;
 
-  form.value.rewards.push(newRewardData);
-  form.value.rewards = mergeRewards(form.value.rewards);
+  const reward: any = { type: rewardType };
 
-  newReward.value = {
-    type: 'cash',
-    amount: 100,
-    item_id: undefined,
-    quantity: 1
-  };
+  if (rewardType === 'item') {
+    const itemId = parseInt((document.getElementById('reward-item') as HTMLSelectElement)?.value);
+    const quantity = parseInt((document.getElementById('reward-quantity') as HTMLInputElement)?.value) || 1;
+    if (itemId) {
+      reward.item_id = itemId;
+      reward.quantity = quantity;
+    }
+  } else {
+    const amount = parseInt((document.getElementById('reward-amount') as HTMLInputElement)?.value) || 1;
+    reward.amount = amount;
+  }
+
+  if (!selectedRewards.value.find(r => r.type === rewardType && r.item_id === reward.item_id)) {
+    selectedRewards.value.push(reward);
+    form.rewards = selectedRewards.value;
+
+    (document.getElementById('reward-type') as HTMLSelectElement).value = '';
+    (document.getElementById('reward-amount') as HTMLInputElement).value = '';
+    (document.getElementById('reward-item') as HTMLSelectElement).value = '';
+    (document.getElementById('reward-quantity') as HTMLInputElement).value = '1';
+  }
 };
 
 const removeReward = (index: number) => {
-  form.value.rewards.splice(index, 1);
+  selectedRewards.value.splice(index, 1);
+  form.rewards = selectedRewards.value;
 };
 
 const addRequirement = () => {
-  const newReqData = {
-    type: newRequirement.value.type,
-    value: newRequirement.value.value,
-    quantity: newRequirement.value.quantity
-  };
+  const requirementType = (document.getElementById('requirement-type') as HTMLSelectElement)?.value;
+  const requirementValue = (document.getElementById('requirement-value') as HTMLSelectElement)?.value;
+  const quantity = parseInt((document.getElementById('requirement-quantity') as HTMLInputElement)?.value) || 1;
 
-  form.value.requirements.push(newReqData);
-  form.value.requirements = mergeRequirements(form.value.requirements);
+  if (requirementType && requirementValue) {
+    const requirement = {
+      id: Date.now(),
+      type: requirementType,
+      value: requirementValue,
+      quantity: quantity
+    };
 
-  newRequirement.value = {
-    type: 'rarity',
-    value: 'normal',
-    quantity: 1
-  };
+    if (!selectedRequirements.value.find(r => r.type === requirementType && r.value === requirementValue)) {
+      selectedRequirements.value.push(requirement);
+      form.requirements = selectedRequirements.value;
+
+      (document.getElementById('requirement-type') as HTMLSelectElement).value = '';
+      (document.getElementById('requirement-value') as HTMLSelectElement).value = '';
+      (document.getElementById('requirement-quantity') as HTMLInputElement).value = '1';
+    }
+  }
 };
 
 const removeRequirement = (index: number) => {
-  form.value.requirements.splice(index, 1);
+  selectedRequirements.value.splice(index, 1);
+  form.requirements = selectedRequirements.value;
 };
 
 const submit = () => {
-  form.value.processing = true;
-  form.value.errors = {};
-
-  router.put(`/admin/expeditions/${props.expedition.id}`, {
-    name: form.value.name,
-    description: form.value.description,
-    rarity: form.value.rarity,
-    duration_minutes: form.value.duration_minutes,
-    rewards: form.value.rewards,
-    requirements: form.value.requirements,
-    is_active: form.value.is_active
-  }, {
-    preserveScroll: true,
+  isSubmitting.value = true;
+  form.put(`/admin/expeditions/${props.expedition.id}`, {
     onSuccess: () => {
-      form.value.processing = false;
       router.visit('/admin/expeditions');
     },
-    onError: (errors: Record<string, string>) => {
-      form.value.errors = errors;
-      form.value.processing = false;
-    },
     onFinish: () => {
-      form.value.processing = false;
+      isSubmitting.value = false;
     }
   });
 };
 
-const cancel = () => {
+const deleteExpedition = () => {
+  showDeleteModal.value = true;
+};
+
+const confirmDelete = () => {
+  router.delete(`/admin/expeditions/${props.expedition.id}`, {
+    onSuccess: () => router.visit('/admin/expeditions'),
+    onFinish: () => {
+      showDeleteModal.value = false;
+    }
+  });
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+};
+
+const goBack = () => {
   router.visit('/admin/expeditions');
 };
 
-const availableRequirementValues = computed(() => {
-  if (newRequirement.value.type === 'rarity') {
-    return props.rarities.map(r => ({ value: r, label: getRarityLabel(r) }));
-  } else {
-    return props.availableTypes.map(t => ({ value: t, label: t }));
-  }
-});
+const getItemById = (id: number) => {
+  return props.items.find(item => item.id === id);
+};
 
-watch(() => newRequirement.value.type, (newType) => {
-  if (newType === 'rarity') {
-    newRequirement.value.value = 'normal';
-  } else {
-    newRequirement.value.value = props.availableTypes[0] || 'Normal';
+const getRarityLabel = (rarity: string) => {
+  switch (rarity) {
+  case 'normal': return 'Normal';
+  case 'rare': return 'Rare';
+  case 'epic': return 'Épique';
+  case 'legendary': return 'Légendaire';
+  default: return rarity;
   }
+};
+
+const getRequirementValueOptions = (requirementType: string) => {
+  if (requirementType === 'rarity') {
+    return props.rarities.map(rarity => ({
+      value: rarity,
+      label: getRarityLabel(rarity)
+    }));
+  } else if (requirementType === 'type') {
+    return props.types.map(type => ({
+      value: type,
+      label: type
+    }));
+  }
+  return [];
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+const formatDuration = (minutes: number) => {
+  if (minutes < 60) {
+    return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours} heure${hours > 1 ? 's' : ''}`;
+};
+
+onMounted(() => {
+  const setupRequirementOptions = () => {
+    const requirementTypeSelect = document.getElementById('requirement-type') as HTMLSelectElement;
+    const requirementValueSelect = document.getElementById('requirement-value') as HTMLSelectElement;
+
+    if (requirementTypeSelect && requirementValueSelect) {
+      requirementTypeSelect.addEventListener('change', function() {
+        const selectedType = this.value;
+        requirementValueSelect.innerHTML = '<option value="">Valeur</option>';
+
+        if (selectedType === 'rarity') {
+          const rarities = ['normal', 'rare', 'epic', 'legendary'];
+          const labels = ['Normal', 'Rare', 'Épique', 'Légendaire'];
+          rarities.forEach((rarity, index) => {
+            const option = document.createElement('option');
+            option.value = rarity;
+            option.textContent = labels[index];
+            requirementValueSelect.appendChild(option);
+          });
+        } else if (selectedType === 'type') {
+          props.types.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            requirementValueSelect.appendChild(option);
+          });
+        }
+      });
+    }
+  };
+
+  setTimeout(setupRequirementOptions, 100);
 });
 </script>
 
 <template>
+  <Head title="Modifier l'expédition" />
 
-  <Head title="Modifier une expédition" />
-
-  <div class="h-screen w-full bg-gradient-to-br from-base-200 to-base-300 relative overflow-hidden">
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 relative overflow-x-hidden">
     <BackgroundEffects />
 
-    <div class="relative z-10 h-full w-full flex flex-col">
-      <div class="flex justify-center pt-4 mb-4 flex-shrink-0">
-        <div class="text-center">
-          <h1
-            class="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-1 tracking-wider flex items-center gap-2">
-            <svg class="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-              </path>
-            </svg>
-            MODIFIER EXPÉDITION
+    <div class="relative z-10 min-h-screen">
+      <div class="container mx-auto px-4 py-6 lg:px-8">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-2 tracking-wider">
+            ✏️ MODIFIER EXPÉDITION
           </h1>
-          <p class="text-xs text-base-content/70 uppercase tracking-wider">
-            {{ expedition.name }}
+          <p class="text-sm text-base-content/70 uppercase tracking-wider">
+            Édition de {{ props.expedition.name }}
           </p>
         </div>
-      </div>
 
-      <div class="flex-1 px-2 md:px-4 lg:px-8 pb-4 overflow-hidden">
-        <div class="h-full max-w-4xl mx-auto w-full">
-          <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-6 h-full overflow-y-auto">
-            <form @submit.prevent="submit" class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <label class="label">
-                    <span class="label-text font-medium">Nom de l'expédition</span>
-                  </label>
-                  <input v-model="form.name" type="text" class="input input-bordered w-full bg-base-100/80"
-                         :class="{ 'input-error': form.errors.name }" placeholder="Nom de l'expédition" required />
-                  <div v-if="form.errors.name" class="text-error text-sm">{{ form.errors.name }}</div>
-                </div>
-
-                <div class="space-y-2">
-                  <label class="label">
-                    <span class="label-text font-medium">Rareté</span>
-                  </label>
-                  <select v-model="form.rarity" class="select select-bordered w-full bg-base-100/80"
-                          :class="{ 'select-error': form.errors.rarity }">
-                    <option v-for="rarity in rarities" :key="rarity" :value="rarity">
-                      {{ getRarityLabel(rarity) }}
-                    </option>
-                  </select>
-                  <div v-if="form.errors.rarity" class="text-error text-sm">{{ form.errors.rarity }}</div>
-                </div>
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+          <div class="xl:col-span-8">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-6 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
+                <h3 class="text-xl font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-2xl">🗺️</span>
+                  INFORMATIONS EXPÉDITION
+                </h3>
               </div>
 
-              <div class="space-y-2">
-                <label class="label">
-                  <span class="label-text font-medium">Description</span>
-                </label>
-                <textarea v-model="form.description" class="textarea textarea-bordered w-full bg-base-100/80 h-24"
-                          :class="{ 'textarea-error': form.errors.description }" placeholder="Description de l'expédition"
-                          required />
-                <div v-if="form.errors.description" class="text-error text-sm">{{ form.errors.description }}</div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <label class="label">
-                    <span class="label-text font-medium">Durée (minutes)</span>
-                  </label>
-                  <input v-model.number="form.duration_minutes" type="number" step="0.1" min="0.1"
-                         class="input input-bordered w-full bg-base-100/80"
-                         :class="{ 'input-error': form.errors.duration_minutes }" placeholder="0.5" required />
-                  <div class="text-sm text-base-content/70">
-                    Durée formatée: {{ formattedDuration }}
-                  </div>
-                  <div v-if="form.errors.duration_minutes" class="text-error text-sm">{{ form.errors.duration_minutes }}
-                  </div>
-                </div>
-
-                <div class="space-y-2">
-                  <label class="label">
-                    <span class="label-text font-medium">Statut</span>
-                  </label>
-                  <div class="form-control">
-                    <label class="label cursor-pointer">
-                      <span class="label-text">Active</span>
-                      <input v-model="form.is_active" type="checkbox" class="toggle toggle-primary" />
+              <form @submit.prevent="submit" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Nom de l'expédition *
                     </label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                  <h3 class="text-lg font-semibold">Récompenses</h3>
-                  <div v-if="form.errors.rewards" class="text-error text-sm">{{ form.errors.rewards }}</div>
-                </div>
-
-                <div class="bg-base-200/50 rounded-lg p-4 space-y-4">
-                  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div class="space-y-2">
-                      <label class="label">
-                        <span class="label-text font-medium">Type</span>
-                      </label>
-                      <select v-model="newReward.type" class="select select-bordered select-sm w-full bg-base-100/80">
-                        <option v-for="type in rewardTypes" :key="type.value" :value="type.value">
-                          {{ type.label }}
-                        </option>
-                      </select>
-                    </div>
-
-                    <div v-if="newReward.type === 'item'" class="space-y-2">
-                      <label class="label">
-                        <span class="label-text font-medium">Item</span>
-                      </label>
-                      <select v-model="newReward.item_id"
-                              class="select select-bordered select-sm w-full bg-base-100/80">
-                        <option value="">Sélectionner un item</option>
-                        <option v-for="item in items" :key="item.id" :value="item.id">
-                          {{ item.name }}
-                        </option>
-                      </select>
-                    </div>
-
-                    <div v-if="newReward.type === 'item'" class="space-y-2">
-                      <label class="label">
-                        <span class="label-text font-medium">Quantité</span>
-                      </label>
-                      <input v-model.number="newReward.quantity" type="number" min="1"
-                             class="input input-bordered input-sm w-full bg-base-100/80" placeholder="1" />
-                    </div>
-
-                    <div v-if="newReward.type !== 'item'" class="space-y-2">
-                      <label class="label">
-                        <span class="label-text font-medium">Montant</span>
-                      </label>
-                      <input v-model.number="newReward.amount" type="number" min="1"
-                             class="input input-bordered input-sm w-full bg-base-100/80" placeholder="100" />
-                    </div>
-
-                    <Button @click="addReward" type="button" variant="primary" size="sm"
-                            :disabled="newReward.type === 'item' && !newReward.item_id">
-                      Ajouter
-                    </Button>
+                    <Input
+                      v-model="form.name"
+                      placeholder="Exploration des Bois Sombres"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.name" class="text-xs text-error mt-1">
+                      {{ props.errors.name }}
+                    </p>
                   </div>
 
-                  <div v-if="form.rewards.length > 0" class="space-y-2">
-                    <h4 class="font-medium text-sm">Récompenses ajoutées:</h4>
-                    <div class="flex flex-wrap gap-2">
-                      <div v-for="(reward, index) in form.rewards" :key="index"
-                           class="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
-                        <span>{{ getRewardLabel(reward, items) }}</span>
-                        <Button @click="removeReward(index)" type="button" variant="outline" size="sm"
-                                class="w-8 h-8 p-0 min-h-0 rounded-full flex items-center justify-center">
-                          ×
-                        </Button>
-                      </div>
-                    </div>
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Rareté *
+                    </label>
+                    <Select
+                      v-model="form.rarity"
+                      :options="rarityOptions"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.rarity" class="text-xs text-error mt-1">
+                      {{ props.errors.rarity }}
+                    </p>
                   </div>
                 </div>
-              </div>
 
-              <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                  <h3 class="text-lg font-semibold">Prérequis</h3>
-                  <div v-if="form.errors.requirements" class="text-error text-sm">{{ form.errors.requirements }}</div>
+                <div class="space-y-2">
+                  <label class="block text-sm font-bold text-base-content/80 mb-2">
+                    Description *
+                  </label>
+                  <textarea
+                    v-model="form.description"
+                    placeholder="Description détaillée de l'expédition..."
+                    class="textarea textarea-bordered w-full bg-base-100/80 border-base-300/50"
+                    rows="3"
+                    required
+                  ></textarea>
+                  <p v-if="props.errors?.description" class="text-xs text-error mt-1">
+                    {{ props.errors.description }}
+                  </p>
                 </div>
 
-                <div class="bg-base-200/50 rounded-lg p-4 space-y-4">
-                  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div class="space-y-2">
-                      <label class="label">
-                        <span class="label-text font-medium">Type</span>
-                      </label>
-                      <select v-model="newRequirement.type"
-                              class="select select-bordered select-sm w-full bg-base-100/80">
-                        <option v-for="type in requirementTypes" :key="type.value" :value="type.value">
-                          {{ type.label }}
-                        </option>
-                      </select>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Durée (minutes) *
+                    </label>
+                    <Input
+                      v-model="form.duration_minutes"
+                      type="number"
+                      min="1"
+                      placeholder="30"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.duration_minutes" class="text-xs text-error mt-1">
+                      {{ props.errors.duration_minutes }}
+                    </p>
+                    <p class="text-xs text-base-content/60">
+                      {{ formatDuration(form.duration_minutes) }}
+                    </p>
+                  </div>
 
-                    <div class="space-y-2">
-                      <label class="label">
-                        <span class="label-text font-medium">Valeur</span>
-                      </label>
-                      <select v-model="newRequirement.value"
-                              class="select select-bordered select-sm w-full bg-base-100/80">
-                        <option v-for="option in availableRequirementValues" :key="option.value" :value="option.value">
+                  <div class="space-y-2">
+                    <label class="block text-sm font-bold text-base-content/80 mb-2">
+                      Statut *
+                    </label>
+                    <Select
+                      v-model="form.is_active"
+                      :options="statusOptions"
+                      class="w-full"
+                      required
+                    />
+                    <p v-if="props.errors?.is_active" class="text-xs text-error mt-1">
+                      {{ props.errors.is_active }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <h4 class="text-lg font-bold text-base-content border-b border-base-300/30 pb-2">
+                    🎁 Récompenses
+                  </h4>
+
+                  <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+                    <div>
+                      <select id="reward-type" class="select select-bordered w-full bg-base-100/80 border-base-300/50 text-sm">
+                        <option value="">Type de récompense</option>
+                        <option v-for="option in rewardTypeOptions" :key="option.value" :value="option.value">
                           {{ option.label }}
                         </option>
                       </select>
                     </div>
-
-                    <div class="space-y-2">
-                      <label class="label">
-                        <span class="label-text font-medium">Quantité</span>
-                      </label>
-                      <input v-model.number="newRequirement.quantity" type="number" min="1"
-                             class="input input-bordered input-sm w-full bg-base-100/80" placeholder="1" />
+                    <div>
+                      <Input
+                        id="reward-amount"
+                        type="number"
+                        min="1"
+                        placeholder="Quantité"
+                        class="w-full"
+                      />
                     </div>
-
-                    <Button @click="addRequirement" type="button" variant="primary" size="sm">
-                      Ajouter
-                    </Button>
+                    <div>
+                      <select id="reward-item" class="select select-bordered w-full bg-base-100/80 border-base-300/50 text-sm">
+                        <option value="">Item (si applicable)</option>
+                        <option v-for="option in itemOptions" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </option>
+                      </select>
+                    </div>
+                    <div>
+                      <Input
+                        id="reward-quantity"
+                        type="number"
+                        min="1"
+                        value="1"
+                        placeholder="Qté item"
+                        class="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Button @click="addReward" type="button" variant="outline" size="sm" class="w-full">
+                        Ajouter
+                      </Button>
+                    </div>
                   </div>
 
-                  <div v-if="form.requirements.length > 0" class="space-y-2">
-                    <h4 class="font-medium text-sm">Prérequis ajoutés:</h4>
-                    <div class="flex flex-wrap gap-2">
-                      <div v-for="(req, index) in form.requirements" :key="index"
-                           class="flex items-center gap-2 bg-warning/10 text-warning px-3 py-1 rounded-full text-sm">
-                        <div v-if="req.type === 'rarity'" class="w-2 h-2 rounded-full"
-                             :class="getRarityDotColor(req.value)"></div>
-                        <img v-else-if="req.type === 'type'" :src="`/images/types/${req.value}.png`" :alt="req.value"
-                             class="w-4 h-4 object-contain">
-                        <span>{{ getRequirementLabel(req) }}</span>
-                        <Button @click="removeRequirement(index)" type="button" variant="outline" size="sm"
-                                class="w-8 h-8 p-0 min-h-0 rounded-full flex items-center justify-center">x</Button>
+                  <div v-if="selectedRewards.length > 0" class="space-y-2">
+                    <div v-for="(reward, index) in selectedRewards" :key="index" class="flex items-center justify-between p-3 bg-base-200/30 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <span class="font-medium">{{ rewardTypeOptions.find(r => r.value === reward.type)?.label }}</span>
+                        <span v-if="reward.type !== 'item'" class="text-sm text-base-content/70">{{ reward.amount }}</span>
+                        <span v-else class="text-sm text-base-content/70">
+                          {{ reward.item?.name || getItemById(reward.item_id!)?.name }} ({{ reward.quantity }})
+                        </span>
                       </div>
+                      <Button @click="removeReward(index)" variant="ghost" size="sm" class="text-error">
+                        ✕
+                      </Button>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="flex justify-end gap-4 pt-6 border-t border-base-300/30">
-                <Button @click="cancel" type="button" variant="outline" size="md" :disabled="form.processing">
-                  Annuler
-                </Button>
-                <Button type="submit" variant="primary" size="md" :disabled="form.processing">
-                  <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2"></span>
-                  Modifier l'expédition
+                <div class="space-y-4">
+                  <h4 class="text-lg font-bold text-base-content border-b border-base-300/30 pb-2">
+                    📋 Prérequis
+                  </h4>
+
+                  <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                    <div>
+                      <select id="requirement-type" class="select select-bordered w-full bg-base-100/80 border-base-300/50 text-sm">
+                        <option value="">Type de prérequis</option>
+                        <option v-for="option in requirementTypeOptions" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </option>
+                      </select>
+                    </div>
+                    <div>
+                      <select id="requirement-value" class="select select-bordered w-full bg-base-100/80 border-base-300/50 text-sm">
+                        <option value="">Valeur</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Input
+                        id="requirement-quantity"
+                        type="number"
+                        min="1"
+                        value="1"
+                        placeholder="Quantité"
+                        class="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Button @click="addRequirement" type="button" variant="outline" size="sm" class="w-full">
+                        Ajouter
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div v-if="selectedRequirements.length > 0" class="space-y-2">
+                    <div v-for="(requirement, index) in selectedRequirements" :key="requirement.id" class="flex items-center justify-between p-3 bg-base-200/30 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <span class="font-medium">{{ requirementTypeOptions.find(r => r.value === requirement.type)?.label }}</span>
+                        <span class="text-sm text-base-content/70">
+                          {{ requirement.quantity }} × {{ requirement.type === 'rarity' ? getRarityLabel(requirement.value) : requirement.value }}
+                        </span>
+                      </div>
+                      <Button @click="removeRequirement(index)" variant="ghost" size="sm" class="text-error">
+                        ✕
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-base-300/30">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    :disabled="isSubmitting || form.processing"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    <span v-if="isSubmitting || form.processing">⏳</span>
+                    <span v-else>💾</span>
+                    {{ isSubmitting || form.processing ? 'Mise à jour...' : 'Mettre à jour' }}
+                  </Button>
+
+                  <Button
+                    @click="goBack"
+                    variant="secondary"
+                    size="lg"
+                    :disabled="isSubmitting || form.processing"
+                    class="flex-1 sm:flex-none sm:px-8"
+                  >
+                    ← Retour à la liste
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="xl:col-span-4 space-y-6">
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">🗺️</span>
+                  EXPÉDITION ACTUELLE
+                </h3>
+              </div>
+              <div class="p-6">
+                <div class="text-center mb-4">
+                  <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-warning/20 to-warning/10 flex items-center justify-center text-2xl font-bold mb-3">
+                    🗺️
+                  </div>
+                  <div class="font-bold text-xl text-warning">{{ props.expedition.name }}</div>
+                  <div class="text-sm text-base-content/70">{{ getRarityLabel(props.expedition.rarity) }}</div>
+                </div>
+
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">ID:</span>
+                    <span class="font-medium">#{{ props.expedition.id }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Créé le:</span>
+                    <span class="font-medium">{{ formatDate(props.expedition.created_at) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Modifié le:</span>
+                    <span class="font-medium">{{ formatDate(props.expedition.updated_at) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Durée:</span>
+                    <span class="font-medium text-info">{{ formatDuration(props.expedition.duration_minutes) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Récompenses:</span>
+                    <span class="font-medium text-success">{{ props.expedition.rewards.length }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-base-content/70">Prérequis:</span>
+                    <span class="font-medium text-secondary">{{ props.expedition.requirements.length }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-error/10 to-error/5 border-b border-error/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">⚠️</span>
+                  ZONE DANGER
+                </h3>
+              </div>
+              <div class="p-6 space-y-4">
+                <p class="text-sm text-base-content/70">
+                  La suppression d'une expédition est définitive et supprimera toutes ses données.
+                </p>
+                <Button
+                  @click="deleteExpedition"
+                  variant="outline"
+                  size="sm"
+                  class="w-full border-error text-error hover:bg-error hover:text-error-content"
+                >
+                  🗑️ Supprimer l'expédition
                 </Button>
               </div>
-            </form>
+            </div>
+
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">🔗</span>
+                  NAVIGATION
+                </h3>
+              </div>
+              <div class="p-6 space-y-3">
+                <Button
+                  @click="router.visit(`/admin/expeditions/${props.expedition.id}`)"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  👁️ Voir l'expédition
+                </Button>
+                <Button
+                  @click="router.visit('/admin/expeditions')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  📋 Liste expéditions
+                </Button>
+                <Button
+                  @click="router.visit('/admin')"
+                  variant="outline"
+                  size="sm"
+                  class="w-full justify-start"
+                >
+                  🏠 Dashboard
+                </Button>
+              </div>
+            </div>
+
+            <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
+              <div class="p-4 bg-gradient-to-r from-accent/10 to-accent/5 border-b border-accent/20">
+                <h3 class="text-lg font-bold tracking-wider flex items-center gap-2">
+                  <span class="text-xl">📊</span>
+                  APERÇU MODIFICATIONS
+                </h3>
+              </div>
+              <div class="p-6 space-y-4">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-warning">{{ selectedRewards.length }}</div>
+                  <div class="text-sm text-base-content/70">Récompenses configurées</div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-center">
+                  <div>
+                    <div class="text-lg font-bold text-info">{{ selectedRequirements.length }}</div>
+                    <div class="text-xs text-base-content/70">Prérequis</div>
+                  </div>
+                  <div>
+                    <div class="text-lg font-bold text-success">{{ formatDuration(form.duration_minutes) }}</div>
+                    <div class="text-xs text-base-content/70">Durée</div>
+                  </div>
+                </div>
+                <div class="text-center pt-2 border-t border-base-300/30">
+                  <div class="text-sm text-base-content/70 mb-1">Statut</div>
+                  <div class="text-lg font-bold" :class="form.is_active ? 'text-success' : 'text-error'">
+                    {{ form.is_active ? '🟢 Active' : '🔴 Inactive' }}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <Modal :show="showDeleteModal" @close="cancelDelete" max-width="md">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-error/20 rounded-lg flex items-center justify-center">
+            <span class="text-xl">⚠️</span>
+          </div>
+          <h3 class="text-xl font-bold text-base-content">Supprimer l'expédition</h3>
+        </div>
+      </template>
+
+      <div class="space-y-4">
+        <p class="text-base-content/80">
+          Êtes-vous sûr de vouloir supprimer l'expédition
+          <span class="font-bold text-error">{{ props.expedition.name }}</span> ?
+        </p>
+        <p class="text-sm text-base-content/60">
+          Cette action est irréversible et supprimera toutes les données associées.
+        </p>
+
+        <div class="flex gap-3 pt-4">
+          <Button @click="confirmDelete" variant="outline" class="flex-1 border-error text-error hover:bg-error hover:text-error-content">
+            🗑️ Supprimer
+          </Button>
+          <Button @click="cancelDelete" variant="secondary" class="flex-1">
+            Annuler
+          </Button>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
