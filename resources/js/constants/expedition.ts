@@ -1,11 +1,3 @@
-export const REWARD_TYPES = [
-  { value: 'cash', label: 'Cash', icon: '$' },
-  { value: 'xp', label: 'XP', icon: 'XP' },
-  { value: 'pokeball', label: 'Pokéball', icon: '⚾' },
-  { value: 'masterball', label: 'Masterball', icon: '🏀' },
-  { value: 'item', label: 'Item', icon: '🎁' }
-];
-
 export const REQUIREMENT_TYPES = [
   { value: 'rarity', label: 'Rareté' },
   { value: 'type', label: 'Type' }
