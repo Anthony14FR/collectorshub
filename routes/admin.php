@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExpeditionController;
 use App\Http\Controllers\Admin\GameConfigurationController;
 use App\Http\Controllers\Admin\ItemController;
+use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\Pokemons\PokemonController;
 use App\Http\Controllers\Admin\Users\UserController;
@@ -45,6 +46,10 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('game-configuration', [GameConfigurationController::class, 'index'])->name('game-configuration.index');
         Route::post('game-configuration/update', [GameConfigurationController::class, 'update'])->name('game-configuration.update');
         Route::post('game-configuration/reset-category', [GameConfigurationController::class, 'resetCategory'])->name('game-configuration.reset-category');
+
+        // Logs
+        Route::get('logs', [LogController::class, 'index'])->name('logs.index');
+        Route::get('logs/debug', [LogController::class, 'debug'])->name('logs.debug');
 
         // Clubs
         Route::get('clubs', [ClubController::class, 'index'])->name('clubs.index');
