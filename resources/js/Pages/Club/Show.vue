@@ -48,6 +48,7 @@ const {
 const showRequestsModal = ref(false);
 const showRemoveMemberModal = ref(false);
 const showLeaderActionsModal = ref(false);
+const showDestroyClubModal = ref(false);
 const selectedMember = ref<User | null>(null);
 const expandedMembers = ref<Set<number>>(new Set());
 const currentPage = ref(1);
@@ -138,13 +139,16 @@ const transferLeadership = (userId: number) => {
 };
 
 const destroyClub = () => {
-  if (confirm('Êtes-vous sûr de vouloir détruire ce club ? Cette action est irréversible.')) {
-    router.delete(`/clubs/${club.id}`, {
-      onSuccess: () => {
-        router.visit('/clubs');
-      }
-    });
-  }
+  showLeaderActionsModal.value = false;
+  showDestroyClubModal.value = true;
+};
+
+const confirmDestroyClub = () => {
+  router.delete(`/clubs/${club.id}`, {
+    onSuccess: () => {
+      router.visit('/clubs');
+    }
+  });
 };
 
 const goBack = () => {
@@ -196,9 +200,9 @@ const formatNumber = (num: number) => {
             <div class="p-4">
               <div class="flex items-center gap-3 mb-4">
                 <div class="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border-2 border-primary/30 flex items-center justify-center">
-                  <img 
-                    v-if="club.icon && club.icon.startsWith('/')" 
-                    :src="club.icon" 
+                  <img
+                    v-if="club.icon && club.icon.startsWith('/')"
+                    :src="club.icon"
                     :alt="club.name"
                     class="w-12 h-12 object-contain"
                     @error="(e) => { if (e.target) (e.target as HTMLElement).style.display = 'none' }"
@@ -249,7 +253,7 @@ const formatNumber = (num: number) => {
               >
                 ➕ Demander à Rejoindre
               </Button>
-               
+
               <Button
                 v-else-if="hasPendingRequest"
                 variant="ghost"
@@ -259,7 +263,7 @@ const formatNumber = (num: number) => {
               >
                 📤 Demande Envoyée
               </Button>
-               
+
               <Button
                 v-if="isMember && !isLeader"
                 @click="leaveClub"
@@ -269,7 +273,7 @@ const formatNumber = (num: number) => {
               >
                 🚪 Quitter le Club
               </Button>
-               
+
               <Button
                 v-if="isLeader"
                 @click="showLeaderActionsModal = true"
@@ -279,7 +283,7 @@ const formatNumber = (num: number) => {
               >
                 👑 Actions du Chef
               </Button>
-               
+
               <Button
                 v-if="isLeader && pendingRequestsCount > 0"
                 @click="showRequestsModal = true"
@@ -312,11 +316,11 @@ const formatNumber = (num: number) => {
                 >
                   <div class="flex items-center gap-4">
                     <div class="flex items-center gap-3 flex-shrink-0">
-                      <Avatar 
+                      <Avatar
                         :src="member.avatar || `/images/trainer/${(member.id % 10) + 1}.png`"
                         :alt="member.username"
                         :placeholder="member.username"
-                        size="md" 
+                        size="md"
                       />
                       <div class="min-w-0">
                         <div class="font-bold text-base truncate flex items-center gap-2">
@@ -455,20 +459,20 @@ const formatNumber = (num: number) => {
                 STATISTIQUES
               </h3>
             </div>
-            
+
             <div class="p-3 space-y-3">
               <div class="bg-primary/10 rounded-xl p-3 text-center border border-primary/20">
                 <div class="text-2xl font-bold text-primary">{{ totalMembers }}</div>
                 <div class="text-xs text-primary/70 uppercase tracking-wide">Membres</div>
                 <div class="text-xs text-base-content/60 mt-1">/ 30 maximum</div>
               </div>
-              
+
               <div class="bg-warning/10 rounded-xl p-3 text-center border border-warning/20">
                 <div class="text-2xl font-bold text-warning">{{ formatNumber(totalTeamCP) }}</div>
                 <div class="text-xs text-warning/70 uppercase tracking-wide">CP Total</div>
                 <div class="text-xs text-base-content/60 mt-1">Puissance collective</div>
               </div>
-              
+
               <div class="bg-info/10 rounded-xl p-3 text-center border border-info/20">
                 <div class="text-2xl font-bold text-info">{{ totalMembers > 0 ? Math.round(totalTeamCP / totalMembers) : 0 }}</div>
                 <div class="text-xs text-info/70 uppercase tracking-wide">CP Moyen</div>
@@ -502,18 +506,18 @@ const formatNumber = (num: number) => {
           class="bg-gradient-to-br from-base-200/50 to-base-300/30 rounded-xl p-4 border border-primary/20"
         >
           <div class="flex items-center gap-3 mb-3">
-            <Avatar 
+            <Avatar
               :src="request.user.avatar || `/images/trainer/${(request.user.id % 10) + 1}.png`"
               :alt="request.user.username"
               :placeholder="request.user.username"
-              size="md" 
+              size="md"
             />
             <div class="flex-1">
               <div class="font-bold">{{ request.user.username }}</div>
               <div class="text-sm text-base-content/70">Niveau {{ request.user.level }}</div>
             </div>
           </div>
-          
+
           <div class="flex gap-2">
             <Button
               @click="acceptRequest(request.id)"
@@ -560,7 +564,7 @@ const formatNumber = (num: number) => {
         <p class="text-base-content/70 mb-6">
           Cette action est irréversible.
         </p>
-        
+
         <div class="flex gap-3 justify-center">
           <Button
             @click="removeMember(selectedMember.id)"
@@ -609,11 +613,11 @@ const formatNumber = (num: number) => {
               class="flex items-center justify-between p-3 bg-gradient-to-br from-base-200/50 to-base-300/30 rounded-xl border border-primary/20"
             >
               <div class="flex items-center gap-3">
-                <Avatar 
+                <Avatar
                   :src="member.avatar || `/images/trainer/${(member.id % 10) + 1}.png`"
                   :alt="member.username"
                   :placeholder="member.username"
-                  size="sm" 
+                  size="sm"
                 />
                 <div>
                   <div class="font-bold">{{ member.username }}</div>
@@ -652,5 +656,49 @@ const formatNumber = (num: number) => {
         </div>
       </div>
     </Modal>
+
+    <Modal :show="showDestroyClubModal" @close="showDestroyClubModal = false" max-width="lg">
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
+            <span class="text-lg">🗑️</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent">
+              Détruire le Club
+            </h3>
+            <p class="text-sm text-base-content/70">Confirmation requise</p>
+          </div>
+        </div>
+      </template>
+
+      <div class="text-center">
+        <div class="text-6xl mb-4">⚠️</div>
+        <p class="text-lg mb-4">
+          Êtes-vous sûr de vouloir détruire le club <strong class="text-primary">{{ club.name }}</strong> ?
+        </p>
+        <p class="text-base-content/70 mb-6">
+          Cette action est <strong class="text-error">irréversible</strong>. Tous les membres seront expulsés et le club sera supprimé définitivement.
+        </p>
+
+        <div class="flex gap-3 justify-center">
+          <Button
+            @click="confirmDestroyClub"
+            variant="outline"
+            size="md"
+            class="!border-error !text-error hover:!bg-error hover:!text-white"
+          >
+            🗑️ Confirmer la Destruction
+          </Button>
+          <Button
+            @click="showDestroyClubModal = false"
+            variant="primary"
+            size="md"
+          >
+            ❌ Annuler
+          </Button>
+        </div>
+      </div>
+    </Modal>
   </div>
-</template> 
+</template>
