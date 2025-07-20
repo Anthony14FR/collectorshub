@@ -94,7 +94,6 @@ const formatDate = (dateString) => {
             <div
               class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-6"
             >
-              <!-- En-tête de l'item -->
               <div class="flex flex-col md:flex-row gap-6 mb-8">
                 <div class="flex-1">
                   <div class="flex items-center gap-3 mb-4">
@@ -147,7 +146,6 @@ const formatDate = (dateString) => {
                 </div>
               </div>
 
-              <!-- Informations détaillées -->
               <div class="grid md:grid-cols-2 gap-8">
                 <!-- Informations de base -->
                 <div class="space-y-4">
@@ -227,7 +225,6 @@ const formatDate = (dateString) => {
                   </div>
                 </div>
 
-                <!-- Métadonnées -->
                 <div class="space-y-4">
                   <h3
                     class="text-xl font-semibold text-base-content border-b border-base-300/30 pb-2"
@@ -263,7 +260,6 @@ const formatDate = (dateString) => {
                 </div>
               </div>
 
-              <!-- Actions -->
               <div class="mt-8 flex justify-end gap-3">
                 <Link href="/admin/items">
                   <Button variant="ghost">

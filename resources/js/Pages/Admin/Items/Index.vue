@@ -78,7 +78,6 @@ const deleteItem = () => {
 
   isLoading.value = true;
 
-  // Préparer les paramètres pour préserver l'onglet actuel
   const params = {};
   if (activeTab.value !== "all") {
     params.type = activeTab.value;
@@ -87,7 +86,6 @@ const deleteItem = () => {
     params.per_page = perPage.value;
   }
 
-  // Construire l'URL avec les paramètres
   const url = new URL(
     `/admin/items/${itemToDelete.value.id}`,
     window.location.origin
@@ -102,10 +100,7 @@ const deleteItem = () => {
       toastMessage.value = "L'item a été supprimé avec succès";
       showToast.value = true;
 
-      // Mettre à jour les stats si elles sont fournies
       if (page.props.flash?.stats) {
-        // Les stats seront automatiquement mises à jour via Inertia
-        // car elles sont passées dans la session flash
       }
     },
     onError: () => {
@@ -245,7 +240,6 @@ const getPageUrl = (page) => {
               :message="notification.message"
             />
 
-            <!-- Statistiques rapides -->
             <div
               class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6"
             >
@@ -348,11 +342,9 @@ const getPageUrl = (page) => {
             </div>
 
             <div class="space-y-4">
-              <!-- Contrôles de pagination -->
               <div
                 class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
               >
-                <!-- Sélecteur d'items par page -->
                 <div class="flex items-center gap-2">
                   <span
                     class="text-sm font-medium text-base-content/70"
@@ -377,14 +369,12 @@ const getPageUrl = (page) => {
                   </span>
                 </div>
 
-                <!-- Informations de pagination -->
                 <div class="text-sm text-base-content/70">
                   Page {{ items.current_page }} sur
                   {{ items.last_page }}
                 </div>
               </div>
 
-              <!-- Onglets et bouton créer -->
               <div
                 class="bg-base-100/30 backdrop-blur-md rounded-lg border border-base-300/30 p-2"
               >
@@ -434,7 +424,6 @@ const getPageUrl = (page) => {
                 </div>
               </div>
 
-              <!-- Contenu -->
               <div v-if="hasNoItems" class="text-center py-12">
                 <h3 class="text-xl font-semibold mb-2">
                   Aucun item trouvé
@@ -651,13 +640,11 @@ const getPageUrl = (page) => {
                 </div>
               </div>
 
-              <!-- Pagination -->
               <div
                 v-if="items.last_page > 1"
                 class="mt-6 flex justify-center"
               >
                 <div class="flex items-center gap-2">
-                  <!-- Première page -->
                   <Link
                     v-if="items.current_page > 1"
                     :href="getPageUrl(1)"
@@ -680,7 +667,6 @@ const getPageUrl = (page) => {
                     </svg>
                   </Link>
 
-                  <!-- Page précédente -->
                   <Link
                     v-if="items.prev_page_url"
                     :href="items.prev_page_url"
@@ -703,7 +689,6 @@ const getPageUrl = (page) => {
                     </svg>
                   </Link>
 
-                  <!-- Pages -->
                   <div class="flex items-center gap-1">
                     <Link
                       v-for="page in getVisiblePages()"
@@ -720,7 +705,6 @@ const getPageUrl = (page) => {
                     </Link>
                   </div>
 
-                  <!-- Page suivante -->
                   <Link
                     v-if="items.next_page_url"
                     :href="items.next_page_url"
@@ -743,7 +727,6 @@ const getPageUrl = (page) => {
                     </svg>
                   </Link>
 
-                  <!-- Dernière page -->
                   <Link
                     v-if="
                       items.current_page < items.last_page
@@ -775,7 +758,6 @@ const getPageUrl = (page) => {
       </div>
     </div>
 
-    <!-- Modal de confirmation de suppression -->
     <Modal :show="showDeleteModal" @close="showDeleteModal = false">
       <div class="p-6">
         <div class="flex items-center mb-4">
