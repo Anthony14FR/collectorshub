@@ -12,7 +12,7 @@ return new class () extends Migration {
             $table->string('name', 50);
             $table->text('description')->nullable();
             $table->string('type');
-            $table->json('effect');
+            $table->json('effect')->nullable();
             $table->integer('price')->default(0);
             $table->enum('rarity', ['normal', 'rare', 'epic', 'legendary']);
             $table->string('image_url')->nullable();

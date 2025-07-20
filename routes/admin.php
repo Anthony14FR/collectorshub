@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CrudPromoCodeController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExpeditionController;
 use App\Http\Controllers\Admin\GameConfigurationController;
+use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\Pokemons\PokemonController;
 use App\Http\Controllers\Admin\Users\UserController;
@@ -30,6 +31,9 @@ Route::middleware(['auth', 'verified', 'admin'])
 
         // PromoCodes
         Route::resource('promocodes', CrudPromoCodeController::class);
+
+        // Items
+        Route::resource('items', ItemController::class);
 
         // Notifications
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
