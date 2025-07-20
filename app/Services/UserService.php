@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
@@ -44,7 +45,27 @@ class UserService
 
     public function deleteUser(User $user): bool
     {
-        return $user->delete();
+        return DB::transaction(function () use ($user) {
+            $user->inventory()->delete();
+            $user->pokedex()->delete();
+            $user->notifications()->delete();
+            $user->userSuccesses()->delete();
+            $user->successes()->detach();
+            $user->promoCodes()->detach();
+            $user->marketplaceSales()->delete();
+            $user->marketplacePurchases()->delete();
+            $user->userExpeditions()->delete();
+            $user->expeditions()->detach();
+            $user->club()->detach();
+            $user->ledClub()->delete();
+            $user->clubRequests()->delete();
+            $user->userFriends()->delete();
+            $user->friendRequests()->delete();
+            $user->userFriendGiftsSent()->delete();
+            $user->userFriendGiftsReceived()->delete();
+            $user->dailyQuestProgress()->delete();
+            return $user->delete();
+        });
     }
 
     public function getUsersWithPagination(int $perPage = 10, array $filters = [])
