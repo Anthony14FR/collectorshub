@@ -117,12 +117,32 @@ class PokedexSeeder extends Seeder
 
     private function seedAdminPokemonByType(User $admin)
     {
-        $types = ['Normal', 'Feu', 'Eau', 'Électrique', 'Plante', 'Glace', 'Combat', 'Poison', 'Sol', 'Vol', 'Psy', 'Insecte', 'Roche', 'Spectre', 'Dragon', 'Ténèbres', 'Acier', 'Fée'];
+        $typeMapping = [
+            'Électrik' => 'Electrik',
+            'Électrique' => 'Electrik',
+            'Fée' => 'Fee',
+            'Ténèbres' => 'Tenebres',
+            'Acier' => 'Acier',
+            'Eau' => 'Eau',
+            'Feu' => 'Feu',
+            'Plante' => 'Plante',
+            'Normal' => 'Normal',
+            'Vol' => 'Vol',
+            'Poison' => 'Poison',
+            'Sol' => 'Sol',
+            'Roche' => 'Roche',
+            'Insecte' => 'Insecte',
+            'Spectre' => 'Spectre',
+            'Combat' => 'Combat',
+            'Psy' => 'Psy',
+            'Glace' => 'Glace',
+            'Dragon' => 'Dragon'
+        ];
 
-        foreach ($types as $type) {
-            $pokemonsOfType = Pokemon::where('type1', $type)
-                ->orWhere('type2', $type)
-                ->take(2)
+        foreach ($typeMapping as $type => $mappedType) {
+            $pokemonsOfType = Pokemon::whereJsonContains('types', $mappedType)
+                ->inRandomOrder()
+                ->take(1)
                 ->get();
 
             foreach ($pokemonsOfType as $pokemon) {
