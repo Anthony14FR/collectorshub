@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/vue3';
 interface Props {
   user: LeaderboardUser;
   position: 1 | 2 | 3;
-  type: 'level' | 'cp' | 'pokemon' | 'club';
+  type: 'level' | 'cp' | 'pokemon' | 'club' | 'tower';
 }
 
 const { user, position, type } = defineProps<Props>();
@@ -43,6 +43,7 @@ const getValue = computed(() => {
   case 'cp': return user.team_cp || 0;
   case 'pokemon': return user.value || 0;
   case 'club': return user.total_cp || 0;
+  case 'tower': return user.tower_level || 0;
   }
 });
 
@@ -52,6 +53,7 @@ const getValueLabel = computed(() => {
   case 'cp': return 'CP';
   case 'pokemon': return 'Pokémon';
   case 'club': return 'CP';
+  case 'tower': return 'Niv. Tour';
   }
 });
 
@@ -131,6 +133,35 @@ const avatarSize = computed(() => {
             />
             <div
               v-for="index in Math.max(0, 6 - user.team_pokemons.length)"
+              :key="`placeholder-${index}`"
+              class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 opacity-50"
+            >
+              <img src="/images/items/pokeball.png" alt="placeholder" class="w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 object-contain opacity-50" />
+            </div>
+          </div>
+        </div>
+
+        <div v-if="type === 'tower' && user.enemy_team" class="space-y-2">
+          <CPBadge :cp="user.enemy_team_cp || 0" size="sm" variant="gradient" />
+          <div class="text-xs text-base-content/70 mb-1">Équipe adverse</div>
+          <div class="grid grid-cols-3 gap-2 max-w-[180px] sm:max-w-[240px] mx-auto">
+            <div
+              v-for="(pokemon, index) in user.enemy_team.slice(0, 6)"
+              :key="index"
+              class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-base-200/60 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 relative overflow-hidden"
+            >
+              <img
+                :src="`/images/pokemon-gifs/${pokemon.pokemon_id}${pokemon.is_shiny ? '_S' : ''}.gif`"
+                :alt="pokemon.name"
+                class="w-full h-full object-contain"
+                style="image-rendering: pixelated;"
+              />
+              <div class="absolute bottom-0 right-0 bg-black/70 text-white text-xs px-1 rounded-tl">
+                {{ pokemon.cp }}
+              </div>
+            </div>
+            <div
+              v-for="index in Math.max(0, 6 - user.enemy_team.length)"
               :key="`placeholder-${index}`"
               class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 opacity-50"
             >

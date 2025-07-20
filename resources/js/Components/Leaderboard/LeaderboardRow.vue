@@ -7,7 +7,7 @@ import type { LeaderboardUser } from '@/types/leaderboard';
 
 interface Props {
   user: LeaderboardUser;
-  type: 'level' | 'cp' | 'pokemon' | 'club';
+  type: 'level' | 'cp' | 'pokemon' | 'club' | 'tower';
   isCurrentUser?: boolean;
 }
 
@@ -19,6 +19,7 @@ const getValue = computed(() => {
   case 'cp': return user.team_cp || 0;
   case 'pokemon': return user.value || 0;
   case 'club': return user.total_cp || 0;
+  case 'tower': return user.tower_level || 0;
   }
 });
 
@@ -28,6 +29,7 @@ const getValueLabel = computed(() => {
   case 'cp': return 'CP Total';
   case 'pokemon': return 'Pokémon';
   case 'club': return 'CP Club';
+  case 'tower': return 'Niveau Tour';
   }
 });
 
@@ -125,6 +127,34 @@ const getRankColor = computed(() => {
             >
               <img src="/images/items/pokeball.png" alt="placeholder" class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 object-contain opacity-50" />
             </div>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="type === 'tower' && user.enemy_team" class="space-y-3 text-right">
+        <CPBadge :cp="user.enemy_team_cp || 0" size="sm" variant="gradient" />
+        <div class="text-xs text-base-content/70">Équipe adverse</div>
+        <div class="grid grid-cols-6 gap-2 w-fit ml-auto">
+          <div
+            v-for="(pokemon, index) in user.enemy_team.slice(0, 6)"
+            :key="index"
+            class="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-base-200/60 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 relative overflow-hidden"
+          >
+            <img
+              :src="`/images/pokemon-gifs/${pokemon.pokemon_id}${pokemon.is_shiny ? '_S' : ''}.gif`"
+              :alt="pokemon.name"
+              class="w-full h-full object-contain"
+              style="image-rendering: pixelated;"
+            />
+            <div class="absolute bottom-0 right-0 bg-black/70 text-white text-xs px-1 rounded-tl">
+              {{ pokemon.cp }}
+            </div>
+          </div>
+          <div
+            v-for="index in Math.max(0, 6 - user.enemy_team.length)"
+            :key="`placeholder-${index}`"
+            class="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-base-200/40 backdrop-blur-sm rounded-md flex items-center justify-center border border-base-300/50 opacity-50"
+          >
+            <img src="/images/items/pokeball.png" alt="placeholder" class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 object-contain opacity-50" />
           </div>
         </div>
       </div>
