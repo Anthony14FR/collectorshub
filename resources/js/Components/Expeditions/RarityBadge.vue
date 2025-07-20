@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getRarityLabel, getRarityColor, getRarityDotColor } from '@/utils/expedition';
 import type { ExpeditionRarity } from '@/constants/expedition';
+import { getRarityColor, getRarityDotColor, getRarityLabel } from '@/utils/expedition';
 
 interface Props {
   rarity: ExpeditionRarity;
@@ -8,7 +8,7 @@ interface Props {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const { rarity, showDot, size } = withDefaults(defineProps<Props>(), {
   showDot: true,
   size: 'md'
 });

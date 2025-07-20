@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import CPBadge from '@/Components/UI/CPBadge.vue';
 import TeamPokemonCard from '@/Components/Profile/TeamPokemonCard.vue';
+import CPBadge from '@/Components/UI/CPBadge.vue';
 import type { LeaderboardUser } from '@/types/leaderboard';
 import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 interface Props {
   user: LeaderboardUser;
@@ -12,22 +12,6 @@ interface Props {
 }
 
 const { user, position, type } = defineProps<Props>();
-
-const podiumHeight = computed(() => {
-  switch(position) {
-  case 1: return 'h-32';
-  case 2: return 'h-24';
-  case 3: return 'h-20';
-  }
-});
-
-const podiumColor = computed(() => {
-  switch(position) {
-  case 1: return 'bg-gradient-to-t from-warning/30 to-warning/20 border-warning/50';
-  case 2: return 'bg-gradient-to-t from-base-300/40 to-base-300/20 border-base-300/50';
-  case 3: return 'bg-gradient-to-t from-accent/30 to-accent/20 border-accent/50';
-  }
-});
 
 const medalImage = computed(() => {
   switch(position) {

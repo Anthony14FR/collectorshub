@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
-import type { Pokedex } from '@/types/pokedex';
 import Button from '@/Components/UI/Button.vue';
-import RarityBadge from '@/Components/UI/RarityBadge.vue';
-import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import type { Pokedex } from '@/types/pokedex';
+import { router } from '@inertiajs/vue3';
+import { Shield, X } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
+  
 
 interface Props {
   pokemons: Pokedex[];
@@ -18,14 +18,6 @@ watch(() => props.pokemons, (newPokemons) => {
   team.value = newPokemons.filter(p => p.is_in_team);
 }, { immediate: true });
 
-const addToTeam = (pokemonId: number) => {
-  router.post(`/pokedex/${pokemonId}/add-to-team`, {}, {
-    preserveScroll: true,
-    onSuccess: () => {
-    }
-  });
-};
-
 const removeFromTeam = (pokemonId: number) => {
   router.post(`/pokedex/${pokemonId}/remove-from-team`, {}, {
     preserveScroll: true,
@@ -34,17 +26,13 @@ const removeFromTeam = (pokemonId: number) => {
   });
 };
 
-const isTeamFull = (): boolean => {
-  return team.value.length >= 6;
-}
-
 </script>
 
 <template>
   <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
     <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
       <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-        <span class="text-lg">🛡️</span>
+        <Shield :size="20" class="text-primary" />
         MON ÉQUIPE ({{ team.length }}/6)
       </h3>
     </div>
@@ -55,7 +43,7 @@ const isTeamFull = (): boolean => {
           :key="member.id"
           class="bg-base-200/50 p-2 rounded-lg flex items-center justify-between gap-2"
         >
-          <div class="flex items-center gap-2">
+          <div v-if="member.pokemon" class="flex items-center gap-2">
             <img 
               :src="`/images/pokemon-gifs/${member.pokemon.is_shiny ? (member.pokemon.id - 1000) + '_S' : member.pokemon.id}.gif`" 
               :alt="member.pokemon.name"
@@ -67,7 +55,17 @@ const isTeamFull = (): boolean => {
               <p class="text-xs text-base-content/70">Niv. {{ member.level }}</p>
             </div>
           </div>
+          <div v-else class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-error/20 rounded flex items-center justify-center">
+              <X :size="16" class="text-error" />
+            </div>
+            <div>
+              <p class="font-bold text-xs text-error">Pokémon introuvable</p>
+              <p class="text-xs text-base-content/70">ID: {{ member.pokemon_id }}</p>
+            </div>
+          </div>
           <Button @click="removeFromTeam(member.id)" size="sm" variant="outline" class="!border-error !text-error hover:!bg-error hover:!text-white">
+            <X :size="12" />
             Retirer
           </Button>
         </div>

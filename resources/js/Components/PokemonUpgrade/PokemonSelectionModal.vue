@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Modal from '@/Components/UI/Modal.vue';
-import Button from '@/Components/UI/Button.vue';
 import SimplePokemonCard from '@/Components/PokemonUpgrade/SimplePokemonCard.vue';
+import Button from '@/Components/UI/Button.vue';
 import type { PokedexEntry } from '@/types/user';
+import { Frown, X } from 'lucide-vue-next';
 
 interface UpgradeRequirement {
   star: number;
@@ -53,7 +53,7 @@ const selectPokemon = (pokemon: PokedexEntry) => {
         @click="emit('close')"
         class="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 rounded-xl bg-base-200/50 hover:bg-base-200 transition-colors duration-200 flex items-center justify-center font-bold hover:text-error w-8 h-8 sm:w-10 sm:h-10 text-xl sm:text-2xl"
       >
-        ×
+        <X :size="20" />
       </button>
 
       <div class="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6">
@@ -69,7 +69,7 @@ const selectPokemon = (pokemon: PokedexEntry) => {
         </div>
 
         <div v-else class="text-center py-6 sm:py-8">
-          <div class="text-3xl sm:text-4xl mb-2">😢</div>
+          <Frown :size="48" class="mb-2 text-base-content/50 mx-auto" />
           <h4 class="font-bold text-base sm:text-lg mb-2">Aucun Pokémon disponible</h4>
           <p class="text-xs sm:text-sm text-base-content/70 px-4">
             Vous n'avez pas de Pokémon correspondant aux critères requis.

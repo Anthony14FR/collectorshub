@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
-import Modal from '@/Components/UI/Modal.vue';
-import Button from '@/Components/UI/Button.vue';
-import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import PokemonSelectionModal from '@/Components/PokemonUpgrade/PokemonSelectionModal.vue';
 import UpgradeSlot from '@/Components/PokemonUpgrade/UpgradeSlot.vue';
+import Button from '@/Components/UI/Button.vue';
+import Modal from '@/Components/UI/Modal.vue';
+import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import type { UpgradeData } from '@/types/upgrade';
 import type { PokedexEntry } from '@/types/user';
-import type { UpgradeData, UpgradeRequirement } from '@/types/upgrade';
+import { router } from '@inertiajs/vue3';
+import { ArrowRight, Sparkles, Star } from 'lucide-vue-next';
+import { computed, onMounted, ref, watch } from 'vue';
 
 declare function route(name: string, params?: Record<string, any>): string;
 
@@ -29,8 +30,6 @@ const selectedMaterials = ref<PokedexEntry[]>([]);
 const showSelectionModal = ref(false);
 const currentSlotType = ref<'main' | 'secondary'>('main');
 const currentSlotIndex = ref(0);
-const showSuccessModal = ref(false);
-const selectedPokemon = ref<PokedexEntry | null>(null);
 
 const materialSlots = computed(() => {
   if (!upgradeData.value) return [];
@@ -139,9 +138,11 @@ const getAvailableForSlot = (slotType: 'main' | 'secondary'): PokedexEntry[] => 
 const getCurrentRequirement = () => {
   if (!upgradeData.value) return null;
   
-  return currentSlotType.value === 'main' 
+  const requirement = currentSlotType.value === 'main' 
     ? upgradeData.value.requirements.main_requirement
     : upgradeData.value.requirements.secondary_requirement;
+    
+  return requirement || null;
 };
 
 watch(() => pokemon.id, () => {
@@ -213,16 +214,17 @@ onMounted(() => {
   <Modal :show="show" @close="emit('close')" max-width="6xl">
     <template #header>
       <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-        <span class="text-xl sm:text-2xl">⭐</span>
+        <Star :size="24" class="text-warning" />
         <div class="flex-1">
           <h3 class="text-base sm:text-lg font-bold">Améliorer {{ pokemon.pokemon?.name }}</h3>
           <div class="flex items-center gap-2 mt-1">
             <StarsBadge :stars="pokemon.star" />
-            <span class="text-lg sm:text-xl">→</span>
+            <ArrowRight :size="20" class="text-base-content/70" />
             <StarsBadge :stars="pokemon.star + 1" />
           </div>
           <p v-if="pokemon.pokemon?.is_shiny" class="text-xs sm:text-sm text-yellow-500 flex items-center gap-1 mt-1">
-            ✨ Pokémon Shiny - Seuls les Shiny peuvent être utilisés
+            <Sparkles :size="16" />
+            Pokémon Shiny - Seuls les Shiny peuvent être utilisés
           </p>
         </div>
       </div>
@@ -247,7 +249,7 @@ onMounted(() => {
               <StarsBadge :stars="pokemon.star" />
             </div>
             <div v-if="pokemon.pokemon?.is_shiny" class="absolute -top-1 sm:-top-2 -left-1 sm:-left-2">
-              <span class="text-yellow-400 text-lg sm:text-xl">✨</span>
+              <Sparkles :size="20" class="text-yellow-400" />
             </div>
           </div>
         </div>
@@ -293,7 +295,8 @@ onMounted(() => {
           class="w-full sm:w-auto order-1 sm:order-2"
         >
           <span v-if="!loading" class="flex items-center justify-center gap-1">
-            <span>⭐ Améliorer</span>
+            <Star :size="16" />
+            Améliorer
             <span class="hidden sm:inline">({{ selectedMaterials.filter(m => m !== null && m !== undefined).length }}/{{ getTotalRequiredMaterials() }})</span>
           </span>
           <span v-else>Amélioration en cours...</span>

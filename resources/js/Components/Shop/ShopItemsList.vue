@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
 import ShopItemCard from '@/Components/Cards/ShopItemCard.vue';
 import Button from '@/Components/UI/Button.vue';
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
   items: {
@@ -196,7 +197,7 @@ const paginationItems = computed(() => {
           title="Page précédente"
           class="w-8 h-8 p-0 flex items-center justify-center"
         >
-          ‹
+          <ChevronLeft :size="16" />
         </Button>
 
         <template v-for="(item, index) in paginationItems" :key="index">
@@ -220,7 +221,7 @@ const paginationItems = computed(() => {
           title="Page suivante"
           class="w-8 h-8 p-0 flex items-center justify-center"
         >
-          ›
+          <ChevronRight :size="16" />
         </Button>
         <Button
           @click="changePage(totalPages)"
@@ -230,7 +231,7 @@ const paginationItems = computed(() => {
           title="Dernière page"
           class="hidden sm:flex"
         >
-          »»
+          <ChevronRight :size="16" />
         </Button>
       </div>
       

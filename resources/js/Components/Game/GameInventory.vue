@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import Modal from '@/Components/UI/Modal.vue';
 import Button from '@/Components/UI/Button.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import type { Inventory } from '@/types/inventory';
+import { Coins, Package } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 
 interface Props {
   inventory?: Inventory[];
@@ -29,14 +30,14 @@ const formatPrice = (price: number) => {
       @click="isModalOpen = true"
       class="w-full"
     >
-      <img src="/images/icons/bag.webp" alt="Sac" class="w-6 h-6 mr-2" /> SAC
+      <Package :size="24" class="mr-2" /> SAC
     </Button>
 
     <Modal :show="isModalOpen" @close="isModalOpen = false" max-width="4xl" fixed-height>
       <template #header>
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-gradient-to-br from-success/20 to-primary/20 rounded-lg flex items-center justify-center">
-            <img src="/images/icons/bag.webp" alt="Sac" class="w-6 h-6" />
+            <Package :size="24" class="text-success" />
           </div>
           <div class="flex flex-col">
             <h3 class="text-xl font-bold bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
@@ -53,7 +54,7 @@ const formatPrice = (price: number) => {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-                <span class="text-lg">💰</span>
+                <Coins :size="24" class="text-warning" />
               </div>
               <div>
                 <h4 class="font-bold text-base-content">Porte-monnaie</h4>
@@ -68,7 +69,7 @@ const formatPrice = (price: number) => {
 
         <div v-if="filteredInventory.length === 0" class="text-center py-8">
           <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-base-200/50 to-base-300/50 rounded-full flex items-center justify-center">
-            <img src="/images/icons/bag.webp" alt="Sac vide" class="w-10 h-10 opacity-50" />
+            <Package :size="40" class="opacity-50" />
           </div>
           <p class="text-base-content/70 mb-2">Votre sac est vide</p>
           <p class="text-sm text-base-content/50">Explorez pour trouver des objets !</p>
@@ -76,7 +77,7 @@ const formatPrice = (price: number) => {
 
         <div v-else>
           <h5 class="font-bold text-base-content mb-3 flex items-center gap-2">
-            <img src="/images/icons/bag.webp" alt="Objets" class="w-6 h-6" />
+            <Package :size="24" />
             Objets
           </h5>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2">
@@ -95,8 +96,9 @@ const formatPrice = (price: number) => {
                   <span class="bg-success/20 px-2 py-1 rounded-full">
                     x{{ item.quantity }}
                   </span>
-                  <span class="text-success font-semibold">
-                    {{ item.item.price }}💰
+                  <span class="text-success font-semibold flex items-center gap-1">
+                    {{ item.item.price }}
+                    <Coins :size="12" class="text-success" />
                   </span>
                 </div>
               </div>

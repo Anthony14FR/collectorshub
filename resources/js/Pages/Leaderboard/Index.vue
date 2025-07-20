@@ -8,6 +8,10 @@ import type { PageProps } from '@/types';
 import type { LeaderboardData } from '@/types/leaderboard';
 import type { User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  Trophy
+} from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 interface Props extends PageProps {
@@ -86,7 +90,7 @@ const changePage = (page: number) => {
         <div class="text-center">
           <h1
             class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            🏆 CLASSEMENTS
+            <Trophy :size="24" class="inline" /> CLASSEMENTS
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             TOP DRESSEURS
@@ -104,7 +108,7 @@ const changePage = (page: number) => {
                 </div>
                 <div class="p-3">
                   <Button @click="router.visit('/me')" variant="secondary" size="sm" class="w-full">
-                    ← Retour à l'accueil
+                    <ArrowLeft :size="16" class="inline" /> Retour à l'accueil
                   </Button>
                 </div>
               </div>
@@ -149,7 +153,7 @@ const changePage = (page: number) => {
 
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 p-4 sm:p-6 mb-6">
               <h2 class="text-lg font-bold text-center mb-6 text-base-content">
-                🏆 Top 3 - {{ tabLabels[activeTab] }}
+                <Trophy :size="20" class="inline" /> Top 3 - {{ tabLabels[activeTab] }}
               </h2>
 
               <div class="flex flex-col gap-6 sm:hidden">

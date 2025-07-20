@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import type { Pokemon } from '@/types/pokemon';
-import type { Pokedex } from '@/types/pokedex';
-import PokedexModalCard from './PokedexModalCard.vue';
+import Button from '@/Components/UI/Button.vue';
+import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
-import StarsBadge from '@/Components/UI/StarsBadge.vue';
-import Input from '@/Components/UI/Input.vue';
 import Select from '@/Components/UI/Select.vue';
-import Button from '@/Components/UI/Button.vue';
+import StarsBadge from '@/Components/UI/StarsBadge.vue';
+import type { Pokedex } from '@/types/pokedex';
+import type { Pokemon } from '@/types/pokemon';
+import { ArrowLeft, Filter, Frown, Sparkles } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+import PokedexModalCard from './PokedexModalCard.vue';
 
 interface Props {
   show: boolean;
@@ -51,6 +52,7 @@ interface DisplayPokemon {
 const basePokemonData = computed(() => {
   const userPokemonGroups = new Map<string, Pokedex[]>();
   props.userPokedex.forEach(p => {
+    if (!p.pokemon) return;
     const key = `${p.pokemon.id}`;
     if (!userPokemonGroups.has(key)) userPokemonGroups.set(key, []);
     userPokemonGroups.get(key)!.push(p);
@@ -63,6 +65,7 @@ const basePokemonData = computed(() => {
       return b.level - a.level;
     });
     const best = sortedGroup[0];
+    if (!best.pokemon) continue;
     bestUserPokemon.set(key, {
       pokedexInfo: best, pokemon: best.pokemon, owned: true, count: group.length, all_duplicates: sortedGroup
     });
@@ -139,7 +142,7 @@ const toggleMobileFilterDropdown = () => {
           <h2 class="sm:text-2xl text-xl font-bold">Mon Pokédex</h2>
           <div class="flex items-center gap-4 mt-1 text-xs text-base-content/70">
             <span>Normal: <span class="font-bold text-base-content">{{ pokedexProgress.normalOwned }}/{{ pokedexProgress.normalTotal }}</span></span>
-            <span class="text-yellow-400">Shiny: <span class="font-bold">{{ pokedexProgress.shinyOwned }}/{{ pokedexProgress.shinyTotal }}</span> ✨</span>
+            <span class="text-yellow-400 flex items-center gap-1">Shiny: <span class="font-bold">{{ pokedexProgress.shinyOwned }}/{{ pokedexProgress.shinyTotal }}</span> <Sparkles :size="14" /></span>
           </div>
         </div>
 
@@ -172,9 +175,7 @@ const toggleMobileFilterDropdown = () => {
         <div class="lg:hidden relative w-full flex justify-end">
           <Button @click="toggleMobileFilterDropdown" variant="secondary" size="sm">
             Filtres
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
+            <Filter :size="20" class="ml-2" />
           </Button>
           <div v-if="isMobileFilterDropdownOpen" class="absolute top-10 right-0 mt-2 w-72 bg-base-200 shadow-lg rounded-lg p-4 z-10">
             <div class="flex flex-col gap-3">
@@ -218,7 +219,7 @@ const toggleMobileFilterDropdown = () => {
             />
           </div>
           <div v-else class="flex flex-col items-center justify-center h-full text-center text-base-content/70">
-            <p class="text-5xl mb-4">😥</p>
+            <Frown :size="64" class="mb-4 text-base-content/50" />
             <h3 class="font-bold text-lg text-base-content">Aucun Pokémon trouvé</h3>
             <p class="text-sm">Essayez de modifier vos filtres de recherche.</p>
           </div>
@@ -226,7 +227,7 @@ const toggleMobileFilterDropdown = () => {
       </div>
       <div v-else-if="selectedPokemon" class="h-[60vh] overflow-y-auto p-4">
         <button @click="closeDetails" class="mb-6 bg-primary text-primary-content hover:bg-primary-focus p-2 rounded-lg flex items-center gap-2 text-sm font-bold">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+          <ArrowLeft :size="20" />
           Retour au Pokédex
         </button>
         <div class="flex flex-col lg:flex-row gap-8">
@@ -239,7 +240,7 @@ const toggleMobileFilterDropdown = () => {
                 style="image-rendering: pixelated;"
               >
               <div v-if="selectedPokemon.pokemon.is_shiny" class="absolute top-0 right-0 w-8 h-8 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-yellow-500/30">
-                <span class="text-yellow-400 text-2xl">✨</span>
+                <Sparkles :size="24" class="text-yellow-400" />
               </div>
             </div>
             <h2 class="text-3xl font-bold mt-4">{{ selectedPokemon.pokedexInfo?.nickname || selectedPokemon.pokemon.name }}</h2>
@@ -257,16 +258,16 @@ const toggleMobileFilterDropdown = () => {
                 :class="{'border-2 border-primary shadow-lg': duplicate.id === selectedPokemon.pokedexInfo?.id}"
               >
                 <div class="flex items-center gap-4">
-                  <div v-if="duplicate.pokemon.is_shiny" class="w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-                    <span class="text-yellow-400 text-sm">✨</span>
+                  <div v-if="duplicate.pokemon?.is_shiny" class="w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
+                    <Sparkles :size="16" class="text-yellow-400" />
                   </div>
                   <div>
-                    <p class="font-bold">{{ duplicate.nickname || duplicate.pokemon.name }}</p>
+                    <p class="font-bold">{{ duplicate.nickname || duplicate.pokemon?.name }}</p>
                     <p class="text-sm text-base-content/70">Niveau {{ duplicate.level }}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-4">
-                  <RarityBadge :rarity="duplicate.pokemon.rarity" />
+                  <RarityBadge v-if="duplicate.pokemon?.rarity" :rarity="duplicate.pokemon.rarity" />
                   <StarsBadge :stars="duplicate.star" size="md" />
                 </div>
               </div>

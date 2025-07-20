@@ -5,6 +5,7 @@ import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { PokedexEntry } from '@/types/marketplace';
 import type { Pokedex } from '@/types/pokedex';
 import { parseTypes } from '@/utils/marketplace';
+import { Heart, Sparkles, Star } from 'lucide-vue-next';
 
 interface Props {
   entry: PokedexEntry | Pokedex;
@@ -59,14 +60,14 @@ const getRarityForBadge = () => {
   ]">
     <div v-if="entry.pokemon?.is_shiny"
          class="absolute top-2 right-2 w-6 h-6 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-      <span class="text-yellow-400 text-sm">✨</span>
+      <Sparkles :size="14" class="text-yellow-400" />
     </div>
 
     <div v-if="entry.is_favorite" :class="[
       'absolute w-6 h-6 bg-red-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-red-500/30',
       entry.pokemon?.is_shiny ? 'top-10 right-2' : 'top-2 right-2'
     ]">
-      <span class="text-red-400 text-sm">❤️</span>
+      <Heart :size="14" class="text-red-400" />
     </div>
 
     <div
@@ -107,7 +108,8 @@ const getRarityForBadge = () => {
       <div v-if="entry.is_in_team" class="flex justify-center gap-1 mb-2">
         <span v-if="entry.is_in_team"
               class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100/80 text-blue-600 border border-blue-200">
-          ⭐ Équipe
+          <Star :size="12" class="mr-1" />
+          Équipe
         </span>
       </div>
 

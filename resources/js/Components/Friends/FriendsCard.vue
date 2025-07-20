@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import Button from "@/Components/UI/Button.vue";
+import FriendGiftCountdown from "@/Components/Friends/FriendGiftCountdown.vue";
 import Avatar from "@/Components/UI/Avatar.vue";
 import Badge from "@/Components/UI/Badge.vue";
-import { Link } from "@inertiajs/vue3";
+import Button from "@/Components/UI/Button.vue";
 import type { UserFriend } from '@/types/friend';
-import FriendGiftCountdown from "@/Components/Friends/FriendGiftCountdown.vue";
+import { Link } from "@inertiajs/vue3";
+import { AlertCircle, Check, Gift, Heart, Star, Trash2 } from 'lucide-vue-next';
+import { computed } from "vue";
 
 const props = defineProps<{
   friend: UserFriend;
@@ -28,11 +29,11 @@ const getAvatarSrc = (friend: UserFriend) => {
 <template>
   <div class="group relative bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-lg rounded-xl p-4 border border-base-300/30 shadow-lg transition-all duration-300">
     <div v-if="canClaimGift" class="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-success/80 to-success rounded-full flex items-center justify-center animate-pulse shadow-lg">
-      <span class="text-white text-xs font-bold">!</span>
+      <AlertCircle :size="12" class="text-white" />
     </div>
 
     <div v-if="props.friend.isOnCooldown && props.friend.nextGiftAvailableAt" class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-warning/80 to-warning rounded-full flex items-center justify-center shadow-lg">
-      <span class="text-white text-xs">✓</span>
+      <Check :size="12" class="text-white" />
     </div>
 
     <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-4 text-center sm:text-left">
@@ -63,7 +64,7 @@ const getAvatarSrc = (friend: UserFriend) => {
         
         <div class="flex items-center gap-2 text-sm text-base-content/70 justify-center sm:justify-start">
           <div class="flex items-center gap-1">
-            <span class="text-info">⭐</span>
+            <Star :size="16" class="text-info" />
             <span>Niveau {{ friend.level }}</span>
           </div>
         </div>
@@ -78,7 +79,7 @@ const getAvatarSrc = (friend: UserFriend) => {
           class="animate-pulse w-full sm:w-auto"
         >
           <span class="flex items-center gap-1">
-            <span>🎁</span>
+            <Gift :size="16" />
             Récupérer
           </span>
         </Button>
@@ -91,7 +92,7 @@ const getAvatarSrc = (friend: UserFriend) => {
           class="w-full sm:w-auto"
         >
           <span class="flex items-center gap-1">
-            <span>💝</span>
+            <Heart :size="16" />
             Envoyer
           </span>
         </Button>
@@ -110,7 +111,7 @@ const getAvatarSrc = (friend: UserFriend) => {
           class="mt-1 w-full sm:w-auto"
         >
           <span class="flex items-center gap-1">
-            <span>🗑️</span>
+            <Trash2 :size="16" />
             Supprimer
           </span>
         </Button>

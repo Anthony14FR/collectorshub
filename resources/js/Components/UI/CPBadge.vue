@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Sword } from 'lucide-vue-next';
+
 interface Props {
   cp: number;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -47,7 +49,7 @@ const formatCP = (cp: number): string => {
       getVariantClasses()
     ]"
   >
-    <span class="mr-1">⚔️</span>
+    <Sword :size="size === 'xs' ? 10 : size === 'sm' ? 12 : 14" class="mr-1" />
     <span v-if="showLabel" class="mr-1">CP</span>
     <span class="font-mono">{{ formatCP(cp) }}</span>
   </div>

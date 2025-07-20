@@ -3,9 +3,7 @@
     <template #header>
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-gradient-to-br from-warning/30 to-warning/40 rounded-lg flex items-center justify-center">
-          <svg class="w-4 h-4 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-          </svg>
+          <Map :size="16" class="text-warning" />
         </div>
         <div>
           <h3 class="text-base font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
@@ -55,9 +53,7 @@
                    class="w-5 h-5 object-contain"
                    style="image-rendering: pixelated;">
               <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center">
-                <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+                <X :size="10" class="text-white" />
               </div>
             </div>
           </div>
@@ -77,7 +73,8 @@
               class="flex-1 text-xs"
               :disabled="selectedPokemons.length === maxPokemons || loading"
             >
-              🤖 Auto
+              <Bot :size="12" class="mr-1" />
+              Auto
             </Button>
             <Button 
               @click="clearSelection"
@@ -86,7 +83,8 @@
               class="flex-1 text-xs"
               :disabled="selectedPokemons.length === 0 || loading"
             >
-              🗑️ Reset
+              <Trash2 :size="12" class="mr-1" />
+              Reset
             </Button>
           </div>
         </div>
@@ -115,9 +113,7 @@
 
       <div v-if="filteredPokemons.length === 0" class="text-center py-6">
         <div class="w-12 h-12 bg-base-200/50 rounded-full flex items-center justify-center mx-auto mb-3">
-          <svg class="w-6 h-6 text-base-content/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-          </svg>
+          <FileText :size="24" class="text-base-content/30" />
         </div>
         <h3 class="font-semibold text-base-content/60 mb-1 text-sm">Aucun Pokémon éligible</h3>
         <p class="text-xs text-base-content/40">Modifiez vos filtres</p>
@@ -139,9 +135,7 @@
             <div class="absolute top-1 right-1 z-10">
               <div v-if="selectedPokemons.includes(pokemon.id)" 
                    class="w-3 h-3 bg-success rounded-full flex items-center justify-center">
-                <svg class="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                </svg>
+                <Check :size="8" class="text-white" />
               </div>
             </div>
 
@@ -149,9 +143,7 @@
                  class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center z-20"
                  @click.stop="removePokemon(pokemon.id)">
               <div class="w-5 h-5 bg-black/80 rounded-full flex items-center justify-center">
-                <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+                <X :size="10" class="text-white" />
               </div>
             </div>
 
@@ -215,7 +207,8 @@
             class="flex-2"
             size="sm"
           >
-            {{ loading ? 'Démarrage...' : `🚀 Démarrer (${selectedPokemons.length})` }}
+            <Rocket v-if="!loading" :size="14" class="mr-1" />
+            {{ loading ? 'Démarrage...' : `Démarrer (${selectedPokemons.length})` }}
           </Button>
         </div>
       </div>
@@ -224,12 +217,13 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import Modal from '@/Components/UI/Modal.vue'
 import Button from '@/Components/UI/Button.vue'
 import Input from '@/Components/UI/Input.vue'
+import Modal from '@/Components/UI/Modal.vue'
 import Select from '@/Components/UI/Select.vue'
+import { usePage } from '@inertiajs/vue3'
+import { Bot, Check, FileText, Map, Rocket, Trash2, X } from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
   show: {

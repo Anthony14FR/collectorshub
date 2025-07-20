@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
-import Modal from '@/Components/UI/Modal.vue';
 import Button from '@/Components/UI/Button.vue';
+import Modal from '@/Components/UI/Modal.vue';
 import Spinner from '@/Components/UI/Spinner.vue';
+import { router } from '@inertiajs/vue3';
+import { Sparkles, Target, Trophy } from 'lucide-vue-next';
+import { ref } from 'vue';
 import type { Success, UserSuccess } from '../../types/success';
 
 defineProps<{
@@ -46,7 +47,7 @@ const claimAllSuccesses = async () => {
     <template #header>
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-gradient-to-br from-info/20 to-info/40 rounded-lg flex items-center justify-center">
-          <span class="text-lg">🏆</span>
+          <Trophy :size="20" class="text-info" />
         </div>
         <div class="flex flex-col">
           <h3 class="sm:text-xl text-lg font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent">
@@ -147,7 +148,7 @@ const claimAllSuccesses = async () => {
             </div>
           </div>
           <div v-else class="flex flex-col justify-center items-center h-full min-h-[400px] text-center">
-            <p class="text-4xl mb-4">🏆</p>
+            <Trophy :size="48" class="mb-4 text-info/50" />
             <p class="text-lg font-semibold mb-1">Aucun succès à réclamer</p>
             <p class="opacity-70 text-sm">Continuez à jouer pour débloquer des succès !</p>
           </div>
@@ -193,7 +194,7 @@ const claimAllSuccesses = async () => {
             </div>
           </div>
           <div v-else class="flex flex-col justify-center items-center h-full min-h-[400px] text-center">
-            <p class="text-4xl mb-4">🎯</p>
+            <Target :size="48" class="mb-4 text-success/50" />
             <p class="text-lg font-semibold mb-1">Vous n'avez pas encore réclamé de succès</p>
             <p class="opacity-70 text-sm">Réclamez vos succès pour obtenir des récompenses !</p>
           </div>
@@ -234,7 +235,7 @@ const claimAllSuccesses = async () => {
             </div>
           </div>
           <div v-else class="flex flex-col justify-center items-center h-full min-h-[400px] text-center">
-            <p class="text-4xl mb-4">✨</p>
+            <Sparkles :size="48" class="mb-4 text-warning/50" />
             <p class="text-lg font-semibold mb-1">Tous les succès ont été débloqués !</p>
             <p class="opacity-70 text-sm">Félicitations, dresseur !</p>
           </div>

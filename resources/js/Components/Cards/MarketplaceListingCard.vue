@@ -1,12 +1,13 @@
 
 <script setup lang="ts">
-import type { MarketplaceListing, NormalizedPokemon } from '@/types/marketplace';
-import { normalizePokemonData, formatPrice, parseTypes, getPokemonImageUrl } from '@/utils/marketplace';
 import Button from '@/Components/UI/Button.vue';
+import CPBadge from '@/Components/UI/CPBadge.vue';
+import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
 import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
-import PokemonTypeBadge from '@/Components/UI/PokemonTypeBadge.vue';
-import CPBadge from '@/Components/UI/CPBadge.vue';
+import type { MarketplaceListing, NormalizedPokemon } from '@/types/marketplace';
+import { formatPrice, getPokemonImageUrl, normalizePokemonData, parseTypes } from '@/utils/marketplace';
+import { Coins, Sparkles } from 'lucide-vue-next';
 
 interface Props {
   listing: MarketplaceListing;
@@ -40,11 +41,11 @@ const getStars = () => {
   <div class="flex flex-col h-full">
     <div class="flex flex-col items-center gap-4 mb-3">
       <div class="flex w-full justify-between items-center">
-        <CPBadge :cp="listing.pokemon.cp" size="xs" :show-label="false" />
+        <CPBadge :cp="listing.pokemon.cp || 0" size="xs" :show-label="false" />
         <div class="flex items-center gap-2">
           <StarsBadge :stars="getStars()" size="sm" />
           <div v-if="pokemon.is_shiny" class="w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-            <span class="text-yellow-400 text-xs">✨</span>
+            <Sparkles :size="12" class="text-yellow-400" />
           </div>
         </div>
       </div>
@@ -94,7 +95,8 @@ const getStars = () => {
           :disabled="loading || userCash < listing.price"
           :class="userCash < listing.price ? 'opacity-50' : ''"
         >
-          💰 Acheter
+          <Coins :size="16" class="mr-1" />
+          Acheter
         </Button>
       </div>
     </div>

@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
+import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import Alert from '@/Components/UI/Alert.vue';
 import Spinner from '@/Components/UI/Spinner.vue';
+import { Head, router } from '@inertiajs/vue3';
+import {
+  PartyPopper,
+  RotateCcw,
+  Target,
+  Trophy
+} from 'lucide-vue-next';
+import { ref } from 'vue';
 
 interface Success {
   id: number;
@@ -78,7 +84,7 @@ const claimAllSuccesses = async () => {
       <div class="flex justify-center pt-4 mb-4">
         <div class="text-center">
           <h1 class="text-2xl font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            🏆 SUCCÈS
+            <Trophy :size="24" class="inline" /> SUCCÈS
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             BADGES ET RÉCOMPENSES
@@ -98,7 +104,7 @@ const claimAllSuccesses = async () => {
           <div class="shrink-0 p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
             <div class="flex justify-between items-center">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">🏆</span>
+                <Trophy :size="18" />
                 MES SUCCÈS
               </h3>
               <div class="flex items-center gap-2">
@@ -189,7 +195,7 @@ const claimAllSuccesses = async () => {
               </div>
 
               <div v-if="unclaimed_successes.length === 0" class="col-span-full text-center py-8">
-                <p class="text-2xl mb-2">🏆</p>
+                <Trophy :size="48" class="mx-auto mb-2 text-base-content/30" />
                 <p class="text-sm mb-1">Aucun succès à réclamer</p>
                 <p class="opacity-70 text-xs">Continuez à jouer pour débloquer des succès !</p>
               </div>
@@ -234,7 +240,7 @@ const claimAllSuccesses = async () => {
               </div>
 
               <div v-if="claimed_successes.length === 0" class="col-span-full text-center py-8">
-                <p class="text-2xl mb-2">🎯</p>
+                <Target :size="48" class="mx-auto mb-2 text-base-content/30" />
                 <p class="text-sm mb-1">Vous n'avez pas encore réclamé de succès</p>
                 <p class="opacity-70 text-xs">Réclamez vos succès pour obtenir des récompenses !</p>
               </div>
@@ -279,7 +285,7 @@ const claimAllSuccesses = async () => {
               </div>
 
               <div v-if="successes.length === 0" class="col-span-full text-center py-8">
-                <p class="text-2xl mb-2">🎉</p>
+                <PartyPopper :size="48" class="mx-auto mb-2 text-base-content/30" />
                 <p class="text-sm mb-1">Vous avez débloqué tous les succès disponibles !</p>
                 <p class="opacity-70 text-xs">Félicitations pour votre progression !</p>
               </div>
@@ -294,7 +300,14 @@ const claimAllSuccesses = async () => {
                 size="sm"
                 :disabled="loading"
               >
-                {{ loading ? '🔄 Chargement...' : '🏆 Réclamer tous les badges' }}
+                <span v-if="loading" class="flex items-center gap-2">
+                  <RotateCcw :size="16" class="animate-spin" />
+                  Chargement...
+                </span>
+                <span v-else class="flex items-center gap-2">
+                  <Trophy :size="16" />
+                  Réclamer tous les badges
+                </span>
               </Button>
             </div>
           </div>
@@ -308,4 +321,4 @@ const claimAllSuccesses = async () => {
       </div>
     </div>
   </div>
-</template> 
+</template>

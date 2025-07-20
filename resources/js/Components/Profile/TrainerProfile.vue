@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { User } from '@/types/user';
-import Button from '@/Components/UI/Button.vue';
 import TeamPokemonCard from '@/Components/Profile/TeamPokemonCard.vue';
+import Button from '@/Components/UI/Button.vue';
 import CPBadge from '@/Components/UI/CPBadge.vue';
 import type { Pokedex } from '@/types/pokedex';
+import type { User } from '@/types/user';
 import { calculateTeamCP } from '@/utils/cp';
+import { Shield } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 interface Props {
   user: User;
@@ -94,7 +95,7 @@ const showTeamCP = computed(() => {
         size="sm"
         class="mt-4"
       >
-        🛡️ Gérer l'équipe
+        <Shield :size="17" class="mr-1" /> Gérer l'équipe
       </Button>
     </div>
   </div>

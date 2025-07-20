@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import axios from 'axios';
-import Modal from '@/Components/UI/Modal.vue';
-import Button from '@/Components/UI/Button.vue';
 import Badge from '@/Components/UI/Badge.vue';
+import Button from '@/Components/UI/Button.vue';
+import Modal from '@/Components/UI/Modal.vue';
+import axios from 'axios';
+import { Check, ClipboardList, Gift, PartyPopper } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 
 interface DailyQuest {
   id: number;
@@ -43,7 +44,6 @@ const emit = defineEmits(['questClaimed', 'bonusClaimed']);
 
 const quests = ref<DailyQuest[]>([...props.initialQuests]);
 const stats = ref<DailyQuestStats>({ ...props.initialStats });
-const loading = ref(false);
 const claiming = ref<number | null>(null);
 const claimingBonus = ref(false);
 
@@ -135,7 +135,7 @@ const claimBonusReward = async () => {
     <template #header>
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
-          <span class="text-lg">📋</span>
+          <ClipboardList :size="20" class="text-primary" />
         </div>
         <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           Quêtes Quotidiennes
@@ -188,7 +188,8 @@ const claimBonusReward = async () => {
                     variant="success" 
                     size="sm"
                   >
-                    ✓ Terminée
+                    <Check :size="12" class="mr-1" />
+                    Terminée
                   </Badge>
                   <Badge 
                     v-else-if="quest.current_count > 0" 
@@ -240,7 +241,8 @@ const claimBonusReward = async () => {
                   size="sm"
                   disabled
                 >
-                  ✓ Réclamée
+                  <Check :size="14" class="mr-1" />
+                  Réclamée
                 </Button>
                 <Button
                   v-else
@@ -260,7 +262,7 @@ const claimBonusReward = async () => {
           class="bg-gradient-to-br from-warning/20 to-accent/20 rounded-xl p-6 border border-warning/30"
         >
           <div class="text-center">
-            <div class="text-4xl mb-3">🎉</div>
+            <PartyPopper :size="48" class="text-warning mx-auto mb-3" />
             <h4 class="text-xl font-bold text-warning mb-2">Bonus Quotidien !</h4>
             <p class="text-base-content/80 mb-4">
               Félicitations ! Vous avez terminé toutes les quêtes quotidiennes !
@@ -278,7 +280,8 @@ const claimBonusReward = async () => {
               :disabled="claimingBonus"
               :loading="claimingBonus"
             >
-              {{ claimingBonus ? 'Réclamation...' : '🎁 Récupérer le Bonus' }}
+              <Gift v-if="!claimingBonus" :size="18" class="mr-2" />
+              {{ claimingBonus ? 'Réclamation...' : 'Récupérer le Bonus' }}
             </Button>
             <Button
               v-else
@@ -286,7 +289,8 @@ const claimBonusReward = async () => {
               size="lg"
               disabled
             >
-              ✓ Bonus Réclamé
+              <Check :size="18" class="mr-1" />
+              Bonus Réclamé
             </Button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import Button from '@/Components/UI/Button.vue';
-
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { computed } from 'vue';
 interface Props {
   currentPage: number;
   totalPages: number;
@@ -42,7 +42,7 @@ const goToPage = (page: number) => {
       size="sm"
       class="hidden sm:flex"
     >
-      ««
+      <ChevronLeft :size="16" />
     </Button>
     
     <Button
@@ -51,7 +51,7 @@ const goToPage = (page: number) => {
       variant="secondary"
       size="sm"
     >
-      ‹
+      <ChevronLeft :size="16" />
     </Button>
     
     <Button
@@ -71,7 +71,7 @@ const goToPage = (page: number) => {
       variant="secondary"
       size="sm"
     >
-      ›
+      <ChevronRight :size="16" />
     </Button>
     
     <Button
@@ -81,7 +81,7 @@ const goToPage = (page: number) => {
       size="sm"
       class="hidden sm:flex"
     >
-      »»
+      <ChevronRight :size="16" />
     </Button>
   </div>
 </template>

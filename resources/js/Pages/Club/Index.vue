@@ -1,9 +1,19 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
+import ClubCard from '@/Components/Cards/ClubCard.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import ClubCard from '@/Components/Cards/ClubCard.vue';
+import { Head, router } from '@inertiajs/vue3';
+import {
+  BarChart3,
+  Crown,
+  Lightbulb,
+  Plus,
+  RotateCcw,
+  Search,
+  Settings,
+  Trophy
+} from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 
 interface Club {
   id: number;
@@ -102,7 +112,7 @@ const resetFilters = () => {
       <div class="flex justify-center pt-8 px-4">
         <div class="text-center">
           <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            🏆 CLUBS
+            CLUBS
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             REJOIGNEZ OU CRÉEZ VOTRE CLUB
@@ -124,7 +134,7 @@ const resetFilters = () => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
             <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">🔍</span>
+                <Search :size="16" class="inline" />
                 FILTRES
               </h3>
             </div>
@@ -162,7 +172,7 @@ const resetFilters = () => {
                 size="sm"
                 class="w-full"
               >
-                🔄 Réinitialiser
+                <RotateCcw :size="16" class="inline" /> Réinitialiser
               </Button>
             </div>
           </div>
@@ -170,7 +180,7 @@ const resetFilters = () => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">📊</span>
+                <BarChart3 :size="16" class="inline" />
                 STATISTIQUES
               </h3>
             </div>
@@ -193,7 +203,7 @@ const resetFilters = () => {
             <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
               <div class="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
                 <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                  <span class="text-lg">👑</span>
+                  <Crown :size="16" class="inline" />
                   VOTRE CLUB
                 </h3>
               </div>
@@ -230,7 +240,7 @@ const resetFilters = () => {
             <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
               <div class="flex items-center justify-between">
                 <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                  <span class="text-lg">🏆</span>
+                  <Trophy :size="16" class="inline" />
                   CLUBS DISPONIBLES
                 </h3>
                 <Button
@@ -239,7 +249,7 @@ const resetFilters = () => {
                   variant="primary"
                   size="sm"
                 >
-                  ➕ Créer un Club
+                  <Plus :size="16" class="inline" /> Créer un Club
                 </Button>
               </div>
             </div>
@@ -258,7 +268,7 @@ const resetFilters = () => {
               </div>
 
               <div v-else class="text-center py-12">
-                <div class="text-6xl mb-4">🔍</div>
+                <div class="text-6xl mb-4"><Search :size="36" class="inline" /></div>
                 <h3 class="text-lg font-bold mb-2">Aucun club trouvé</h3>
                 <p class="text-base-content/70 mb-4">Essayez de modifier vos critères de recherche.</p>
                 <Button @click="resetFilters" variant="primary">
@@ -313,7 +323,7 @@ const resetFilters = () => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
             <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">⚙️</span>
+                <Settings :size="16" class="inline" />
                 ACTIONS
               </h3>
             </div>
@@ -326,7 +336,7 @@ const resetFilters = () => {
                 size="sm"
                 class="w-full"
               >
-                🏗️ Créer un Club
+                <Plus :size="16" class="inline" /> Créer un Club
               </Button>
               
               <Button
@@ -336,7 +346,7 @@ const resetFilters = () => {
                 size="sm"
                 class="w-full"
               >
-                👑 Mon Club
+                <Crown :size="16" class="inline" /> Mon Club
               </Button>
 
               <Button
@@ -345,7 +355,7 @@ const resetFilters = () => {
                 size="sm"
                 class="w-full"
               >
-                🔄 Actualiser
+                <RotateCcw :size="16" class="inline" /> Actualiser
               </Button>
             </div>
           </div>
@@ -353,7 +363,7 @@ const resetFilters = () => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-accent/10 to-accent/5 border-b border-accent/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">💡</span>
+                <Lightbulb :size="16" class="inline" />
                 GUIDE
               </h3>
             </div>

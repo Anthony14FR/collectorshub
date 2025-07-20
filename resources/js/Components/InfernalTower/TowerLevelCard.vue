@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import CPBadge from '@/Components/UI/CPBadge.vue';
-import Button from '@/Components/UI/Button.vue';
 import Badge from '@/Components/UI/Badge.vue';
-import ProgressBar from '@/Components/UI/ProgressBar.vue';
+import Button from '@/Components/UI/Button.vue';
+import { Circle, CircleDot, Coins, Star, Sword, X } from 'lucide-vue-next';
 
 interface TowerPokemon {
   pokemon_id: number;
@@ -32,7 +31,7 @@ interface Props {
   isAttempting?: boolean;
 }
 
-const props = defineProps<Props>();
+const { level, isCurrentLevel, onAttempt, dailyDefeats, isAttempting = false } = defineProps<Props>();
 
 const getSuccessRateColor = (rate: number) => {
   if (rate >= 80) return 'success';
@@ -158,28 +157,28 @@ const getSuccessRateColor = (rate: number) => {
               v-if="level.rewards.pokeballs && level.rewards.pokeballs > 0"
               class="flex items-center gap-2 bg-base-200/60 rounded-lg px-2 py-2 text-xs sm:text-sm border border-base-300/30"
             >
-              <img src="/images/items/pokeball.png" alt="Pokeball" class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <Circle :size="20" class="text-primary flex-shrink-0" />
               <span class="text-base-content font-medium">{{ level.rewards.pokeballs }}</span>
             </div>
             <div 
               v-if="level.rewards.masterballs && level.rewards.masterballs > 0"
               class="flex items-center gap-2 bg-base-200/60 rounded-lg px-2 py-2 text-xs sm:text-sm border border-base-300/30"
             >
-              <img src="/images/items/masterball.png" alt="Masterball" class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <CircleDot :size="20" class="text-secondary flex-shrink-0" />
               <span class="text-base-content font-medium">{{ level.rewards.masterballs }}</span>
             </div>
             <div 
               v-if="level.rewards.money && level.rewards.money > 0"
               class="flex items-center gap-2 bg-base-200/60 rounded-lg px-2 py-2 text-xs sm:text-sm border border-base-300/30"
             >
-              <span class="text-yellow-500 font-bold text-base sm:text-lg flex-shrink-0">💰</span>
+              <Coins :size="20" class="text-warning flex-shrink-0" />
               <span class="text-base-content font-medium">{{ level.rewards.money.toLocaleString() }}</span>
             </div>
             <div 
               v-if="level.rewards.exp && level.rewards.exp > 0"
               class="flex items-center gap-2 bg-base-200/60 rounded-lg px-2 py-2 text-xs sm:text-sm border border-base-300/30"
             >
-              <span class="text-blue-500 font-bold text-base sm:text-lg flex-shrink-0">⭐</span>
+              <Star :size="20" class="text-info flex-shrink-0" />
               <span class="text-base-content font-medium">{{ level.rewards.exp }} EXP</span>
             </div>
           </div>
@@ -210,9 +209,18 @@ const getSuccessRateColor = (rate: number) => {
             size="lg"
             class="w-full"
           >
-            <span v-if="isAttempting">⚔️ Combat...</span>
-            <span v-else-if="dailyDefeats > 0">⚔️ Combattre</span>
-            <span v-else>🚫 Épuisé</span>
+            <span v-if="isAttempting" class="flex items-center gap-2">
+              <Sword :size="16" />
+              Combat...
+            </span>
+            <span v-else-if="dailyDefeats > 0" class="flex items-center gap-2">
+              <Sword :size="16" />
+              Combattre
+            </span>
+            <span v-else class="flex items-center gap-2">
+              <X :size="16" />
+              Épuisé
+            </span>
           </Button>
         </div>
 
@@ -238,9 +246,18 @@ const getSuccessRateColor = (rate: number) => {
             size="lg"
             class="flex-shrink-0 min-w-[180px]"
           >
-            <span v-if="isAttempting">⚔️ Combat...</span>
-            <span v-else-if="dailyDefeats > 0">⚔️ Combattre</span>
-            <span v-else">🚫 Épuisé</span>
+            <span v-if="isAttempting" class="flex items-center gap-2">
+              <Sword :size="16" />
+              Combat...
+            </span>
+            <span v-else-if="dailyDefeats > 0" class="flex items-center gap-2">
+              <Sword :size="16" />
+              Combattre
+            </span>
+            <span v-else class="flex items-center gap-2">
+              <X :size="16" />
+              Épuisé
+            </span>
           </Button>
         </div>
         

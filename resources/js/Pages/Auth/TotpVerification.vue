@@ -8,7 +8,7 @@
       <div class="max-w-lg w-full bg-base-100/90 backdrop-blur-sm rounded-2xl shadow-xl border border-base-300/30 p-4 sm:p-8">
         <div class="text-center mb-8">
           <div class="w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span class="text-2xl">🔐</span>
+            <Lock :size="32" class="text-primary" />
           </div>
           <h1 class="text-3xl font-bold text-base-content mb-2">
             Vérification requise
@@ -21,7 +21,7 @@
         <div class="space-y-6">
           <div class="bg-info/10 border border-info/30 rounded-lg p-4">
             <div class="flex gap-3">
-              <span class="text-info text-xl">ℹ️</span>
+              <Info :size="20" class="text-info" />
               <div>
                 <h3 class="font-semibold text-info mb-1">Authentification à deux facteurs</h3>
                 <p class="text-sm text-info/80">
@@ -73,12 +73,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue'
 import Button from '@/Components/UI/Button.vue'
 import Input from '@/Components/UI/Input.vue'
 import { useMatomoTracking } from '@/composables/useMatomoTracking'
+import { Head, router } from '@inertiajs/vue3'
+import { Info, Lock } from 'lucide-vue-next'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const processing = ref(false)
 const verificationCode = ref('')

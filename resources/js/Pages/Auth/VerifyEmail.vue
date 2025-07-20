@@ -1,10 +1,20 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
+import Alert from '@/Components/UI/Alert.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import Alert from '@/Components/UI/Alert.vue';
 import { useMatomoTracking } from '@/composables/useMatomoTracking';
+import { Head, Link, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  Clock,
+  Gamepad2,
+  Lightbulb,
+  LogOut,
+  Mail,
+  RotateCcw,
+  Sparkles, Zap
+} from 'lucide-vue-next';
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 
 interface Props {
   status?: string;
@@ -95,14 +105,14 @@ onUnmounted(() => {
       <div class="w-full max-w-lg">
         <div class="text-center mb-8">
           <Link href="/" class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:from-secondary hover:to-primary transition-all duration-300 tracking-wider">
-            🎮 CollectorsHub
+            <Gamepad2 :size="32" class="inline" /> CollectorsHub
           </Link>
           <div class="mt-6">
             <h2 class="text-2xl font-bold text-base-content tracking-wider">
               VÉRIFICATION EMAIL
             </h2>
             <p class="mt-2 text-sm text-base-content/70">
-              Votre aventure vous attend ! ✨
+              Votre aventure vous attend ! <Sparkles :size="16" class="inline" />
             </p>
           </div>
         </div>
@@ -114,7 +124,7 @@ onUnmounted(() => {
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
           <div class="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">⚡</span>
+              <Zap :size="18" />
               ACTIVATION REQUISE
             </h3>
           </div>
@@ -131,8 +141,9 @@ onUnmounted(() => {
               </p>
               
               <div class="bg-info/10 border border-info/30 rounded-lg p-4">
-                <p class="text-info text-sm">
-                  💡 <strong>Astuce :</strong> Vérifiez vos spams si vous ne trouvez pas l'email !
+                <p class="text-info text-sm flex items-center gap-2">
+                  <Lightbulb :size="16" />
+                  <strong>Astuce :</strong> Vérifiez vos spams si vous ne trouvez pas l'email !
                 </p>
               </div>
             </div>
@@ -153,11 +164,11 @@ onUnmounted(() => {
                   Envoi en cours...
                 </span>
                 <span v-else-if="remainingTime > 0" class="flex items-center justify-center">
-                  <span class="text-lg mr-2">⏱️</span>
+                  <Clock :size="18" class="mr-2" />
                   Renvoyer dans {{ remainingTime }}s
                 </span>
                 <span v-else class="flex items-center justify-center">
-                  <span class="text-lg mr-2">🔄</span>
+                  <RotateCcw :size="18" class="mr-2" />
                   Renvoyer l'email de vérification
                 </span>
               </Button>
@@ -174,7 +185,7 @@ onUnmounted(() => {
                 size="sm"
                 class="w-full"
               >
-                <span class="text-lg mr-2">🚪</span>
+                <LogOut :size="18" class="mr-2" />
                 Se déconnecter
               </Button>
             </div>
@@ -191,14 +202,15 @@ onUnmounted(() => {
               href="mailto:contact@collectorshub.fr"
               class="inline-flex items-center text-sm text-primary hover:text-secondary transition-colors"
             >
-              <span class="text-lg mr-2">📧</span>
+              <Mail :size="16" class="mr-2" />
               contact@collectorshub.fr
             </a>
           </div>
 
           <div class="text-center">
-            <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors">
-              ← Retour à l'accueil
+            <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors inline-flex items-center">
+              <ArrowLeft :size="16" class="mr-1" />
+              Retour à l'accueil
             </Link>
           </div>
         </div>

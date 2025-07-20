@@ -12,6 +12,19 @@ import Spinner from '@/Components/UI/Spinner.vue';
 import { useMarketplace } from '@/composables/useMarketplace';
 import type { MarketplaceListing } from '@/types/marketplace';
 import { Head, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Package,
+  RotateCcw,
+  Search,
+  Settings,
+  ShoppingCart,
+  Store,
+  Tag,
+  Trash2
+} from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
 interface Props {
@@ -101,7 +114,7 @@ onMounted(() => {
         <div class="text-center">
           <h1
             class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            🏪 MARKETPLACE
+            <Store :size="24" class="inline" /> MARKETPLACE
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             POKÉMONS À VENDRE
@@ -112,12 +125,12 @@ onMounted(() => {
       <div class="flex flex-col lg:flex-row gap-4 p-4 lg:p-8">
         <div class="w-full lg:w-64 order-1 lg:order-1">
           <Button @click="router.visit('/me')" variant="secondary" size="sm" class="w-full mb-4">
-            ← Retour vers le menu
+            <ArrowLeft :size="16" class="inline" /> Retour vers le menu
           </Button>
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden mb-4">
             <div class="p-3 bg-gradient-to-r from-info/10 to-info/5 border-b border-info/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">🔍</span>
+                <Search :size="16" class="inline" />
                 FILTRES
               </h3>
             </div>
@@ -132,7 +145,8 @@ onMounted(() => {
                      size="sm" />
 
               <Button @click="applyFilters" variant="secondary" size="sm" :disabled="loading" class="w-full">
-                {{ loading ? '🔄' : '🔍' }} Filtrer
+                <RotateCcw v-if="loading" :size="16" class="inline" />
+                <Search v-else :size="16" class="inline" /> Filtrer
               </Button>
             </div>
           </div>
@@ -150,7 +164,7 @@ onMounted(() => {
             class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden h-[600px] lg:h-[800px] flex flex-col sm:max-w-[1000px] mx-auto">
             <div class="shrink-0 p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-b border-warning/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">📦</span>
+                <Package :size="16" class="inline" />
                 MARKETPLACE
               </h3>
             </div>
@@ -170,7 +184,7 @@ onMounted(() => {
               </div>
 
               <div v-else class="text-center py-8">
-                <p class="text-2xl mb-2">🛒</p>
+                <ShoppingCart :size="32" class="mx-auto mb-2 text-base-content/30" />
                 <p class="text-sm mb-1">Aucun Pokémon en vente</p>
                 <p class="opacity-70 text-xs">Revenez plus tard !</p>
               </div>
@@ -180,7 +194,7 @@ onMounted(() => {
                  class="shrink-0 bg-gradient-to-r from-warning/10 to-warning/5 px-4 py-3 border-t border-warning/20">
               <div class="flex justify-center items-center gap-2">
                 <Button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" variant="ghost" size="sm">
-                  ←
+                  <ChevronLeft :size="16" />
                 </Button>
 
                 <span v-for="page in totalPages" :key="page">
@@ -192,7 +206,7 @@ onMounted(() => {
 
                 <Button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" variant="ghost"
                         size="sm">
-                  →
+                  <ChevronRight :size="16" />
                 </Button>
               </div>
             </div>
@@ -212,14 +226,14 @@ onMounted(() => {
           <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
             <div class="p-3 bg-gradient-to-r from-secondary/10 to-accent/5 border-b border-secondary/20">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">⚙️</span>
+                <Settings :size="16" class="inline" />
                 ACTIONS
               </h3>
             </div>
 
             <div class="p-3">
               <Button @click="router.visit('/marketplace/sell')" variant="secondary" size="sm" class="w-full">
-                🏷️ Vendre
+                <Tag :size="16" class="inline" /> Vendre
               </Button>
             </div>
           </div>
@@ -246,7 +260,7 @@ onMounted(() => {
           <div class="flex items-center gap-3">
             <div
               class="w-8 h-8 bg-gradient-to-br from-error/20 to-error/40 rounded-lg flex items-center justify-center">
-              <span class="text-lg">🗑️</span>
+              <span class="text-lg"><Trash2 :size="20" /></span>
             </div>
             <div class="flex flex-col">
               <h3 class="text-xl font-bold bg-gradient-to-r from-error to-error/80 bg-clip-text text-transparent">
@@ -274,7 +288,8 @@ onMounted(() => {
 
               <Button @click="confirmCancel" variant="outline" size="lg"
                       class="flex-1 !border-error !text-error hover:!bg-error hover:!text-white" :disabled="loading">
-                {{ loading ? '🔄 En cours...' : '🗑️ Confirmer' }}
+                <RotateCcw v-if="loading" :size="16" class="inline" />
+                <Trash2 v-else :size="16" class="inline" /> {{ loading ? 'En cours...' : 'Confirmer' }}
               </Button>
             </div>
           </div>

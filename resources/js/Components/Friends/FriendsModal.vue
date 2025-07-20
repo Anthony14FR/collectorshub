@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import axios from "axios";
-import { router } from "@inertiajs/vue3";
-import FriendsCard from "./FriendsCard.vue";
-import Modal from "@/Components/UI/Modal.vue";
-import Button from "@/Components/UI/Button.vue";
-import Input from "@/Components/UI/Input.vue";
 import Avatar from "@/Components/UI/Avatar.vue";
 import Badge from "@/Components/UI/Badge.vue";
-import type { UserFriend, FriendRequest } from "@/types/friend";
+import Button from "@/Components/UI/Button.vue";
+import Input from "@/Components/UI/Input.vue";
+import Modal from "@/Components/UI/Modal.vue";
+import type { FriendRequest, UserFriend } from "@/types/friend";
 import type { User } from "@/types/user";
+import { router } from "@inertiajs/vue3";
+import axios from "axios";
+import { Check, Clock, Gift, Mail, Plus, RefreshCw, Search, Users, X } from 'lucide-vue-next';
+import { ref, watch } from "vue";
+import FriendsCard from "./FriendsCard.vue";
+
+type SimpleUser = {
+  id: number;
+  username: string;
+  level: number;
+  avatar?: string;
+};
+
+type ExtendedUserFriend = UserFriend & {
+  hasSentGiftToday?: boolean;
+};
 
 const props = defineProps<{
   show: boolean;
@@ -34,7 +46,7 @@ const pendingRequests = ref<FriendRequest[]>([]);
 const loadingPending = ref(false);
 const hasSearched = ref(false);
 
-const localFriends = ref<UserFriend[]>([]);
+const localFriends = ref<ExtendedUserFriend[]>([]);
 const localFriendRequests = ref<FriendRequest[]>([]);
 const localSuggestions = ref<User[]>([]);
 
@@ -83,7 +95,7 @@ const handleSearch = async () => {
       params: { query: searchQuery.value.trim() },
     });
     
-    const filtered = data.results.filter(user => user.id !== props.currentUserId);
+    const filtered = data.results.filter((user: User) => user.id !== props.currentUserId);
     searchResults.value = filtered;
   } catch (error) {
     searchResults.value = [];
@@ -105,7 +117,7 @@ const refreshSuggestions = async () => {
     if (data.success) {
       localFriends.value = data.friends;
       localFriendRequests.value = data.friend_requests;
-      localSuggestions.value = data.suggestions.filter(user => user.id !== props.currentUserId);
+      localSuggestions.value = data.suggestions.filter((user: User) => user.id !== props.currentUserId);
       pendingRequests.value = data.pending_requests || [];
       
       emit('dataRefreshed', {
@@ -121,7 +133,7 @@ const refreshSuggestions = async () => {
         await handleSearch();
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     if (error.response?.status === 429) {
       const remainingTime = error.response.data.remaining_time || REFRESH_COOLDOWN;
       refreshCountdown.value = Math.ceil(remainingTime);
@@ -163,7 +175,7 @@ const handleClose = () => {
   props.onClose();
 };
 
-const acceptRequest = (requesterId) => {
+const acceptRequest = (requesterId: number) => {
   const acceptedRequest = localFriendRequests.value.find(req => req.user.id === requesterId);
   
   router.post(
@@ -182,10 +194,12 @@ const acceptRequest = (requesterId) => {
             username: acceptedRequest.user.username,
             level: acceptedRequest.user.level,
             avatar: acceptedRequest.user.avatar,
+            isOnCooldown: false,
+            nextGiftAvailableAt: null,
             hasSentGiftToday: false,
             hasGiftToClaim: false,
-            giftId: null
-          });
+            giftId: undefined
+          } as ExtendedUserFriend);
         }
         
         emit('dataRefreshed', {
@@ -198,7 +212,7 @@ const acceptRequest = (requesterId) => {
   );
 };
 
-const refuseRequest = (targetId) => {
+const refuseRequest = (targetId: number) => {
   router.post(
     "/friends/remove",
     { target_id: targetId },
@@ -213,7 +227,7 @@ const refuseRequest = (targetId) => {
   );
 };
 
-const sendFriendRequest = (targetId) => {
+const sendFriendRequest = (targetId: number) => {
   const userToAdd = searchResults.value.find(u => u.id === targetId) || 
     localSuggestions.value.find(u => u.id === targetId);
   
@@ -246,7 +260,7 @@ const sendFriendRequest = (targetId) => {
   );
 };
 
-const cancelPendingRequest = (targetId) => {
+const cancelPendingRequest = (targetId: number) => {
   router.post(
     "/friends/remove",
     { target_id: targetId },
@@ -261,7 +275,7 @@ const cancelPendingRequest = (targetId) => {
   );
 };
 
-const sendGift = (friendId) => {
+const sendGift = (friendId: number) => {
   router.post(
     "/friend-gifts/send",
     { receiver_id: friendId },
@@ -275,6 +289,7 @@ const sendGift = (friendId) => {
           localFriends.value[friendIndex] = {
             ...localFriends.value[friendIndex],
             isOnCooldown: true,
+            hasSentGiftToday: true,
             nextGiftAvailableAt: nextAvailableTime.toISOString(),
           };
         }
@@ -283,7 +298,7 @@ const sendGift = (friendId) => {
   );
 };
 
-const claimGift = (giftId) => {
+const claimGift = (giftId: number) => {
   router.post(
     "/friend-gifts/claim",
     { gift_id: giftId },
@@ -293,7 +308,7 @@ const claimGift = (giftId) => {
         const friendIndex = localFriends.value.findIndex(f => f.giftId === giftId);
         if (friendIndex !== -1) {
           localFriends.value[friendIndex].hasGiftToClaim = false;
-          localFriends.value[friendIndex].giftId = null;
+          localFriends.value[friendIndex].giftId = undefined;
         }
       }
     }
@@ -310,7 +325,7 @@ const claimAllGifts = () => {
         localFriends.value.forEach(friend => {
           if (friend.hasGiftToClaim) {
             friend.hasGiftToClaim = false;
-            friend.giftId = null;
+            friend.giftId = undefined;
           }
         });
       }
@@ -332,6 +347,7 @@ const sendGiftToAll = () => {
             return {
               ...friend,
               isOnCooldown: true,
+              hasSentGiftToday: true,
               nextGiftAvailableAt: nextAvailableTime.toISOString(),
             };
           } else {
@@ -343,7 +359,7 @@ const sendGiftToAll = () => {
   );
 };
 
-const removeFriend = (friendId) => {
+const removeFriend = (friendId: number) => {
   router.post(
     "/friends/remove",
     { target_id: friendId },
@@ -356,7 +372,7 @@ const removeFriend = (friendId) => {
   );
 };
 
-const getAvatarSrc = (user: User) => {
+const getAvatarSrc = (user: User | SimpleUser) => {
   return user.avatar || `/images/trainer/${(user.id % 10) + 1}.png`;
 };
 </script>
@@ -366,7 +382,7 @@ const getAvatarSrc = (user: User) => {
     <template #header>
       <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-3">
         <div class="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center mb-2 sm:mb-0">
-          <span class="text-2xl">👥</span>
+          <Users :size="24" class="text-primary" />
         </div>
         <div class="flex-1 text-center sm:text-left">
           <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
@@ -385,10 +401,12 @@ const getAvatarSrc = (user: User) => {
           class="mt-2 sm:mt-0 sm:mr-10 w-full sm:w-auto"
         >
           <span v-if="refreshCountdown > 0">
-            🔄 Attendre {{ refreshCountdown }}s
+            <RefreshCw :size="16" />
+            Attendre {{ refreshCountdown }}s
           </span>
           <span v-else>
-            🔄 Rafraîchir
+            <RefreshCw :size="16" />
+            Rafraîchir
           </span>
         </Button>
       </div>
@@ -401,7 +419,7 @@ const getAvatarSrc = (user: User) => {
           class="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           :class="activeTab === 'friends' ? 'text-primary border-b-2 border-primary' : 'text-base-content/70 hover:text-base-content'"
         >
-          <span>👥</span>
+          <Users :size="16" />
           Amis ({{ props.friends.length }})
         </button>
         
@@ -410,7 +428,7 @@ const getAvatarSrc = (user: User) => {
           class="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           :class="activeTab === 'requests' ? 'text-warning border-b-2 border-warning' : 'text-base-content/70 hover:text-base-content'"
         >
-          <span>📨</span>
+          <Mail :size="16" />
           Demandes reçues ({{ props.friend_requests.length }})
           <Badge v-if="props.friend_requests.length > 0" variant="warning" size="xs">{{ props.friend_requests.length }}</Badge>
         </button>
@@ -420,7 +438,7 @@ const getAvatarSrc = (user: User) => {
           class="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           :class="activeTab === 'pending' ? 'text-info border-b-2 border-info' : 'text-base-content/70 hover:text-base-content'"
         >
-          <span>⏳</span>
+          <Clock :size="16" />
           En attente ({{ pendingRequests.length }})
           <Badge v-if="pendingRequests.length > 0" variant="info" size="xs">{{ pendingRequests.length }}</Badge>
         </button>
@@ -430,7 +448,7 @@ const getAvatarSrc = (user: User) => {
           class="px-2 sm:px-4 py-2 sm:py-3 text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           :class="activeTab === 'search' ? 'text-success border-b-2 border-success' : 'text-base-content/70 hover:text-base-content'"
         >
-          <span>🔍</span>
+          <Search :size="16" />
           Rechercher
         </button>
       </div>
@@ -445,12 +463,12 @@ const getAvatarSrc = (user: User) => {
               <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
                 <div class="flex items-center gap-4 text-sm text-base-content/70">
                   <div class="flex items-center gap-1">
-                    <span class="text-success">🎁</span>
+                    <Gift :size="16" class="text-success" />
                     <span>{{ localFriends.filter(f => f.hasGiftToClaim).length }} cadeaux</span>
                   </div>
                   <div class="flex items-center gap-1">
-                    <span class="text-warning">✉️</span>
-                    <span>{{ localFriends.filter(f => f.hasSentGiftToday).length }} envoyés</span>
+                    <Mail :size="16" class="text-warning" />
+                    <span>{{ localFriends.filter(f => f.hasSentGiftToday || false).length }} envoyés</span>
                   </div>
                 </div>
                 
@@ -462,17 +480,19 @@ const getAvatarSrc = (user: User) => {
                     size="sm"
                     class="w-full sm:w-auto"
                   >
-                    🎁 Tout récupérer
+                    <Gift :size="16" />
+                    Tout récupérer
                   </Button>
                   
                   <Button
-                    v-if="localFriends.filter(f => !f.hasSentGiftToday).length > 0"
+                    v-if="localFriends.filter(f => !(f.hasSentGiftToday || false)).length > 0"
                     @click="sendGiftToAll"
                     variant="primary"
                     size="sm"
                     class="w-full sm:w-auto"
                   >
-                    💝 Envoyer à tous
+                    <Mail :size="16" />
+                    Envoyer à tous
                   </Button>
                 </div>
               </div>
@@ -492,7 +512,7 @@ const getAvatarSrc = (user: User) => {
           
           <div v-else class="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
             <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mb-4">
-              <span class="text-3xl sm:text-4xl">👥</span>
+              <Users :size="48" class="text-primary" />
             </div>
             <h3 class="text-lg sm:text-xl font-bold text-base-content mb-2">Aucun ami pour le moment</h3>
             <p class="text-base-content/70 mb-4">Commencez à ajouter des amis pour partager des cadeaux !</p>
@@ -535,15 +555,17 @@ const getAvatarSrc = (user: User) => {
                       @click="acceptRequest(req.user.id)"
                       class="w-1/2 sm:w-auto"
                     >
-                      ✅ Accepter
+                      <Check :size="16" />
+                      Accepter
                     </Button>
                     <Button
                       size="sm"
-                      variant="error"
+                      variant="secondary"
                       @click="refuseRequest(req.user.id)"
                       class="w-1/2 sm:w-auto"
                     >
-                      ❌ Refuser
+                      <X :size="16" />
+                      Refuser
                     </Button>
                   </div>
                 </div>
@@ -553,7 +575,7 @@ const getAvatarSrc = (user: User) => {
           
           <div v-else class="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
             <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
-              <span class="text-3xl sm:text-4xl">📨</span>
+              <Mail :size="48" class="text-info" />
             </div>
             <h3 class="text-lg sm:text-xl font-bold text-base-content mb-2">Aucune demande</h3>
             <p class="text-base-content/70">Vous n'avez pas de demande d'ami en attente.</p>
@@ -596,11 +618,12 @@ const getAvatarSrc = (user: User) => {
                   <div class="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
                     <Button
                       size="sm"
-                      variant="error"
+                      variant="secondary"
                       @click="cancelPendingRequest(req.user.id)"
                       class="w-full sm:w-auto"
                     >
-                      ❌ Annuler
+                      <X :size="16" />
+                      Annuler
                     </Button>
                   </div>
                 </div>
@@ -610,7 +633,7 @@ const getAvatarSrc = (user: User) => {
           
           <div v-else class="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
             <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
-              <span class="text-3xl sm:text-4xl">⏳</span>
+              <Clock :size="48" class="text-info" />
             </div>
             <h3 class="text-lg sm:text-xl font-bold text-base-content mb-2">Aucune demande en attente</h3>
             <p class="text-base-content/70">Vous n'avez envoyé aucune demande d'ami en attente.</p>
@@ -630,10 +653,11 @@ const getAvatarSrc = (user: User) => {
                 <Button
                   @click="handleSearch"
                   :loading="loadingSearch"
-                  variant="info"
+                  variant="primary"
                   class="w-full sm:w-auto"
                 >
-                  🔍 Rechercher
+                  <Search :size="16" />
+                  Rechercher
                 </Button>
               </div>
             </div>
@@ -665,7 +689,8 @@ const getAvatarSrc = (user: User) => {
                       @click="sendFriendRequest(user.id)"
                       class="w-full sm:w-auto"
                     >
-                      ➕ Ajouter
+                      <Plus :size="16" />
+                      Ajouter
                     </Button>
                   </div>
                 </div>
@@ -675,7 +700,7 @@ const getAvatarSrc = (user: User) => {
             <div v-else-if="hasSearched && !loadingSearch && searchResults.length === 0" class="space-y-4">
               <div class="flex flex-col items-center justify-center py-10 sm:py-12 text-center">
                 <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-error/20 to-error/30 rounded-full flex items-center justify-center mb-4">
-                  <span class="text-3xl sm:text-4xl">🔍</span>
+                  <Search :size="32" class="text-error" />
                 </div>
                 <h3 class="text-base sm:text-lg font-bold text-base-content mb-2">Aucun utilisateur trouvé</h3>
                 <p class="text-base-content/70 mb-4">
@@ -719,7 +744,8 @@ const getAvatarSrc = (user: User) => {
                       @click="sendFriendRequest(user.id)"
                       class="w-full"
                     >
-                      ➕ Ajouter
+                      <Plus :size="16" />
+                      Ajouter
                     </Button>
                   </div>
                 </div>
@@ -728,7 +754,7 @@ const getAvatarSrc = (user: User) => {
             
             <div v-else-if="!loadingSearch && !searchResults.length" class="flex flex-col items-center justify-center py-10 sm:py-16 text-center">
               <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-info/20 to-info/40 rounded-full flex items-center justify-center mb-4">
-                <span class="text-3xl sm:text-4xl">🔍</span>
+                <Search :size="48" class="text-info" />
               </div>
               <h3 class="text-lg sm:text-xl font-bold text-base-content mb-2">Recherchez des amis</h3>
               <p class="text-base-content/70">Utilisez la barre de recherche pour trouver d'autres joueurs !</p>

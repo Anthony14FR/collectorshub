@@ -4,6 +4,7 @@ import Button from "@/Components/UI/Button.vue";
 import Modal from "@/Components/UI/Modal.vue";
 import type { AvailableLevelReward, GroupedReward, LevelRewardPreview, PreviewLevelReward, User } from '@/types/user';
 import { router } from "@inertiajs/vue3";
+import { Gift, Mail, Trophy, Zap } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
 interface Props {
@@ -106,7 +107,7 @@ const groupedNext = computed(() =>
           <div class="relative">
             <Button @click="router.visit('/notifications')" variant="secondary" size="sm"
                     class="relative group rounded-lg shadow-lg shadow-secondary/10">
-              <span class="text-sm">📬</span>
+              <Mail :size="16" />
             </Button>
             <div v-if="unreadNotificationsCount > 0" class="absolute -top-1 -right-1">
               <span class="relative flex h-3 w-3">
@@ -121,7 +122,7 @@ const groupedNext = computed(() =>
           <div class="relative">
             <Button @click="openModal" variant="secondary" size="sm"
                     class="relative group rounded-lg shadow-lg shadow-primary/10">
-              <span class="text-sm">🎁</span>
+              <Gift :size="16" />
             </Button>
             <div v-if="hasAvailableReward" class="absolute -top-1 -right-1">
               <span class="relative flex h-3 w-3">
@@ -195,7 +196,7 @@ const groupedNext = computed(() =>
         <div class="flex items-center gap-3">
           <div
             class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-            <span class="text-lg">🏆</span>
+            <Trophy :size="20" class="text-warning" />
           </div>
           <div class="flex flex-col">
             <h3
@@ -213,7 +214,7 @@ const groupedNext = computed(() =>
         <div class="space-y-6">
           <div v-if="level_rewards_to_claim.length > 0" class="flex justify-center">
             <Button @click="claimAllRewards" variant="primary" class="w-full max-w-xs">
-              <span class="text-sm sm:text-xl mr-2">⚡</span>
+              <Zap :size="20" class="mr-2" />
               Tout réclamer ({{ level_rewards_to_claim.length }})
             </Button>
           </div>
@@ -225,7 +226,7 @@ const groupedNext = computed(() =>
                 <div class="flex items-start gap-3">
                   <div
                     class="w-14 h-14 shrink-0 bg-warning/20 rounded-lg overflow-hidden flex items-center justify-center animate-pulse">
-                    <span class="text-2xl">🎁</span>
+                    <Gift :size="32" class="text-warning" />
                   </div>
                   <div class="flex-1">
                     <h3 class="font-bold text-base-content group-hover:text-warning transition-colors">
@@ -269,7 +270,7 @@ const groupedNext = computed(() =>
                 <div class="flex items-start gap-3">
                   <div
                     class="w-14 h-14 shrink-0 bg-primary/20 rounded-lg overflow-hidden flex items-center justify-center">
-                    <span class="text-2xl opacity-60">🎁</span>
+                    <Gift :size="32" class="text-primary/60" />
                   </div>
                   <div class="flex-1">
                     <h3 class="font-bold text-base-content group-hover:text-primary transition-colors">
@@ -314,7 +315,7 @@ const groupedNext = computed(() =>
                 <div class="flex items-start gap-3">
                   <div
                     class="w-14 h-14 shrink-0 bg-success/20 rounded-lg overflow-hidden flex items-center justify-center">
-                    <span class="text-2xl opacity-70">🎁</span>
+                    <Gift :size="32" class="text-success/70" />
                   </div>
                   <div class="flex-1">
                     <h3 class="font-bold text-base-content group-hover:text-success transition-colors">

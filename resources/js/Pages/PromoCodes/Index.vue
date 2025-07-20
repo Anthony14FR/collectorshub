@@ -4,9 +4,10 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import { Head, router } from '@inertiajs/vue3';
-import { computed, ref, watch } from 'vue';
 import { useMatomoTracking } from '@/composables/useMatomoTracking';
+import { Head, router } from '@inertiajs/vue3';
+import { AlertTriangle, Gift, Lightbulb, Package, PartyPopper, Sparkles, Ticket } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 
 interface Props {
   promoCodes?: any[];
@@ -162,7 +163,7 @@ watch(() => props.flash, (newFlash) => {
         <div class="text-center">
           <h1
             class="text-2xl font-bold bg-gradient-to-r from-success to-primary bg-clip-text text-transparent mb-1 tracking-wider">
-            🎟️ CODES PROMO
+            <Ticket :size="24" class="inline" /> CODES PROMO
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             RÉCOMPENSES EXCLUSIVES
@@ -186,12 +187,12 @@ watch(() => props.flash, (newFlash) => {
           <div class="shrink-0 p-3 bg-gradient-to-r from-success/10 to-primary/5 border-b border-success/20">
             <div class="flex justify-between items-center">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">✨</span>
+                <Sparkles :size="18" />
                 UTILISER UN CODE
               </h3>
               <div class="flex items-center gap-2">
                 <div class="text-xs text-base-content/70">Solde:</div>
-                <div class="text-xs font-bold text-primary">{{ formatCash(props.auth?.user?.cash || 0) }} 💰</div>
+                <div class="text-xs font-bold text-primary">{{ formatCash(props.auth?.user?.cash || 0) }} <Coins :size="12" class="inline" /></div>
               </div>
             </div>
           </div>
@@ -204,7 +205,7 @@ watch(() => props.flash, (newFlash) => {
                   <div class="text-center mb-6">
                     <div
                       class="w-16 h-16 bg-gradient-to-br from-success/20 to-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <span class="text-3xl">🎟️</span>
+                      <Ticket :size="32" />
                     </div>
                     <h2 class="text-xl font-bold mb-2">
                       <span class="bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
@@ -243,7 +244,7 @@ watch(() => props.flash, (newFlash) => {
                         Validation...
                       </span>
                       <span v-else class="flex items-center gap-2">
-                        ✨ Utiliser
+                        <Sparkles :size="16" /> Utiliser
                       </span>
                     </Button>
                   </form>
@@ -253,7 +254,7 @@ watch(() => props.flash, (newFlash) => {
                   class="bg-gradient-to-br from-base-200/60 to-base-300/40 backdrop-blur-lg rounded-xl p-4 border border-info/20">
                   <div class="flex items-center gap-3 mb-3">
                     <div class="w-8 h-8 bg-info/20 rounded-lg flex items-center justify-center">
-                      <span class="text-lg">💡</span>
+                      <Lightbulb :size="18" />
                     </div>
                     <h3 class="font-semibold text-info text-sm">Comment ça marche ?</h3>
                   </div>
@@ -269,7 +270,7 @@ watch(() => props.flash, (newFlash) => {
                   class="bg-gradient-to-br from-base-200/60 to-base-300/40 backdrop-blur-lg rounded-xl p-4 border border-warning/20">
                   <div class="flex items-center gap-3 mb-3">
                     <div class="w-8 h-8 bg-warning/20 rounded-lg flex items-center justify-center">
-                      <span class="text-lg">⚠️</span>
+                      <AlertTriangle :size="18" />
                     </div>
                     <h3 class="font-semibold text-warning text-sm">Important</h3>
                   </div>
@@ -282,7 +283,7 @@ watch(() => props.flash, (newFlash) => {
                   class="bg-gradient-to-br from-base-200/60 to-base-300/40 backdrop-blur-lg rounded-xl p-4 border border-accent/20">
                   <div class="flex items-center gap-3 mb-3">
                     <div class="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center">
-                      <span class="text-lg">🎁</span>
+                      <Gift :size="18" />
                     </div>
                     <h3 class="font-semibold text-accent text-sm">Types de récompenses</h3>
                   </div>
@@ -307,7 +308,7 @@ watch(() => props.flash, (newFlash) => {
                   <div class="text-center">
                     <div
                       class="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-                      <span class="text-2xl">💰</span>
+                      <Coins :size="24" />
                     </div>
                     <h3 class="font-semibold text-sm mb-1">Mon Solde</h3>
                     <div class="text-2xl font-bold text-primary">
@@ -328,7 +329,7 @@ watch(() => props.flash, (newFlash) => {
         <div class="flex items-center gap-3">
           <div
             class="w-10 h-10 bg-gradient-to-br from-success/20 to-primary/20 rounded-xl flex items-center justify-center">
-            <span class="text-2xl">🎉</span>
+            <PartyPopper :size="24" />
           </div>
           <div>
             <h3 class="text-xl font-bold">
@@ -349,7 +350,7 @@ watch(() => props.flash, (newFlash) => {
             class="text-center p-6 bg-gradient-to-br from-success/10 to-primary/5 rounded-xl border border-success/20">
             <div
               class="w-16 h-16 bg-gradient-to-br from-success/20 to-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span class="text-3xl">✨</span>
+              <Sparkles :size="32" />
             </div>
             <h4 class="text-lg font-bold text-success mb-2">Récompenses obtenues !</h4>
             <p class="text-sm text-base-content/70">
@@ -364,7 +365,7 @@ watch(() => props.flash, (newFlash) => {
               <div class="flex items-center gap-4">
                 <div
                   class="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center">
-                  <span class="text-2xl">💰</span>
+                  <Coins :size="24" />
                 </div>
                 <div class="flex-1">
                   <h5 class="font-semibold">PokéCoins</h5>
@@ -387,7 +388,7 @@ watch(() => props.flash, (newFlash) => {
                   <div class="w-12 h-12 rounded-xl overflow-hidden bg-base-200/50 flex items-center justify-center">
                     <img v-if="item.image_url" :src="item.image_url" :alt="item.name" class="w-8 h-8 object-contain"
                          style="image-rendering: pixelated;" />
-                    <span v-else class="text-xl">📦</span>
+                    <Package v-else :size="20" />
                   </div>
 
                   <div class="flex-1 min-w-0">
@@ -420,7 +421,7 @@ watch(() => props.flash, (newFlash) => {
 
           <div class="pt-4 border-t border-base-300/30">
             <Button variant="primary" size="lg" class="w-full" @click="closeRewardsModal">
-              Parfait ! 🎊
+              Parfait ! <PartyPopper :size="16" class="inline" />
             </Button>
           </div>
         </div>

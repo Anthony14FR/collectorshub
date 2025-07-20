@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { PokedexEntry } from '@/types/user';
+import { HelpCircle, Plus, Sparkles } from 'lucide-vue-next';
 
 interface UpgradeRequirement {
   star: number;
@@ -61,7 +62,7 @@ const getPlaceholderName = () => {
         />
 
         <div v-if="selectedPokemon.pokemon?.is_shiny" class="absolute -top-0.5 sm:-top-1 -left-0.5 sm:-left-1">
-          <span class="text-yellow-400 text-xs">✨</span>
+          <Sparkles :size="12" class="text-yellow-400" />
         </div>
       </div>
 
@@ -75,12 +76,12 @@ const getPlaceholderName = () => {
             style="image-rendering: pixelated;"
           />
           <div v-else class="w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 flex items-center justify-center">
-            <span class="text-2xl sm:text-3xl opacity-30 group-hover:opacity-50 transition-opacity">?</span>
+            <HelpCircle :size="24" class="opacity-30 group-hover:opacity-50 transition-opacity" />
           </div>
           
           <div class="absolute inset-0 flex items-center justify-center">
             <div class="w-4 sm:w-5 md:w-6 h-4 sm:h-5 md:h-6 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-              <span class="text-primary text-sm sm:text-base md:text-lg font-bold">+</span>
+              <Plus :size="16" class="text-primary font-bold" />
             </div>
           </div>
         </div>

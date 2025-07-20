@@ -20,6 +20,11 @@ import type { Pokemon } from '@/types/pokemon';
 import type { Success, UserSuccess } from '@/types/success';
 import type { AvailableLevelReward, LevelRewardPreview, User } from '@/types/user';
 import { Head, router } from '@inertiajs/vue3';
+import {
+  Coins,
+  HelpCircle,
+  Trophy
+} from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
 interface Props extends PageProps {
@@ -275,7 +280,7 @@ const dismissWelcomeModal = async () => {
         <div class="flex items-center gap-3">
           <div
             class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-            <span class="text-lg">🏆</span>
+            <Trophy :size="20" />
           </div>
           <div class="flex flex-col">
             <h3 class="text-xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
@@ -297,13 +302,13 @@ const dismissWelcomeModal = async () => {
 
     <div v-if="showWelcomeAlert" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-96">
       <Alert type="success"
-             :message="`🎉 Bienvenue ${auth.user.username} ! Votre email a été vérifié avec succès. Votre aventure Pokémon peut commencer !`"
+             :message="`Bienvenue ${auth.user.username} ! Votre email a été vérifié avec succès. Votre aventure Pokémon peut commencer !`"
              dismissible @dismiss="dismissWelcomeAlert" />
     </div>
     <button @click="showHelpModal = true"
             class="fixed bottom-4 left-4 w-12 h-12 bg-info hover:bg-info/80 cursor-pointer hover:bg-base-300 text-white rounded-full flex items-center justify-center shadow-lg transition-all z-50"
             title="Aide">
-      <span class="text-xl font-bold">?</span>
+      <HelpCircle :size="20" />
     </button>
     <FriendsModal :show="friendsModalOpen" :onClose="() => friendsModalOpen = false" :friends="friendsData"
                   :friend_requests="friendRequestsData" :suggestions="suggestionsData" :currentUserId="auth.user.id"
@@ -354,7 +359,7 @@ const dismissWelcomeModal = async () => {
 
             <div class="bg-base-100/60 rounded-xl p-4 text-center border border-accent/20">
               <div class="w-16 h-16 mx-auto mb-3 bg-accent/10 rounded-full flex items-center justify-center">
-                <span class="text-2xl">💰</span>
+                <Coins :size="32" />
               </div>
               <h4 class="font-bold text-accent">+50 000 coins</h4>
             </div>

@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-gradient-to-br from-info/20 to-info/40 rounded-lg flex items-center justify-center">
-          <span class="text-lg">❓</span>
+          <HelpCircle :size="20" class="text-info" />
         </div>
         <div>
           <h3 class="text-xl font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent">
@@ -19,7 +19,7 @@
           
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🎒</span>
+            <ShoppingBag :size="20" class="text-primary" />
             <h4 class="font-bold text-base-content">Sac</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -29,7 +29,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🏪</span>
+            <Store :size="20" class="text-secondary" />
             <h4 class="font-bold text-base-content">Boutique</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -39,7 +39,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🎰</span>
+            <Dice6 :size="20" class="text-accent" />
             <h4 class="font-bold text-base-content">Invocation</h4>
           </div>
           <p class="text-sm text-base-content/80 mb-2">
@@ -54,7 +54,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🛒</span>
+            <ShoppingCart :size="20" class="text-warning" />
             <h4 class="font-bold text-base-content">Marketplace</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -64,7 +64,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🏆</span>
+            <Trophy :size="20" class="text-success" />
             <h4 class="font-bold text-base-content">Badges</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -74,7 +74,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🏅</span>
+            <Medal :size="20" class="text-info" />
             <h4 class="font-bold text-base-content">Classement</h4>
           </div>
           <p class="text-sm text-base-content/80 mb-2">
@@ -85,7 +85,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">👥</span>
+            <Users :size="20" class="text-primary" />
             <h4 class="font-bold text-base-content">Amis</h4>
           </div>
           <p class="text-sm text-base-content/80 mb-2">
@@ -99,7 +99,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🎁</span>
+            <Gift :size="20" class="text-warning" />
             <h4 class="font-bold text-base-content">Récompenses de Niveau</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -109,7 +109,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">👤</span>
+            <User :size="20" class="text-secondary" />
             <h4 class="font-bold text-base-content">Profile</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -119,7 +119,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🎟️</span>
+            <Ticket :size="20" class="text-accent" />
             <h4 class="font-bold text-base-content">Codes promo</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -129,7 +129,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">📚</span>
+            <BookOpen :size="20" class="text-info" />
             <h4 class="font-bold text-base-content">Pokédex</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -139,7 +139,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">⭐</span>
+            <Star :size="20" class="text-warning" />
             <h4 class="font-bold text-base-content">Amélioration</h4>
           </div>
           <p class="text-sm text-base-content/80">
@@ -149,7 +149,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🗺️</span>
+            <Map :size="20" class="text-success" />
             <h4 class="font-bold text-base-content">Expédition</h4>
           </div>
           <p class="text-sm text-base-content/80 mb-2">
@@ -162,7 +162,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🏗️</span>
+            <Building2 :size="20" class="text-error" />
             <h4 class="font-bold text-base-content">Tour Infernale</h4>
           </div>
           <p class="text-sm text-base-content/80 mb-2">
@@ -175,7 +175,7 @@
   
         <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-xl">🎵</span>
+            <Music :size="20" class="text-accent" />
             <h4 class="font-bold text-base-content">Lecteur MP3</h4>
           </div>
           <p class="text-sm text-base-content/80 mb-2">
@@ -192,12 +192,13 @@
 </template>
   
 <script setup lang="ts">
-import Modal from '@/Components/UI/Modal.vue'
-  
+import Modal from '@/Components/UI/Modal.vue';
+import { BookOpen, Building2, Dice6, Gift, HelpCircle, Map, Medal, Music, ShoppingBag, ShoppingCart, Star, Store, Ticket, Trophy, User, Users } from 'lucide-vue-next';
+
 interface Props {
-  show: boolean
-  onClose: () => void
+  show: boolean;
+  onClose: () => void;
 }
-  
-defineProps<Props>()
+
+defineProps<Props>();
 </script>

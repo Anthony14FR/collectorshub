@@ -1,11 +1,17 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { Head, router, usePage } from '@inertiajs/vue3'
+import ExpeditionCountdown from '@/Components/Expeditions/ExpeditionCountdown.vue'
+import ExpeditionPokemonSelectionModal from '@/Components/Expeditions/ExpeditionPokemonSelectionModal.vue'
+import RewardsModal from '@/Components/Expeditions/RewardsModal.vue'
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue'
 import Button from '@/Components/UI/Button.vue'
-import ExpeditionPokemonSelectionModal from '@/Components/Expeditions/ExpeditionPokemonSelectionModal.vue'
-import ExpeditionCountdown from '@/Components/Expeditions/ExpeditionCountdown.vue'
-import RewardsModal from '@/Components/Expeditions/RewardsModal.vue'
+import { Head, router, usePage } from '@inertiajs/vue3'
+import {
+  ArrowLeft,
+  Clock,
+  Gift,
+  Rocket
+} from 'lucide-vue-next'
+import { computed, ref } from 'vue'
 
 const page = usePage()
 const activeTab = ref('disponibles')
@@ -322,11 +328,11 @@ const rerollExpeditions = async () => {
       <div class="w-full max-w-7xl mx-auto px-4 lg:px-6 pb-16">
         <div class="flex items-center gap-4 pt-6 mb-6">
           <Button @click="goBack" variant="outline" size="sm" class="shrink-0">
-            ← Retour
+            <ArrowLeft :size="16" class="inline" /> Retour
           </Button>
           <div class="flex-1">
             <h1 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-warning via-warning/90 to-accent bg-clip-text text-transparent">
-              🗺️ Expéditions
+              Expéditions
             </h1>
             <p class="text-base-content/60 text-sm mt-1">Explorez les terres lointaines avec vos Pokémons</p>
           </div>
@@ -408,7 +414,7 @@ const rerollExpeditions = async () => {
                         <span v-else-if="reward.type === 'xp'" class="text-success font-bold text-xs">XP</span>
                         <img v-else-if="reward.type === 'pokeball'" src="/images/items/pokeball.png" alt="Pokeball" class="w-3 h-3 object-contain">
                         <img v-else-if="reward.type === 'masterball'" src="/images/items/masterball.png" alt="Masterball" class="w-3 h-3 object-contain">
-                        <span v-else class="text-primary text-xs">🎁</span>
+                        <span v-else class="text-primary text-xs"><Gift :size="12" /></span>
                       </div>
                       <span class="font-bold text-success text-xs">{{ reward.amount }}</span>
                       <span v-if="reward.type !== 'xp'" class="text-xs text-base-content/70">{{ getRewardLabel(reward.type) }}</span>
@@ -436,7 +442,7 @@ const rerollExpeditions = async () => {
                         variant="primary" 
                         size="sm" 
                         class="w-full">
-                  🚀 Démarrer l'expédition
+                  <Rocket :size="16" class="inline" /> Démarrer l'expédition
                 </Button>
                 
                 <Button v-else-if="isExpeditionClaimable(expedition)" 
@@ -444,13 +450,13 @@ const rerollExpeditions = async () => {
                         variant="secondary" 
                         size="sm" 
                         class="w-full bg-gradient-to-r from-success/20 to-success/10 hover:from-success/30 hover:to-success/20 text-success border-success/30">
-                  🎁 Réclamer les récompenses
+                  <Gift :size="16" class="inline" /> Réclamer les récompenses
                 </Button>
                 
                 <div v-else-if="expedition.status === 'in_progress'" 
                      class="bg-gradient-to-r from-warning/10 to-warning/5 rounded-lg p-3 border border-warning/20">
                   <div class="text-center">
-                    <p class="text-xs font-medium text-warning mb-2">⏳ Expédition en cours...</p>
+                    <p class="text-xs font-medium text-warning mb-2"><Clock :size="16" class="inline" /> Expédition en cours...</p>
                     <ExpeditionCountdown 
                       :end-time="expedition.ends_at" 
                       @expired="refreshExpeditions" 

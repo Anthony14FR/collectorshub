@@ -1,10 +1,21 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
 import { useMatomoTracking } from '@/composables/useMatomoTracking';
+import { Head, Link, router } from '@inertiajs/vue3';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Check,
+  Gamepad2,
+  Lightbulb,
+  Lock,
+  Mail,
+  Save,
+  Shield
+} from 'lucide-vue-next';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 
 interface Props {
   token: string;
@@ -85,17 +96,17 @@ const submit = () => {
       <div class="w-full max-w-md">
         <div class="text-center mb-8">
           <Link href="/" class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:from-secondary hover:to-primary transition-all duration-300 tracking-wider">
-            🎮 CollectorsHub
+            <Gamepad2 :size="32" class="inline" /> CollectorsHub
           </Link>
           <div class="mt-6">
             <div class="bg-success/20 border border-success/50 rounded-full p-4 w-20 h-20 mx-auto flex items-center justify-center mb-4">
-              <span class="text-4xl">🔐</span>
+              <Lock :size="32" class="text-success" />
             </div>
             <h2 class="text-2xl font-bold text-base-content tracking-wider">
               NOUVEAU MOT DE PASSE
             </h2>
             <p class="mt-2 text-sm text-base-content/70">
-              Choisissez un mot de passe sécurisé ! 🔒
+              Choisissez un mot de passe sécurisé ! <Shield :size="16" class="inline" />
             </p>
           </div>
         </div>
@@ -103,7 +114,7 @@ const submit = () => {
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
           <div class="p-3 bg-gradient-to-r from-success/10 to-success/5 border-b border-success/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-              <span class="text-lg">✅</span>
+              <Check :size="18" />
               RÉINITIALISATION RÉUSSIE
             </h3>
           </div>
@@ -163,8 +174,9 @@ const submit = () => {
               </div>
 
               <div class="bg-info/10 border border-info/30 rounded-lg p-4">
-                <p class="text-info text-sm">
-                  💡 <strong>Exigences :</strong> Au moins 8 caractères avec lettres et chiffres recommandés.
+                <p class="text-info text-sm flex items-center gap-2">
+                  <Lightbulb :size="16" />
+                  <strong>Exigences :</strong> Au moins 8 caractères avec lettres et chiffres recommandés.
                 </p>
               </div>
             </div>
@@ -184,14 +196,14 @@ const submit = () => {
                 Sauvegarde...
               </span>
               <span v-else class="flex items-center justify-center">
-                <span class="text-lg mr-2">💾</span>
+                <Save :size="18" class="mr-2" />
                 Sauvegarder le nouveau mot de passe
               </span>
             </Button>
 
             <div class="bg-warning/10 border border-warning/30 rounded-lg p-4">
               <div class="flex items-start">
-                <span class="text-warning mr-2 mt-0.5 text-lg">⚠️</span>
+                <AlertTriangle :size="18" class="text-warning mr-2 mt-0.5" />
                 <div>
                   <p class="text-warning text-sm font-medium">Sécurité</p>
                   <p class="text-warning/80 text-xs mt-1">
@@ -210,15 +222,16 @@ const submit = () => {
               Si ce lien a expiré, vous pouvez en demander un nouveau.
             </p>
             <Link href="/forgot-password" class="inline-flex items-center text-sm text-primary hover:text-secondary transition-colors">
-              <span class="text-lg mr-2">📧</span>
+              <Mail :size="16" class="mr-2" />
               Demander un nouveau lien
             </Link>
           </div>
         </div>
 
         <div class="text-center mt-4">
-          <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors">
-            ← Retour à l'accueil
+          <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors inline-flex items-center">
+            <ArrowLeft :size="16" class="mr-1" />
+            Retour à l'accueil
           </Link>
         </div>
       </div>

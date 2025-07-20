@@ -7,6 +7,18 @@ import RarityBadge from '@/Components/UI/RarityBadge.vue';
 import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { PageProps } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
+import {
+  ArrowLeft,
+  ClipboardList,
+  Coins,
+  FileText,
+  Inbox,
+  Mail,
+  Megaphone,
+  ScrollText,
+  ShoppingCart,
+  Sparkles
+} from 'lucide-vue-next';
 import { ref } from 'vue';
 
 interface Notification {
@@ -107,19 +119,6 @@ const markAllAsRead = async () => {
   }
 };
 
-const getNotificationIcon = (type: string) => {
-  switch (type) {
-  case 'announcement':
-    return '📢';
-  case 'marketplace_buy':
-    return '🛒';
-  case 'marketplace_sell':
-    return '💰';
-  default:
-    return '📝';
-  }
-};
-
 const getNotificationBg = (type: string, isRead: boolean) => {
   const opacity = isRead ? '10' : '20';
   switch (type) {
@@ -172,12 +171,13 @@ const goBack = () => {
         <div class="flex items-center justify-between max-w-6xl mx-auto">
           <div class="flex items-center gap-4">
             <Button variant="ghost" size="sm" @click="goBack" class="lg:hidden">
-              ← Retour
+              <ArrowLeft :size="16" class="inline" /> Retour
             </Button>
             <div class="flex items-center gap-3">
               <div
                 class="w-8 h-8 bg-gradient-to-br from-info/50 to-primary/50 rounded-lg flex items-center justify-center text-lg">
-                📬</div>
+                <Mail :size="20" class="text-base-content" />
+              </div>
               <div>
                 <h1 class="text-xl font-bold bg-gradient-to-r from-info to-primary bg-clip-text text-transparent">
                   Boîte de réception
@@ -195,7 +195,7 @@ const goBack = () => {
               Tout marquer comme lu
             </Button>
             <Button variant="ghost" size="sm" @click="goBack">
-              ← Retour au profil
+              <ArrowLeft :size="16" class="inline" /> Retour au profil
             </Button>
           </div>
         </div>
@@ -211,7 +211,7 @@ const goBack = () => {
                 : 'text-base-content/70 hover:text-base-content hover:bg-base-200/70'
             ]">
               <div class="flex items-center justify-center gap-2">
-                <span>📢</span>
+                <Megaphone :size="16" />
                 <span>Annonces</span>
                 <span v-if="announcements.filter(n => !n.is_read).length > 0"
                       class="bg-primary/20 text-primary text-xs px-2 py-1 rounded-full font-bold">
@@ -226,7 +226,7 @@ const goBack = () => {
                 : 'text-base-content/70 hover:text-base-content hover:bg-base-200/70'
             ]">
               <div class="flex items-center justify-center gap-2">
-                <span>📜</span>
+                <ScrollText :size="16" />
                 <span>Historique</span>
                 <span v-if="marketplace_history.filter(n => !n.is_read).length > 0"
                       class="bg-primary/20 text-primary text-xs px-2 py-1 rounded-full font-bold">
@@ -239,7 +239,7 @@ const goBack = () => {
           <div class="space-y-6">
             <div v-if="activeTab === 'announcements'">
               <div v-if="announcements.length === 0" class="text-center py-12 text-base-content/60">
-                <div class="text-6xl mb-4">📭</div>
+                <Inbox :size="64" class="mx-auto mb-4 text-base-content/30" />
                 <h3 class="text-lg font-medium mb-2">Aucune annonce</h3>
                 <p class="text-sm">Vous n'avez reçu aucune annonce pour le moment.</p>
               </div>
@@ -250,7 +250,12 @@ const goBack = () => {
                   !notification.is_read ? 'shadow-sm ring-2 ring-primary/20' : ''
                 ]" @click="!notification.is_read && markAsRead(notification.id)">
                   <div class="flex items-start gap-4">
-                    <span class="text-2xl">{{ getNotificationIcon(notification.type) }}</span>
+                    <div class="flex-shrink-0">
+                      <Megaphone v-if="notification.type === 'announcement'" :size="24" class="text-primary" />
+                      <ShoppingCart v-else-if="notification.type === 'marketplace_buy'" :size="24" class="text-blue-500" />
+                      <Coins v-else-if="notification.type === 'marketplace_sell'" :size="24" class="text-green-500" />
+                      <FileText v-else :size="24" class="text-base-content/70" />
+                    </div>
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-3 mb-2">
                         <h4 :class="['text-base font-medium', !notification.is_read ? 'font-bold' : '']">
@@ -271,7 +276,7 @@ const goBack = () => {
 
             <div v-if="activeTab === 'history'">
               <div v-if="marketplace_history.length === 0" class="text-center py-12 text-base-content/60">
-                <div class="text-6xl mb-4">📋</div>
+                <ClipboardList :size="64" class="mx-auto mb-4 text-base-content/30" />
                 <h3 class="text-lg font-medium mb-2">Aucun historique</h3>
                 <p class="text-sm">Votre historique de transactions sera affiché ici.</p>
               </div>
@@ -294,7 +299,7 @@ const goBack = () => {
                             <StarsBadge :stars="getPokemonStars(notification)" size="sm" />
                             <div v-if="notification.data.is_shiny"
                                  class="w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-                              <span class="text-yellow-400 text-xs">✨</span>
+                              <Sparkles :size="12" class="text-yellow-400" />
                             </div>
                             <div v-if="!notification.is_read" class="w-3 h-3 bg-primary rounded-full animate-pulse">
                             </div>

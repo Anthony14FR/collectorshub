@@ -3,9 +3,18 @@ import SocialLoginButtons from '@/Components/Auth/SocialLoginButtons.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
-import { Head, Link, router } from "@inertiajs/vue3";
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useMatomoTracking } from '@/composables/useMatomoTracking';
+import { Head, Link, router } from "@inertiajs/vue3";
+import {
+  ArrowLeft,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Gamepad2,
+  Target,
+  User
+} from 'lucide-vue-next';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 
 const AVATAR_OPTIONS = [1, 2];
 const AVATAR_PATH = (id: number) => `/images/trainer/${id}.png`;
@@ -165,7 +174,7 @@ const submit = () => {
         <div class="text-center mb-8">
           <Link href="/"
                 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:from-secondary hover:to-primary transition-all duration-300 tracking-wider">
-            🎮 CollectorsHub
+            <Gamepad2 :size="32" class="inline" /> CollectorsHub
           </Link>
           <h2 class="mt-6 text-2xl font-bold text-base-content tracking-wider">
             INSCRIPTION
@@ -186,7 +195,7 @@ const submit = () => {
           <div class="p-3 bg-gradient-to-r from-accent/10 to-accent/5 border-b border-accent/20">
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">
-                <span class="text-lg">👤</span>
+                <User :size="18" />
                 CRÉER VOTRE COMPTE
               </h3>
               <div class="text-xs text-base-content/70">
@@ -216,7 +225,7 @@ const submit = () => {
                          :class="form.avatar === AVATAR_PATH(id) ? 'border-accent shadow-lg shadow-accent/30' : 'border-base-300 opacity-70 group-hover:opacity-100 group-hover:border-accent/50'" />
                     <div v-if="form.avatar === AVATAR_PATH(id)"
                          class="absolute -top-2 -right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                      <span class="text-xs">✓</span>
+                      <Check :size="12" class="text-white" />
                     </div>
                   </div>
                   <span v-if="form.avatar === AVATAR_PATH(id)"
@@ -230,7 +239,7 @@ const submit = () => {
 
               <div class="flex justify-end">
                 <Button @click="nextStep" :disabled="!canProceedStep1" variant="primary" size="md">
-                  Suivant →
+                  Suivant <ChevronRight :size="16" class="ml-1" />
                 </Button>
               </div>
             </div>
@@ -263,10 +272,10 @@ const submit = () => {
 
               <div class="flex justify-between">
                 <Button @click="prevStep" variant="secondary" size="md">
-                  ← Précédent
+                  <ChevronLeft :size="16" class="mr-1" /> Précédent
                 </Button>
                 <Button @click="nextStep" :disabled="!canProceedStep2" variant="primary" size="md">
-                  Suivant →
+                  Suivant <ChevronRight :size="16" class="ml-1" />
                 </Button>
               </div>
             </div>
@@ -299,10 +308,10 @@ const submit = () => {
 
               <div class="flex justify-between">
                 <Button @click="prevStep" variant="secondary" size="md">
-                  ← Précédent
+                  <ChevronLeft :size="16" class="mr-1" /> Précédent
                 </Button>
                 <Button @click="nextStep" :disabled="!canProceedStep3" variant="primary" size="md">
-                  Suivant →
+                  Suivant <ChevronRight :size="16" class="ml-1" />
                 </Button>
               </div>
             </div>
@@ -347,7 +356,7 @@ const submit = () => {
 
               <div class="flex justify-between">
                 <Button @click="prevStep" variant="secondary" size="md">
-                  ← Précédent
+                  <ChevronLeft :size="16" class="mr-1" /> Précédent
                 </Button>
                 <Button @click="submit" :disabled="form.processing || !canSubmit" variant="primary" size="md">
                   <span v-if="form.processing" class="flex items-center justify-center">
@@ -360,7 +369,10 @@ const submit = () => {
                     </svg>
                     Inscription...
                   </span>
-                  <span v-else>🎯 Confirmer l'inscription</span>
+                  <span v-else class="flex items-center justify-center">
+                    <Target :size="18" class="mr-2" />
+                    Confirmer l'inscription
+                  </span>
                 </Button>
               </div>
             </div>
@@ -368,8 +380,9 @@ const submit = () => {
         </div>
 
         <div class="text-center mt-6">
-          <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors">
-            ← Retour à l'accueil
+          <Link href="/" class="text-sm text-base-content/70 hover:text-base-content transition-colors inline-flex items-center">
+            <ArrowLeft :size="16" class="mr-1" />
+            Retour à l'accueil
           </Link>
         </div>
       </div>

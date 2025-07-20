@@ -6,6 +6,7 @@ import StarsBadge from '@/Components/UI/StarsBadge.vue';
 import type { BasePokemon, PokedexEntry as MarketplacePokedexEntry } from '@/types/marketplace';
 import type { Pokedex } from '@/types/pokedex';
 import type { Pokemon } from '@/types/pokemon';
+import { Sparkles } from 'lucide-vue-next';
 
 interface DisplayPokemon {
   pokedexInfo: Pokedex | MarketplacePokedexEntry | null;
@@ -83,7 +84,7 @@ const getPokemonName = () => {
         </div>
         <div v-if="displayPokemon.pokemon.is_shiny"
              class="absolute top-4 -right-1 w-5 h-5 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-yellow-500/30">
-          <span class="text-yellow-400 text-sm">✨</span>
+          <Sparkles :size="12" class="text-yellow-400" />
         </div>
         <h4 class="font-bold text-base-content truncate">{{ getPokemonName() }}</h4>
         <RarityBadge :rarity="displayPokemon.pokemon.rarity" size="xs" />
