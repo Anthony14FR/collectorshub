@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\Pokemons\PokemonController;
+use App\Http\Controllers\Admin\SuccessController;
 use App\Http\Controllers\Admin\Users\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,9 @@ Route::middleware(['auth', 'verified', 'admin'])
 
         // Items
         Route::resource('items', ItemController::class);
+
+        // Sucess
+        Route::resource('success', SuccessController::class);
 
         // Notifications
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
