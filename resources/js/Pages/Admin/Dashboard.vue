@@ -22,6 +22,7 @@ interface Props {
     marketplace_listings: number;
     pending_tickets: number;
     shop_items: number;
+    clubsCount: number;
   };
 }
 
@@ -90,6 +91,15 @@ const adminSections = ref([
     color: 'accent',
     stat: props.stats?.active_users || 0,
     statLabel: 'Actifs'
+  },
+  {
+    title: 'Clubs',
+    description: 'Gestion des clubs et modération',
+    icon: '🏆',
+    route: '/admin/clubs',
+    color: 'info',
+    stat: props.stats?.clubsCount || 0,
+    statLabel: 'Clubs'
   },
   {
     title: 'Configuration',

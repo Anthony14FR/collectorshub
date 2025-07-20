@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Club;
 use App\Models\PromoCode;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -36,7 +37,8 @@ class DashboardController extends Controller
             'activePromoCodes' => PromoCode::where('is_active', true)->count(),
             'globalPromoCodes' => PromoCode::where('is_global', true)->count(),
             'expiredPromoCodes' => PromoCode::where('expires_at', '<', now())->count(),
-            'totalPromoCodeUses' => PromoCode::withCount('users')->get()->sum('users_count')
+            'totalPromoCodeUses' => PromoCode::withCount('users')->get()->sum('users_count'),
+            'clubsCount' => Club::count(),
         ];
 
         return Inertia::render('Admin/Dashboard', [
