@@ -127,7 +127,11 @@ class SuccessService
                 });
             }
 
-            $count = $query->count();
+            if (!empty($requirements['distinct'])) {
+                $count = $query->distinct('pokemon_id')->count('pokemon_id');
+            } else {
+                $count = $query->count();
+            }
             return $count >= $requirements['count'];
         }
 
