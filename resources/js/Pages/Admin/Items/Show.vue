@@ -12,10 +12,6 @@ const props = defineProps({
 
 const getTypeLabel = (type) => {
   const types = {
-    heal: "Soin",
-    boost: "Boost",
-    evolution: "Évolution",
-    special: "Spécial",
     ball: "Ball",
     avatar: "Avatar",
     background: "Background",

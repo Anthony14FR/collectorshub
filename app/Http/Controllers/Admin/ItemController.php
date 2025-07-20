@@ -29,10 +29,6 @@ class ItemController extends Controller
             'ball' => Item::where('type', 'ball')->count(),
             'avatar' => Item::where('type', 'avatar')->count(),
             'background' => Item::where('type', 'background')->count(),
-            'heal' => Item::where('type', 'heal')->count(),
-            'boost' => Item::where('type', 'boost')->count(),
-            'evolution' => Item::where('type', 'evolution')->count(),
-            'special' => Item::where('type', 'special')->count(),
         ];
 
         return Inertia::render('Admin/Items/Index', [
@@ -52,13 +48,27 @@ class ItemController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:50',
             'description' => 'nullable|string|max:250',
-            'type' => 'required|in:heal,boost,evolution,special,ball,avatar,background',
-            'effect' => 'required|array',
+            'type' => 'required|in:ball,avatar,background',
             'price' => 'required|integer|min:0',
             'rarity' => 'required|in:normal,rare,epic,legendary',
-            'image' => 'nullable|string'
+            'image' => 'required|file|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = strtolower(str_replace(' ', '_', $validated['name'])) . '.' . $image->getClientOriginalExtension();
+            $path = public_path('images/items/' . $filename);
+
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            $image->move(public_path('images/items'), $filename);
+            $imagePath = '/images/items/' . $filename;
+        }
+
+        $validated['image'] = $imagePath;
         Item::create($validated);
 
         return redirect()->route('admin.items.index')
@@ -90,12 +100,24 @@ class ItemController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:50',
             'description' => 'nullable|string|max:250',
-            'type' => 'required|in:heal,boost,evolution,special,ball,avatar,background',
-            'effect' => 'required|array',
+            'type' => 'required|in:ball,avatar,background',
             'price' => 'required|integer|min:0',
             'rarity' => 'required|in:normal,rare,epic,legendary',
-            'image' => 'nullable|string'
+            'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = strtolower(str_replace(' ', '_', $validated['name'])) . '.' . $image->getClientOriginalExtension();
+            $path = public_path('images/items/' . $filename);
+
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            $image->move(public_path('images/items'), $filename);
+            $validated['image'] = '/images/items/' . $filename;
+        }
 
         $item->update($validated);
 
@@ -121,10 +143,6 @@ class ItemController extends Controller
             'ball' => Item::where('type', 'ball')->count(),
             'avatar' => Item::where('type', 'avatar')->count(),
             'background' => Item::where('type', 'background')->count(),
-            'heal' => Item::where('type', 'heal')->count(),
-            'boost' => Item::where('type', 'boost')->count(),
-            'evolution' => Item::where('type', 'evolution')->count(),
-            'special' => Item::where('type', 'special')->count(),
         ];
 
         return redirect()->route('admin.items.index', $params)

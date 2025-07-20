@@ -14,34 +14,18 @@ const props = defineProps({
 });
 
 const form = ref({
-  name: "",
-  description: "",
-  type: "heal",
-  effect: {},
-  price: 0,
-  rarity: "normal",
-  image: "",
+  name: props.item.name,
+  description: props.item.description || "",
+  type: props.item.type,
+  effect: props.item.effect || {},
+  price: props.item.price,
+  rarity: props.item.rarity,
+  image: null,
 });
 
 const isLoading = ref(false);
 
-onMounted(() => {
-  form.value = {
-    name: props.item.name,
-    description: props.item.description || "",
-    type: props.item.type,
-    effect: props.item.effect || {},
-    price: props.item.price,
-    rarity: props.item.rarity,
-    image: props.item.image || "",
-  };
-});
-
 const typeOptions = [
-  { value: "heal", label: "Soin" },
-  { value: "boost", label: "Boost" },
-  { value: "evolution", label: "Évolution" },
-  { value: "special", label: "Spécial" },
   { value: "ball", label: "Ball" },
   { value: "avatar", label: "Avatar" },
   { value: "background", label: "Background" },
@@ -54,71 +38,10 @@ const rarityOptions = [
   { value: "legendary", label: "Légendaire" },
 ];
 
-const statOptions = [
-  { value: "hp", label: "PV" },
-  { value: "attack", label: "Attaque" },
-  { value: "defense", label: "Défense" },
-  { value: "speed", label: "Vitesse" },
-  { value: "special_attack", label: "Attaque Spé." },
-  { value: "special_defense", label: "Défense Spé." },
-];
 
-const specialTypeOptions = [
-  { value: "shiny", label: "Shiny" },
-  { value: "rare", label: "Rare" },
-  { value: "legendary", label: "Légendaire" },
-];
 
 const effectFields = computed(() => {
   switch (form.value.type) {
-  case "heal":
-    return [
-      {
-        name: "amount",
-        label: "Montant de soin",
-        type: "number",
-        min: 1,
-        required: true,
-      },
-    ];
-  case "boost":
-    return [
-      {
-        name: "stat",
-        label: "Statistique",
-        type: "select",
-        options: statOptions,
-        required: true,
-      },
-      {
-        name: "amount",
-        label: "Montant du boost",
-        type: "number",
-        min: 1,
-        max: 32,
-        required: true,
-      },
-    ];
-  case "evolution":
-    return [
-      {
-        name: "pokemon_id",
-        label: "ID du Pokémon",
-        type: "number",
-        min: 1,
-        required: true,
-      },
-    ];
-  case "special":
-    return [
-      {
-        name: "type",
-        label: "Type d'effet",
-        type: "select",
-        options: specialTypeOptions,
-        required: true,
-      },
-    ];
   default:
     return [];
   }
@@ -134,9 +57,21 @@ const updateEffect = (field, value) => {
 const submit = () => {
   isLoading.value = true;
 
-  router.put(`/admin/items/${props.item.id}`, form.value, {
+  const formData = new FormData();
+  formData.append('_method', 'PUT');
+  formData.append('name', form.value.name);
+  formData.append('description', form.value.description || '');
+  formData.append('type', form.value.type);
+  formData.append('price', form.value.price);
+  formData.append('rarity', form.value.rarity);
+  formData.append('effect', JSON.stringify(form.value.effect || {}));
+  
+  if (form.value.image) {
+    formData.append('image', form.value.image);
+  }
+
+  router.post(`/admin/items/${props.item.id}`, formData, {
     onSuccess: () => {
-      // Redirection gérée par le contrôleur
     },
     onError: () => {
       isLoading.value = false;
@@ -216,7 +151,7 @@ const submit = () => {
                   <Input
                     v-model="form.name"
                     label="Nom de l'item"
-                    placeholder="Ex: Potion de soin"
+                    placeholder="Ex: Master Ball"
                     :error="errors?.name"
                     required
                     maxlength="50"
@@ -225,7 +160,7 @@ const submit = () => {
                   <Input
                     v-model="form.description"
                     label="Description"
-                    placeholder="Description de l'item (optionnel)"
+                    placeholder="Ex: Une Pokéball très rare qui capture à coup sûr"
                     :error="errors?.description"
                     maxlength="250"
                     type="textarea"
@@ -259,12 +194,24 @@ const submit = () => {
                     min="0"
                   />
 
-                  <Input
-                    v-model="form.image"
-                    label="Image (chemin)"
-                    placeholder="Ex: /images/items/potion.png"
-                    :error="errors?.image"
-                  />
+                  <div class="space-y-2">
+                    <label class="block text-sm font-medium text-base-content">
+                      Image
+                    </label>
+                    <div v-if="props.item.image" class="mb-2">
+                      <img :src="props.item.image" alt="Image actuelle" class="w-16 h-16 object-cover rounded border" />
+                      <p class="text-xs text-base-content/70 mt-1">Image actuelle</p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      @change="form.image = $event.target.files[0]"
+                      class="w-full px-4 py-3 text-base bg-base-200/50 border border-base-300 focus:border-primary focus:bg-base-200/80 backdrop-blur-sm rounded-lg transition-all duration-200 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-content hover:file:bg-primary-focus"
+                    />
+                    <p v-if="errors?.image" class="text-xs text-error">
+                      {{ errors.image }}
+                    </p>
+                  </div>
                 </div>
 
                 <!-- Effets -->

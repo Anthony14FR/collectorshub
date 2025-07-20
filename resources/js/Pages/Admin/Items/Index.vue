@@ -58,14 +58,6 @@ const tabs = computed(() => [
     label: "Backgrounds",
     count: props.stats?.background || 0,
   },
-  { id: "heal", label: "Soins", count: props.stats?.heal || 0 },
-  { id: "boost", label: "Boosts", count: props.stats?.boost || 0 },
-  {
-    id: "evolution",
-    label: "Évolutions",
-    count: props.stats?.evolution || 0,
-  },
-  { id: "special", label: "Spéciaux", count: props.stats?.special || 0 },
 ]);
 
 const confirmDelete = (item) => {
@@ -122,10 +114,6 @@ const deleteItem = () => {
 
 const getTypeLabel = (type) => {
   const types = {
-    heal: "Soin",
-    boost: "Boost",
-    evolution: "Évolution",
-    special: "Spécial",
     ball: "Ball",
     avatar: "Avatar",
     background: "Background",
@@ -247,7 +235,7 @@ const getPageUrl = (page) => {
 
             <!-- Statistiques rapides -->
             <div
-              class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6"
+              class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"
             >
               <div
                 class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
@@ -295,54 +283,6 @@ const getPageUrl = (page) => {
                 </div>
                 <div class="text-lg font-bold text-primary">
                   {{ props.stats?.background || 0 }}
-                </div>
-              </div>
-              <div
-                class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
-              >
-                <div
-                  class="text-sm font-medium text-base-content/70"
-                >
-                  Soins
-                </div>
-                <div class="text-lg font-bold text-primary">
-                  {{ props.stats?.heal || 0 }}
-                </div>
-              </div>
-              <div
-                class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
-              >
-                <div
-                  class="text-sm font-medium text-base-content/70"
-                >
-                  Boosts
-                </div>
-                <div class="text-lg font-bold text-primary">
-                  {{ props.stats?.boost || 0 }}
-                </div>
-              </div>
-              <div
-                class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
-              >
-                <div
-                  class="text-sm font-medium text-base-content/70"
-                >
-                  Évolutions
-                </div>
-                <div class="text-lg font-bold text-primary">
-                  {{ props.stats?.evolution || 0 }}
-                </div>
-              </div>
-              <div
-                class="bg-base-100/50 backdrop-blur-md rounded-lg border border-base-300/30 p-3 text-center"
-              >
-                <div
-                  class="text-sm font-medium text-base-content/70"
-                >
-                  Spéciaux
-                </div>
-                <div class="text-lg font-bold text-primary">
-                  {{ props.stats?.special || 0 }}
                 </div>
               </div>
             </div>
