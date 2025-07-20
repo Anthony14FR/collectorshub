@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMusicPlayer } from '@/composables/useMusicPlayer'
+import { Music } from 'lucide-vue-next'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 const {
@@ -153,7 +154,7 @@ onUnmounted(() => {
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-2">
             <div class="w-6 h-6 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-lg flex items-center justify-center">
-              <span class="text-xs">🎵</span>
+              <Music :size="12" class="text-primary" />
             </div>
             <h3 class="text-xs font-bold tracking-wider text-base-content/80">MUSIC PLAYER</h3>
           </div>
@@ -291,7 +292,7 @@ onUnmounted(() => {
             :class="index === currentTrackIndex ? 'bg-primary/10 text-primary' : 'text-base-content/80'"
           >
             <div class="w-6 h-6 rounded-md bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center flex-shrink-0">
-              <span class="text-xs font-bold">{{ index + 1 }}</span>
+              <Music :size="10" class="text-primary" />
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium truncate">{{ track.title }}</p>
@@ -316,7 +317,7 @@ onUnmounted(() => {
       class="fixed bottom-4 right-4 z-50 w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-lg rounded-full border border-primary/30 shadow-lg flex items-center justify-center transition-all duration-300 hover:from-primary/30 hover:to-secondary/30 hover:scale-110"
       :class="isPlaying ? 'music-playing' : ''"
     >
-      <span class="text-lg transition-transform duration-300" :class="isPlaying ? 'music-note-playing' : ''">🎵</span>
+      <Music :size="20" class="text-primary transition-transform duration-300" :class="isPlaying ? 'music-note-playing' : ''" />
     </button>
   </Teleport>
 </template>
