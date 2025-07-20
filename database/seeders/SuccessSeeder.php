@@ -8,8 +8,8 @@ use Illuminate\Database\Seeder;
 class SuccessSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
-     */
+    * Run the database seeds.
+    */
     public function run(): void
     {
         $successes = [
@@ -49,7 +49,7 @@ class SuccessSeeder extends Seeder
                 'description' => 'Ajouter les 151 Pokémon normaux au Pokédex.',
                 'image' => '4.png',
                 'type' => 'pokedex',
-                'requirements' => ['count' => 151, 'shiny' => false],
+                'requirements' => ['count' => 151, 'shiny' => false, 'distinct' => true],
                 'cash_reward' => 1000,
                 'xp_reward' => 500
             ],
@@ -59,7 +59,7 @@ class SuccessSeeder extends Seeder
                 'description' => 'Ajouter 25 Pokémon shiny différents au Pokédex.',
                 'image' => '5.png',
                 'type' => 'pokedex',
-                'requirements' => ['count' => 25, 'shiny' => true],
+                'requirements' => ['count' => 25, 'shiny' => true, 'distinct' => true],
                 'cash_reward' => 1500,
                 'xp_reward' => 750
             ],
@@ -69,7 +69,7 @@ class SuccessSeeder extends Seeder
                 'description' => 'Ajouter 75 Pokémon shiny différents au Pokédex.',
                 'image' => '6.png',
                 'type' => 'pokedex',
-                'requirements' => ['count' => 75, 'shiny' => true],
+                'requirements' => ['count' => 75, 'shiny' => true, 'distinct' => true],
                 'cash_reward' => 2500,
                 'xp_reward' => 1250
             ],
@@ -79,7 +79,7 @@ class SuccessSeeder extends Seeder
                 'description' => 'Ajouter les 151 Pokémon shiny au Pokédex.',
                 'image' => '7.png',
                 'type' => 'pokedex',
-                'requirements' => ['count' => 151, 'shiny' => true],
+                'requirements' => ['count' => 151, 'shiny' => true, 'distinct' => true],
                 'cash_reward' => 5000,
                 'xp_reward' => 2500
             ],
@@ -89,7 +89,7 @@ class SuccessSeeder extends Seeder
                 'description' => 'Compléter le Pokédex avec les 302 Pokémon (normaux + shiny).',
                 'image' => '8.png',
                 'type' => 'pokedex',
-                'requirements' => ['count' => 302],
+                'requirements' => ['count' => 302, 'distinct' => true],
                 'cash_reward' => 10000,
                 'xp_reward' => 5000
             ],
@@ -98,7 +98,7 @@ class SuccessSeeder extends Seeder
                 'title' => 'Première centaine',
                 'description' => 'Capturer 100 Pokémon (doublons inclus).',
                 'image' => '9.png',
-                'type' => 'capture',
+                'type' => 'pokedex',
                 'requirements' => ['count' => 100],
                 'cash_reward' => 300,
                 'xp_reward' => 150
@@ -108,7 +108,7 @@ class SuccessSeeder extends Seeder
                 'title' => 'Chasseur expérimenté',
                 'description' => 'Capturer 500 Pokémon.',
                 'image' => '10.png',
-                'type' => 'capture',
+                'type' => 'pokedex',
                 'requirements' => ['count' => 500],
                 'cash_reward' => 800,
                 'xp_reward' => 400
@@ -118,7 +118,7 @@ class SuccessSeeder extends Seeder
                 'title' => 'Chasseur légendaire',
                 'description' => 'Capturer 1000 Pokémon.',
                 'image' => '11.png',
-                'type' => 'capture',
+                'type' => 'pokedex',
                 'requirements' => ['count' => 1000],
                 'cash_reward' => 2000,
                 'xp_reward' => 1000
@@ -128,7 +128,7 @@ class SuccessSeeder extends Seeder
                 'title' => 'Maître chasseur',
                 'description' => 'Capturer 5000 Pokémon.',
                 'image' => '12.png',
-                'type' => 'capture',
+                'type' => 'pokedex',
                 'requirements' => ['count' => 5000],
                 'cash_reward' => 8000,
                 'xp_reward' => 4000
@@ -312,8 +312,8 @@ class SuccessSeeder extends Seeder
                 'requirements' => ['count' => 100],
                 'cash_reward' => 20000,
                 'xp_reward' => 20000
-            ]
-        ];
+                ]
+            ];
 
         foreach ($successes as $success) {
             Success::updateOrCreate(['key' => $success['key']], $success);
