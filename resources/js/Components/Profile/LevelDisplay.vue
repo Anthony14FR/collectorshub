@@ -178,14 +178,14 @@ const groupedNext = computed(() =>
           </div>
         </div>
         <div class="mt-2 text-center">
-          <p class="text-xs text-base-content/50" v-if="user.level < 100">
+          <p class="text-sm text-base-content/70 font-medium" v-if="user.level < 100">
             Encore
             {{
               (user.experience_for_next_level - user.experience).toLocaleString()
             }}
             EXP pour le niveau {{ user.level + 1 }}
           </p>
-          <p class="text-xs text-base-content/50" v-else>
+          <p class="text-sm text-base-content/70 font-medium" v-else>
             Niveau maximum atteint
           </p>
         </div>

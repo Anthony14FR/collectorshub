@@ -141,7 +141,7 @@ const handleBonusClaimed = (_data: any) => {
               <img src="/images/items/pokeball.png" alt="pokeball" class="w-6 h-6 mr-2">
               Invocation
             </h3>
-            <p class="mb-3 text-xs text-white/80">
+            <p class="mb-3 text-sm text-white/90 font-medium">
               Invoquez de nouveaux Pokémon
             </p>
             <Button @click="goToInvocation" variant="invocation" size="sm" class="w-full">
@@ -158,7 +158,7 @@ const handleBonusClaimed = (_data: any) => {
               class="mb-1 bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-base font-bold text-transparent">
               Marketplace
             </h3>
-            <p class="text-xs text-base-content/70">
+            <p class="text-sm text-base-content/80 font-medium">
               Achetez et vendez
             </p>
           </div>
@@ -181,7 +181,7 @@ const handleBonusClaimed = (_data: any) => {
             <h3 class="mb-1  font-bold">
               Badges
             </h3>
-            <p class="text-xs text-base-content/70">
+            <p class="text-sm text-base-content/80 font-medium">
               Vos succès et récompenses
             </p>
           </div>
@@ -202,7 +202,7 @@ const handleBonusClaimed = (_data: any) => {
                     class="mb-1 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-base font-bold text-transparent">
                     Classement
                   </h3>
-                  <p class="text-xs text-base-content/70">
+                  <p class="text-sm text-base-content/80 font-medium">
                     Top 100 dresseurs
                   </p>
                 </div>
@@ -228,7 +228,7 @@ const handleBonusClaimed = (_data: any) => {
               class="mb-1 bg-gradient-to-r from-secondary to-secondary/80 bg-clip-text text-base font-bold text-transparent">
               Amis
             </h3>
-            <p class="text-xs text-base-content/70">
+            <p class="text-sm text-base-content/80 font-medium">
               Gérer mes amis & cadeaux
             </p>
           </div>
@@ -268,7 +268,7 @@ const handleBonusClaimed = (_data: any) => {
             </div>
           </div>
 
-          <p class="text-white">Augmentez le niveau d'étoiles de vos Pokémon</p>
+          <p class="text-white/90 font-medium">Augmentez le niveau d'étoiles de vos Pokémon</p>
 
           <div class="flex">
             <Button @click="goToPokemonUpgrade" variant="secondary" size="sm" class="shadow-lg w-full">
@@ -295,7 +295,7 @@ const handleBonusClaimed = (_data: any) => {
           <h3 class="mb-1 text-lg font-bold text-white flex items-center">
             Expéditions
           </h3>
-          <p class="mb-3 text-xs text-white/80">
+          <p class="mb-3 text-sm text-white/90 font-medium">
             Partez à l'aventure et gagnez des récompenses
           </p>
           <Button v-if="onGoToExpeditions" @click="onGoToExpeditions" variant="secondary" size="sm" class="w-full">
@@ -319,7 +319,7 @@ const handleBonusClaimed = (_data: any) => {
             <Flame :size="20" class="mr-2 text-warning" />
             Tour Infernale
           </h3>
-          <p class="mb-3 text-xs text-white/80">
+          <p class="mb-3 text-sm text-white/90 font-medium">
             Défiez les dresseurs les plus puissants
           </p>
           <Button v-if="onGoToTower" @click="onGoToTower" variant="secondary" size="sm" class="w-full">
