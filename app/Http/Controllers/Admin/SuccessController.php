@@ -12,7 +12,6 @@ class SuccessController extends Controller
     public function index(Request $request)
     {
         $query = Success::query();
-        // Ajout de filtres si besoin (ex: type, catégorie)
         if ($request->has('type') && $request->type !== 'all') {
             $query->where('type', $request->type);
         }
@@ -20,10 +19,8 @@ class SuccessController extends Controller
         $perPage = min(max($perPage, 10), 100);
         $successes = $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
 
-        // Statistiques par type si besoin
         $stats = [
             'total' => Success::count(),
-            // Ajoute ici d'autres stats par type/catégorie si tu veux
         ];
 
         return Inertia::render('Admin/Success/Index', [
@@ -54,12 +51,10 @@ class SuccessController extends Controller
         $validated['xp_reward'] = $request->input('xp_reward', 0);
         $validated['requirements'] = $request->input('requirements') ? json_decode($request->input('requirements'), true) : [];
 
-        // Générer la clé unique à partir du titre
         $key = strtolower(preg_replace('/[^a-z0-9]+/i', '_', $validated['title']));
-        // S'assurer que la clé est unique
         $baseKey = $key;
         $i = 2;
-        while (\App\Models\Success::where('key', $key)->exists()) {
+        while (Success::where('key', $key)->exists()) {
             $key = $baseKey . '_' . $i;
             $i++;
         }
@@ -77,8 +72,7 @@ class SuccessController extends Controller
             $imagePath = $filename;
         }
         $validated['image'] = $imagePath;
-        $success = \App\Models\Success::create($validated);
-        // Mettre à jour la clé avec l'id du badge
+        $success = Success::create($validated);
         $success->key = (string)$success->id;
         $success->save();
         return redirect()->route('admin.success.index')->with('success', 'Succès créé avec succès');
@@ -127,7 +121,6 @@ class SuccessController extends Controller
             $validated['image'] = $filename;
         }
         $success->update($validated);
-        // Mettre à jour la clé avec l'id du badge (comme dans le create)
         $success->key = (string)$success->id;
         $success->save();
         return redirect()->route('admin.success.index')->with('success', 'Succès mis à jour avec succès');

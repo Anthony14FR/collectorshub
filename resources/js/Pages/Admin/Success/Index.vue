@@ -50,7 +50,6 @@ const hasNoSuccesses = computed(() => {
 
 const tabs = computed(() => [
   { id: "all", label: "Tous", count: props.stats?.total || 0 },
-  // Ajoute ici d'autres types si besoin
 ]);
 
 const confirmDelete = (success) => {
