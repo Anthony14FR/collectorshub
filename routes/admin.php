@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ClubController;
 use App\Http\Controllers\Admin\CrudPromoCodeController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExpeditionController;
@@ -45,4 +46,8 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::post('game-configuration/update', [GameConfigurationController::class, 'update'])->name('game-configuration.update');
         Route::post('game-configuration/reset-category', [GameConfigurationController::class, 'resetCategory'])->name('game-configuration.reset-category');
 
+        // Clubs
+        Route::get('clubs', [ClubController::class, 'index'])->name('clubs.index');
+        Route::get('clubs/{club}', [ClubController::class, 'show'])->name('clubs.show');
+        Route::delete('clubs/{club}', [ClubController::class, 'destroy'])->name('clubs.destroy');
     });
