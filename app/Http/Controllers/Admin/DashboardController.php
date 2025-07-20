@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Club;
+use App\Models\Expedition;
+use App\Models\Item;
+use App\Models\Pokemon;
 use App\Models\PromoCode;
+use App\Models\Success;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -14,30 +18,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        if (!is_admin()) {
-            abort(403, 'Accès non autorisé');
-        }
-
         $stats = [
-            'totalUsers' => User::count(),
-            'activeUsers' => User::where('status', 'active')->count(),
-            'premiumUsers' => User::where('role', 'premium')->count(),
-            'onlineUsers' => User::where('last_login', '>=', now()->subMinutes(15))->count(),
-            'suspendedUsers' => User::where('status', 'suspended')->count(),
-            'totalListings' => 234,
-            'totalTransactions' => 1567,
-            'reports' => 3,
-            'totalPokemon' => 15483,
-            'shinyPokemon' => 892,
-            'legendaryPokemon' => 145,
-            'errors' => 2,
-            'warnings' => 8,
-            'connections' => 2341,
+            'total_users' => User::count(),
+            'total_pokemons' => Pokemon::count(),
+            'total_expeditions' => Expedition::count(),
             'totalPromoCodes' => PromoCode::count(),
-            'activePromoCodes' => PromoCode::where('is_active', true)->count(),
-            'globalPromoCodes' => PromoCode::where('is_global', true)->count(),
-            'expiredPromoCodes' => PromoCode::where('expires_at', '<', now())->count(),
-            'totalPromoCodeUses' => PromoCode::withCount('users')->get()->sum('users_count'),
+            'totalSuccess' => Success::count(),
+            'shop_items' => Item::count(),
             'clubsCount' => Club::count(),
         ];
 
@@ -48,13 +35,6 @@ class DashboardController extends Controller
 
     public function clearCache(Request $request)
     {
-        if (!is_admin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Accès non autorisé'
-            ], 403);
-        }
-
         try {
             Artisan::call('cache:clear');
             Artisan::call('config:clear');
