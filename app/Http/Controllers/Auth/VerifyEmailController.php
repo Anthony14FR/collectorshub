@@ -29,7 +29,7 @@ class VerifyEmailController extends Controller
             abort(404, 'Utilisateur introuvable.');
         }
 
-        if (sha1($user->getEmailForVerification()) !== $hash) {
+        if (hash('sha256', $user->getEmailForVerification()) !== $hash) {
             abort(403, 'Lien de vérification invalide.');
         }
 
