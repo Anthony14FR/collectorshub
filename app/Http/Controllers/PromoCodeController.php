@@ -86,17 +86,13 @@ class PromoCodeController extends Controller
                 $promoCode = PromoCode::where('code', $code)
                     ->where('is_active', true)
                     ->where(function ($query) {
-                        $query->where('start_date', '<=', now())
-                            ->where('end_date', '>=', now());
+                        $query->whereNull('expires_at')
+                            ->orWhere('expires_at', '>=', now());
                     })
                     ->first();
 
                 if (!$promoCode) {
                     throw new \Exception('Code promo invalide ou expiré');
-                }
-
-                if ($promoCode->max_uses > 0 && $promoCode->current_uses >= $promoCode->max_uses) {
-                    throw new \Exception('Ce code promo a atteint sa limite d\'utilisation');
                 }
 
                 if ($promoCode->is_global) {
@@ -127,8 +123,6 @@ class PromoCodeController extends Controller
                         'used_at' => null
                     ]);
                 }
-
-                $promoCode->increment('current_uses');
 
                 return $rewards;
             });
