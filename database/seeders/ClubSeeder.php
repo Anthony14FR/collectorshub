@@ -10,9 +10,19 @@ class ClubSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::take(10)->get();
+        $admin = User::where('username', 'admin')->first();
+        $regularUsers = User::where('username', '!=', 'admin')
+            ->whereBetween('id', [2, 10])
+            ->take(8)
+            ->get();
 
-        if ($users->count() < 3) {
+        if (!$admin || $regularUsers->count() < 8) {
+            $this->command->info('Pas assez d\'utilisateurs pour créer les clubs. Skipping...');
+            return;
+        }
+
+        if (Club::exists()) {
+            $this->command->info('Les clubs existent déjà. Skipping...');
             return;
         }
 
@@ -20,14 +30,39 @@ class ClubSeeder extends Seeder
             [
                 'name' => 'Team Rocket',
                 'description' => 'Un club de goat',
-                'icon' => '/images/types/Feu.png',
-                'leader_id' => $users[0]->id,
+                'icon' => '/images/club-icons/1.png',
+                'leader_id' => $admin->id,
+                'members' => [$regularUsers[0]->id, $regularUsers[1]->id]
             ],
+            [
+                'name' => 'La Tcheam Vroom',
+                'description' => 'Que gens faire vroom vroom',
+                'icon' => '/images/club-icons/2.png',
+                'leader_id' => $regularUsers[2]->id,
+                'members' => [$regularUsers[3]->id, $regularUsers[4]->id]
+            ],
+            [
+                'name' => 'Les motards',
+                'description' => 'En y comme Jul',
+                'icon' => '/images/club-icons/4.png',
+                'leader_id' => $regularUsers[5]->id,
+                'members' => [$regularUsers[6]->id, $regularUsers[7]->id]
+            ]
         ];
 
         foreach ($clubs as $clubData) {
+            $members = $clubData['members'];
+            unset($clubData['members']);
+
             $club = Club::create($clubData);
             $club->members()->attach($clubData['leader_id'], ['role' => 'leader']);
+
+            foreach ($members as $memberId) {
+                if ($memberId !== $clubData['leader_id']) {
+                    $club->members()->attach($memberId, ['role' => 'member']);
+                }
+            }
+
             $club->updateTotalCp();
         }
     }

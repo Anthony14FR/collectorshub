@@ -76,13 +76,13 @@ class ClubController extends Controller
         }
 
         $typeImages = [];
-        $typesPath = public_path('images/types');
+        $typesPath = public_path('images/club-icons');
 
         if (is_dir($typesPath)) {
             $files = glob($typesPath . '/*.png');
             foreach ($files as $file) {
                 $filename = basename($file, '.png');
-                $typeImages[$filename] = '/images/types/' . basename($file);
+                $typeImages[$filename] = '/images/club-icons/' . basename($file);
             }
         }
 

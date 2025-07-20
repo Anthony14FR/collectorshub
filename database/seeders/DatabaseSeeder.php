@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             InfernalTowerLevelSeeder::class,
             ClubSeeder::class,
             DailyQuestSeeder::class,
+            UserTeamSeeder::class,
         ]);
     }
 }

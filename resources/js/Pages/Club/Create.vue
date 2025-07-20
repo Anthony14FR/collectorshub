@@ -247,25 +247,6 @@ const formatPrice = (amount: number) => {
                 <label class="block text-sm font-medium text-base-content/80 mb-2">
                   Icône du Club *
                 </label>
-                
-                <div class="mb-4">
-                  <div class="flex flex-wrap gap-2">
-                    <button
-                      v-for="category in iconCategories"
-                      :key="category"
-                      type="button"
-                      @click="selectedCategory = category"
-                      :class="[
-                        'px-3 py-1 rounded-lg text-xs font-medium transition-colors',
-                        selectedCategory === category
-                          ? 'bg-warning/20 text-warning border border-warning/30'
-                          : 'bg-base-200/50 text-base-content/70 border border-base-300/30 hover:border-warning/30'
-                      ]"
-                    >
-                      {{ category === 'all' ? 'Tous' : category.charAt(0).toUpperCase() + category.slice(1) }}
-                    </button>
-                  </div>
-                </div>
 
                 <div class="bg-base-200/30 rounded-xl p-4 max-h-80 overflow-y-auto">
                   <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
