@@ -77,7 +77,7 @@ const adminSections = ref([
     title: 'Boutique',
     description: 'Items et configuration shop',
     icon: '🛍️',
-    route: '/admin/shop',
+    route: '/admin/items',
     color: 'success',
     stat: props.stats?.shop_items || 42,
     statLabel: 'Items'
