@@ -31,6 +31,7 @@ class UserSeeder extends Seeder
                 'last_login' => now(),
                 'role' => 'admin',
                 'status' => 'active',
+                'welcome_modal_dismissed' => true,
                 'avatar' => '/images/trainer/2.png',
                 'unlocked_avatars' => json_encode(['/images/trainer/1.png', '/images/trainer/2.png']),
             ]
@@ -50,6 +51,7 @@ class UserSeeder extends Seeder
                 'last_login' => now(),
                 'role' => 'user',
                 'status' => 'active',
+                'welcome_modal_dismissed' => true,
                 'avatar' => '/images/trainer/2.png',
                 'unlocked_avatars' => json_encode(['/images/trainer/1.png', '/images/trainer/2.png']),
             ]
