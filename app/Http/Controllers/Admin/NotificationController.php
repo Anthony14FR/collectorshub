@@ -12,8 +12,8 @@ class NotificationController extends Controller
 {
     public function create()
     {
-        $users = User::select(['id', 'name', 'username', 'email', 'level', 'role'])
-            ->orderBy('name')
+        $users = User::select(['id', 'username', 'email', 'level', 'role'])
+            ->orderBy('username')
             ->get();
 
         return Inertia::render('Admin/Notifications/Create', [
@@ -63,7 +63,7 @@ class NotificationController extends Controller
     public function index()
     {
         $announcements = Notification::announcements()
-            ->with('user:id,name')
+            ->with('user:id,username')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 

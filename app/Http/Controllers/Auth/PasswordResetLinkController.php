@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -46,9 +47,24 @@ class PasswordResetLinkController extends Controller
             ]);
         }
 
-        $status = Password::sendResetLink([
-            'email' => $user->email
-        ]);
+        try {
+            $status = Password::sendResetLink([
+                'email' => $user->email
+            ]);
+        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+            $message = $e->getMessage();
+            if (str_contains($message, '554') || str_contains($message, '5.7.1')) {
+                Log::warning('Envoi email de reset password bloqué pour spam', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'exception' => $message
+                ]);
+                return back()->withErrors([
+                    'login' => 'Votre adresse email a été détectée comme spam. Veuillez contacter le support.'
+                ]);
+            }
+            throw $e;
+        }
 
         if ($status == Password::RESET_LINK_SENT) {
             return back()->with('status', __($status));

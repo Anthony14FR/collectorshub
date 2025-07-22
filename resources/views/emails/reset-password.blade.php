@@ -3,67 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Réinitialisation de votre mot de passe CollectorsHub</title>
+    <title>Réinitialisation de votre mot de passe Collector's Hub</title>
+    <style>
+        body { color: #1e293b; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .container { max-width: 480px; margin: 32px auto; border-radius: 16px; border: 1px solid #60a5fa; box-shadow: 0 8px 32px rgba(0,0,0,0.07); overflow: hidden; }
+        .header { color: #fff; text-align: center; padding: 32px 16px; background: #3b82f6; }
+        .title { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+        .subtitle { font-size: 15px; opacity: 0.9; }
+        .content { padding: 32px 24px; text-align: center; }
+        .username { color: #2563eb; font-weight: bold; }
+        .button { display: inline-block; background: #3b82f6; color: #fff; font-weight: bold; font-size: 16px; border-radius: 10px; padding: 12px 32px; text-decoration: none; margin: 24px 0; }
+        .info { color: #334155; border-radius: 10px; padding: 16px; margin: 20px 0; font-size: 14px; border: 1px solid #e0e7ef; }
+        .footer { color: #64748b; text-align: center; font-size: 12px; padding: 20px; border-top: 1px solid #e0e7ef; }
+        .link { color: #2563eb; text-decoration: none; }
+        .small { font-size: 10px; margin-top: 16px; word-break: break-all; }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #001e29; font-family: Arial, sans-serif; color: #e2e8f0;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #001e29;">
-        <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #001e29; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); border: 1px solid #3b82f6;">
-                    <tr>
-                        <td style="background-color: #3b82f6; color: white; text-align: center; padding: 40px 30px;">
-                            <div style="font-size: 28px; font-weight: bold; margin-bottom: 8px;">🎮 Collector's Hub</div>
-                            <div style="font-size: 16px; opacity: 0.9;">Récupération de votre compte</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="background-color: #001e29; padding: 40px 30px; text-align: center;">
-                            <div style="font-size: 24px; font-weight: bold; color: #e2e8f0; margin-bottom: 20px;">
-                                Salut <span style="color: #3b82f6; font-weight: bold;">{{ $user->username }}</span>
-                            </div>
-                            
-                            <div style="font-size: 16px; color: #94a3b8; line-height: 1.6; margin-bottom: 30px;">
-                                Vous avez demandé une réinitialisation de votre mot de passe pour votre compte <strong style="color: #e2e8f0;">Collector's Hub</strong><br><br>
-                                Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe et retrouver l'accès à votre collection !
-                            </div>
-                            
-                            <table cellpadding="0" cellspacing="0" style="margin: 20px auto;">
-                                <tr>
-                                    <td style="background-color: #3b82f6; border-radius: 16px; padding: 16px 40px;">
-                                        <a href="{{ $actionUrl }}" style="color: white; text-decoration: none; font-weight: bold; font-size: 16px; display: block;">
-                                            Réinitialiser mon mot de passe
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                            <div style="background-color: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; border-radius: 16px; padding: 20px; margin: 20px 0; color: #94a3b8;">
-                                <div>
-                                    Ce lien de récupération expirera dans <strong style="color: #e2e8f0;">60 minutes</strong><br>
-                                    Si vous n'avez pas demandé cette récupération, ignorez cet email.<br>
-                                    Votre mot de passe actuel reste inchangé jusqu'à ce que vous en définissiez un nouveau.
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="background-color: #0f2937; color: #e2e8f0; padding: 30px; text-align: center; border-top: 1px solid rgba(59, 130, 246, 0.1);">
-                            <div style="font-size: 12px; margin-bottom: 15px; color: #64748b;">
-                                Vous recevez cet email car une demande de récupération de mot de passe a été effectuée pour votre compte Collector's Hub.
-                            </div>
-                            <div style="font-size: 12px; margin-bottom: 15px; color: #64748b;">
-                                📧 Si vous avez des questions, contactez-nous à : 
-                                <a href="mailto:contact@collectorshub.fr" style="color: #3b82f6; text-decoration: none;">contact@collectorshub.fr</a>
-                            </div>
-                            <div style="color: #64748b; font-size: 10px; margin-top: 20px; word-break: break-all; background-color: rgba(0, 0, 0, 0.2); padding: 8px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.05);">
-                                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
-                                <span style="color: #3b82f6; font-size: 9px;">{{ $actionUrl }}</span>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">🎮 Collector's Hub</div>
+            <div class="subtitle">Récupération de votre compte</div>
+        </div>
+        <div class="content">
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 16px;">
+                Salut <span class="username">{{ $user->username }}</span>
+            </div>
+            <div style="font-size: 15px; color: #334155; line-height: 1.6; margin-bottom: 24px;">
+                Vous avez demandé une réinitialisation de votre mot de passe pour votre compte <strong style="color: #1e293b;">Collector's Hub</strong>.<br><br>
+                Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.
+            </div>
+            <a href="{{ $actionUrl }}" class="button">Réinitialiser mon mot de passe</a>
+            <div class="info">
+                Ce lien expirera dans <strong style="color: #1e293b;">60 minutes</strong>.<br>
+                Si vous n'avez pas demandé cette récupération, ignorez cet email.<br>
+                Votre mot de passe actuel reste inchangé jusqu'à ce que vous en définissiez un nouveau.
+            </div>
+        </div>
+        <div class="footer">
+            Vous recevez cet email car une demande de récupération de mot de passe a été effectuée pour votre compte Collector's Hub.<br>
+            📧 Contact : <a href="mailto:contact@collectorshub.fr" class="link">contact@collectorshub.fr</a>
+            <div class="small">
+                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+                <span class="link">{{ $actionUrl }}</span>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
