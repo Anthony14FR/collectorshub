@@ -37,17 +37,24 @@ class ExpeditionService
         $neededExpeditions = 3 - $activeExpeditions->count();
 
         if ($neededExpeditions > 0) {
-            $excludedIds = $activeExpeditions->pluck('expedition_id')
-                ->merge($completedExpeditionIds)
-                ->toArray();
+            $excludedIds = $activeExpeditions->pluck('expedition_id')->toArray();
 
             $newExpeditions = $this->selectExpeditionsByRarity($excludedIds, $neededExpeditions);
 
             foreach ($newExpeditions as $expedition) {
+                $alreadyActive = UserExpedition::where('user_id', $user->id)
+                    ->where('expedition_id', $expedition->id)
+                    ->whereIn('status', ['available', 'in_progress'])
+                    ->exists();
+
+                if ($alreadyActive) {
+                    continue;
+                }
+
                 $userExpedition = UserExpedition::create([
                     'user_id' => $user->id,
                     'expedition_id' => $expedition->id,
-                    'date' => now()->toDateString(),
+                    'date' => now(),
                     'status' => 'available'
                 ]);
 
@@ -147,6 +154,7 @@ class ExpeditionService
         return DB::transaction(function () use ($user, $expedition, $pokemonIds) {
             $userExpedition = UserExpedition::where('user_id', $user->id)
                 ->where('expedition_id', $expedition->id)
+                ->where('status', 'available')
                 ->first();
 
             if (!$userExpedition) {
