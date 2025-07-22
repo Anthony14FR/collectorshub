@@ -89,11 +89,6 @@ docker-prod-restart: ## Redémarre l'environnement de production Docker
 	docker compose -f docker-compose.prod.yml down
 	docker compose -f docker-compose.prod.yml up -d
 
-docker-prod-down: ## Arrête et supprime les conteneurs Docker
-	docker compose down -v --remove-orphans
-	docker compose -f docker-compose.prod.yml down -v --remove-orphans 2>/dev/null || true
-	rm -f ./database/database.sqlite
-
 docker-prod-stop: ## Arrête les conteneurs Docker
 	docker compose -f docker-compose.prod.yml down
 
@@ -112,8 +107,8 @@ docker-clean: ## Nettoie l'environnement Docker
 	@echo "❓ Êtes-vous sûr ? (y/N)"
 	@read confirm && [ "$$confirm" = "y" ] || exit 1
 	make docker-prod-down
-	docker compose -f docker-compose.prod.yml down -v --remove-orphans
-	docker system prune -af --volumes
+	docker compose -f docker-compose.prod.yml down
+	docker system prune -af
 
 docker-prod-artisan: ## Exécute une commande Artisan dans le conteneur Docker
 	docker compose -f docker-compose.prod.yml exec app php artisan $(CMD)
