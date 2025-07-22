@@ -97,6 +97,10 @@ const submit = () => {
                  message="Si les crédentiels renseignés sont correctes, vous allez recevoir un email pour mettre à jour votre mot de passe." />
         </div>
 
+        <div v-if="$page.props.errors && $page.props.errors.login" class="mb-6">
+          <Alert type="error" :message="$page.props.errors.login" />
+        </div>
+
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 overflow-hidden">
           <div class="p-3 bg-gradient-to-r from-secondary/10 to-secondary/5 border-b border-secondary/20">
             <h3 class="text-sm font-bold tracking-wider flex items-center gap-2">

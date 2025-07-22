@@ -3,6 +3,7 @@ import SocialLoginButtons from '@/Components/Auth/SocialLoginButtons.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
+import Alert from '@/Components/UI/Alert.vue';
 import { useMatomoTracking } from '@/composables/useMatomoTracking';
 import { Head, Link, router } from "@inertiajs/vue3";
 import {
@@ -268,6 +269,9 @@ const submit = () => {
                     {{ form.errors.email }}
                   </div>
                 </div>
+              </div>
+              <div v-if="form.errors.email" class="mb-6">
+                <Alert type="error" :message="form.errors.email" />
               </div>
 
               <div class="flex justify-between">

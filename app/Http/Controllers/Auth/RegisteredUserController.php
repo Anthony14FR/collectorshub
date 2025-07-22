@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -51,7 +52,22 @@ class RegisteredUserController extends Controller
 
         $user->assignRole('user');
 
-        $user->sendEmailVerificationNotification();
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+            $message = $e->getMessage();
+            if (str_contains($message, '554') || str_contains($message, '5.7.1')) {
+                Log::warning('Envoi email de vérification bloqué pour spam', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'exception' => $message
+                ]);
+                return redirect()->back()->withErrors([
+                    'email' => 'Votre adresse email a été détectée comme spam. Veuillez contacter le support.'
+                ]);
+            }
+            throw $e;
+        }
 
         Auth::login($user);
 
