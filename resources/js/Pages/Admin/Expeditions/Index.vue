@@ -12,8 +12,8 @@ import {
   getStatusLabel
 } from '@/utils/expedition';
 import { Head, router } from '@inertiajs/vue3';
+import { AlertTriangle, ArrowLeft, BarChart3, CheckCircle, Copy, Edit, Eye, Filter, Map, Plus, RotateCcw, Trash2, User, Users, XCircle, Zap } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
-import { Zap, ArrowLeft, Plus, Eye, Edit, Trash2, AlertTriangle, BarChart3, Map, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Filter, RotateCcw, Users, CheckCircle, XCircle, Copy, Home, User } from 'lucide-vue-next';
 
 interface Expedition {
   id: number;
@@ -128,20 +128,6 @@ const duplicateExpedition = (expeditionId: number) => {
   router.post(`/admin/expeditions/${expeditionId}/duplicate`, {}, {
     preserveScroll: true
   });
-};
-
-const sortBy = (field: string) => {
-  if (sortField.value === field) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-  } else {
-    sortField.value = field;
-    sortDirection.value = 'asc';
-  }
-};
-
-const getSortIcon = (field: string) => {
-  if (sortField.value !== field) return '↕️';
-  return sortDirection.value === 'asc' ? '↑' : '↓';
 };
 
 const applyFilters = () => {
@@ -454,7 +440,7 @@ const clearFilters = () => {
           <Button @click="showDeleteModal = false" variant="outline">
             Annuler
           </Button>
-          <Button @click="confirmDelete" variant="error">
+          <Button @click="confirmDelete" variant="secondary">
             <component :is="Trash2" :size="16" class="mr-2" />
             Supprimer
           </Button>

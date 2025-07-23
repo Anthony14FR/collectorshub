@@ -3,8 +3,8 @@ import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import { getRarityDotColor, getRarityLabel, getRequirementLabel, getRewardLabel } from '@/utils/expedition';
 import { Head, router } from '@inertiajs/vue3';
+import { ArrowLeft, Award, CheckCircle, Circle, Clock, DollarSign, Edit, Gift, Home, Info, Loader2, Map, Plus, Save, Shield, Sparkles, Star, X, Zap } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
-import { Zap, ArrowLeft, Edit, Save, Loader2, Info, RotateCcw, Home, Map, BarChart3, DollarSign, Star, Circle, Sparkles, Gift, Target, Shield, X, CheckCircle, Clock, Users, Award } from 'lucide-vue-next';
 
 interface Expedition {
   id: number;

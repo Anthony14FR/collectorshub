@@ -9,8 +9,7 @@ import { Head, router } from '@inertiajs/vue3';
 import {
   ArrowLeft,
   Gamepad2,
-  PartyPopper,
-  Zap
+  PartyPopper
 } from 'lucide-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
@@ -233,7 +232,7 @@ const goBack = () => {
         <div class="text-center sm:mt-0 mt-14">
           <h1
             class="sm:text-2xl text-xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent mb-1 tracking-wider">
-            <Zap :size="24" class="inline" /> INVOCATION
+            INVOCATION
           </h1>
           <p class="sm:text-xs text-[10px] text-base-content/70 uppercase tracking-wider">
             Choisissez votre type de ball et la quantité

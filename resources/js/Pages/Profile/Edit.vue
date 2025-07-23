@@ -14,7 +14,6 @@ import {
   Edit3,
   Lock,
   Palette,
-  Settings,
   User
 } from 'lucide-vue-next';
 import { computed, reactive, ref } from 'vue';
@@ -289,7 +288,7 @@ const enableTotp = () => {
         <div class="text-center">
           <h1
             class="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-2 tracking-wider">
-            <Settings :size="32" class="inline" /> PROFIL
+            PROFIL
           </h1>
           <p class="text-sm text-base-content/70 uppercase tracking-wider">
             MODIFIER VOS INFORMATIONS

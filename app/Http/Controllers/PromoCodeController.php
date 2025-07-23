@@ -164,7 +164,7 @@ class PromoCodeController extends Controller
                 'description' => $item->description,
                 'type' => $item->type,
                 'rarity' => $item->rarity,
-                'image_url' => $item->image_url,
+                'image' => $item->image,
                 'effect' => $item->effect,
                 'price' => $item->price,
                 'quantity' => $quantity
