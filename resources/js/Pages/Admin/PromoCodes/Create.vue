@@ -1,14 +1,15 @@
 <script setup>
-import { ref } from 'vue';
-import { Head, router, Link } from '@inertiajs/vue3';
+import Alert from '@/Components/UI/Alert.vue';
+import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Input from '@/Components/UI/Input.vue';
-import Select from '@/Components/UI/Select.vue';
+import MultipleItemSelect from '@/Components/UI/MultipleItemSelect.vue';
 import MultipleSelect from '@/Components/UI/MultipleSelect.vue';
-import Alert from '@/Components/UI/Alert.vue';
+import Select from '@/Components/UI/Select.vue';
 import Toast from '@/Components/UI/Toast.vue';
-import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
-import { Ticket, ArrowLeft, Plus, Users, Gift, Coins, Calendar, Settings } from 'lucide-vue-next';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ArrowLeft, Plus, Ticket } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 const props = defineProps({
   users: Array,
@@ -165,6 +166,7 @@ const handleSubmit = () => {
                         v-model="form.is_global"
                         :options="[{value: true, label: 'Global'}, {value: false, label: 'Ciblé'}]"
                         :error="props.errors?.is_global"
+                        @update:modelValue="val => form.is_global = val === true || val === 'true'"
                         placeholder="Choisir le type"
                       />
                       <Select
@@ -174,12 +176,6 @@ const handleSubmit = () => {
                         :error="props.errors?.is_active"
                         placeholder="Choisir le statut"
                       />
-                    </div>
-                  </div>
-
-                  <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-base-content">Ciblage et récompenses</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <MultipleSelect
                         v-if="!form.is_global"
                         label="Utilisateurs ciblés"
@@ -188,13 +184,20 @@ const handleSubmit = () => {
                         placeholder="Sélectionner des utilisateurs..."
                         :disabled="form.is_global"
                       />
-                      <MultipleSelect
+                    </div>
+                  </div>
+
+                  <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-base-content">Ciblage et récompenses</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <MultipleItemSelect
                         label="Items à attribuer"
                         :options="props.items.map(i => ({
                           id: i.id,
-                          name: i.name + ' (' + i.type + ')',
-                          description: i.rarity,
-                          quantity: 1
+                          name: i.name,
+                          image: i.image,
+                          type: i.type,
+                          rarity: i.rarity
                         }))"
                         v-model="form.items"
                         placeholder="Sélectionner des items..."

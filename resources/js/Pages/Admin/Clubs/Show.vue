@@ -224,7 +224,7 @@
           <Button @click="closeDeleteModal" variant="outline">
             Annuler
           </Button>
-          <Button @click="confirmDelete" variant="error" :disabled="!deleteReason.trim()">
+          <Button @click="confirmDelete" variant="outline" :disabled="!deleteReason.trim()">
             <component :is="Trash2" :size="16" class="mr-2" />
             Supprimer
           </Button>
@@ -235,12 +235,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import { Trophy, Zap, ArrowLeft, Trash2, BarChart3, Info, Users, Crown, AlertTriangle } from 'lucide-vue-next';
+import { router } from '@inertiajs/vue3';
+import { AlertTriangle, ArrowLeft, BarChart3, Crown, Info, Trash2, Trophy, Users, Zap } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 interface ClubMember {
   id: number;

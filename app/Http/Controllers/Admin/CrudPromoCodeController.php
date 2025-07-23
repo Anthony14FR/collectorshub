@@ -25,7 +25,7 @@ class CrudPromoCodeController extends Controller
     public function create()
     {
         $users = User::select('id', 'username', 'email')->orderBy('username')->get();
-        $items = Item::select('id', 'name', 'type', 'rarity')->orderBy('name')->get();
+        $items = Item::select('id', 'name', 'type', 'rarity', 'image')->orderBy('name')->get();
 
         return Inertia::render('Admin/PromoCodes/Create', [
             'users' => $users,
@@ -106,7 +106,7 @@ class CrudPromoCodeController extends Controller
     {
         $promoCode = PromoCode::with(['items', 'users'])->findOrFail($id);
         $users = User::select('id', 'username', 'email')->orderBy('username')->get();
-        $items = Item::select('id', 'name', 'type', 'rarity')->orderBy('name')->get();
+        $items = Item::select('id', 'name', 'type', 'rarity', 'image')->orderBy('name')->get();
 
         return Inertia::render('Admin/PromoCodes/Edit', [
             'promoCode' => $promoCode,

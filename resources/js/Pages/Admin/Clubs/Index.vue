@@ -193,7 +193,7 @@
           <Button @click="closeDeleteModal" variant="outline">
             Annuler
           </Button>
-          <Button @click="confirmDelete" variant="error" :disabled="!deleteReason.trim()">
+          <Button @click="confirmDelete" variant="outline" :disabled="!deleteReason.trim()">
             <component :is="Trash2" :size="16" class="mr-2" />
             Supprimer
           </Button>
@@ -204,12 +204,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
 import Modal from '@/Components/UI/Modal.vue';
-import { Trophy, Zap, ArrowLeft, User, BarChart3, Info, Eye, Trash2, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-vue-next';
+import { Head, router } from '@inertiajs/vue3';
+import { AlertTriangle, ArrowLeft, BarChart3, ChevronLeft, ChevronRight, Eye, Info, Trash2, Trophy, User, Zap } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 interface Club {
   id: number;
@@ -235,8 +235,7 @@ interface Props {
     next_page_url: string | null;
   };
 }
-
-const props = defineProps<Props>();
+const { clubs } = defineProps<Props>();
 
 const showDeleteModal = ref(false);
 const selectedClub = ref<Club | null>(null);
@@ -264,7 +263,7 @@ const confirmDelete = () => {
     onSuccess: () => {
       closeDeleteModal();
     },
-    onError: (errors) => {
+    onError: (errors: any) => {
       console.error('Erreur:', errors);
     }
   });
