@@ -134,7 +134,9 @@ const onAddOrUpdate = (option: ItemOption) => {
 
 const getItemImage = (item: ItemOption) => {
   if (item.image) {
-    return item.image;
+    if (item.image.startsWith('/')) return item.image;
+    if (item.image.startsWith('images/items/')) return '/' + item.image;
+    return '/images/items/' + item.image;
   }
   return '/images/items/default-item.png';
 };
