@@ -193,20 +193,17 @@ const groupedNext = computed(() =>
     </div>
     <Modal :show="modalOpen" @close="closeModal" max-width="4xl">
       <template #header>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-3">
           <div
-            class="w-8 h-8 bg-gradient-to-br from-warning/20 to-warning/40 rounded-lg flex items-center justify-center">
-            <Trophy :size="20" class="text-warning" />
+            class="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center mb-2 sm:mb-0">
+            <Trophy :size="24" class="text-primary" />
           </div>
-          <div class="flex flex-col">
+          <div class="flex-1 text-center sm:text-left">
             <h3
-              class="sm:text-xl text-sm font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent">
+              class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Récompenses de Niveau
             </h3>
-            <div class="mt-1">
-              <span class="sm:text-sm text-xs font-semibold text-warning">{{ level_rewards_to_claim.length }}
-                récompenses disponibles</span>
-            </div>
+            <p class="text-sm text-base-content/70">{{ level_rewards_to_claim.length }} récompenses disponibles</p>
           </div>
         </div>
       </template>

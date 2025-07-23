@@ -4,7 +4,6 @@ import Button from '@/Components/UI/Button.vue'
 import { Head, router } from '@inertiajs/vue3'
 import {
   ArrowLeft,
-  Flame,
   Swords
 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
@@ -254,8 +253,8 @@ const goBack = () => {
             <ArrowLeft :size="16" class="inline" /> Retour
           </Button>
           <div>
-            <h1 class="text-2xl lg:text-3xl font-bold ">
-              <Flame :size="24" class="inline" /> Tour Infernale
+            <h1 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-warning via-warning/90 to-accent bg-clip-text text-transparent">
+              Tour Infernale
             </h1>
             <p class="text-base-content/60 text-sm mt-1">Défiez les dresseurs les plus puissants</p>
           </div>

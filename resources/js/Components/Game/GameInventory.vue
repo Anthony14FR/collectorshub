@@ -35,17 +35,15 @@ const formatPrice = (price: number) => {
 
     <Modal :show="isModalOpen" @close="isModalOpen = false" max-width="4xl" fixed-height>
       <template #header>
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-success/20 to-primary/20 rounded-lg flex items-center justify-center">
-            <Package :size="24" class="text-success" />
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center mb-2 sm:mb-0">
+            <Package :size="24" class="text-primary" />
           </div>
-          <div class="flex flex-col">
-            <h3 class="text-xl font-bold bg-gradient-to-r from-success to-primary bg-clip-text text-transparent">
+          <div class="flex-1 text-center sm:text-left">
+            <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Mon Inventaire
             </h3>
-            <div class="mt-1">
-              <span class="text-sm font-semibold text-success">{{ filteredInventory.length }} objets</span>
-            </div>
+            <p class="text-sm text-base-content/70">{{ filteredInventory.length }} objets</p>
           </div>
         </div>
       </template>

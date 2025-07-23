@@ -14,8 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   RotateCcw,
-  Search,
-  Star
+  Search
 } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 
@@ -210,15 +209,13 @@ onMounted(() => {
 
     <div class="relative z-10 min-h-screen">
       <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-16">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 sm:pt-6 mb-4 sm:mb-6">
-          <div class="flex items-center gap-2 sm:gap-4">
-            <Button @click="goBack" variant="secondary" size="sm" class="shrink-0">
-              <ArrowLeft :size="16" class="inline" /> Retour
-            </Button>
-            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              <Star :size="24" class="inline" /> Amélioration Pokémon
-            </h1>
-          </div>
+        <div class="flex items-center justify-between pt-4 sm:pt-6 mb-4 sm:mb-6">
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Amélioration Pokémon
+          </h1>
+          <Button @click="goBack" variant="secondary" size="sm" class="shrink-0">
+            <ArrowLeft :size="16" class="inline" /> Retour
+          </Button>
         </div>
 
         <div class="bg-base-100/60 backdrop-blur-sm rounded-xl border border-base-300/30 shadow-lg">

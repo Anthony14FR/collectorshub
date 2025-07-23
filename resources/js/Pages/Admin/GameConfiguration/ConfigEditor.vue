@@ -139,9 +139,8 @@
 </template>
 
 <script setup lang="ts">
-import Button from '@/Components/UI/Button.vue'
+import { Circle, Crown, DollarSign, Gem, Save, Settings, Sparkles, Star, Target, Trophy, X } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
-import { Target, Sparkles, Star, Settings, DollarSign, Circle, Trophy, Award, Crown, Gem, X, Save } from 'lucide-vue-next'
 
 interface GameConfig {
   id: number

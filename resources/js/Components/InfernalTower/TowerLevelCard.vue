@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Badge from '@/Components/UI/Badge.vue';
 import Button from '@/Components/UI/Button.vue';
-import { Circle, CircleDot, Coins, Star, Sword, X } from 'lucide-vue-next';
+import { Coins, Star, Sword, X } from 'lucide-vue-next';
 
 interface TowerPokemon {
   pokemon_id: number;
@@ -157,14 +157,14 @@ const getSuccessRateColor = (rate: number) => {
               v-if="level.rewards.pokeballs && level.rewards.pokeballs > 0"
               class="flex items-center gap-2 bg-base-200/60 rounded-lg px-2 py-2 text-xs sm:text-sm border border-base-300/30"
             >
-              <Circle :size="20" class="text-primary flex-shrink-0" />
+              <img src="/images/items/pokeball.png" alt="Pokeball" class="w-4 h-4" />
               <span class="text-base-content font-medium">{{ level.rewards.pokeballs }}</span>
             </div>
             <div 
               v-if="level.rewards.masterballs && level.rewards.masterballs > 0"
               class="flex items-center gap-2 bg-base-200/60 rounded-lg px-2 py-2 text-xs sm:text-sm border border-base-300/30"
             >
-              <CircleDot :size="20" class="text-secondary flex-shrink-0" />
+              <img src="/images/items/masterball.png" alt="Masterball" class="w-4 h-4" />
               <span class="text-base-content font-medium">{{ level.rewards.masterballs }}</span>
             </div>
             <div 

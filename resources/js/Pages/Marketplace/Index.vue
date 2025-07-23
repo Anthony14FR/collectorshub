@@ -21,7 +21,6 @@ import {
   Search,
   Settings,
   ShoppingCart,
-  Store,
   Tag,
   Trash2
 } from 'lucide-vue-next';
@@ -114,7 +113,7 @@ onMounted(() => {
         <div class="text-center">
           <h1
             class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            <Store :size="24" class="inline" /> MARKETPLACE
+            MARKETPLACE
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             POKÉMONS À VENDRE

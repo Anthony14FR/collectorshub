@@ -90,7 +90,7 @@ const changePage = (page: number) => {
         <div class="text-center">
           <h1
             class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-warning to-warning/80 bg-clip-text text-transparent mb-1 tracking-wider">
-            <Trophy :size="24" class="inline" /> CLASSEMENTS
+            CLASSEMENTS
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             TOP DRESSEURS

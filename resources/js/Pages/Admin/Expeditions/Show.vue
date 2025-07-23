@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import DurationDisplay from '@/Components/Expeditions/DurationDisplay.vue';
+import RarityBadge from '@/Components/Expeditions/RarityBadge.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Button from '@/Components/UI/Button.vue';
-import RarityBadge from '@/Components/Expeditions/RarityBadge.vue';
-import DurationDisplay from '@/Components/Expeditions/DurationDisplay.vue';
-import { formatDate, getRewardLabel, getRequirementLabel, getRarityDotColor } from '@/utils/expedition';
 import type { ExpeditionRarity } from '@/constants/expedition';
-import { Zap, ArrowLeft, Edit, Eye, AlertTriangle, BarChart3, Map, Hash, Calendar, Clock, DollarSign, Star, Circle, Sparkles, Gift, Target, Shield, CheckCircle, XCircle, Award, Info } from 'lucide-vue-next';
+import { formatDate, getRarityDotColor, getRequirementLabel, getRewardLabel } from '@/utils/expedition';
+import { Head, router } from '@inertiajs/vue3';
+import { ArrowLeft, Award, BarChart3, Calendar, CheckCircle, Clock, DollarSign, Edit, Eye, Gift, Hash, Info, Map, Shield, Star, Target, XCircle, Zap } from 'lucide-vue-next';
 
 interface Expedition {
   id: number;

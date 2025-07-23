@@ -6,7 +6,7 @@ import Input from '@/Components/UI/Input.vue';
 import Modal from '@/Components/UI/Modal.vue';
 import { useMatomoTracking } from '@/composables/useMatomoTracking';
 import { Head, router } from '@inertiajs/vue3';
-import { AlertTriangle, Gift, Lightbulb, Package, PartyPopper, Sparkles, Ticket } from 'lucide-vue-next';
+import { AlertTriangle, Coins, Gift, Lightbulb, Package, PartyPopper, Sparkles, Ticket } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 interface Props {
@@ -49,6 +49,8 @@ const alertTitle = ref('');
 const alertMessage = ref('');
 const showRewardsModal = ref(false);
 const rewards = ref<any>(null);
+
+console.log(rewards.value);
 
 const formatCash = (amount: number) => {
   return amount.toLocaleString();
@@ -163,7 +165,7 @@ watch(() => props.flash, (newFlash) => {
         <div class="text-center">
           <h1
             class="text-2xl font-bold bg-gradient-to-r from-success to-primary bg-clip-text text-transparent mb-1 tracking-wider">
-            <Ticket :size="24" class="inline" /> CODES PROMO
+            CODES PROMO
           </h1>
           <p class="text-xs text-base-content/70 uppercase tracking-wider">
             RÉCOMPENSES EXCLUSIVES
@@ -348,10 +350,6 @@ watch(() => props.flash, (newFlash) => {
         <div v-if="rewards" class="space-y-6">
           <div
             class="text-center p-6 bg-gradient-to-br from-success/10 to-primary/5 rounded-xl border border-success/20">
-            <div
-              class="w-16 h-16 bg-gradient-to-br from-success/20 to-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles :size="32" />
-            </div>
             <h4 class="text-lg font-bold text-success mb-2">Récompenses obtenues !</h4>
             <p class="text-sm text-base-content/70">
               {{ totalRewards }} récompense{{ totalRewards > 1 ? 's' : '' }} ajoutée{{ totalRewards > 1 ? 's' : '' }} à
@@ -386,7 +384,7 @@ watch(() => props.flash, (newFlash) => {
                    class="bg-gradient-to-br from-base-100/80 to-base-200/60 backdrop-blur-sm rounded-xl p-4 border border-base-300/30">
                 <div class="flex items-center gap-4">
                   <div class="w-12 h-12 rounded-xl overflow-hidden bg-base-200/50 flex items-center justify-center">
-                    <img v-if="item.image_url" :src="item.image_url" :alt="item.name" class="w-8 h-8 object-contain"
+                    <img v-if="item.image" :src="item.image" :alt="item.name" class="w-8 h-8 object-contain"
                          style="image-rendering: pixelated;" />
                     <Package v-else :size="20" />
                   </div>
@@ -421,7 +419,7 @@ watch(() => props.flash, (newFlash) => {
 
           <div class="pt-4 border-t border-base-300/30">
             <Button variant="primary" size="lg" class="w-full" @click="closeRewardsModal">
-              Parfait ! <PartyPopper :size="16" class="inline" />
+              Parfait !
             </Button>
           </div>
         </div>

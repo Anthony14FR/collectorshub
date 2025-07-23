@@ -45,17 +45,15 @@ const claimAllSuccesses = async () => {
 <template>
   <Modal :show="show" @close="onClose" max-width="4xl" :fixed-height="true">
     <template #header>
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-gradient-to-br from-info/20 to-info/40 rounded-lg flex items-center justify-center">
-          <Trophy :size="20" class="text-info" />
+      <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl flex items-center justify-center mb-2 sm:mb-0">
+          <Trophy :size="24" class="text-primary" />
         </div>
-        <div class="flex flex-col">
-          <h3 class="sm:text-xl text-lg font-bold bg-gradient-to-r from-info to-info/80 bg-clip-text text-transparent">
+        <div class="flex-1 text-center sm:text-left">
+          <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Mes Succès
           </h3>
-          <div class="sm:mt-1 mt-0">
-            <span class="sm:text-sm text-xs font-semibold text-info">Badges et récompenses</span>
-          </div>
+          <p class="text-sm text-base-content/70">Badges et récompenses</p>
         </div>
       </div>
     </template>
