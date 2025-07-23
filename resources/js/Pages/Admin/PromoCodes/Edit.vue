@@ -1,13 +1,16 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import { Head, router, Link } from '@inertiajs/vue3';
-import Button from '@/Components/UI/Button.vue';
-import Input from '@/Components/UI/Input.vue';
 import Alert from '@/Components/UI/Alert.vue';
-import Toast from '@/Components/UI/Toast.vue';
 import BackgroundEffects from '@/Components/UI/BackgroundEffects.vue';
 import Badge from '@/Components/UI/Badge.vue';
-import { Ticket, ArrowLeft, Plus, X, Save, Loader2, Users, Gift, Coins, Calendar, Settings } from 'lucide-vue-next';
+import Button from '@/Components/UI/Button.vue';
+import Input from '@/Components/UI/Input.vue';
+import MultipleItemSelect from '@/Components/UI/MultipleItemSelect.vue';
+import MultipleSelect from '@/Components/UI/MultipleSelect.vue';
+import Select from '@/Components/UI/Select.vue';
+import Toast from '@/Components/UI/Toast.vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ArrowLeft, Loader2, Save, Ticket } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 const props = defineProps({
   promoCode: Object,
@@ -19,8 +22,8 @@ const props = defineProps({
 
 const form = ref({
   code: props.promoCode?.code || '',
-  is_global: props.promoCode?.is_global || true,
-  is_active: props.promoCode?.is_active || true,
+  is_global: props.promoCode?.is_global,
+  is_active: props.promoCode?.is_active,
   cash: props.promoCode?.cash || 0,
   expires_at: props.promoCode?.expires_at ? props.promoCode.expires_at.substring(0, 10) : '',
   target_user_ids: props.promoCode?.users ? props.promoCode.users.map(u => u.id) : [],
@@ -222,6 +225,7 @@ const handleSubmit = () => {
                         v-model="form.is_global"
                         :options="[{value: true, label: 'Global'}, {value: false, label: 'Ciblé'}]"
                         :error="props.errors?.is_global"
+                        @update:modelValue="val => form.is_global = val === true || val === 'true'"
                         placeholder="Choisir le type"
                       />
                       <Select
@@ -231,111 +235,32 @@ const handleSubmit = () => {
                         :error="props.errors?.is_active"
                         placeholder="Choisir le statut"
                       />
+                      <MultipleSelect
+                        v-if="!form.is_global"
+                        label="Utilisateurs ciblés"
+                        :options="props.users.map(u => ({ id: u.id, name: u.username, email: u.email }))"
+                        v-model="form.target_user_ids"
+                        placeholder="Sélectionner des utilisateurs..."
+                        :disabled="form.is_global"
+                      />
                     </div>
                   </div>
 
                   <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-base-content">Items à attribuer</h3>
-                    <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
-                      <div v-if="form.items.length === 0" class="text-sm text-base-content/50 text-center py-2">
-                        Aucun item ajouté
-                      </div>
-                      <ul v-else class="space-y-2">
-                        <li v-for="item in form.items" :key="item.id" class="flex items-center justify-between bg-base-200/40 p-3 rounded-lg">
-                          <div class="flex items-center gap-2">
-                            <Badge variant="primary" size="sm">{{ getItemById(item.id)?.name || 'Item' }}</Badge>
-                            <span class="text-sm">{{ getItemById(item.id)?.type || 'Item' }} - {{ getItemById(item.id)?.rarity || '' }}</span>
-                          </div>
-                          <div class="flex items-center gap-2">
-                            <span class="text-xs font-medium">Quantité: {{ item.quantity }}</span>
-                            <Button @click="removeItem(item.id)" variant="ghost" size="xs">
-                              <component :is="X" :size="14" class="text-error" />
-                            </Button>
-                          </div>
-                        </li>
-                      </ul>
-
-                      <div v-if="showItemSelector" class="mt-4 space-y-3 p-3 bg-base-200/50 rounded-lg">
-                        <div>
-                          <label class="block text-sm font-medium text-base-content/80 mb-2">Sélectionner un item</label>
-                          <select
-                            v-model="selectedItem"
-                            class="w-full px-4 py-2 bg-base-200/50 border border-base-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
-                          >
-                            <option value="">Choisir un item...</option>
-                            <option v-for="item in props.items" :key="item.id" :value="item.id">
-                              {{ item.name }} ({{ item.type }}, {{ item.rarity }})
-                            </option>
-                          </select>
-                        </div>
-                        <div class="flex items-center gap-3">
-                          <div class="flex-1">
-                            <label class="block text-sm font-medium text-base-content/80 mb-2">Quantité</label>
-                            <input
-                              type="number"
-                              v-model="itemQuantity"
-                              min="1"
-                              class="w-full px-4 py-2 bg-base-200/50 border border-base-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
-                            />
-                          </div>
-                          <div class="flex items-center gap-2 pt-6">
-                            <Button @click="addItem" variant="secondary" size="sm" :disabled="!selectedItem">
-                              <component :is="Plus" :size="14" class="mr-1" />
-                              Ajouter
-                            </Button>
-                            <Button @click="showItemSelector = false" variant="ghost" size="sm">
-                              <component :is="X" :size="14" class="mr-1" />
-                              Annuler
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div v-if="!showItemSelector" class="mt-3">
-                        <Button @click="showItemSelector = true" variant="secondary" size="sm">
-                          <component :is="Plus" :size="16" class="mr-2" />
-                          Ajouter un item
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="!form.is_global" class="space-y-4">
-                    <h3 class="text-lg font-semibold text-base-content">Utilisateurs ciblés</h3>
-                    <div class="bg-base-200/30 rounded-lg p-4 border border-base-300/20">
-                      <div v-if="form.target_user_ids.length === 0" class="text-sm text-base-content/50 text-center py-2">
-                        Aucun utilisateur sélectionné
-                      </div>
-                      <div v-else class="flex flex-wrap gap-2">
-                        <Badge
-                          v-for="userId in form.target_user_ids"
-                          :key="userId"
-                          variant="secondary"
-                          size="sm"
-                          removable
-                          @remove="toggleUserSelection(userId)"
-                        >
-                          {{ props.users.find(u => u.id === userId)?.username || 'User' }}
-                        </Badge>
-                      </div>
-
-                      <div class="mt-4">
-                        <label class="block text-sm font-medium text-base-content/80 mb-2">Ajouter des utilisateurs</label>
-                        <select
-                          class="w-full px-4 py-2 bg-base-200/50 border border-base-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
-                          @change="event => event.target.value && toggleUserSelection(parseInt(event.target.value))"
-                        >
-                          <option value="">Sélectionner un utilisateur...</option>
-                          <option
-                            v-for="user in props.users.filter(u => !form.target_user_ids.includes(u.id))"
-                            :key="user.id"
-                            :value="user.id"
-                          >
-                            {{ user.username }} ({{ user.email }})
-                          </option>
-                        </select>
-                      </div>
-                      <p v-if="props.errors?.target_user_ids" class="mt-1 text-xs text-error">{{ props.errors.target_user_ids }}</p>
+                    <h3 class="text-lg font-semibold text-base-content">Ciblage et récompenses</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <MultipleItemSelect
+                        label="Items à attribuer"
+                        :options="props.items.map(i => ({
+                          id: i.id,
+                          name: i.name,
+                          image: i.image,
+                          type: i.type,
+                          rarity: i.rarity
+                        }))"
+                        v-model="form.items"
+                        placeholder="Sélectionner des items..."
+                      />
                     </div>
                   </div>
 
